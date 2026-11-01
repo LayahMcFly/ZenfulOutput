@@ -4,6 +4,23 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>The Family Recipe Book</title>
+<meta name="description" content="Our family recipes, meals and cook mode, saved on your device.">
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="The Family Recipe Book">
+<meta property="og:title" content="The Family Recipe Book">
+<meta property="og:description" content="From our kitchen to yours. Recipes, meals, cook mode and timers.">
+<meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/recipe-book.html">
+<meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/preview.png">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="The Family Recipe Book: from our kitchen to yours, in a stitched brown and cream frame">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="The Family Recipe Book">
+<meta name="twitter:description" content="From our kitchen to yours. Recipes, meals, cook mode and timers.">
+<meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/preview.png">
+<meta name="theme-color" content="#ecdfc8">
+
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='3' width='24' height='26' rx='3' fill='%236f4a33'/%3E%3Crect x='7' y='3' width='21' height='26' rx='2' fill='%23f7efdf'/%3E%3Cpath d='M17.5 23C11.5 18.5 11.5 14.5 14.8 13.8c1.3-.3 2.3.6 2.7 1.5.4-.9 1.4-1.8 2.7-1.5 3.3.7 3.3 4.7-2.7 9.2z' fill='%2393573a'/%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -575,7 +592,7 @@ const cleanRecipe=(r,stamp)=>{
 const G={token:'',exp:0,client:null,folderId:'',fileId:'',lastMod:'',lastSync:0,busy:false,again:false,timer:0};
 const cid=()=>store.get('rb_gcid')||'';
 const canGoogle=()=>location.protocol==='https:'||location.hostname==='localhost';
-const VERSION='2.9';
+const VERSION='3.0';
 function driveBar(){
   if(G.token){
     const t=G.busy?'Saving to Google Drive…':G.lastSync?'Saved to Google Drive at '+new Date(G.lastSync).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'Connected to Google Drive';
