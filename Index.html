@@ -1,1 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Our Family Hub</title>
+<meta name="description" content="Our family recipe book and shared calendar, in one place.">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Our Family Hub">
+<meta property="og:description" content="The family recipe book and the shared calendar.">
+<meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/">
+<meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/hub-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Our Family Hub: the recipe book and the shared calendar">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Our Family Hub">
+<meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/hub-preview.png">
+<meta name="theme-color" content="#6f4a33">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='4' fill='%236f4a33'/%3E%3Cpath d='M16 7l9 8h-3v9h-12v-9h-3z' fill='%23f7efdf'/%3E%3Crect x='13.5' y='17.5' width='5' height='6.5' fill='%2393573a'/%3E%3C/svg%3E">
+<style>
+:root{
+  --paper:#ecdfc8; --paper-lo:#e0cfb0; --linen:#f7efdf; --card:#fbf5e8;
+  --ink:#40291d; --ink-soft:#6d523f; --walnut:#6f4a33; --on-walnut:#f7efdf;
+  --caramel:#b0845b; --rust:#93573a; --line:#d9c6a6; --shadow:rgba(64,41,29,.35);
+  --display:Georgia,'Times New Roman',serif;
+  --label:ui-monospace,'Courier New',Courier,monospace;
+  color-scheme:light;
+}
+@media (prefers-color-scheme:dark){
+  :root{--paper:#241a14;--paper-lo:#2d2119;--linen:#33261d;--card:#3a2c22;--ink:#f1e6d2;--ink-soft:#c9b79e;--walnut:#c79a6b;--on-walnut:#241a14;--rust:#e09a74;--line:#57432f;--shadow:rgba(0,0,0,.55);color-scheme:dark}
+  body{background-image:none!important}
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{
+  margin:0;min-height:100vh;color:var(--ink);font:400 18px/1.55 var(--display);background-color:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E");
+  display:grid;grid-template-rows:auto 1fr auto;
+}
+a{color:inherit}
+:focus-visible{outline:3px solid var(--rust);outline-offset:3px}
+header{background:var(--walnut);color:var(--on-walnut);position:relative;text-align:center;padding:34px 20px 30px}
+header::after{content:"";position:absolute;inset:7px;border:1.5px dashed rgba(247,239,223,.45);pointer-events:none}
+@media (prefers-color-scheme:dark){header::after{border-color:rgba(36,26,20,.4)}}
+header svg{width:52px;height:52px;margin-bottom:6px}
+h1{font:400 clamp(32px,6vw,52px)/1.1 var(--display);margin:0}
+header p{margin:8px auto 0;max-width:46ch;opacity:.92}
+main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
+.cards{display:grid;gap:22px;grid-template-columns:repeat(auto-fit,minmax(270px,1fr));padding:0;margin:0;list-style:none}
+.card{
+  display:flex;flex-direction:column;gap:12px;height:100%;padding:24px;text-decoration:none;
+  background:var(--card);border:1px solid var(--line);border-top:8px solid var(--c,var(--walnut));
+  box-shadow:0 10px 18px -14px var(--shadow);transition:transform .15s ease,box-shadow .15s ease
+}
+.card:hover{transform:translateY(-3px);box-shadow:0 16px 22px -14px var(--shadow)}
+.card:active{transform:translateY(0)}
+.card svg{width:48px;height:48px}
+.card h2{font:400 28px/1.15 var(--display);margin:0}
+.card p{margin:0;color:var(--ink-soft)}
+.go{margin-top:auto;align-self:flex-start;font:700 13px/1 var(--label);letter-spacing:.08em;text-transform:uppercase;
+  background:var(--walnut);color:var(--on-walnut);padding:14px 18px;border-radius:3px;min-height:44px;display:inline-flex;align-items:center;
+  outline:1.5px dashed rgba(247,239,223,.6);outline-offset:-5px}
+.note{margin-top:30px;text-align:center;color:var(--ink-soft);font-size:16px}
+footer{padding:0 20px 28px;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+@media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
+</style>
+</head>
+<body>
+<header>
+  <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="4" fill="#f7efdf"/><path d="M16 7l9 8h-3v9h-12v-9h-3z" fill="#6f4a33"/><rect x="13.5" y="17.5" width="5" height="6.5" fill="#b0845b"/></svg>
+  <h1>Our Family Hub</h1>
+  <p>Everything we share, in one place.</p>
+</header>
 
+<main>
+  <!-- To add another app later: copy one <li>, change the folder name in href, the title and the text. -->
+  <ul class="cards">
+    <li>
+      <a class="card" href="recipe-book/" style="--c:#93573a">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="4" y="3" width="24" height="26" rx="3" fill="#6f4a33"/><rect x="7" y="3" width="21" height="26" rx="2" fill="#f7efdf"/><path d="M11 11h12M11 16h12M11 21h8" stroke="#93573a" stroke-width="2" stroke-linecap="round"/></svg>
+        <h2>Family Recipe Book</h2>
+        <p>Our recipes, meals, cook mode and timers.</p>
+        <span class="go">Open recipes</span>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="family-board/" style="--c:#4a6272">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="5" width="26" height="24" rx="3" fill="#6f4a33"/><rect x="5" y="11" width="22" height="16" rx="1.5" fill="#f7efdf"/><rect x="9" y="2" width="3" height="6" rx="1.5" fill="#b0845b"/><rect x="20" y="2" width="3" height="6" rx="1.5" fill="#b0845b"/><path d="M10 19l4 4 8-9" fill="none" stroke="#93573a" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        <h2>Family Board</h2>
+        <p>The shared calendar, tasks and who checked off what.</p>
+        <span class="go">Open calendar</span>
+      </a>
+    </li>
+  </ul>
+  <p class="note">Each app saves its data in the browser on the device you use, so recipes and tasks do not sync between devices.</p>
+</main>
+<footer>Made at home</footer>
+</body>
+</html>
