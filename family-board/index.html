@@ -280,6 +280,15 @@ const PALETTE=[
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
+const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
+
+/* Optional: fill these in so everyone who opens the page connects automatically.
+   Both values are PUBLIC by design. Never paste a service_role or secret key here. */
+const CLOUD_CONFIG={url:'',anonKey:''};
+
+/* Shared-mode state. CL.on is true only when the person chose shared mode AND connection details exist. */
+const CL={on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces:[],wsId:'',invites:[],
+  err:'',sent:'',email:'',busy:false,stale:false,poll:0,pending:''};
 
 /* =====================================================================
    2. Data model, validation, storage
@@ -291,6 +300,7 @@ const UI={view:'calendar',month:new Date(new Date().getFullYear(),new Date().get
 
 function testStorage(){try{localStorage.setItem('__fb','1');localStorage.removeItem('__fb');return true}catch{return false}}
 function save(){
+  if(CL.on)return true;   // shared data lives on the server, never in this browser
   if(!storageOK)return false;
   try{localStorage.setItem(KEY,JSON.stringify(D));return true}catch{storageOK=false;return false}
 }
@@ -526,6 +536,7 @@ const pass=t=>{
 const sel=(id,label,opts,val,extra='')=>`<div class="field"><label for="${id}">${label}</label><select id="${id}" ${extra}>${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
 
 function header(){
+  if(CL.on)return headerCloud();
   const u=me();
   const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members','Members'],['settings','Settings']];
   return`<header class="top"><div class="in">
@@ -537,6 +548,7 @@ function header(){
     <nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav></header>`;
 }
 function banners(){
+  if(CL.on)return cloudBanners();
   let h='';
   if(loadNote)h+=`<div class="banner bad" role="alert"><p>${esc(loadNote)}</p><button class="btn soft sm" data-act="dismissnote">Dismiss</button></div>`;
   if(!storageOK&&!loadNote)h+=`<div class="banner bad" role="alert"><p>This browser is blocking storage, so changes will be lost when you close the page. Use Export in Settings to keep a copy.</p></div>`;
@@ -596,7 +608,7 @@ function myView(){
   const forOthers=D.tasks.filter(t=>t.status==='complete'&&t.completedBy===u.id&&t.completedForId&&t.completedForId!==u.id).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
   const sec=(h,l,empty,c)=>`<section class="panel"><h3>${h} (${l.length})</h3>${l.length?l.map(t=>taskRow(t,c)).join(''):`<p class="muted">${empty}</p>`}</section>`;
   return`<div class="page-head"><h2>My Tasks · ${esc(u.name)}</h2><button class="btn" data-act="addtask" data-assignee="${esc(u.id)}" data-fk="addmine">+ Add task for me</button></div>
-    <p class="muted">Showing tasks assigned to the profile chosen under “Acting as”.</p>
+    <p class="muted">${CL.on?'Showing tasks assigned to you.':'Showing tasks assigned to the profile chosen under “Acting as”.'}</p>
     ${sec('To do',open,'Nothing assigned to you is waiting.','my1')}
     ${sec('Completed',done,'Nothing assigned to you has been completed yet.','my2')}
     ${sec('Checked off by you for someone else',forOthers,'You have not checked off anyone else’s tasks.','my3')}`;
@@ -646,20 +658,19 @@ function membersView(){
         <div class="field" style="flex:1 1 220px"><label for="mname">Add a local profile</label><input id="mname" type="text" maxlength="40" autocomplete="off" placeholder="Display name" ${mg?'':'disabled'}></div>
         <button class="btn" type="submit" ${mg?'':'disabled'}>Add profile</button></form>
       <p class="err" id="merr" role="alert" hidden style="margin-top:10px"></p></section>
-    <section class="panel"><h3>Invitations <span class="pill" style="color:var(--warn)">Requires backend</span></h3>
-      <p>Email invitations and shareable invite links need a server that sends mail and creates single-use links. No backend is connected, so nothing can be sent from this file.</p>
-      <div class="row" style="margin:14px 0"><div class="field" style="flex:1 1 240px"><label for="inv">Email address</label><input id="inv" type="email" disabled placeholder="Needs a connected backend"></div><button class="btn" disabled>Send invitation</button><button class="btn soft" disabled>Create invite link</button></div>
-      ${backendHelp()}</section>`;
+    <section class="panel"><h3>Invitations <span class="pill" style="color:var(--warn)">Shared mode only</span></h3>
+      <p>Invite links need a server to create single-use links and add people to the workspace. This is local demo mode, so nothing can be sent or shared from here.</p>
+      <div class="row" style="margin:14px 0"><button class="btn" data-act="${CL.cfg?'usecloud':'nav'}" data-v="settings" data-fk="goshared">${CL.cfg?'Switch to shared mode':'Set up shared mode in Settings'}</button></div></section>`;
 }
 function backendHelp(){
   return`<details><summary>What real family collaboration needs</summary>
-    <p><strong>Collaboration status:</strong> not configured. This file works fully offline, but it cannot share data between people.</p>
+    <p><strong>Collaboration status:</strong> ${CL.on?'shared mode is on.':'not connected. Local demo mode works fully offline, but it cannot share data between people.'}</p>
     <ol><li><strong>Accounts.</strong> A sign-in service (email links or passwords) so each person has their own verified identity.</li>
     <li><strong>Shared storage.</strong> A hosted database where every member of a workspace reads and writes the same tasks, with rules that only allow members of that workspace in.</li>
     <li><strong>Trusted activity records.</strong> The server, not this page, must write “completed by” and “reopened by” using the signed-in user’s ID. The browser must never send those names itself.</li>
     <li><strong>Invitations.</strong> A server function that emails an invite or creates a single-use link and attaches the new account to the workspace.</li>
     <li><strong>Keys.</strong> Only public client keys may appear in this HTML. Secret or service keys stay on the server.</li></ol>
-    <p>Hosted options such as Supabase or Firebase cover these pieces, and so does a small API of your own. This file has no adapter for any of them yet, so adding one would be a separate step.</p></details>`;
+    <p>This file includes an adapter for <strong>Supabase</strong>. The matching <code>supabase-setup.sql</code> file creates the tables, the access rules and the server-side activity records. Invitations are single-use links that you send yourself; the page never emails anyone.</p></details>`;
 }
 
 /* ---- settings ---- */
@@ -681,15 +692,21 @@ function settingsView(){
       <div class="row" style="margin-top:12px"><button class="btn" data-act="export" data-fk="exp">Export workspace</button><button class="btn soft" data-act="import" data-fk="imp">Import a backup</button>
       ${hasSample()?'<button class="btn soft" data-act="rmsample">Remove sample data</button>':''}<button class="btn danger" data-act="erase">Erase everything</button></div>
       <p class="muted small" style="margin-top:10px">Storage: ${storageOK?'saving to this browser':'not available, changes are kept in memory only'}.</p></section>
-    <section class="panel"><h3>Activity records in this version</h3>
-      <p>Each task keeps a chronological history of creation, reassignment, completion, reopening and group moves. The name on each entry is the profile selected under “Acting as” at that moment. Because anyone can switch profiles, this is a demonstration of attribution, <strong>not a verified audit trail</strong>.</p>
-      ${backendHelp()}</section>`;
+    ${collabPanel()}
+    <section class="panel"><h3>Activity records in local demo mode</h3>
+      <p>Each task keeps a chronological history of creation, reassignment, completion, reopening and group moves. The name on each entry is the profile selected under “Acting as” at that moment. Because anyone can switch profiles, this is a demonstration of attribution, <strong>not a verified audit trail</strong>. Shared mode records the signed-in person instead.</p></section>`;
 }
 
 /* ---- render ---- */
 function render(){
   const ae=document.activeElement,fk=ae&&ae.dataset&&ae.dataset.fk,sy=window.scrollY;
-  const views={calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,settings:settingsView};
+  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,settings:settingsViewCloud}
+    :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,settings:settingsView};
+  if(CL.on&&CL.stage!=='ready'){
+    const gates={loading:cloudLoadingView,gate:cloudGateView,name:cloudNameView,workspace:cloudWorkspaceView};
+    $('#app').innerHTML=headerCloud()+`<main id="main">${(gates[CL.stage]||cloudLoadingView)()}</main>`;
+    return;
+  }
   $('#app').innerHTML=header()+`<main id="main">${banners()}${(views[UI.view]||calendarView)()}</main>`;
   if(fk){const n=$('#app').querySelector('[data-fk="'+CSS.escape(fk)+'"]');if(n)n.focus({preventScroll:true})}
   window.scrollTo(0,sy);
@@ -797,12 +814,12 @@ function detailHTML(t){
       ${done?`<dt>Marked complete by</dt><dd>${esc(t.completedByName||'Unknown')}</dd><dt>Completed at</dt><dd>${esc(fmtStamp(t.completedAt))}</dd>`:''}</dl>
     ${call}
     <div class="row"><button class="btn" data-act="toggletask" data-id="${t.id}">${done?'Reopen task':'Mark complete'}</button><button class="btn soft" data-act="edittask" data-id="${t.id}">Edit</button><button class="btn danger" data-act="deltask" data-id="${t.id}">Delete</button></div>
-    <p class="muted small">Actions are recorded under <strong>${esc(me().name)}</strong>, the profile selected as “Acting as”.</p>
+    <p class="muted small">${CL.on?'Actions are recorded under your own sign-in, <strong>'+esc(me().name)+'</strong>. The server writes the name, not this page.':'Actions are recorded under <strong>'+esc(me().name)+'</strong>, the profile selected as “Acting as”.'}</p>
     <section><h3 style="font-size:22px">Activity history</h3>
       <ol class="hist">${t.history.map(h=>`<li><time datetime="${esc(h.at)}">${esc(fmtStamp(h.at))}</time>${histLine(h)}</li>`).join('')||'<li>No activity recorded.</li>'}</ol>
-      <p class="muted small">Demo mode: names come from the profile picker, so this is not a verified audit trail. Real verification needs sign-in on a backend.</p></section></div>`;
+      <p class="muted small">${CL.on?'Shared mode: each entry was recorded by the server using the signed-in person’s account, and entries cannot be edited from this page.':'Demo mode: names come from the profile picker, so this is not a verified audit trail. Real verification needs sign-in on a backend.'}</p></section></div>`;
 }
-function openDetail(id){const t=task(id);if(t)openDlg(detailHTML(t),id)}
+function openDetail(id){const t=task(id);if(t){openDlg(detailHTML(t),id);if(CL.on)cloudShowDetail(t)}}
 function refreshDetail(){const d=$('#dlg'),t=task(d.dataset.task);if(!t){closeDlg();return}d.innerHTML=detailHTML(t);const b=d.querySelector('[data-act=toggletask]');if(b)b.focus()}
 
 function openDayList(k){
@@ -838,7 +855,7 @@ function openDeleteGroup(g){
 function openMemberForm(m){
   openDlg(`<form id="mform" class="dbody" data-id="${m.id}" novalidate>${dhead('Edit profile')}
     <p class="err" id="mferr" role="alert" hidden></p>
-    <div class="field"><label for="mf-name">Display name</label><input id="mf-name" type="text" maxlength="40" value="${esc(m.name)}"></div>
+    ${CL.on?`<p><strong>${esc(m.name)}</strong> chooses their own display name.</p>`:`<div class="field"><label for="mf-name">Display name</label><input id="mf-name" type="text" maxlength="40" value="${esc(m.name)}"></div>`}
     ${sel('mf-role','Role',[['owner','Owner'],['admin','Admin'],['member','Member']],m.role)}
     <div class="row"><button class="btn" type="submit">Save</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
 }
@@ -864,7 +881,7 @@ function exportData(){
   }catch{toast('The backup file could not be created.',true)}
 }
 $('#importfile').addEventListener('change',async e=>{
-  const f=e.target.files[0];e.target.value='';if(!f)return;
+  const f=e.target.files[0];e.target.value='';if(!f||CL.on)return;
   let n=null;
   try{if(f.size>8e6)throw 0;n=normalize(JSON.parse(await f.text()))}catch{n=null}
   if(!n){toast('That file is not a Family Board backup, so nothing was changed.',true);return}
@@ -891,6 +908,7 @@ function setComplete(t,checked,srcEl){
 }
 document.addEventListener('change',async e=>{
   const t=e.target;
+  if(CL.on&&await cloudChange(t))return;
   if(t.dataset.cb){const tk=task(t.dataset.cb);if(tk)setComplete(tk,t.checked,t);return}
   const a=t.dataset.act;if(!a)return;
   if(a==='actas'){D.currentUserId=t.value;save();render();say('Now acting as '+me().name);return}
@@ -915,6 +933,7 @@ document.addEventListener('click',async e=>{
     return;
   }
   const a=b.dataset.act,id=b.dataset.id;
+  if(await cloudClick(a,b,id))return;
   switch(a){
     case'nav':UI.view=b.dataset.v;render();window.scrollTo(0,0);break;
     case'prev':UI.month=new Date(UI.month.getFullYear(),UI.month.getMonth()-1,1);render();break;
@@ -983,6 +1002,7 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('submit',e=>{
   const f=e.target;e.preventDefault();
+  if(cloudSubmit(f))return;
   if(f.id==='tform')return submitTask(f);
   if(f.id==='gform'){
     const name=$('#g-name').value.trim(),err=$('#gerr');
@@ -1030,10 +1050,560 @@ let wasNarrow=innerWidth<720;
 addEventListener('resize',()=>{const nw=innerWidth<720;if(nw!==wasNarrow){wasNarrow=nw;if(UI.view==='calendar')render()}});
 
 /* =====================================================================
-   9. Start
+   9. Shared mode (Supabase, plain fetch, no libraries)
+   Everything the server must be trusted for (who checked a task off,
+   who reopened it, who may see a workspace) is enforced by the database
+   rules in supabase-setup.sql. This page only asks and displays.
    ===================================================================== */
-loadAll();applyTheme();setupCursor();render();
+const cfgStored=()=>{try{const c=JSON.parse(localStorage.getItem(CFGKEY));return c&&typeof c.url==='string'&&typeof c.key==='string'?c:null}catch{return null}};
+function cloudCfg(){
+  if(CLOUD_CONFIG.url&&CLOUD_CONFIG.anonKey)return{url:CLOUD_CONFIG.url.trim().replace(/\/+$/,''),key:CLOUD_CONFIG.anonKey.trim(),builtIn:true};
+  const c=cfgStored();
+  return c&&c.url&&c.key?{url:c.url.replace(/\/+$/,''),key:c.key,builtIn:false}:null;
+}
+const jwtPayload=t=>{const p=String(t).split('.')[1];if(!p)throw new Error('bad');const b=atob(p.replace(/-/g,'+').replace(/_/g,'/'));return JSON.parse(new TextDecoder().decode(Uint8Array.from(b,c=>c.charCodeAt(0))))};
+function urlProblem(u){
+  try{const x=new URL(u);if(x.protocol!=='https:')return'The project URL must start with https://';if(x.pathname.replace(/\/+$/,'')!=='')return'Use just the project URL, with nothing after the domain name.'}
+  catch{return'That does not look like a web address.'}
+  return'';
+}
+function keyProblem(k){
+  if(!k)return'Paste the public anon key.';
+  if(/^sb_secret_/i.test(k))return'That is a secret key. Never put it in a web page. Use the public anon (publishable) key.';
+  if(/^sb_publishable_/i.test(k))return'';
+  if(k.split('.').length!==3)return'That does not look like a Supabase key.';
+  try{const p=jwtPayload(k);if(p.role!=='anon')return'That key has the role “'+(p.role||'unknown')+'”. Never put it in a web page. Use the public anon key.'}
+  catch{return'That does not look like a valid key.'}
+  return'';
+}
+const colorFor=id=>{let h=0;for(const c of String(id))h=(h*31+c.charCodeAt(0))>>>0;return PALETTE[h%PALETTE.length].hex};
+const setPending=t=>{CL.pending=t||'';try{t?localStorage.setItem(INVKEY,t):localStorage.removeItem(INVKEY)}catch{}};
+function captureInvite(){
+  try{
+    const q=new URLSearchParams(location.search),t=q.get('invite');
+    if(t&&/^[A-Za-z0-9]{20,100}$/.test(t)){setPending(t);q.delete('invite');history.replaceState(null,'',location.pathname+(q.toString()?'?'+q:''))}
+    else CL.pending=localStorage.getItem(INVKEY)||'';
+  }catch{}
+}
+
+/* ---- session ---- */
+const saveSession=s=>{CL.session=s;try{s?localStorage.setItem(SESSKEY,JSON.stringify(s)):localStorage.removeItem(SESSKEY)}catch{}};
+function sessionFrom(tok){
+  const p=jwtPayload(tok.access_token);
+  return{access_token:tok.access_token,refresh_token:tok.refresh_token||'',expires_at:Date.now()+(Number(tok.expires_in)||3600)*1000,user_id:p.sub,email:p.email||''};
+}
+function readSession(){
+  const h=location.hash;
+  if(h&&h.length>1&&/(access_token|error)=/.test(h)){
+    const p=new URLSearchParams(h.slice(1));
+    history.replaceState(null,'',location.pathname+location.search);
+    if(p.get('error')){CL.err=(p.get('error_description')||'The sign-in link did not work.')+' Request a new link below.';return null}
+    try{return sessionFrom({access_token:p.get('access_token'),refresh_token:p.get('refresh_token'),expires_in:p.get('expires_in')})}
+    catch{CL.err='The sign-in link could not be read. Request a new one below.';return null}
+  }
+  try{const s=JSON.parse(localStorage.getItem(SESSKEY));if(s&&s.access_token&&s.user_id)return s}catch{}
+  return null;
+}
+let refreshing=null;
+function refreshSession(){
+  if(refreshing)return refreshing;
+  refreshing=(async()=>{
+    if(!CL.session||!CL.session.refresh_token)return false;
+    try{
+      const r=await fetch(CL.cfg.url+'/auth/v1/token?grant_type=refresh_token',{method:'POST',headers:{apikey:CL.cfg.key,'Content-Type':'application/json'},body:JSON.stringify({refresh_token:CL.session.refresh_token})});
+      if(!r.ok)return false;
+      saveSession(sessionFrom(await r.json()));return true;
+    }catch{return false}
+  })().finally(()=>{refreshing=null});
+  return refreshing;
+}
+function signOutLocal(msg){
+  saveSession(null);CL.profile=null;CL.workspaces=[];CL.wsId='';CL.stage='gate';CL.err=msg||'';CL.sent='';
+  clearInterval(CL.poll);CL.poll=0;render();
+}
+
+/* ---- requests ---- */
+const NETERR='Could not reach the server. Check your connection and try again.';
+async function api(path,o={}){
+  const{method='GET',body,prefer,auth=true}=o;
+  if(auth&&CL.session&&CL.session.expires_at-30000<Date.now())await refreshSession();
+  const send=()=>{
+    const h={apikey:CL.cfg.key,'Content-Type':'application/json',};
+    if(auth&&CL.session)h.Authorization='Bearer '+CL.session.access_token;
+    else if(CL.cfg.key.split('.').length===3)h.Authorization='Bearer '+CL.cfg.key;
+    if(prefer)h.Prefer=prefer;
+    return fetch(CL.cfg.url+path,{method,headers:h,body:body===undefined?undefined:JSON.stringify(body)});
+  };
+  let r;
+  try{r=await send()}catch{throw new Error(NETERR)}
+  if(r.status===401&&auth&&CL.session){
+    if(await refreshSession()){try{r=await send()}catch{throw new Error(NETERR)}}
+    if(r.status===401){signOutLocal('Your sign-in expired. Please sign in again.');throw new Error('Your sign-in expired. Please sign in again.')}
+  }
+  const txt=await r.text();let data=null;
+  if(txt){try{data=JSON.parse(txt)}catch{data=txt}}
+  if(!r.ok){
+    const m=data&&typeof data==='object'?(data.message||data.msg||data.error_description||data.error):'';
+    throw new Error(m||('The server answered with an error ('+r.status+').'));
+  }
+  return data;
+}
+const rpc=(name,args)=>api('/rest/v1/rpc/'+name,{method:'POST',body:args||{}});
+async function changeRows(path,method,body){
+  const rows=await api(path,{method,body,prefer:'return=representation'});
+  if(!Array.isArray(rows)||!rows.length)throw new Error('That change was not applied. The item may have been removed, or you may not have permission.');
+  return rows;
+}
+const patchTask=(id,body)=>changeRows('/rest/v1/tasks?id=eq.'+id,'PATCH',body);
+
+/* ---- loading ---- */
+async function loadMemberships(){
+  const rows=await api('/rest/v1/members?user_id=eq.'+CL.session.user_id+'&select=workspace_id,role,workspaces(name)');
+  CL.workspaces=(rows||[]).map(r=>({id:r.workspace_id,name:(r.workspaces&&r.workspaces.name)||'Workspace',role:r.role}));
+}
+async function cloudLoad(){
+  const w=CL.wsId,get=p=>api('/rest/v1/'+p);
+  const[mem,grp,tsk]=await Promise.all([
+    get('members?workspace_id=eq.'+w+'&select=user_id,role,joined_at,profiles(display_name)&order=joined_at'),
+    get('groups?workspace_id=eq.'+w+'&select=*&order=created_at'),
+    get('tasks?workspace_id=eq.'+w+'&select=*&order=created_at')]);
+  const ws=CL.workspaces.find(x=>x.id===w);
+  const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),sample:false}));
+  if(!members.some(m=>m.id===CL.session.user_id))throw new Error('You are no longer a member of this workspace.');
+  const old=new Map(((D&&D.tasks)||[]).map(t=>[t.id,t.history]));
+  const tasks=tsk.map(t=>({id:t.id,title:t.title,description:t.description||'',due:t.due_date||'',time:t.due_time?String(t.due_time).slice(0,5):'',
+    assigneeId:t.assignee_id||'',groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',
+    completedBy:t.completed_by||'',completedByName:t.completed_by_name||'',completedForId:t.completed_for_id||'',completedForName:t.completed_for_name||'',
+    completedAt:t.completed_at||'',createdAt:t.created_at||'',sample:false,history:old.get(t.id)||[]}));
+  const groups=grp.map(g=>({id:g.id,name:g.name,description:g.description||'',color:HEX.test(g.color)?g.color:PALETTE[0].hex,sample:false}));
+  D={app:'family-board',version:1,workspace:{name:ws?ws.name:'Workspace',createdAt:''},members,groups,tasks,currentUserId:CL.session.user_id};
+  const me0=members.find(m=>m.id===CL.session.user_id);
+  CL.invites=['owner','admin'].includes(me0.role)?await get('invites?workspace_id=eq.'+w+'&used_by=is.null&select=*&order=created_at.desc'):[];
+  CL.stale=false;
+}
+async function cloudAfterAuth(){
+  const pr=await api('/rest/v1/profiles?id=eq.'+CL.session.user_id+'&select=display_name');
+  CL.profile=(pr&&pr[0])||null;
+  if(!CL.profile){CL.stage='name';render();return}
+  if(CL.pending){
+    const tok=CL.pending;setPending('');
+    try{CL.wsId=await rpc('accept_invite',{p_token:tok});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}toast('You joined the workspace.')}
+    catch(e){CL.err=e.message}
+  }
+  await loadMemberships();
+  if(!CL.workspaces.length){CL.stage='workspace';render();return}
+  let want=CL.wsId;try{want=want||localStorage.getItem(WSKEY)||''}catch{}
+  CL.wsId=CL.workspaces.some(x=>x.id===want)?want:CL.workspaces[0].id;
+  await cloudLoad();
+  CL.stage='ready';startPolling();render();
+}
+async function cloudBoot(){
+  CL.stage='loading';render();
+  try{
+    CL.session=readSession();
+    if(CL.session)saveSession(CL.session);
+    if(!CL.session){CL.stage='gate';render();return}
+    await cloudAfterAuth();
+  }catch(e){
+    if(CL.stage!=='gate'||!CL.err)CL.err=e.message;
+    if(CL.stage!=='name'&&CL.stage!=='workspace'&&CL.stage!=='ready')CL.stage='gate';
+    render();
+  }
+}
+function startPolling(){clearInterval(CL.poll);CL.poll=setInterval(refreshQuiet,20000)}
+async function refreshQuiet(){
+  if(!CL.on||CL.stage!=='ready'||CL.busy||document.hidden||$('#dlg').open||$('#cdlg').open)return;
+  const ae=document.activeElement;
+  if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&$('#app').contains(ae))return;
+  try{await cloudLoad();render()}catch(e){if(!CL.stale){CL.stale=true;render()}}
+}
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshQuiet()});
+
+/* ---- doing things ---- */
+async function cloudDo(fn,okMsg){
+  if(CL.busy){toast('One moment, the last change is still saving.',true);render();return false}
+  CL.busy=true;
+  try{await fn()}catch(e){CL.busy=false;toast(e.message||'That did not work.',true);render();return false}
+  try{await cloudLoad()}catch(e){CL.busy=false;CL.stale=true;render();toast('Your change was saved, but the screen could not refresh. '+e.message,true);return true}
+  CL.busy=false;render();
+  if(okMsg)toast(okMsg);
+  const dlg=$('#dlg');
+  if(dlg.open&&dlg.dataset.task){const t=task(dlg.dataset.task);if(t)await cloudShowDetail(t);else closeDlg()}
+  return true;
+}
+async function cloudStep(fn){
+  if(CL.busy)return;
+  CL.busy=true;CL.err='';render();
+  try{await fn()}catch(e){CL.err=e.message}
+  CL.busy=false;render();
+}
+async function cloudShowDetail(t){
+  try{
+    const rows=await api('/rest/v1/task_events?task_id=eq.'+t.id+'&select=*&order=at.asc');
+    t.history=rows.map(r=>{const d=r.detail||{};return{id:r.id,type:r.type,at:r.at,actorId:r.actor_id||'',actorName:r.actor_name,fromName:d.from_name||'',toName:d.to_name||'',forName:d.for_name||'',fields:d.fields||'',assigneeName:d.assignee_name||''}});
+  }catch(e){toast('The activity history could not be loaded. '+e.message,true)}
+  const dlg=$('#dlg');
+  if(dlg.open&&dlg.dataset.task===t.id){const cur=task(t.id);if(cur)cur.history=t.history;refreshDetail()}
+}
+const inviteLink=t=>location.origin+location.pathname+'?invite='+t;
+function openInviteDialog(tok){
+  openDlg(`<div class="dbody">${dhead('Invite link created')}
+    <p><strong>Nothing has been emailed.</strong> Send this link yourself, by text or email. It works once and expires in 7 days.</p>
+    <div class="field"><label for="invlink">Invite link</label><input id="invlink" type="text" readonly value="${esc(inviteLink(tok))}"></div>
+    <div class="row"><button class="btn" data-act="copylink" data-token="${esc(tok)}">Copy link</button><button class="btn soft" data-act="closedlg">Done</button></div></div>`);
+  $('#invlink').addEventListener('focus',e=>e.target.select());
+}
+function openNewWsCloud(){
+  openDlg(`<form id="wscloud" class="dbody" novalidate>${dhead('Create another workspace')}
+    <p class="err" id="wserr" role="alert" hidden></p>
+    <div class="field"><label for="nw-name">Workspace name</label><input id="nw-name" type="text" maxlength="80" placeholder="The Parker Family"></div>
+    <p class="muted small">You will be its owner. You can invite people afterward.</p>
+    <div class="row"><button class="btn" type="submit">Create workspace</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+}
+function openMyName(){
+  openDlg(`<form id="dnform" class="dbody" novalidate>${dhead('Change my display name')}
+    <p class="err" id="dnerr" role="alert" hidden></p>
+    <div class="field"><label for="dn-name">Display name</label><input id="dn-name" type="text" maxlength="40" value="${esc(me().name)}"></div>
+    <p class="muted small">New activity will use the new name. Past history entries keep the name you had at the time.</p>
+    <div class="row"><button class="btn" type="submit">Save</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+}
+
+/* ---- clicks, changes, forms (shared mode) ---- */
+async function cloudClick(a,b,id){
+  if(a==='usecloud'||a==='uselocal'){
+    try{localStorage.setItem(MODEKEY,a==='usecloud'?'cloud':'local')}catch{toast('This browser blocked saving that choice.',true);return true}
+    location.reload();return true;
+  }
+  if(!CL.on)return false;
+  switch(a){
+    case'signout':
+      try{await api('/auth/v1/logout',{method:'POST'})}catch{}
+      signOutLocal('');toast('Signed out.');return true;
+    case'retryboot':cloudBoot();return true;
+    case'retryload':
+      try{await cloudLoad();render();toast('Up to date.')}catch(e){toast(e.message,true)}
+      return true;
+    case'dismisserr':CL.err='';render();return true;
+    case'mydisplayname':openMyName();return true;
+    case'toggletask':{
+      const t=task(id);if(!t)return true;
+      const going=t.status!=='complete';
+      if(going&&fxOn())UI.popId=t.id;
+      const ok=await cloudDo(()=>patchTask(t.id,{status:going?'complete':'open'}),null);
+      if(ok)say('“'+t.title+'” '+(going?'marked complete':'reopened')+' by '+me().name);
+      return true;
+    }
+    case'deltask':{
+      const t=task(id);if(!t)return true;
+      const ok=await confirmBox('Delete this task?','“'+t.title+'” and its activity history will be permanently deleted for everyone in the workspace.','Delete task',true);
+      if(!ok)return true;
+      const done=await cloudDo(()=>changeRows('/rest/v1/tasks?id=eq.'+t.id,'DELETE'),'Task deleted.');
+      if(done)closeDlg();
+      return true;
+    }
+    case'addexisting':{
+      const s=$('#exist'),t=s&&task(s.value);if(!t)return true;
+      await cloudDo(()=>patchTask(t.id,{group_id:id}),'Task added to the group.');
+      return true;
+    }
+    case'rmmember':{
+      const m=member(id);if(!m)return true;
+      const self=id===D.currentUserId;
+      if(!self&&!canManage()){toast('Only an owner or admin can remove other members.',true);return true}
+      const ok=await confirmBox(self?'Leave this workspace?':'Remove '+m.name+'?',
+        self?'You will lose access to its tasks. Tasks assigned to you become unassigned. You would need a new invite link to come back.':
+             'Tasks assigned to '+m.name+' become unassigned. Past activity entries keep their name.',self?'Leave':'Remove',true);
+      if(!ok)return true;
+      if(self){
+        if(CL.busy)return true;
+        CL.busy=true;
+        try{await rpc('remove_member',{p_ws:CL.wsId,p_user:id});CL.busy=false;CL.wsId='';try{localStorage.removeItem(WSKEY)}catch{}toast('You left the workspace.');cloudBoot()}
+        catch(e){CL.busy=false;toast(e.message,true);render()}
+        return true;
+      }
+      await cloudDo(()=>rpc('remove_member',{p_ws:CL.wsId,p_user:id}),'Member removed.');
+      return true;
+    }
+    case'newws':openNewWsCloud();return true;
+    case'createinvite':{
+      let tok='';
+      const ok=await cloudDo(async()=>{tok=await rpc('create_invite',{p_ws:CL.wsId})},null);
+      if(ok&&tok)openInviteDialog(tok);
+      return true;
+    }
+    case'copylink':{
+      const link=inviteLink(b.dataset.token);
+      try{await navigator.clipboard.writeText(link);toast('Link copied. Send it to the person you are inviting.')}
+      catch{toast('Copying was blocked by the browser. Open “Create invite link” and copy it by hand.',true)}
+      return true;
+    }
+    case'revokeinvite':{
+      const ok=await confirmBox('Revoke this invite link?','Anyone who has the link will no longer be able to join with it.','Revoke',true);
+      if(!ok)return true;
+      await cloudDo(()=>changeRows('/rest/v1/invites?id=eq.'+id,'DELETE'),'Invite link revoked.');
+      return true;
+    }
+    case'rmsample':case'erase':case'import':
+      toast('That option is only for local demo mode. Shared data lives on the server.',true);return true;
+  }
+  return false;
+}
+async function cloudChange(t){
+  if(t.dataset.cb){
+    const tk=task(t.dataset.cb);if(!tk)return true;
+    const going=t.checked;
+    if(going&&fxOn()){const r=t.getBoundingClientRect();sparkle(r.left+r.width/2,r.top+r.height/2);UI.popId=tk.id}
+    const ok=await cloudDo(()=>patchTask(tk.id,{status:going?'complete':'open'}),null);
+    if(ok)say('“'+tk.title+'” '+(going?'marked complete':'reopened')+' by '+me().name);
+    return true;
+  }
+  if(t.dataset.act==='movegroup'){
+    const tk=task(t.dataset.id);if(!tk)return true;
+    const none=t.value==='__none';
+    await cloudDo(()=>patchTask(tk.id,{group_id:none?null:t.value}),none?'Task removed from the group and kept as a standalone task.':'Task moved.');
+    return true;
+  }
+  if(t.dataset.act==='switchws'){
+    CL.wsId=t.value;try{localStorage.setItem(WSKEY,CL.wsId)}catch{}
+    UI.view='calendar';UI.f={person:'all',group:'all',status:'all'};D=null;
+    CL.busy=true;
+    try{await cloudLoad();CL.busy=false;render()}catch(e){CL.busy=false;toast(e.message,true);render()}
+    return true;
+  }
+  return false;
+}
+function cloudSubmit(f){
+  const id=f.id;
+  /* connection details work in both modes */
+  if(id==='cfgform'){
+    const url=$('#cf-url').value.trim(),key=$('#cf-key').value.trim(),er=$('#cferr');
+    const p=urlProblem(url)||keyProblem(key);
+    if(p){er.textContent=p;er.hidden=false;return true}
+    try{localStorage.setItem(CFGKEY,JSON.stringify({url,key}));localStorage.setItem(MODEKEY,'cloud')}
+    catch{er.textContent='This browser blocked saving the connection details.';er.hidden=false;return true}
+    location.reload();return true;
+  }
+  if(!CL.on)return false;
+
+  if(id==='signin'){
+    const em=$('#si-email').value.trim();CL.email=em;
+    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){CL.err='Enter a valid email address.';render();const i=$('#si-email');if(i)i.focus();return true}
+    CL.sent='';
+    cloudStep(async()=>{
+      await api('/auth/v1/otp?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:{email:em,create_user:true},auth:false});
+      CL.sent=em;
+    });
+    return true;
+  }
+  if(id==='nameform'){
+    const n=$('#nm-name').value.trim();
+    if(!n||n.length>40){CL.err='Enter a name between 1 and 40 characters.';render();return true}
+    cloudStep(async()=>{await rpc('set_display_name',{p_name:n});await cloudAfterAuth()});
+    return true;
+  }
+  if(id==='wscreate'){
+    const n=$('#ws-name').value.trim();
+    if(!n){CL.err='Give the workspace a name.';render();return true}
+    cloudStep(async()=>{CL.wsId=await rpc('create_workspace',{p_name:n});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}await cloudAfterAuth();toast('Workspace created.')});
+    return true;
+  }
+  if(id==='joinform'){
+    const raw=$('#join-code').value.trim(),m=/invite=([A-Za-z0-9]+)/.exec(raw),tok=m?m[1]:raw;
+    if(!/^[A-Za-z0-9]{20,100}$/.test(tok)){CL.err='Paste the full invite link you were sent.';render();return true}
+    cloudStep(async()=>{CL.wsId=await rpc('accept_invite',{p_token:tok});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}await cloudAfterAuth();toast('You joined the workspace.')});
+    return true;
+  }
+  if(id==='dnform'){
+    const n=$('#dn-name').value.trim(),er=$('#dnerr');
+    if(!n||n.length>40){er.textContent='Enter a name between 1 and 40 characters.';er.hidden=false;return true}
+    cloudDo(async()=>{await rpc('set_display_name',{p_name:n});CL.profile={display_name:n}},'Name updated.').then(ok=>{if(ok)closeDlg()});
+    return true;
+  }
+  if(id==='wscloud'){
+    const n=$('#nw-name').value.trim(),er=$('#wserr');
+    if(!n){er.textContent='Give the workspace a name.';er.hidden=false;return true}
+    cloudDo(async()=>{CL.wsId=await rpc('create_workspace',{p_name:n});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}await loadMemberships()},'Workspace created.').then(ok=>{if(ok){closeDlg();UI.view='calendar'}});
+    return true;
+  }
+  if(id==='wsform'){
+    const n=$('#wsname').value.trim();
+    if(!n){toast('Enter a workspace name.',true);return true}
+    cloudDo(async()=>{await changeRows('/rest/v1/workspaces?id=eq.'+CL.wsId,'PATCH',{name:n});await loadMemberships()},'Workspace name saved.');
+    return true;
+  }
+  if(id==='tform'){
+    const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value;
+    const bad=m=>{err.textContent=m;err.hidden=false;return true};
+    if(!title){err.textContent='Give the task a title.';err.hidden=false;$('#t-title').focus();return true}
+    if(due&&!parseYmd(due))return bad('That due date is not valid.');
+    if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
+    const body={title,description:$('#t-desc').value.trim(),due_date:due||null,due_time:due&&time?time:null,assignee_id:$('#t-who').value||null,group_id:$('#t-group').value||null};
+    const tid=f.dataset.id;
+    cloudDo(async()=>{
+      if(tid)await patchTask(tid,body);
+      else await api('/rest/v1/tasks',{method:'POST',body:{workspace_id:CL.wsId,...body},prefer:'return=minimal'});
+    },tid?'Task saved.':'Task added.').then(ok=>{
+      if(!ok)return;
+      closeDlg();
+      if(due){const d=parseYmd(due);UI.month=new Date(d.getFullYear(),d.getMonth(),1);render()}
+    });
+    return true;
+  }
+  if(id==='gform'){
+    const name=$('#g-name').value.trim(),er=$('#gerr');
+    if(!name){er.textContent='Give the group a name.';er.hidden=false;$('#g-name').focus();return true}
+    const body={name,description:$('#g-desc').value.trim(),color:($('input[name=gcolor]:checked')||{}).value||PALETTE[0].hex},gid=f.dataset.id;
+    cloudDo(async()=>{
+      if(gid)await changeRows('/rest/v1/groups?id=eq.'+gid,'PATCH',body);
+      else await api('/rest/v1/groups',{method:'POST',body:{workspace_id:CL.wsId,...body},prefer:'return=minimal'});
+    },gid?'Group saved.':'Group created.').then(ok=>{if(ok)closeDlg()});
+    return true;
+  }
+  if(id==='gdel'){
+    const g=group(f.dataset.id);if(!g)return true;
+    const mode=($('input[name=gd]:checked')||{}).value||'keep';
+    if(mode==='delete'&&!$('#gdok').checked){const er=$('#gdelerr');er.textContent='Tick the box to confirm that the tasks should be deleted too.';er.hidden=false;$('#gdok').focus();return true}
+    cloudDo(async()=>{
+      if(mode==='delete'){if(tasksIn(g).length)await api('/rest/v1/tasks?group_id=eq.'+g.id,{method:'DELETE'})}
+      else if(tasksIn(g).length)await api('/rest/v1/tasks?group_id=eq.'+g.id,{method:'PATCH',body:{group_id:null}});
+      await api('/rest/v1/groups?id=eq.'+g.id,{method:'DELETE'});
+    },mode==='delete'?'Group and its tasks deleted.':'Group deleted. Its tasks were kept as standalone tasks.').then(ok=>{if(ok){closeDlg();UI.view='groups';render()}});
+    return true;
+  }
+  if(id==='mform'){
+    const m=member(f.dataset.id),role=$('#mf-role').value;
+    if(!m)return true;
+    cloudDo(()=>rpc('set_member_role',{p_ws:CL.wsId,p_user:m.id,p_role:role}),'Role updated.').then(ok=>{if(ok)closeDlg()});
+    return true;
+  }
+  return false;
+}
+
+/* ---- views (shared mode) ---- */
+const roleLabel=r=>r==='owner'?'Owner':r==='admin'?'Admin':'Member';
+function cloudLoadingView(){return'<section class="panel" style="margin-top:0"><h2>Connecting…</h2><p class="muted">Checking your sign-in.</p></section>'}
+function cloudGateView(){
+  const file=location.protocol==='file:';
+  return`<section class="panel" style="margin-top:0"><h2>Sign in to your family workspace</h2>
+    ${file?'<p class="err">Shared mode needs this page opened from its web address (for example your GitHub site), not from a downloaded file, because the sign-in link has to come back to this page.</p>':''}
+    <p>Enter your email address and we will send you a sign-in link. There is no password.</p>
+    ${CL.err?`<p class="err" role="alert">${esc(CL.err)}</p>`:''}
+    <form id="signin" class="row" style="align-items:end;margin:14px 0" novalidate>
+      <div class="field" style="flex:1 1 260px"><label for="si-email">Email address</label><input id="si-email" type="email" autocomplete="email" value="${esc(CL.email||'')}" placeholder="you@example.com" ${file?'disabled':''}></div>
+      <button class="btn" type="submit" ${file||CL.busy?'disabled':''}>${CL.busy?'Sending…':'Email me a sign-in link'}</button></form>
+    ${CL.sent?`<div class="callout"><strong>A sign-in link was sent to ${esc(CL.sent)}.</strong><div class="muted small">Open it on this device. It can take a minute, and it may land in spam.</div></div>`:''}
+    ${CL.pending?'<p class="muted">You have an invite link waiting. Sign in and it will be used automatically.</p>':''}
+    <div class="row" style="margin-top:12px">${CL.session?'<button class="btn" data-act="retryboot">Try again</button>':''}<button class="btn soft" data-act="uselocal">Use local demo mode instead</button></div></section>`;
+}
+function cloudNameView(){
+  return`<section class="panel" style="margin-top:0"><h2>What should we call you?</h2>
+    <p>Your display name shows next to tasks you create, tasks assigned to you, and tasks you check off.</p>
+    ${CL.err?`<p class="err" role="alert">${esc(CL.err)}</p>`:''}
+    <form id="nameform" class="row" style="align-items:end;margin-top:14px" novalidate>
+      <div class="field" style="flex:1 1 260px"><label for="nm-name">Display name</label><input id="nm-name" type="text" maxlength="40" autocomplete="nickname" placeholder="Your name"></div>
+      <button class="btn" type="submit" ${CL.busy?'disabled':''}>Continue</button></form>
+    <div class="row" style="margin-top:12px"><button class="btn quiet" data-act="signout">Sign out</button></div></section>`;
+}
+function cloudWorkspaceView(){
+  return`<section class="panel" style="margin-top:0"><h2>Welcome, ${esc(CL.profile?CL.profile.display_name:'')}</h2>
+    ${CL.err?`<p class="err" role="alert">${esc(CL.err)}</p>`:''}
+    <p>You are not in a workspace yet. Start your own, or join one with an invite link from someone in your family.</p></section>
+    <section class="panel"><h3>Start a workspace</h3>
+      <form id="wscreate" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="ws-name">Workspace name</label><input id="ws-name" type="text" maxlength="80" placeholder="The Parker Family"></div><button class="btn" type="submit" ${CL.busy?'disabled':''}>Create workspace</button></form></section>
+    <section class="panel"><h3>Join with an invite link</h3>
+      <form id="joinform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="join-code">Invite link</label><input id="join-code" type="text" autocomplete="off" placeholder="Paste the link you were sent"></div><button class="btn" type="submit" ${CL.busy?'disabled':''}>Join</button></form></section>`;
+}
+function headerCloud(){
+  const ready=CL.stage==='ready';
+  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members','Members'],['settings','Settings']];
+  const nm=(CL.profile&&CL.profile.display_name)||(CL.session&&CL.session.email)||'';
+  return`<header class="top"><div class="in">
+    <div class="brand">${LOGO}<div><h1>Family Board</h1><div class="ws">${ready&&D?esc(D.workspace.name):'Shared mode'}</div></div></div>
+    <div class="who-box"><span class="pill">Shared · online</span>
+      ${ready&&CL.workspaces.length>1?`<label for="wssel">Workspace</label><select id="wssel" data-act="switchws" data-fk="wssel" style="width:auto;min-width:140px">${CL.workspaces.map(w=>`<option value="${esc(w.id)}"${w.id===CL.wsId?' selected':''}>${esc(w.name)}</option>`).join('')}</select>`:''}
+      ${CL.session?`<span>Signed in as <strong>${esc(nm)}</strong></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div>
+    ${ready?`<nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav>`:''}</header>`;
+}
+function cloudBanners(){
+  let h='';
+  if(CL.stale)h+='<div class="banner bad" role="alert"><p>The server could not be reached, so what you see may be out of date. Changes will not save until the connection returns.</p><button class="btn soft sm" data-act="retryload">Try again</button></div>';
+  if(CL.err&&CL.stage!=='gate'&&CL.stage!=='name'&&CL.stage!=='workspace')h+=`<div class="banner bad" role="alert"><p>${esc(CL.err)}</p><button class="btn soft sm" data-act="dismisserr">Dismiss</button></div>`;
+  return h;
+}
+function cloudMembersView(){
+  const u=me(),isOwner=u.role==='owner',mg=canManage(),now=Date.now();
+  return`<div class="page-head"><h2>Members and invitations</h2></div>
+    <section class="panel" style="margin-top:0"><h3>People in “${esc(D.workspace.name)}”</h3>
+      ${D.members.map(m=>{
+        const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner');
+        return`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${self?' (you)':''}</div><div class="muted small">${roleLabel(m.role)}</div></div>
+          <div class="row">${self?'<button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}</div></div>`}).join('')}
+      <p class="muted small" style="margin-top:12px">Everyone signs in with their own email address. Names on completed tasks come from each person’s own sign-in, not from a menu.</p></section>
+    <section class="panel"><h3>Invitations</h3>
+      ${mg?`<p>Create a single-use link and send it to the person yourself, by text or email. <strong>Nothing is emailed from this page.</strong> Each link works once and expires after 7 days.</p>
+        <div class="row" style="margin:12px 0"><button class="btn" data-act="createinvite" data-fk="mkinv">Create invite link</button></div>
+        ${CL.invites.length?CL.invites.map(i=>{const exp=new Date(i.expires_at).getTime()<now;return`<div class="mem" style="grid-template-columns:1fr auto"><div><div>Link created ${esc(fmtStamp(i.created_at))}</div><div class="muted small">${exp?'Expired':'Expires '+esc(fmtStamp(i.expires_at))} · works once</div></div><div class="row">${exp?'':`<button class="btn soft sm" data-act="copylink" data-token="${esc(i.token)}" aria-label="Copy invite link created ${esc(fmtStamp(i.created_at))}">Copy link</button>`}<button class="btn soft sm" data-act="revokeinvite" data-id="${esc(i.id)}" aria-label="Revoke invite link created ${esc(fmtStamp(i.created_at))}">Revoke</button></div></div>`}).join(''):'<p class="muted">No unused invite links.</p>'}`
+      :'<p class="muted">Only an owner or admin can create invite links.</p>'}</section>`;
+}
+const appearancePanels=()=>`
+    <section class="panel"><h3>Appearance</h3><div class="two">
+      ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
+      <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label></section>
+    <section class="panel"><h3>Effects</h3>
+      <label class="chk"><input type="checkbox" data-act="cursor" ${ST.cursor?'checked':''} data-fk="s-cursor"> Custom cursor (mouse and trackpad only; never on touch screens)</label>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="effects" ${ST.effects?'checked':''} data-fk="s-effects"> Click ripples and the sparkle when a task is completed</label>
+      ${RM.matches?'<p class="muted small" style="margin-top:8px">Your device asks for reduced motion, so animations stay off even when this box is ticked.</p>':''}</section>`;
+function cfgForm(cfg){
+  return`<form id="cfgform" style="display:grid;gap:12px;margin:12px 0" novalidate>
+    <p class="err" id="cferr" role="alert" hidden></p>
+    <div class="field"><label for="cf-url">Supabase project URL</label><input id="cf-url" type="text" inputmode="url" autocomplete="off" spellcheck="false" placeholder="https://abcdxyz.supabase.co" value="${esc(cfg?cfg.url:'')}"></div>
+    <div class="field"><label for="cf-key">Public anon key</label><input id="cf-key" type="text" autocomplete="off" spellcheck="false" placeholder="Public anon or publishable key only" value="${esc(cfg?cfg.key:'')}"></div>
+    <p class="muted small">These two values are meant to be public. Never paste a service_role or secret key here. The page refuses them.</p>
+    <div class="row"><button class="btn" type="submit">Save and use shared mode</button></div></form>`;
+}
+function collabPanel(){
+  const cfg=CL.cfg||cloudCfg();
+  let status;
+  if(CL.on)status=`<strong>Shared mode is on.</strong> ${CL.session?'Signed in as '+esc(CL.session.email||'your account')+'. ':''}Tasks and activity history are stored on your Supabase project.`;
+  else if(cfg)status='Connection details are saved, but this page is in local demo mode, which shares nothing.';
+  else status='Not connected. This page is in local demo mode. Follow the setup steps below to share one workspace with your family.';
+  return`<section class="panel"><h3>Shared mode (online)</h3><p>${status}</p>
+    ${cfg?`<p class="muted small">Server: ${esc((()=>{try{return new URL(cfg.url).host}catch{return cfg.url}})())}${cfg.builtIn?' · connection details are built into this file':''}</p>`:''}
+    ${(!cfg||!cfg.builtIn)?cfgForm(cfg):''}
+    <div class="row" style="margin-top:12px">${cfg&&!CL.on?'<button class="btn" data-act="usecloud">Switch to shared mode</button>':''}${CL.on?'<button class="btn soft" data-act="uselocal">Switch to local demo mode</button>':''}</div>
+    ${backendHelp()}</section>`;
+}
+function settingsViewCloud(){
+  const admin=canManage();
+  return`<div class="page-head"><h2>Settings</h2></div>
+    <section class="panel" style="margin-top:0"><h3>Workspace</h3>
+      <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="80" value="${esc(D.workspace.name)}" ${admin?'':'disabled'}></div><button class="btn" type="submit" ${admin?'':'disabled'}>Save name</button></form>
+      ${admin?'':'<p class="muted small" style="margin-top:8px">Only an owner or admin can rename the workspace.</p>'}
+      <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws3">Create another workspace</button></div></section>
+    ${appearancePanels()}
+    <section class="panel"><h3>Data backup</h3>
+      <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
+      <div class="row" style="margin-top:12px"><button class="btn" data-act="export" data-fk="exp">Export workspace</button></div></section>
+    ${collabPanel()}`;
+}
+
+/* =====================================================================
+   10. Start
+   ===================================================================== */
+(function start(){
+  try{const sraw=localStorage.getItem(SKEY);if(sraw){const s=JSON.parse(sraw);if(s&&typeof s==='object')ST={...ST,...s}}}catch{}
+  CL.cfg=cloudCfg();
+  let mode='';try{mode=localStorage.getItem(MODEKEY)||''}catch{}
+  captureInvite();
+  /* An invite link only makes sense in shared mode, so opening one switches to it when connection details exist. */
+  if(CL.pending&&CL.cfg)mode='cloud';
+  CL.on=!!(CL.cfg&&mode==='cloud');
+  applyTheme();setupCursor();
+  if(CL.on){cloudBoot();return}
+  loadAll();render();
+  if(CL.pending&&!CL.cfg)toast('This link is an invitation, but shared mode is not set up in this file yet.',true);
+})();
 })();
 </script>
 </body>
-  </html>
+</html>
