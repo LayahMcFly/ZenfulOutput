@@ -1786,7 +1786,9 @@ function cyDayHTML(d){
   return`<div class="dbody">${dhead(title)}
     <p class="muted small" style="margin:0">Day ${n} of the period that ${l.end_date?'ran '+esc(cyDate(l.start_date))+' to '+esc(cyDate(l.end_date)):'started '+esc(cyDate(l.start_date))+' and is still going'}.</p>
     ${sum}${ctl}
-    <div class="row" style="margin-top:14px"><button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}">Change dates</button>${l.end_date?'':`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}">End period</button>`}<button type="button" class="btn soft sm" data-cy="del" data-id="${esc(l.id)}">Delete this period</button></div></div>`;
+    <div class="row" style="margin-top:14px">${r.pain!=null||r.heaviness!=null?`<button type="button" class="btn soft sm" data-cy="clearday" data-id="${esc(l.id)}" data-d="${d}">Clear this day’s pain and flow</button>`:''}${(d===l.start_date||d===l.end_date)?`<button type="button" class="btn soft sm" data-cy="rmday" data-id="${esc(l.id)}" data-d="${d}">Remove this day from the period</button>`:''}</div>
+    <div class="row" style="margin-top:10px"><button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}">Change dates</button>${l.end_date?'':`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}">End period</button>`}</div>
+    <div style="margin-top:18px;padding-top:12px;border-top:1px solid var(--line)"><p class="muted small" style="margin:0 0 8px">This only affects ${esc(cyDate(d))}, unless you use the button below, which removes every day of the period.</p><button type="button" class="btn danger sm" data-cy="del" data-id="${esc(l.id)}">Delete the whole period (${l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1} ${(l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1)===1?'day':'days'})</button></div></div>`;
 }
 function cyRefreshDay(){
   const dlg=$('#dlg');if(!dlg.open||!dlg.dataset.cyday)return;
@@ -1880,7 +1882,20 @@ document.addEventListener('click',async e=>{
     case'flow':cySetDay(id,b.dataset.d,'heaviness',+b.dataset.v);break;
     case'day':openCycleDay(b.dataset.d);break;
     case'startat':{const d=b.dataset.d;if(d&&await cySaveLog(cyClean({id:'',start_date:d,end_date:'',days:[]}),false))openCycleDay(d);break}
-    case'del':if(l&&await confirmBox('Delete this period?','The period and its pain and flow entries are removed from your tracker.','Delete',true)){await cyDelete(id);closeDlg()}break;
+    case'del':if(l){
+      const n=(l.end_date?daysBetween(l.start_date,l.end_date):daysBetween(l.start_date,todayStr()))+1;
+      if(await confirmBox('Delete the whole period?','This removes all '+n+' '+(n===1?'day':'days')+' of the period '+cyDate(l.start_date)+(l.end_date?' to '+cyDate(l.end_date):' (still going)')+', with their pain and flow. Your other periods are not touched.','Delete the whole period',true)){await cyDelete(id);closeDlg()}
+    }break;
+    case'clearday':{const x=CY.logs.find(y=>y.id===id),d=b.dataset.d;if(x&&d){x.days=x.days.filter(r=>r.d!==d);cySummary(x);render();cyRefreshDay();cyQueueSave(x.id);toast('That day’s pain and flow were cleared.')}break}
+    case'rmday':{
+      const x=CY.logs.find(y=>y.id===id),d=b.dataset.d;if(!x||!d)break;
+      if(x.start_date===d&&(x.end_date===d||(!x.end_date&&d===todayStr()))){
+        if(await confirmBox('Remove the only day?','This is the only day in the period, so the whole period is deleted.','Delete the period',true)){await cyDelete(id);closeDlg()}
+        break;
+      }
+      const ns=d===x.start_date?addDays(d,1):x.start_date,ne=x.end_date&&d===x.end_date?addDays(d,-1):x.end_date;
+      await cySaveLog(cyClean({id:x.id,start_date:ns,end_date:ne,days:x.days}),true);break;
+    }
     case'delall':if(await confirmBox('Delete all cycle entries?','Every entry in your tracker is removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
     case'mprev':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()-1,1);render();break;
     case'mnext':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()+1,1);render();break;
