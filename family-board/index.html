@@ -160,13 +160,13 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cyd.pad{border:0;background:none}
 .cygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:420px}
 .cygrid .dh{font:700 11px var(--label);text-align:center;color:var(--ink-soft);letter-spacing:.06em}
-.sw{display:inline-block;width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,.25);vertical-align:-4px;margin-right:6px}
+.hsw{display:inline-block;width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,.25);vertical-align:-4px;margin-right:6px}
 .hv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
 .hv label{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:2px solid var(--line);border-radius:8px;cursor:pointer;font-size:12px;text-align:center}
 .hv input{position:absolute;opacity:0;pointer-events:none}
 .hv label:has(input:checked){border-color:var(--accent);background:var(--wash)}
 .hv label:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
-.hv .sw{width:100%;height:22px;margin:0}
+.hv .hsw{width:100%;height:22px;margin:0}
 .dayrow{padding:10px 0;border-top:1px solid var(--line)}
 .dayrow .dt{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
 .xb{margin-left:auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:8px;background:var(--field);color:var(--mark);cursor:pointer;padding:0}
@@ -180,7 +180,7 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .pb.on{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
 .fl{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px}
 .fb{border:1.5px solid var(--line);border-radius:8px;background:var(--field);padding:5px 2px 6px;font:12px/1.2 var(--body);color:var(--ink);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;min-height:44px}
-.fb .sw{width:calc(100% - 8px);height:16px;margin:0}
+.fb .hsw{width:calc(100% - 8px);height:16px;margin:0}
 .fb.on{border-color:var(--accent);box-shadow:inset 0 0 0 2px var(--accent);font-weight:700}
 .pb:focus-visible,.fb:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cyd.un{background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 4px,#fff 4px,#fff 8px);color:#3b281d;border-color:#e6b5b0}
@@ -1848,7 +1848,7 @@ function cycleView(){
     const r=l.days.find(x=>x.d===d)||{pain:null,heaviness:null};
     return`<div class="dayrow"><div class="dt"><strong>Day ${n}</strong><span class="muted">${esc(cyDate(d))}${d===today?' (today)':''}</span><button type="button" class="xb" data-cy="rmday" data-id="${esc(l.id)}" data-d="${d}" aria-label="Remove ${esc(cyDate(d))} from the period" title="Remove this day from the period"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5L19 19M19 5L5 19" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button></div>
       <div class="ctl"><span class="lbl" id="p-${esc(l.id)}-${d}">Pain</span><div class="pn" role="group" aria-labelledby="p-${esc(l.id)}-${d}">${Array.from({length:11},(_,i)=>`<button type="button" class="pb${r.pain===i?' on':''}" aria-pressed="${r.pain===i}" aria-label="Pain ${i} of 10" data-cy="pain" data-id="${esc(l.id)}" data-d="${d}" data-v="${i}">${i}</button>`).join('')}</div></div>
-      <div class="ctl"><span class="lbl" id="f-${esc(l.id)}-${d}">Flow</span><div class="fl" role="group" aria-labelledby="f-${esc(l.id)}-${d}">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="sw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div></div>`;
+      <div class="ctl"><span class="lbl" id="f-${esc(l.id)}-${d}">Flow</span><div class="fl" role="group" aria-labelledby="f-${esc(l.id)}-${d}">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="hsw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div></div>`;
   };
   const card=l=>{
     const isOpen=!l.end_date,end=l.end_date||today,dates=[];
@@ -1868,7 +1868,7 @@ function cycleView(){
     <p class="muted">${logs.length?'Press any date on the calendar to see its pain and flow, or to change them.':'Choose “Log period start” when your period begins. While it lasts, each day appears in a list where you tap how much pain you had, from 0 to 10, and how heavy the flow was. When it finishes, tap “End period”. After that, press any date on the calendar to see that day.'}</p>
     <section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><button type="button" class="btn soft sm" data-cy="mprev" data-fk="cyprev" aria-label="Previous month">‹ Prev</button><h3 style="margin:0">${esc(CY.month.toLocaleDateString('en-US',{month:'long',year:'numeric'}))}</h3><button type="button" class="btn soft sm" data-cy="mnext" data-fk="cynext" aria-label="Next month">Next ›</button></div>
       <div class="cygrid" style="margin-top:12px">${['S','M','T','W','T','F','S'].map(x=>`<div class="dh" aria-hidden="true">${x}</div>`).join('')}${cells}</div>
-      <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="sw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
+      <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="hsw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="hsw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
       <p class="muted small" style="margin-top:4px">The small white circle in a day’s corner is that day’s pain, from 0 to 10.</p></section>
     ${open?card(open):''}
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
@@ -1893,9 +1893,9 @@ function cyDayHTML(d){
           :`<div class="row"><button type="button" class="btn" data-cy="startat" data-d="${d}" data-fk="cystart">Start a period on this day</button></div>`}`}</div>`;
   }
   const r=l.days.find(x=>x.d===d)||{pain:null,heaviness:null},hv=r.heaviness?HEAVY[r.heaviness-1]:null,n=daysBetween(l.start_date,d)+1;
-  const sum=`<p style="font-size:20px;margin:6px 0 12px">Pain: <strong>${r.pain==null?'not logged':r.pain+' of 10'}</strong><br>Flow: ${hv?`<span class="sw" style="background:${hv[0]}"></span><strong>${hv[1]}</strong>`:'<strong>not logged</strong>'}</p>`;
+  const sum=`<p style="font-size:20px;margin:6px 0 12px">Pain: <strong>${r.pain==null?'not logged':r.pain+' of 10'}</strong><br>Flow: ${hv?`<span class="hsw" style="background:${hv[0]}"></span><strong>${hv[1]}</strong>`:'<strong>not logged</strong>'}</p>`;
   const ctl=`<div class="ctl"><span class="lbl" id="dp">Pain</span><div class="pn" role="group" aria-labelledby="dp">${Array.from({length:11},(_,i)=>`<button type="button" class="pb${r.pain===i?' on':''}" aria-pressed="${r.pain===i}" aria-label="Pain ${i} of 10" data-cy="pain" data-id="${esc(l.id)}" data-d="${d}" data-v="${i}">${i}</button>`).join('')}</div></div>
-    <div class="ctl"><span class="lbl" id="df">Flow</span><div class="fl" role="group" aria-labelledby="df">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="sw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div>`;
+    <div class="ctl"><span class="lbl" id="df">Flow</span><div class="fl" role="group" aria-labelledby="df">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="hsw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div>`;
   return`<div class="dbody">${dhead(title)}
     <p class="muted small" style="margin:0">Day ${n} of the period that ${l.end_date?'ran '+esc(cyDate(l.start_date))+' to '+esc(cyDate(l.end_date)):'started '+esc(cyDate(l.start_date))+' and is still going'}.</p>
     ${sum}${ctl}
@@ -2483,4 +2483,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-</html>
+  </html>
