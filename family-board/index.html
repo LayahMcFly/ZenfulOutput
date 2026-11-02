@@ -145,6 +145,12 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 /* avatars, chips */
 .av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c,#6f4a33);color:#fff;font:700 11px/1 var(--label);flex:none}
 .av{overflow:hidden}
+.bell{position:relative}
+.bell .nb{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--mark,#b3261e);color:#fff;font:700 12px/20px var(--sans,system-ui);text-align:center}
+.nlist{display:grid;gap:8px;margin:0;padding:0;list-style:none}
+.nitem{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card,#fff);color:inherit;font:inherit;cursor:pointer}
+.nitem.new{border-left:5px solid var(--accent)}
+.nitem small{display:block;color:var(--muted,#6b5e54);margin-top:2px}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .av.lg{width:44px;height:44px;font-size:15px}
 .av.xl{width:84px;height:84px;font-size:28px}
@@ -338,7 +344,7 @@ const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKE
 const CLOUD_CONFIG={url:'https://nxiyujunhqhlyzggymqb.supabase.co',anonKey:'sb_publishable_WJtf61r3ldDk5YPXBX_sww_7JxKMm-p'};
 
 /* Shared-mode state. CL.on is true only when the person chose shared mode AND connection details exist. */
-const CL={noAvatar:false,on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces:[],wsId:'',invites:[],
+const CL={notes:[],noNotes:false,noAvatar:false,on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces:[],wsId:'',invites:[],
   err:'',sent:'',email:'',busy:false,stale:false,poll:0,pending:''};
 
 /* =====================================================================
@@ -1290,14 +1296,64 @@ async function cloudBoot(){
     render();
   }
 }
-function startPolling(){clearInterval(CL.poll);CL.poll=setInterval(refreshQuiet,20000)}
+function startPolling(){clearInterval(CL.poll);clearInterval(CL.npoll);CL.poll=setInterval(refreshQuiet,20000);CL.npoll=setInterval(pollNotes,20000);pollNotes()}
+const unreadCount=()=>CL.notes.filter(n=>!n.read_at).length;
+const NSEEN='familyBoard.notified.v1';
+function noteText(n){
+  const due=n.due_date?' Due '+new Date(n.due_date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+'.':'';
+  return`${n.actor_name||'Someone'} assigned you “${n.task_title}” in ${n.workspace_name}.${due}`;
+}
+function updateBadge(){
+  const b=$('#nbadge');if(!b)return;const c=unreadCount();
+  b.textContent=c;b.hidden=!c;
+  const btn=b.closest('button');if(btn)btn.setAttribute('aria-label','Notifications'+(c?', '+c+' new':''));
+}
+async function pollNotes(){
+  if(!CL.on||CL.stage!=='ready'||CL.noNotes||!CL.session)return;
+  let rows;
+  try{rows=await api('/rest/v1/notifications?select=*&order=created_at.desc&limit=30')}
+  catch(e){if(/notifications/i.test(e.message||'')){CL.noNotes=true;render()}return}
+  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id);
+  let seen=null;try{seen=JSON.parse(localStorage.getItem(NSEEN)||'null')}catch{}
+  const first=!Array.isArray(seen);seen=Array.isArray(seen)?seen:[];
+  const fresh=CL.notes.filter(n=>!n.read_at&&!seen.includes(n.id));
+  if(fresh.length){
+    if(first&&fresh.length>1)toast('You have '+fresh.length+' task assignments waiting. Tap the bell to see them.');
+    else fresh.slice(0,3).forEach((n,i)=>setTimeout(()=>{toast(noteText(n));say(noteText(n))},i*4300));
+    if(!first||fresh.length===1)fresh.slice(0,3).forEach(n=>{
+      try{if('Notification' in window&&Notification.permission==='granted'&&localStorage.getItem('familyBoard.alerts.v1')==='on'){
+        const nt=new Notification('New task for you',{body:noteText(n),tag:n.id});nt.onclick=()=>{window.focus();nt.close()}}}catch{}
+    });
+  }
+  try{localStorage.setItem(NSEEN,JSON.stringify([...new Set([...seen,...CL.notes.map(n=>n.id)])].slice(-200)))}catch{}
+  updateBadge();
+}
+function openNotes(){
+  const list=CL.notes.slice();
+  openDlg(`<div class="dbody">${dhead('Notifications')}
+    ${list.length?`<ul class="nlist">${list.map(n=>`<li><button type="button" class="nitem${n.read_at?'':' new'}" data-act="opennote" data-id="${esc(n.id)}">${n.read_at?'':'<strong>New · </strong>'}${esc(noteText(n))}<small>${esc(new Date(n.created_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))}</small></button></li>`).join('')}</ul>`
+      :'<p class="muted">Nothing yet. When someone assigns you a task, it shows up here.</p>'}
+  </div>`);
+  if(unreadCount()){
+    rpc('mark_notifications_read',{}).then(()=>{CL.notes.forEach(n=>{if(!n.read_at)n.read_at=new Date().toISOString()});updateBadge()}).catch(()=>{});
+  }
+}
+async function enableAlerts(){
+  if(!('Notification' in window)){toast('This browser does not support desktop alerts.',true);return}
+  let p=Notification.permission;
+  if(p==='default')p=await Notification.requestPermission();
+  if(p==='granted'){try{localStorage.setItem('familyBoard.alerts.v1','on')}catch{}toast('Alerts are on for this device.');new Notification('Family Board',{body:'You will see an alert here when someone assigns you a task.'})}
+  else toast('Alerts are blocked. Allow notifications for this site in your browser settings, then try again.',true);
+  render();
+}
+function disableAlerts(){try{localStorage.removeItem('familyBoard.alerts.v1')}catch{}toast('Alerts are off for this device.');render()}
 async function refreshQuiet(){
   if(!CL.on||CL.stage!=='ready'||CL.busy||document.hidden||$('#dlg').open||$('#cdlg').open)return;
   const ae=document.activeElement;
   if(ae&&/^(INPUT|TEXTAREA|SELECT)$/.test(ae.tagName)&&$('#app').contains(ae))return;
   try{await cloudLoad();render()}catch(e){if(!CL.stale){CL.stale=true;render()}}
 }
-document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshQuiet()});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshQuiet();pollNotes()}});
 
 /* ---- doing things ---- */
 function dbHint(m){
@@ -1491,6 +1547,16 @@ async function cloudClick(a,b,id){
     }
     case'newws':openNewWsCloud();return true;
     case'openws':await cloudSwitch(id);return true;
+    case'notes':openNotes();return true;
+    case'opennote':{
+      const n=CL.notes.find(x=>x.id===id);closeDlg();if(!n)return true;
+      if(n.workspace_id!==CL.wsId)await cloudSwitch(n.workspace_id);
+      if(n.task_id&&task(n.task_id))openDetail(n.task_id);
+      else toast('That task is no longer there.',true);
+      return true;
+    }
+    case'alertson':await enableAlerts();return true;
+    case'alertsoff':disableAlerts();return true;
     case'delws':{
       const w=CL.workspaces.find(x=>x.id===id);if(!w)return true;
       openDeleteWs(w);return true;
@@ -1709,7 +1775,7 @@ function headerCloud(){
     <div class="brand">${LOGO}<div><h1>Family Board</h1><div class="ws">${ready&&D?esc(D.workspace.name):'Shared mode'}</div></div></div>
     <div class="who-box"><span class="pill">Shared · online</span>
       ${ready&&CL.workspaces.length>1?`<label for="wssel">Workspace</label><select id="wssel" data-act="switchws" data-fk="wssel" style="width:auto;min-width:140px">${CL.workspaces.map(w=>`<option value="${esc(w.id)}"${w.id===CL.wsId?' selected':''}>${esc(w.name)}</option>`).join('')}</select>`:''}
-      ${CL.session?`<span class="who">${ready&&D&&me()?avatar(me()):''}<span>Signed in as <strong>${esc(nm)}</strong></span></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
+      ${CL.session?`${ready&&!CL.noNotes?`<button type="button" class="btn soft sm bell" data-act="notes" data-fk="bell" aria-label="Notifications${unreadCount()?', '+unreadCount()+' new':''}">🔔<span class="nb" id="nbadge"${unreadCount()?'':' hidden'}>${unreadCount()}</span></button>`:''}<span class="who">${ready&&D&&me()?avatar(me()):''}<span>Signed in as <strong>${esc(nm)}</strong></span></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
 }
 function cloudBanners(){
   let h='';
@@ -1761,6 +1827,7 @@ function collabPanel(){
     <div class="row" style="margin-top:12px">${cfg&&!CL.on?'<button class="btn" data-act="usecloud">Switch to shared mode</button>':''}${CL.on?'<button class="btn soft" data-act="uselocal">Switch to local demo mode</button>':''}</div>
     ${backendHelp()}</section>`;
 }
+function alertsOn(){try{return'Notification' in window&&Notification.permission==='granted'&&localStorage.getItem('familyBoard.alerts.v1')==='on'}catch{return false}}
 function settingsViewCloud(){
   const admin=canManage();
   return`<div class="page-head"><h2>Settings</h2></div>
@@ -1772,6 +1839,11 @@ function settingsViewCloud(){
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
         <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div></section>
+    <section class="panel"><h3>Assignment alerts</h3>
+      ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
+      <p>When someone assigns you a task, a message appears here and a red number shows on the bell at the top. Tasks you assign to yourself do not alert you.</p>
+      ${alertsOn()?'<p><strong>Desktop alerts are on for this device.</strong></p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off desktop alerts</button></div>':'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on desktop alerts</button></div>'}
+      <p class="muted small" style="margin-top:10px">Desktop alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent.</p>`}</section>
     ${appearancePanels()}
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
@@ -1800,4 +1872,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-</html>
+  </html>
