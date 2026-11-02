@@ -1321,8 +1321,7 @@ async function pollNotes(){
     if(first&&fresh.length>1)toast('You have '+fresh.length+' task assignments waiting. Tap the bell to see them.');
     else fresh.slice(0,3).forEach((n,i)=>setTimeout(()=>{toast(noteText(n));say(noteText(n))},i*4300));
     if(!first||fresh.length===1)fresh.slice(0,3).forEach(n=>{
-      try{if('Notification' in window&&Notification.permission==='granted'&&localStorage.getItem('familyBoard.alerts.v1')==='on'){
-        const nt=new Notification('New task for you',{body:noteText(n),tag:n.id});nt.onclick=()=>{window.focus();nt.close()}}}catch{}
+      if(alertsOn())showAlert('New task for you',noteText(n),n.id);
     });
   }
   try{localStorage.setItem(NSEEN,JSON.stringify([...new Set([...seen,...CL.notes.map(n=>n.id)])].slice(-200)))}catch{}
@@ -1338,11 +1337,24 @@ function openNotes(){
     rpc('mark_notifications_read',{}).then(()=>{CL.notes.forEach(n=>{if(!n.read_at)n.read_at=new Date().toISOString()});updateBadge()}).catch(()=>{});
   }
 }
+async function showAlert(title,body,tag){
+  try{   // phones need a service worker to show alerts, so try that first
+    const reg=navigator.serviceWorker&&await navigator.serviceWorker.getRegistration();
+    if(reg&&reg.showNotification){await reg.showNotification(title,{body,tag});return true}
+  }catch{}
+  try{const nt=new Notification(title,{body,tag});nt.onclick=()=>{window.focus();nt.close()};return true}catch{}
+  return false;
+}
 async function enableAlerts(){
   if(!('Notification' in window)){toast('This browser does not support desktop alerts.',true);return}
   let p=Notification.permission;
   if(p==='default')p=await Notification.requestPermission();
-  if(p==='granted'){try{localStorage.setItem('familyBoard.alerts.v1','on')}catch{}toast('Alerts are on for this device.');new Notification('Family Board',{body:'You will see an alert here when someone assigns you a task.'})}
+  if(p==='granted'){
+    try{localStorage.setItem('familyBoard.alerts.v1','on')}catch{}
+    try{if('serviceWorker' in navigator)await navigator.serviceWorker.register('sw.js')}catch{}
+    const shown=await showAlert('Family Board','You will see an alert like this when someone assigns you a task.','test');
+    toast(shown?'Alerts are on for this device.':'Alerts are on, but this browser could not show a test alert. You will still see the bell and the message in the app.',!shown);
+  }
   else toast('Alerts are blocked. Allow notifications for this site in your browser settings, then try again.',true);
   render();
 }
@@ -1843,7 +1855,7 @@ function settingsViewCloud(){
       ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
       <p>When someone assigns you a task, a message appears here and a red number shows on the bell at the top. Tasks you assign to yourself do not alert you.</p>
       ${alertsOn()?'<p><strong>Desktop alerts are on for this device.</strong></p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off desktop alerts</button></div>':'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on desktop alerts</button></div>'}
-      <p class="muted small" style="margin-top:10px">Desktop alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent.</p>`}</section>
+      <p class="muted small" style="margin-top:10px">Desktop alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent. On an iPhone, alerts only work after you add Family Board to your Home Screen (Share, then Add to Home Screen).</p>`}</section>
     ${appearancePanels()}
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
@@ -1872,4 +1884,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-  </html>
+</html>
