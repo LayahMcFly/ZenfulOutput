@@ -62,7 +62,18 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
   background:var(--walnut);color:var(--on-walnut);padding:14px 18px;border-radius:3px;min-height:44px;display:inline-flex;align-items:center;
   outline:1.5px dashed rgba(247,239,223,.6);outline-offset:-5px}
 .note{margin-top:30px;text-align:center;color:var(--ink-soft);font-size:16px}
-footer{padding:0 20px 28px;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.1em;text-transform:uppercase;color:var(--ink-soft)}
+.foot{background:var(--walnut);color:var(--on-walnut);position:relative;margin-top:24px;padding:38px 20px 26px}
+.foot::before{content:"";position:absolute;inset:7px;border:1.5px dashed rgba(247,239,223,.45);pointer-events:none}
+@media (prefers-color-scheme:dark){.foot::before{border-color:rgba(36,26,20,.4)}}
+.foot .in{width:min(960px,100%);margin:0 auto;padding:0 clamp(0px,2vw,16px);position:relative;display:grid;gap:28px 40px;grid-template-columns:repeat(auto-fit,minmax(210px,1fr))}
+.foot h2{font:700 12px/1.2 var(--label);letter-spacing:.14em;text-transform:uppercase;margin:0 0 12px;opacity:.85}
+.foot p,.foot li{font-size:15px;line-height:1.5;margin:0}
+.foot ul{list-style:none;margin:0;padding:0;display:grid;gap:6px}
+.foot a{color:inherit;text-underline-offset:3px}
+.foot a:hover{text-decoration-thickness:2px}
+.foot :focus-visible{outline-color:var(--on-walnut)}
+.foot .base{grid-column:1/-1;border-top:1px solid rgba(247,239,223,.3);padding-top:16px;font:400 12px/1.5 var(--label);letter-spacing:.08em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
+@media (prefers-color-scheme:dark){.foot .base{border-color:rgba(36,26,20,.35)}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
 </head>
@@ -103,6 +114,35 @@ footer{padding:0 20px 28px;text-align:center;font:400 12px/1.4 var(--label);lett
   </ul>
   <p class="note">Each app saves its data in the browser on the device you use, so recipes and games do not sync between devices. The calendar can share tasks once it is connected to its online database.</p>
 </main>
-<footer>Made at home</footer>
+<footer class="foot">
+  <div class="in">
+    <section aria-labelledby="f-about">
+      <h2 id="f-about">About</h2>
+      <p>A small family corner of the web: recipes, a shared calendar and a coloring game. Made at home, for home.</p>
+    </section>
+    <nav aria-labelledby="f-apps">
+      <h2 id="f-apps">The apps</h2>
+      <ul>
+        <li><a href="recipe-book/">Family Recipe Book</a></li>
+        <li><a href="family-board/">Family Board</a></li>
+        <li><a href="color-bloom/">Color Bloom</a></li>
+      </ul>
+    </nav>
+    <section aria-labelledby="f-legal">
+      <h2 id="f-legal">License and privacy</h2>
+      <p>The code is released under the <a href="LICENSE.txt">MIT License</a>.</p>
+      <p style="margin-top:8px">The recipe book and Color Bloom keep their data only in your own browser. The Family Board does the same until you turn on shared mode, which stores tasks and sign-in emails with our hosting provider, Supabase, where only the people in your workspace can see them.</p>
+    </section>
+    <section aria-labelledby="f-more">
+      <h2 id="f-more">More from Leia</h2>
+      <p><a href="https://layahmcfly.github.io/PlayPop/?v=2" rel="noopener">PlayPop</a>, another website made by Leia: a collection of games to play in your browser.</p>
+    </section>
+    <section aria-labelledby="f-contact">
+      <h2 id="f-contact">Contact</h2>
+      <p>Found a bug or have an idea? Reach out through <a href="https://github.com/layahmcfly">GitHub</a>.</p>
+    </section>
+    <div class="base"><span>&copy; 2026 Leia</span><span>Made at home</span></div>
+  </div>
+</footer>
 </body>
 </html>
