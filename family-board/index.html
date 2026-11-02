@@ -149,6 +149,9 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 .av{overflow:hidden}
 .cyd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font:600 14px var(--label);background:var(--field);color:var(--ink)}
 .cyd.on{border-color:transparent}
+button.cyd{padding:0;cursor:pointer;width:100%}
+button.cyd:hover{filter:brightness(.96)}
+button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cyd.today{outline:2px solid var(--accent);outline-offset:1px}
 .cyd.pad{border:0;background:none}
 .cygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:420px}
@@ -1729,7 +1732,7 @@ function cycleView(){
   for(let d=1;d<=dim;d++){
     const s=y+'-'+pad(m+1)+'-'+pad(d),l=cover(s),rec=l&&l.days.find(x=>x.d===s),hv=rec&&rec.heaviness?HEAVY[rec.heaviness-1]:null;
     const lbl=esc(fmtDate(s,{month:'long',day:'numeric'}))+(l?', period'+(hv?', '+hv[1].toLowerCase()+' flow':', flow not logged')+(rec&&rec.pain!=null?', pain '+rec.pain+' of 10':''):'');
-    cells+=`<div class="cyd${hv?' on':l?' un':''}${s===today?' today':''}" ${hv?`style="background:${hv[0]};color:${rec.heaviness>=3?'#fff':'#3b281d'}"`:''} role="img" aria-label="${lbl}">${d}</div>`;
+    cells+=`<button type="button" class="cyd${hv?' on':l?' un':''}${s===today?' today':''}" ${hv?`style="background:${hv[0]};color:${rec.heaviness>=3?'#fff':'#3b281d'}"`:''} data-cy="day" data-d="${s}" aria-label="${lbl}. Press to see or change this day.">${d}</button>`;
   }
   const starts=logs.map(l=>l.start_date).sort();
   const gaps=[];for(let i=1;i<starts.length;i++)gaps.push(daysBetween(starts[i-1],starts[i]));
@@ -1745,26 +1748,53 @@ function cycleView(){
   const card=l=>{
     const isOpen=!l.end_date,end=l.end_date||today,dates=[];
     for(let d=l.start_date;d<=end&&dates.length<60;d=addDays(d,1))dates.push(d);
-    const shown=isOpen||CY.exp[l.id];
+    const shown=true;
     const rated=l.days.length,pk=l.pain;
     return`<section class="panel"><div class="row" style="justify-content:space-between;align-items:center">
       <h3 style="margin:0">${esc(cyDate(l.start_date,{month:'short',day:'numeric',year:'numeric'}))}${isOpen?' <span class="pill">Ongoing</span>':' to '+esc(cyDate(l.end_date,{month:'short',day:'numeric',year:'numeric'}))}</h3>
       <div class="row">${isOpen?`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}" data-fk="cyend-${esc(l.id)}">End period</button>`:''}<button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}" data-fk="cye-${esc(l.id)}" aria-label="Change dates for the period starting ${esc(cyDate(l.start_date))}">Change dates</button><button type="button" class="btn soft sm" data-cy="del" data-id="${esc(l.id)}" data-fk="cyd-${esc(l.id)}" aria-label="Delete the period starting ${esc(cyDate(l.start_date))}">Delete</button></div></div>
       <p class="muted small" style="margin:6px 0 0">${dates.length} ${dates.length===1?'day':'days'}${rated?` · worst pain ${pk} of 10`:' · nothing rated yet'}${isOpen?' · a new day is added each morning':''}</p>
-      ${isOpen?'':`<div class="row" style="margin-top:8px"><button type="button" class="btn soft sm" data-cy="toggledays" data-id="${esc(l.id)}" data-fk="cytd-${esc(l.id)}" aria-expanded="${!!shown}">${shown?'Hide days':'Show days'}</button></div>`}
       ${shown?dates.map((d,i)=>dayRow(l,d,i+1)).join(''):''}</section>`;
   };
   return`<div class="page-head"><h2>Period tracker</h2>${open?'':'<button type="button" class="btn" data-cy="log" data-fk="cylog">+ Log period start</button>'}</div>
     <p class="muted"><span class="pill">Only you can see this</span> Other people in your workspaces never see this tab or what is in it.</p>
-    ${logs.length?'':'<section class="panel"><p class="muted" style="margin:0">Nothing logged yet. Choose “Log period start” when your period begins. Each day then appears in a list where you tap how much pain you had, from 0 to 10, and how heavy the flow was. When it finishes, tap “End period”.</p></section>'}
-    ${logs.map(card).join('')}
+    <p class="muted">${logs.length?'Press any date on the calendar to see its pain and flow, or to change them.':'Choose “Log period start” when your period begins. While it lasts, each day appears in a list where you tap how much pain you had, from 0 to 10, and how heavy the flow was. When it finishes, tap “End period”. After that, press any date on the calendar to see that day.'}</p>
+    ${open?card(open):''}
     <section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><button type="button" class="btn soft sm" data-cy="mprev" data-fk="cyprev" aria-label="Previous month">‹ Prev</button><h3 style="margin:0">${esc(CY.month.toLocaleDateString('en-US',{month:'long',year:'numeric'}))}</h3><button type="button" class="btn soft sm" data-cy="mnext" data-fk="cynext" aria-label="Next month">Next ›</button></div>
       <div class="cygrid" style="margin-top:12px">${['S','M','T','W','T','F','S'].map(x=>`<div class="dh" aria-hidden="true">${x}</div>`).join('')}${cells}</div>
       <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="sw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p></section>
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
       <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}`;
 }
+function cyDayHTML(d){
+  const today=todayStr(),l=CY.logs.find(x=>x.start_date<=d&&d<=(x.end_date||today));
+  const title=fmtDate(d,{weekday:'long',month:'long',day:'numeric',year:'numeric'});
+  if(!l){
+    const ongoing=CY.logs.some(x=>!x.end_date);
+    return`<div class="dbody">${dhead(title)}
+      ${d>today?'<p class="muted">This day has not happened yet.</p>'
+        :`<p>No period logged on this day.</p>${ongoing?'<p class="muted small">You already have a period that is still going. End it first if you want to start another.</p>'
+          :`<div class="row"><button type="button" class="btn" data-cy="startat" data-d="${d}" data-fk="cystart">Start a period on this day</button></div>`}`}</div>`;
+  }
+  const r=l.days.find(x=>x.d===d)||{pain:null,heaviness:null},hv=r.heaviness?HEAVY[r.heaviness-1]:null,n=daysBetween(l.start_date,d)+1;
+  const sum=`<p style="font-size:20px;margin:6px 0 12px">Pain: <strong>${r.pain==null?'not logged':r.pain+' of 10'}</strong><br>Flow: ${hv?`<span class="sw" style="background:${hv[0]}"></span><strong>${hv[1]}</strong>`:'<strong>not logged</strong>'}</p>`;
+  const ctl=`<div class="ctl"><span class="lbl" id="dp">Pain</span><div class="pn" role="group" aria-labelledby="dp">${Array.from({length:11},(_,i)=>`<button type="button" class="pb${r.pain===i?' on':''}" aria-pressed="${r.pain===i}" aria-label="Pain ${i} of 10" data-cy="pain" data-id="${esc(l.id)}" data-d="${d}" data-v="${i}">${i}</button>`).join('')}</div></div>
+    <div class="ctl"><span class="lbl" id="df">Flow</span><div class="fl" role="group" aria-labelledby="df">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="sw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div>`;
+  return`<div class="dbody">${dhead(title)}
+    <p class="muted small" style="margin:0">Day ${n} of the period that ${l.end_date?'ran '+esc(cyDate(l.start_date))+' to '+esc(cyDate(l.end_date)):'started '+esc(cyDate(l.start_date))+' and is still going'}.</p>
+    ${sum}${ctl}
+    <div class="row" style="margin-top:14px"><button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}">Change dates</button>${l.end_date?'':`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}">End period</button>`}<button type="button" class="btn soft sm" data-cy="del" data-id="${esc(l.id)}">Delete this period</button></div></div>`;
+}
+function cyRefreshDay(){
+  const dlg=$('#dlg');if(!dlg.open||!dlg.dataset.cyday)return;
+  const had=document.activeElement&&document.activeElement.dataset?{c:document.activeElement.dataset.cy,v:document.activeElement.dataset.v}:null;
+  dlg.innerHTML=cyDayHTML(dlg.dataset.cyday);
+  if(had&&had.c){const b=dlg.querySelector('[data-cy="'+had.c+'"]'+(had.v?'[data-v="'+had.v+'"]':''));if(b)b.focus()}
+}
+function openCycleDay(d){openDlg(cyDayHTML(d));$('#dlg').dataset.cyday=d}
+$('#dlg').addEventListener('close',()=>{$('#dlg').dataset.cyday=''});
 function openCycleForm(l,mode){
+  $('#dlg').dataset.cyday='';
   const v=l||{id:'',start_date:todayStr(),end_date:''};
   const ongoing=!v.end_date&&mode!=='end';
   const title=mode==='end'?'End your period':l?'Change dates':'Log period start';
@@ -1800,7 +1830,7 @@ async function cySaveLog(rec,isEdit){
     }else if(!isEdit)rec.id=uid();
     CY.logs=CY.logs.filter(x=>x.id!==rec.id);CY.logs.push(rec);cySort();
     if(!CL.on)cyLocalSave();
-    render();toast('Saved.');return true;
+    render();cyRefreshDay();toast('Saved.');return true;
   }catch(e){toast(dbHint(e.message),true);return false}
 }
 function cySetDay(id,d,k,v){
@@ -1810,7 +1840,7 @@ function cySetDay(id,d,k,v){
   l.days=l.days.filter(x=>x.d!==d);
   if(nx.pain!==null||nx.heaviness!==null)l.days.push(nx);
   l.days.sort((a,b)=>a.d<b.d?-1:1);cySummary(l);
-  render();cyQueueSave(l.id);
+  render();cyRefreshDay();cyQueueSave(l.id);
 }
 function cyQueueSave(id){
   if(!CL.on){cyLocalSave();return}
@@ -1845,8 +1875,9 @@ document.addEventListener('click',async e=>{
     case'end':if(l)openCycleForm(l,'end');break;
     case'pain':cySetDay(id,b.dataset.d,'pain',+b.dataset.v);break;
     case'flow':cySetDay(id,b.dataset.d,'heaviness',+b.dataset.v);break;
-    case'toggledays':CY.exp[id]=!CY.exp[id];render();break;
-    case'del':if(l&&await confirmBox('Delete this entry?','The entry is removed from your tracker.','Delete',true))await cyDelete(id);break;
+    case'day':openCycleDay(b.dataset.d);break;
+    case'startat':{const d=b.dataset.d;if(d&&await cySaveLog(cyClean({id:'',start_date:d,end_date:'',days:[]}),false))openCycleDay(d);break}
+    case'del':if(l&&await confirmBox('Delete this period?','The period and its pain and flow entries are removed from your tracker.','Delete',true)){await cyDelete(id);closeDlg()}break;
     case'delall':if(await confirmBox('Delete all cycle entries?','Every entry in your tracker is removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
     case'mprev':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()-1,1);render();break;
     case'mnext':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()+1,1);render();break;
