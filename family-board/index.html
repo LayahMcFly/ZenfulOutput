@@ -481,7 +481,7 @@ function blankData(ws,user){
   const m={id:uid(),name:user,role:'owner',color:PALETTE[0].hex,sample:false};
   return{app:'family-board',version:1,workspace:{name:ws,createdAt:new Date().toISOString()},members:[m],groups:[],tasks:[],currentUserId:m.id};
 }
-const hasSample=()=>D.members.some(m=>m.sample)||D.groups.some(g=>g.sample)||D.tasks.some(t=>t.sample);
+const hasSample=()=>!CL.on&&D.members.some(m=>m.sample)||D.groups.some(g=>g.sample)||D.tasks.some(t=>t.sample);
 
 /* =====================================================================
    3. Feedback: toast, live region, effects, cursor
@@ -1395,6 +1395,30 @@ function openPhotoDialog(){
     cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok)closeDlg()});
   });
 }
+function openDeleteWs(w){
+  openDlg(`<form id="delwsform" class="dbody" novalidate>${dhead('Delete this workspace?')}
+    <p class="err" id="dwerr" role="alert" hidden></p>
+    <p><strong>${esc(w.name)}</strong> has ${w.count} ${w.count===1?'person':'people'}. Deleting it removes its calendar, groups, tasks, task history and invite links for everyone. This cannot be undone.</p>
+    <div class="field"><label for="dw-name">Type the workspace name to confirm</label><input id="dw-name" type="text" autocomplete="off" placeholder="${esc(w.name)}"></div>
+    <div class="row"><button class="btn danger" type="submit" id="dw-go" disabled>Delete workspace</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  const inp=$('#dw-name'),go=$('#dw-go');
+  inp.addEventListener('input',()=>{go.disabled=inp.value.trim()!==w.name});
+  $('#delwsform').addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    if(inp.value.trim()!==w.name)return;
+    if(CL.busy)return;CL.busy=true;
+    try{
+      await rpc('delete_workspace',{p_ws:w.id});
+      CL.busy=false;closeDlg();
+      if(CL.wsId===w.id){CL.wsId='';try{localStorage.removeItem(WSKEY)}catch{}}
+      toast('Workspace deleted.');
+      await cloudBoot();
+    }catch(e){
+      CL.busy=false;const er=$('#dwerr');
+      er.textContent=/delete_workspace/i.test(e.message||'')?'Your database needs a small update before workspaces can be deleted. Run supabase-update-delete-workspace.sql in Supabase.':(e.message||'That did not work.');er.hidden=false;
+    }
+  });
+}
 function openMyName(){
   openDlg(`<form id="dnform" class="dbody" novalidate>${dhead('Change my display name')}
     <p class="err" id="dnerr" role="alert" hidden></p>
@@ -1467,6 +1491,10 @@ async function cloudClick(a,b,id){
     }
     case'newws':openNewWsCloud();return true;
     case'openws':await cloudSwitch(id);return true;
+    case'delws':{
+      const w=CL.workspaces.find(x=>x.id===id);if(!w)return true;
+      openDeleteWs(w);return true;
+    }
     case'createinvite':{
       let tok='';
       const ok=await cloudDo(async()=>{tok=await rpc('create_invite',{p_ws:CL.wsId})},null);
@@ -1645,7 +1673,7 @@ function cloudGateView(){
 }
 function cloudWorkspacesView(){
   const row=w=>`<div class="mem" style="grid-template-columns:1fr auto"><div><div class="nm">${esc(w.name)}${w.id===CL.wsId?' <span class="pill">Open now</span>':''}</div><div class="muted small">You are ${w.role==='owner'?'the owner':w.role==='admin'?'an admin':'a member'} · ${w.count} ${w.count===1?'person':'people'}</div></div>
-    <div class="row">${w.id===CL.wsId?'':`<button class="btn soft sm" data-act="openws" data-id="${esc(w.id)}" data-fk="ow-${esc(w.id)}" aria-label="Open ${esc(w.name)}">Open</button>`}</div></div>`;
+    <div class="row">${w.id===CL.wsId?'':`<button class="btn soft sm" data-act="openws" data-id="${esc(w.id)}" data-fk="ow-${esc(w.id)}" aria-label="Open ${esc(w.name)}">Open</button>`}${w.role==='owner'?`<button class="btn soft sm" data-act="delws" data-id="${esc(w.id)}" data-fk="dw-${esc(w.id)}" aria-label="Delete ${esc(w.name)}">Delete</button>`:''}</div></div>`;
   const mine=CL.workspaces.filter(w=>w.role==='owner'),joined=CL.workspaces.filter(w=>w.role!=='owner');
   const block=(h,l,empty)=>`<section class="panel"><h3>${h} (${l.length})</h3>${l.length?l.map(row).join(''):`<p class="muted">${empty}</p>`}</section>`;
   return`<div class="page-head"><h2>Workspaces</h2><button class="btn" data-act="newws" data-fk="newws-tab">+ New workspace</button></div>
