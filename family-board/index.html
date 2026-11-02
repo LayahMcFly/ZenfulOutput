@@ -149,6 +149,8 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 .av{overflow:hidden}
 .cyd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font:600 14px var(--label);background:var(--field);color:var(--ink)}
 .cyd.on{border-color:transparent}
+.dz{border:2px solid var(--warn);border-radius:8px;padding:16px 18px;margin-top:32px}
+.dz h3{color:var(--warn);margin-top:0}
 button.cyd{padding:0;cursor:pointer;width:100%;position:relative}
 .cyd .pv{position:absolute;right:3px;bottom:3px;min-width:17px;height:17px;padding:0 3px;box-sizing:border-box;border-radius:9px;background:rgba(255,255,255,.94);color:#3b281d;font:700 11px/17px var(--label);text-align:center;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
 @media (max-width:520px){.cyd .pv{min-width:15px;height:15px;font-size:10px;line-height:15px;right:2px;bottom:2px}}
@@ -814,7 +816,8 @@ function settingsView(){
       <p class="muted small" style="margin-top:10px">Storage: ${storageOK?'saving to this browser':'not available, changes are kept in memory only'}.</p></section>
     ${collabPanel()}
     <section class="panel"><h3>Activity records in local mode</h3>
-      <p>Each task keeps a history of creation, reassignment, completion, reopening and group moves. Every entry is recorded under your name, because this copy is only for you. Shared mode records each person’s own sign-in instead.</p></section>`;
+      <p>Each task keeps a history of creation, reassignment, completion, reopening and group moves. Every entry is recorded under your name, because this copy is only for you. Shared mode records each person’s own sign-in instead.</p></section>
+    ${cyDanger()}`;
 }
 
 /* ---- render ---- */
@@ -1721,8 +1724,7 @@ function privateFields(){
     <p class="muted small">Only you can see this. It is never shown to anyone in a workspace${CL.on?', and it is saved in your own private rows that other members cannot read':', and it stays in this browser'}.</p>
     <fieldset style="border:0;padding:0;margin:8px 0 0"><legend class="small muted">Gender</legend>${opt('none','Prefer not to say')}${opt('male','Male')}${opt('female','Female')}</fieldset>
     ${g==='female'?`<label class="chk" style="margin:12px 0 4px"><input type="checkbox" data-cy="tracker" ${CY.on?'checked':''}> <span><strong>Period tracker</strong>, shown as a private “Cycle” tab</span></label>
-      <p class="muted small">Turning it off hides the tab. Your entries are kept, so turning it back on brings them back.</p>
-      ${CY.logs.length?`<div class="row" style="margin-top:8px"><button type="button" class="btn danger sm" data-cy="delall" data-fk="cydelall">Delete all my cycle entries</button></div>`:''}`:''}`;
+      <p class="muted small">Turning it off hides the tab. Your entries are kept, so turning it back on brings them back.</p>`:''}`;
 }
 /* local mode has no separate profile panel, so it gets its own "Your profile" panel */
 function privatePanel(){return`<section class="panel"><h3>Your profile</h3>${privateFields()}</section>`}
@@ -1750,24 +1752,34 @@ function cycleView(){
   const card=l=>{
     const isOpen=!l.end_date,end=l.end_date||today,dates=[];
     for(let d=l.start_date;d<=end&&dates.length<60;d=addDays(d,1))dates.push(d);
+    const total=dates.length,hidden=Math.max(0,total-14),shownDates=dates.slice(hidden);
     const shown=true;
     const rated=l.days.length,pk=l.pain;
     return`<section class="panel"><div class="row" style="justify-content:space-between;align-items:center">
       <h3 style="margin:0">${esc(cyDate(l.start_date,{month:'short',day:'numeric',year:'numeric'}))}${isOpen?' <span class="pill">Ongoing</span>':' to '+esc(cyDate(l.end_date,{month:'short',day:'numeric',year:'numeric'}))}</h3>
       <div class="row">${isOpen?`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}" data-fk="cyend-${esc(l.id)}">End period</button>`:''}<button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}" data-fk="cye-${esc(l.id)}" aria-label="Change dates for the period starting ${esc(cyDate(l.start_date))}">Change dates</button><button type="button" class="btn soft sm" data-cy="del" data-id="${esc(l.id)}" data-fk="cyd-${esc(l.id)}" aria-label="Delete the period starting ${esc(cyDate(l.start_date))}">Delete</button></div></div>
       <p class="muted small" style="margin:6px 0 0">${dates.length} ${dates.length===1?'day':'days'}${rated?` · worst pain ${pk} of 10`:' · nothing rated yet'}${isOpen?' · a new day is added each morning':''}</p>
-      ${shown?dates.map((d,i)=>dayRow(l,d,i+1)).join(''):''}</section>`;
+      ${hidden?`<p class="muted small" style="margin:8px 0 0">Showing the last 14 days. Press a date on the calendar to see or change earlier days. If this period has finished, tap “End period”.</p>`:''}
+      ${shownDates.map(d=>dayRow(l,d,dates.indexOf(d)+1)).join('')}</section>`;
   };
   return`<div class="page-head"><h2>Period tracker</h2>${open?'':'<button type="button" class="btn" data-cy="log" data-fk="cylog">+ Log period start</button>'}</div>
     <p class="muted"><span class="pill">Only you can see this</span> Other people in your workspaces never see this tab or what is in it.</p>
     <p class="muted">${logs.length?'Press any date on the calendar to see its pain and flow, or to change them.':'Choose “Log period start” when your period begins. While it lasts, each day appears in a list where you tap how much pain you had, from 0 to 10, and how heavy the flow was. When it finishes, tap “End period”. After that, press any date on the calendar to see that day.'}</p>
-    ${open?card(open):''}
     <section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><button type="button" class="btn soft sm" data-cy="mprev" data-fk="cyprev" aria-label="Previous month">‹ Prev</button><h3 style="margin:0">${esc(CY.month.toLocaleDateString('en-US',{month:'long',year:'numeric'}))}</h3><button type="button" class="btn soft sm" data-cy="mnext" data-fk="cynext" aria-label="Next month">Next ›</button></div>
       <div class="cygrid" style="margin-top:12px">${['S','M','T','W','T','F','S'].map(x=>`<div class="dh" aria-hidden="true">${x}</div>`).join('')}${cells}</div>
       <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="sw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
       <p class="muted small" style="margin-top:4px">The small white circle in a day’s corner is that day’s pain, from 0 to 10.</p></section>
+    ${open?card(open):''}
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
-      <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}`;
+      <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}
+    ${cyDanger()}`;
+}
+function cyDanger(){
+  if(CY.noDb||!CY.logs.length)return'';
+  const n=CY.logs.length;
+  return`<section class="panel dz" aria-labelledby="dzh"><h3 id="dzh">Danger zone</h3>
+    <p>Delete all ${n} ${n===1?'period':'periods'} you have logged, with every pain and flow entry. This cannot be undone.</p>
+    <div class="row"><button type="button" class="btn danger" data-cy="delall" data-fk="cydelall">Delete all my cycle entries</button></div></section>`;
 }
 function cyDayHTML(d){
   const today=todayStr(),l=CY.logs.find(x=>x.start_date<=d&&d<=(x.end_date||today));
@@ -1834,6 +1846,7 @@ async function cySaveLog(rec,isEdit){
       else{const r=await changeRows('/rest/v1/cycle_logs','POST',{...body,user_id:CL.session.user_id});rec=cyClean(r[0])}
     }else if(!isEdit)rec.id=uid();
     CY.logs=CY.logs.filter(x=>x.id!==rec.id);CY.logs.push(rec);cySort();
+    CY.month=new Date(+rec.start_date.slice(0,4),+rec.start_date.slice(5,7)-1,1);
     if(!CL.on)cyLocalSave();
     render();cyRefreshDay();toast('Saved.');return true;
   }catch(e){toast(dbHint(e.message),true);return false}
@@ -1845,6 +1858,7 @@ function cySetDay(id,d,k,v){
   l.days=l.days.filter(x=>x.d!==d);
   if(nx.pain!==null||nx.heaviness!==null)l.days.push(nx);
   l.days.sort((a,b)=>a.d<b.d?-1:1);cySummary(l);
+  CY.month=new Date(+d.slice(0,4),+d.slice(5,7)-1,1);   // show the month that was just changed
   render();cyRefreshDay();cyQueueSave(l.id);
 }
 function cyQueueSave(id){
@@ -1896,7 +1910,7 @@ document.addEventListener('click',async e=>{
       const ns=d===x.start_date?addDays(d,1):x.start_date,ne=x.end_date&&d===x.end_date?addDays(d,-1):x.end_date;
       await cySaveLog(cyClean({id:x.id,start_date:ns,end_date:ne,days:x.days}),true);break;
     }
-    case'delall':if(await confirmBox('Delete all cycle entries?','Every entry in your tracker is removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
+    case'delall':if(await confirmBox('Delete all cycle entries?','All '+CY.logs.length+' '+(CY.logs.length===1?'period':'periods')+' and every pain and flow entry are removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
     case'mprev':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()-1,1);render();break;
     case'mnext':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()+1,1);render();break;
   }
@@ -2286,7 +2300,8 @@ function settingsViewCloud(){
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
       <div class="row" style="margin-top:12px"><button class="btn" data-act="export" data-fk="exp">Export workspace</button></div></section>
-    ${collabPanel()}`;
+    ${collabPanel()}
+    ${cyDanger()}`;
 }
 
 /* =====================================================================
