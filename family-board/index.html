@@ -149,7 +149,9 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 .av{overflow:hidden}
 .cyd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font:600 14px var(--label);background:var(--field);color:var(--ink)}
 .cyd.on{border-color:transparent}
-button.cyd{padding:0;cursor:pointer;width:100%}
+button.cyd{padding:0;cursor:pointer;width:100%;position:relative}
+.cyd .pv{position:absolute;right:3px;bottom:3px;min-width:17px;height:17px;padding:0 3px;box-sizing:border-box;border-radius:9px;background:rgba(255,255,255,.94);color:#3b281d;font:700 11px/17px var(--label);text-align:center;box-shadow:0 0 0 1px rgba(0,0,0,.18)}
+@media (max-width:520px){.cyd .pv{min-width:15px;height:15px;font-size:10px;line-height:15px;right:2px;bottom:2px}}
 button.cyd:hover{filter:brightness(.96)}
 button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .cyd.today{outline:2px solid var(--accent);outline-offset:1px}
@@ -1732,7 +1734,7 @@ function cycleView(){
   for(let d=1;d<=dim;d++){
     const s=y+'-'+pad(m+1)+'-'+pad(d),l=cover(s),rec=l&&l.days.find(x=>x.d===s),hv=rec&&rec.heaviness?HEAVY[rec.heaviness-1]:null;
     const lbl=esc(fmtDate(s,{month:'long',day:'numeric'}))+(l?', period'+(hv?', '+hv[1].toLowerCase()+' flow':', flow not logged')+(rec&&rec.pain!=null?', pain '+rec.pain+' of 10':''):'');
-    cells+=`<button type="button" class="cyd${hv?' on':l?' un':''}${s===today?' today':''}" ${hv?`style="background:${hv[0]};color:${rec.heaviness>=3?'#fff':'#3b281d'}"`:''} data-cy="day" data-d="${s}" aria-label="${lbl}. Press to see or change this day.">${d}</button>`;
+    cells+=`<button type="button" class="cyd${hv?' on':l?' un':''}${s===today?' today':''}" ${hv?`style="background:${hv[0]};color:${rec.heaviness>=3?'#fff':'#3b281d'}"`:''} data-cy="day" data-d="${s}" aria-label="${lbl}. Press to see or change this day.">${d}${rec&&rec.pain!=null?`<span class="pv" aria-hidden="true">${rec.pain}</span>`:''}</button>`;
   }
   const starts=logs.map(l=>l.start_date).sort();
   const gaps=[];for(let i=1;i<starts.length;i++)gaps.push(daysBetween(starts[i-1],starts[i]));
@@ -1762,7 +1764,8 @@ function cycleView(){
     ${open?card(open):''}
     <section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><button type="button" class="btn soft sm" data-cy="mprev" data-fk="cyprev" aria-label="Previous month">‹ Prev</button><h3 style="margin:0">${esc(CY.month.toLocaleDateString('en-US',{month:'long',year:'numeric'}))}</h3><button type="button" class="btn soft sm" data-cy="mnext" data-fk="cynext" aria-label="Next month">Next ›</button></div>
       <div class="cygrid" style="margin-top:12px">${['S','M','T','W','T','F','S'].map(x=>`<div class="dh" aria-hidden="true">${x}</div>`).join('')}${cells}</div>
-      <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="sw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p></section>
+      <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="sw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
+      <p class="muted small" style="margin-top:4px">The small white circle in a day’s corner is that day’s pain, from 0 to 10.</p></section>
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
       <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}`;
 }
