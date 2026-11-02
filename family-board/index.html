@@ -29,7 +29,7 @@
   --ink:#3b281d; --ink-soft:#6a5140; --walnut:#6f4a33; --caramel:#b0845b; --rust:#93573a; --line:#d6c3a1; --shadow:rgba(64,41,29,.35);
   --accent:#3d5668; --on-accent:#f6f0e2; --wash:rgba(61,86,104,.10); --wknd:#f2e8d2; --today:#e3ebee;
   --hole:#cdb994; --coil:#7f8c96; --grid:rgba(111,74,51,.075);
-  --ok:#4d6a3a; --warn:#8a2f1f;
+  --ok:#4d6a3a; --warn:#8a2f1f; --mark:#b3332a;
   --display:Georgia,'Times New Roman',serif;
   --body:Georgia,'Iowan Old Style','Times New Roman',serif;
   --label:ui-monospace,'Courier New',Courier,monospace;
@@ -40,7 +40,7 @@ html[data-theme=dark]{
   --ink:#f1e6d2; --ink-soft:#c9b79e; --walnut:#c79a6b; --caramel:#b0845b; --rust:#e09a74; --line:#57432f; --shadow:rgba(0,0,0,.55);
   --accent:#8db0c6; --on-accent:#16222b; --wash:rgba(141,176,198,.14); --wknd:#32261c; --today:#26343f;
   --hole:#17100b; --coil:#8d9aa4; --grid:rgba(199,154,107,.07);
-  --ok:#9bbd7e; --warn:#f0907c; color-scheme:dark;
+  --ok:#9bbd7e; --warn:#f0907c; --mark:#ff9a86; color-scheme:dark;
 }
 *{box-sizing:border-box}
 html{background:var(--paper);font-size:100%}
@@ -168,10 +168,36 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
 .dow{background:var(--accent);color:var(--on-accent);padding:9px 6px;text-align:center;font:700 12px/1 var(--label);letter-spacing:.14em;text-transform:uppercase}
 .day{background:var(--field);min-height:122px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.day{position:relative}
+.day>:not(.xmark){position:relative;z-index:1}
 .day:nth-child(7n+1),.day:nth-child(7n){background:var(--wknd)}
+/* fridge-calendar marks: an X through days that have passed, a hand-drawn circle around special occasions */
+.xmark{position:absolute;left:4px;top:4px;width:calc(100% - 8px);height:calc(100% - 8px);pointer-events:none;z-index:0}
+.xmark path{fill:none;stroke:var(--ink);stroke-opacity:.3;stroke-width:2.4;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.dn{position:relative;display:inline-grid;place-items:center;min-width:30px;height:30px}
+.circ{position:absolute;left:-5px;top:-5px;width:calc(100% + 10px);height:calc(100% + 10px);pointer-events:none;overflow:visible}
+.circ path{fill:none;stroke:var(--mark);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
+.stat.spc{color:var(--mark)}
+.legend{display:flex;gap:6px 22px;flex-wrap:wrap;align-items:center;margin-top:12px}
+.legend span{display:inline-flex;gap:8px;align-items:center}
+.legend svg{width:22px;height:22px;flex:none}
+.legend svg path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.4}
+.legend .lx path{stroke:var(--ink);stroke-opacity:.5}
+.legend .lc path{stroke:var(--mark)}
+/* compact month for phones */
+.mini{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line);margin-bottom:8px}
+.mini .dow{padding:7px 0;font-size:10px;letter-spacing:.04em}
+.mday{position:relative;background:var(--field);border:0;padding:6px 0 6px;min-height:56px;display:flex;flex-direction:column;align-items:center;gap:4px;font:700 16px/1 var(--display);color:var(--ink);min-width:0}
+.mday>:not(.xmark){position:relative;z-index:1}
+.mday:nth-child(7n+1),.mday:nth-child(7n){background:var(--wknd)}
+.mday.other{background:var(--paper-lo);opacity:.8;font-weight:400}
+.mday.today{background:var(--today);box-shadow:inset 0 3px 0 var(--accent)}
+.mday .dn{min-width:28px;height:28px}
+.dots{display:flex;gap:3px;height:6px}
+.dots i{display:block;width:6px;height:6px;background:var(--c,var(--caramel))}
 .day.other{background:var(--paper-lo);opacity:.8}
 .day:hover{background:var(--linen)}
-.dnum{align-self:flex-start;background:none;border:0;padding:2px 6px;min-height:30px;font:700 19px/1 var(--display);display:flex;gap:8px;align-items:center;border-radius:2px}
+.dnum{align-self:flex-start;background:none;border:0;padding:2px 6px;min-height:34px;font:700 19px/1 var(--display);display:flex;gap:8px;align-items:center;border-radius:2px}
 .dnum:hover{background:var(--wash)}
 .day.other .dnum{font-weight:400}
 .day.today{background:var(--today);box-shadow:inset 0 3px 0 var(--accent)}
@@ -297,7 +323,7 @@ const CL={on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces
    2. Data model, validation, storage
    ===================================================================== */
 let D=null;                 // workspace data
-let ST={theme:'system',cursor:true,effects:true,large:false,calMode:'month'};
+let ST={theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
 let storageOK=true, loadNote='';
 const UI={view:'calendar',month:new Date(new Date().getFullYear(),new Date().getMonth(),1),f:{person:'all',group:'all',status:'all'},gid:'',popId:''};
 
@@ -329,7 +355,7 @@ function normalize(d){
       id:t.id.slice(0,40),title:str(t.title,120).trim(),description:str(t.description,2000),
       due:parseYmd(t.due)?t.due:'',time:parseYmd(t.due)&&validTime(t.time)?t.time:'',
       assigneeId:mids.has(t.assigneeId)?t.assigneeId:'',groupId:gids.has(t.groupId)?t.groupId:'',
-      status:done?'complete':'open',
+      status:done?'complete':'open',special:!!t.special&&!!parseYmd(t.due),
       completedBy:done?str(t.completedBy,40):'',completedByName:done?str(t.completedByName,60):'',
       completedForId:done?str(t.completedForId,40):'',completedForName:done?str(t.completedForName,60):'',
       completedAt:done?str(t.completedAt,40):'',createdAt:str(t.createdAt,40),sample:!!t.sample,
@@ -363,7 +389,7 @@ const group=id=>D.groups.find(g=>g.id===id)||null;
 const task=id=>D.tasks.find(t=>t.id===id)||null;
 const me=()=>member(D.currentUserId)||D.members[0];
 const mName=id=>{const m=member(id);return m?m.name:'Unassigned'};
-const canManage=()=>['owner','admin'].includes(me().role);
+const canManage=()=>!CL.on||['owner','admin'].includes(me().role);   // local mode is one person, so they manage everything
 const tasksIn=g=>D.tasks.filter(t=>t.groupId===g.id);
 const progress=g=>{const l=tasksIn(g);return{done:l.filter(t=>t.status==='complete').length,total:l.length}};
 const byDate=(a,b)=>(a.due||'9999').localeCompare(b.due||'9999')||(a.time||'99').localeCompare(b.time||'99')||a.title.localeCompare(b.title);
@@ -371,7 +397,7 @@ const isOverdue=t=>t.status!=='complete'&&t.due&&t.due<todayStr();
 
 function ev(type,actor,at,extra){return{id:uid(),type,at:at||new Date().toISOString(),actorId:actor.id,actorName:actor.name,...extra}}
 function makeTask(f,actor,at){
-  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',assigneeId:f.assigneeId||'',groupId:f.groupId||'',
+  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',assigneeId:f.assigneeId||'',groupId:f.groupId||'',special:!!(f.special&&f.due),
     status:'open',completedBy:'',completedByName:'',completedForId:'',completedForName:'',completedAt:'',createdAt:at||new Date().toISOString(),sample:!!f.sample,history:[]};
   t.history.push(ev('created',actor,t.createdAt,{assigneeName:t.assigneeId?mName(t.assigneeId):''}));
   return t;
@@ -404,27 +430,28 @@ function applyGroup(t,newId,actor){
 function sampleData(){
   const base=new Date(),off=n=>ymd(new Date(base.getFullYear(),base.getMonth(),base.getDate()+n));
   const at=(n,h,mi)=>new Date(base.getFullYear(),base.getMonth(),base.getDate()+n,h,mi).toISOString();
-  const M=[['m-jordan','Jordan','owner'],['m-taylor','Taylor','admin'],['m-riley','Riley','member'],['m-casey','Casey','member']]
-    .map((m,i)=>({id:m[0],name:m[1],role:m[2],color:PALETTE[[0,3,2,5][i]].hex,sample:true}));
+  const M=[['m-me','Me','owner'],['m-taylor','Taylor','member'],['m-riley','Riley','member'],['m-casey','Casey','member']]
+    .map((m,i)=>({id:m[0],name:m[1],role:m[2],color:PALETTE[[0,3,2,5][i]].hex,sample:i>0}));
   const G=[
     {id:'g-book',name:'Book Project',description:'Read one book together, then summarize and present it.',color:PALETTE[4].hex,sample:true},
     {id:'g-chores',name:'Weekend Chores',description:'Yard and house jobs that need doing before Sunday.',color:PALETTE[6].hex,sample:true}];
-  D={app:'family-board',version:1,workspace:{name:'Sample Family',createdAt:new Date().toISOString()},members:M,groups:G,tasks:[],currentUserId:'m-jordan'};
-  const J=M[0],T=M[1],R=M[2],C=M[3];
+  D={app:'family-board',version:1,workspace:{name:'Sample Family',createdAt:new Date().toISOString()},members:M,groups:G,tasks:[],currentUserId:'m-me'};
+  const J=M[0];
   const add=(f,actor)=>{const t=makeTask({...f,sample:true},actor||J,at(-8,9,0));D.tasks.push(t);return t};
   const t1=add({title:'Read chapters 1–3',assigneeId:'m-riley',groupId:'g-book',due:off(-4)});
-  applyComplete(t1,T,at(-4,16,35));
+  applyComplete(t1,J,at(-4,16,35));
   add({title:'Finish the book',assigneeId:'m-riley',groupId:'g-book',due:off(5)});
   add({title:'Write a book summary',assigneeId:'m-casey',groupId:'g-book',due:off(9)});
-  add({title:'Prepare the book presentation',assigneeId:'m-jordan',groupId:'g-book',due:off(14)});
-  add({title:'Give the presentation',assigneeId:'m-riley',groupId:'g-book',due:off(18),time:'18:30',description:'Family room after dinner. Slides are optional.'});
-  add({title:'Mow the lawn',assigneeId:'m-jordan',groupId:'g-chores',due:off(2)});
+  add({title:'Prepare the book presentation',assigneeId:'m-me',groupId:'g-book',due:off(14)});
+  add({title:'Give the presentation',assigneeId:'m-riley',groupId:'g-book',due:off(18),time:'18:30',special:true,description:'Family room after dinner. Slides are optional.'});
+  add({title:'Mow the lawn',assigneeId:'m-me',groupId:'g-chores',due:off(2)});
   add({title:'Clean out the garage',assigneeId:'m-taylor',groupId:'g-chores',due:off(6)});
   add({title:'Pay the water bill',assigneeId:'m-taylor',due:off(3)});
-  add({title:'Buy a birthday gift',assigneeId:'m-jordan',due:off(-1)});
+  add({title:'Buy a birthday gift',assigneeId:'m-me',due:off(-1)});
   add({title:'Plan family dinner',assigneeId:'m-casey',due:off(0),time:'17:30'});
   const t2=add({title:'Return library books',assigneeId:'m-riley',due:off(-2)});
-  applyComplete(t2,R,at(-2,15,10));
+  applyComplete(t2,J,at(-2,15,10));
+  add({title:'Casey’s birthday',due:off(12),special:true});
   add({title:'Schedule dentist visits'});
   return D;
 }
@@ -515,7 +542,7 @@ function taskRow(t,ctx){
     <input type="checkbox" class="cb" data-cb="${t.id}" data-fk="cb-${ctx}-${t.id}" ${done?'checked':''} aria-label="Mark “${esc(t.title)}” complete">
     <button type="button" class="tmain" data-act="open" data-id="${t.id}" data-fk="open-${ctx}-${t.id}">
       <span class="ttitle">${esc(t.title)}</span>
-      <span class="tmeta">${whoTag(t.assigneeId)}${gTag(g)}<span>${esc(dueText(t))}</span>${statusTag(t)}</span>
+      <span class="tmeta">${whoTag(t.assigneeId)}${gTag(g)}<span>${esc(dueText(t))}</span>${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion</span>':''}</span>
     </button></div>`;
 }
 function chip(t){
@@ -540,7 +567,7 @@ const pass=t=>{
 const sel=(id,label,opts,val,extra='')=>`<div class="field"><label for="${id}">${label}</label><select id="${id}" ${extra}>${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
 
 function tabsNav(){
-  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members','Members'],['settings','Settings']];
+  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],['settings','Settings']];
   return`<nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav>`;
 }
 function header(){
@@ -548,9 +575,8 @@ function header(){
   const u=me();
   return`<header class="top"><div class="in">
     <div class="brand">${LOGO}<div><h1>Family Board</h1><div class="ws">${esc(D.workspace.name)}</div></div></div>
-    <div class="who-box"><span class="pill" title="Data stays in this browser. It is not shared with other devices or people.">Local demo mode</span>
-      <label for="actas">Acting as (demo)</label>
-      <select id="actas" data-act="actas" data-fk="actas" style="width:auto;min-width:140px">${D.members.map(m=>`<option value="${esc(m.id)}"${m.id===u.id?' selected':''}>${esc(m.name)}</option>`).join('')}</select></div>
+    <div class="who-box"><span class="pill" title="Everything stays in this browser on this device. Nobody else can see it.">Local · just you</span>
+      <span>Using as <strong>${esc(u.name)}</strong></span></div>
     </div></header>`;
 }
 function banners(){
@@ -558,11 +584,13 @@ function banners(){
   let h='';
   if(loadNote)h+=`<div class="banner bad" role="alert"><p>${esc(loadNote)}</p><button class="btn soft sm" data-act="dismissnote">Dismiss</button></div>`;
   if(!storageOK&&!loadNote)h+=`<div class="banner bad" role="alert"><p>This browser is blocking storage, so changes will be lost when you close the page. Use Export in Settings to keep a copy.</p></div>`;
-  if(hasSample())h+=`<div class="banner"><p><strong>Sample data is showing.</strong> Jordan, Taylor, Riley and Casey are made-up demo profiles. Remove them in Settings, or start your own workspace.</p><div class="row"><button class="btn sm" data-act="newws">Start my workspace</button><button class="btn soft sm" data-act="rmsample">Remove sample data</button></div></div>`;
+  if(hasSample())h+=`<div class="banner"><p><strong>Sample data is showing.</strong> Taylor, Riley and Casey are made-up names so you can try assigning tasks. Remove them in Settings, or start your own workspace.</p><div class="row"><button class="btn sm" data-act="newws">Start my workspace</button><button class="btn soft sm" data-act="rmsample">Remove sample data</button></div></div>`;
   return h;
 }
 
 /* ---- calendar ---- */
+const XMARK='<svg class="xmark" viewBox="0 0 100 100" preserveAspectRatio="none" aria-hidden="true"><path d="M9 8C30 30 62 66 91 93"/><path d="M92 9C70 32 34 64 8 91"/></svg>';
+const CIRCLE='<svg class="circ" viewBox="0 0 44 44" aria-hidden="true"><path d="M6 24C4 11 17 3 28 6c12 3 15 18 8 28-7 9-24 8-29-3-1-2-1-4-1-7 0-3 4-10 10-13"/></svg>';
 function filtersHTML(){
   const f=UI.f;
   return`<div class="filters">
@@ -578,14 +606,23 @@ function calendarView(){
   const byDay={};list.filter(t=>t.due).forEach(t=>{(byDay[t.due]=byDay[t.due]||[]).push(t)});
   Object.values(byDay).forEach(a=>a.sort(byDate));
   const tdy=todayStr();
-  let cells='';
+  let cells='',mcells='';
+  const crossing=ST.crossOff;
   for(let i=0;i<rows*7;i++){
     const d=new Date(yr,mo,1-lead+i),k=ymd(d),ts=byDay[k]||[];
-    cells+=`<div class="day${d.getMonth()!==mo?' other':''}${k===tdy?' today':''}" data-date="${k}">
-      <button type="button" class="dnum" data-act="addday" data-date="${k}" data-fk="day-${k}" aria-label="Add a task on ${esc(fmtDate(k,{weekday:'long',month:'long',day:'numeric'}))}"${k===tdy?' aria-current="date"':''}>${d.getDate()}${k===tdy?' <small>Today</small>':''}</button>
+    const past=crossing&&k<tdy,spc=ts.some(t=>t.special),other=d.getMonth()!==mo;
+    const longDate=fmtDate(k,{weekday:'long',month:'long',day:'numeric'});
+    const note=(past?'. This day has passed.':'')+(spc?'. Special occasion.':'');
+    cells+=`<div class="day${other?' other':''}${k===tdy?' today':''}${past?' crossed':''}${spc?' special':''}" data-date="${k}">
+      ${past?XMARK:''}
+      <button type="button" class="dnum" data-act="addday" data-date="${k}" data-fk="day-${k}" aria-label="Add a task on ${esc(longDate)}${note}"${k===tdy?' aria-current="date"':''}><span class="dn">${d.getDate()}${spc?CIRCLE:''}</span>${k===tdy?'<small>Today</small>':''}</button>
       ${ts.slice(0,3).map(chip).join('')}
       ${ts.length>3?`<button type="button" class="more" data-act="daylist" data-date="${k}">+${ts.length-3} more</button>`:''}</div>`;
+    mcells+=`<button type="button" class="mday${other?' other':''}${k===tdy?' today':''}" data-act="daylist" data-date="${k}" data-fk="md-${k}" aria-label="${esc(longDate)}, ${ts.length} task${ts.length===1?'':'s'}${note}"${k===tdy?' aria-current="date"':''}>
+      ${past?XMARK:''}<span class="dn">${d.getDate()}${spc?CIRCLE:''}</span><span class="dots" aria-hidden="true">${ts.slice(0,4).map(t=>{const g=group(t.groupId);return`<i style="--c:${g?esc(g.color):'var(--caramel)'}"></i>`}).join('')}</span></button>`;
   }
+  const legend=`<p class="legend muted small"><span>${crossing?'<svg class="lx" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4l14 15M18 4L4 18"/></svg>Day has passed':''}</span><span><svg class="lc" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 12C2 6 8 2 13 3c5 1 7 7 4 12-3 4-9 4-12 0-1-1-2-3-2-5 0-3 3-6 6-7"/></svg>Special occasion</span></p>`;
+  const mini=`<div class="mini" role="group" aria-label="${esc(title)}">${['S','M','T','W','T','F','S'].map((w,i)=>`<div class="dow" aria-hidden="true">${w}</div>`).join('')}${mcells}</div>`;
   const agendaDays=Object.keys(byDay).filter(k=>k.slice(0,7)===yr+'-'+pad(mo+1)).sort();
   const agenda=agendaDays.length?agendaDays.map(k=>`<section class="agenda-day"><h3>${esc(fmtDate(k,{weekday:'long',month:'long',day:'numeric'}))}${k===tdy?' · Today':''}</h3>${byDay[k].map(t=>taskRow(t,'ag')).join('')}</section>`).join(''):`<div class="empty">No tasks on the calendar this month${UI.f.person!=='all'||UI.f.group!=='all'||UI.f.status!=='all'?' with these filters':''}. Use “Add task” to create one.</div>`;
   const undated=D.tasks.filter(t=>!t.due&&pass(t)).sort(byDate);
@@ -600,7 +637,8 @@ function calendarView(){
       <span class="seg view-toggle" role="group" aria-label="Calendar layout"><button class="btn soft" data-act="calmode" data-m="month" aria-pressed="${!agendaMode}" data-fk="m-month">Month</button><button class="btn soft" data-act="calmode" data-m="agenda" aria-pressed="${agendaMode}" data-fk="m-agenda">Agenda</button></span>
       <button class="btn" data-act="addtask" data-fk="addtop">+ Add task</button></div>
     ${filtersHTML()}
-    ${agendaMode?agenda:`<div class="cal cal-only" role="group" aria-label="${esc(title)}">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w=>`<div class="dow">${w}</div>`).join('')}${cells}</div><div class="only-narrow">${agenda}</div>`}
+    ${narrow?mini+agenda:agendaMode?agenda:`<div class="cal cal-only" role="group" aria-label="${esc(title)}">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w=>`<div class="dow">${w}</div>`).join('')}${cells}</div>`}
+    ${legend}
     <section class="panel" aria-labelledby="und-h"><h3 id="und-h">No due date (${undated.length})</h3>
       ${undated.length?undated.map(t=>taskRow(t,'un')).join(''):'<p class="muted">Every task that matches the filters has a due date.</p>'}</section>`;
 }
@@ -614,7 +652,7 @@ function myView(){
   const forOthers=D.tasks.filter(t=>t.status==='complete'&&t.completedBy===u.id&&t.completedForId&&t.completedForId!==u.id).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
   const sec=(h,l,empty,c)=>`<section class="panel"><h3>${h} (${l.length})</h3>${l.length?l.map(t=>taskRow(t,c)).join(''):`<p class="muted">${empty}</p>`}</section>`;
   return`<div class="page-head"><h2>My Tasks · ${esc(u.name)}</h2><button class="btn" data-act="addtask" data-assignee="${esc(u.id)}" data-fk="addmine">+ Add task for me</button></div>
-    <p class="muted">${CL.on?'Showing tasks assigned to you.':'Showing tasks assigned to the profile chosen under “Acting as”.'}</p>
+    <p class="muted">Showing tasks assigned to you.</p>
     ${sec('To do',open,'Nothing assigned to you is waiting.','my1')}
     ${sec('Completed',done,'Nothing assigned to you has been completed yet.','my2')}
     ${sec('Checked off by you for someone else',forOthers,'You have not checked off anyone else’s tasks.','my3')}`;
@@ -651,21 +689,20 @@ function groupView(){
 }
 const mGroupName=id=>{const g=group(id);return g?g.name:'No group'};
 
-/* ---- members ---- */
+/* ---- people (local mode) ---- */
 function membersView(){
-  const mg=canManage();
-  return`<div class="page-head"><h2>Members and invitations</h2></div>
-    <section class="panel" style="margin-top:0"><h3>Family profiles</h3>
-      <p class="muted small">These are local demo profiles on this device. Anyone using this browser can switch between them, so this is not login security.</p>
-      ${D.members.map(m=>`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}</div><div class="muted small">${m.role==='owner'?'Owner':m.role==='admin'?'Admin':'Member'} · ${m.sample?'Sample profile':'Local profile'}${m.id===me().id?' · Acting as this profile':''}</div></div>
-        <div class="row"><button class="btn soft sm" data-act="editmember" data-id="${m.id}" data-fk="em-${m.id}" ${mg?'':'disabled'}>Edit</button><button class="btn soft sm" data-act="rmmember" data-id="${m.id}" data-fk="rm-${m.id}" ${mg?'':'disabled'}>Remove</button></div></div>`).join('')}
-      ${mg?'':'<p class="muted small" style="margin-top:10px">Switch to an owner or admin profile under “Acting as” to manage members. In this demo that is a convenience, not a security control.</p>'}
+  const u=me();
+  return`<div class="page-head"><h2>People</h2></div>
+    <section class="panel" style="margin-top:0"><h3>Names you can assign tasks to</h3>
+      <p class="muted small">This copy is just for you, on this device. Nothing is online, so the people below cannot see it or sign in. They are names to put on tasks. When you check off a task for someone, it is recorded as done by you.</p>
+      ${D.members.map(m=>`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${m.id===u.id?' (you)':''}</div><div class="muted small">${m.id===u.id?'This is you':m.sample?'Sample name':'Family name'}</div></div>
+        <div class="row"><button class="btn soft sm" data-act="editmember" data-id="${m.id}" data-fk="em-${m.id}" aria-label="Rename ${esc(m.name)}">Rename</button>${m.id===u.id?'':`<button class="btn soft sm" data-act="rmmember" data-id="${m.id}" data-fk="rm-${m.id}" aria-label="Remove ${esc(m.name)}">Remove</button>`}</div></div>`).join('')}
       <form id="addmember" class="row" style="margin-top:16px;align-items:end" novalidate>
-        <div class="field" style="flex:1 1 220px"><label for="mname">Add a local profile</label><input id="mname" type="text" maxlength="40" autocomplete="off" placeholder="Display name" ${mg?'':'disabled'}></div>
-        <button class="btn" type="submit" ${mg?'':'disabled'}>Add profile</button></form>
+        <div class="field" style="flex:1 1 220px"><label for="mname">Add a name</label><input id="mname" type="text" maxlength="40" autocomplete="off" placeholder="For example, Taylor"></div>
+        <button class="btn" type="submit">Add name</button></form>
       <p class="err" id="merr" role="alert" hidden style="margin-top:10px"></p></section>
-    <section class="panel"><h3>Invitations <span class="pill" style="color:var(--warn)">Shared mode only</span></h3>
-      <p>Invite links need a server to create single-use links and add people to the workspace. This is local demo mode, so nothing can be sent or shared from here.</p>
+    <section class="panel"><h3>Sharing with your family <span class="pill" style="color:var(--warn)">Shared mode only</span></h3>
+      <p>To let family members see the same calendar and check off their own tasks, switch to shared mode. Each person then signs in with their own email, and you invite them with a link you send yourself.</p>
       <div class="row" style="margin:14px 0"><button class="btn" data-act="${CL.cfg?'usecloud':'nav'}" data-v="settings" data-fk="goshared">${CL.cfg?'Switch to shared mode':'Set up shared mode in Settings'}</button></div></section>`;
 }
 function backendHelp(){
@@ -688,7 +725,8 @@ function settingsView(){
       <p class="muted small" style="margin-top:8px">The workspace lives only in this browser. It is private to this device, not protected by a password.</p></section>
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
-      <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label></section>
+      <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
       <label class="chk"><input type="checkbox" data-act="cursor" ${ST.cursor?'checked':''} data-fk="s-cursor"> Custom cursor (mouse and trackpad only; never on touch screens)</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="effects" ${ST.effects?'checked':''} data-fk="s-effects"> Click ripples and the sparkle when a task is completed</label>
@@ -699,8 +737,8 @@ function settingsView(){
       ${hasSample()?'<button class="btn soft" data-act="rmsample">Remove sample data</button>':''}<button class="btn danger" data-act="erase">Erase everything</button></div>
       <p class="muted small" style="margin-top:10px">Storage: ${storageOK?'saving to this browser':'not available, changes are kept in memory only'}.</p></section>
     ${collabPanel()}
-    <section class="panel"><h3>Activity records in local demo mode</h3>
-      <p>Each task keeps a chronological history of creation, reassignment, completion, reopening and group moves. The name on each entry is the profile selected under “Acting as” at that moment. Because anyone can switch profiles, this is a demonstration of attribution, <strong>not a verified audit trail</strong>. Shared mode records the signed-in person instead.</p></section>`;
+    <section class="panel"><h3>Activity records in local mode</h3>
+      <p>Each task keeps a history of creation, reassignment, completion, reopening and group moves. Every entry is recorded under your name, because this copy is only for you. Shared mode records each person’s own sign-in instead.</p></section>`;
 }
 
 /* ---- render ---- */
@@ -752,13 +790,14 @@ const dhead=(t)=>`<div class="dhead"><h2 id="dtitle">${esc(t)}</h2><button type=
 
 /* ---- task form ---- */
 function openTaskForm(t,preset={}){
-  const v=t||{title:'',description:'',due:preset.due||'',time:'',assigneeId:preset.assigneeId||'',groupId:preset.groupId||''};
+  const v=t||{title:'',description:'',due:preset.due||'',time:'',assigneeId:preset.assigneeId||'',groupId:preset.groupId||'',special:false};
   const open=!!(v.time||v.description||v.groupId);
   openDlg(`<form id="tform" class="dbody" data-id="${t?t.id:''}" novalidate>${dhead(t?'Edit task':'Add a task')}
     <p class="err" id="terr" role="alert" hidden></p>
     <div class="field"><label for="t-title">Task title</label><input id="t-title" type="text" maxlength="120" required autocomplete="off" value="${esc(v.title)}" placeholder="What needs doing?"></div>
     <div class="two"><div class="field"><label for="t-due">Due date (optional)</label><input id="t-due" type="date" value="${esc(v.due)}"></div>
       ${sel('t-who','Assigned to',[['','Unassigned'],...D.members.map(m=>[m.id,m.name])],v.assigneeId)}</div>
+    <label class="chk"><input type="checkbox" id="t-special" ${v.special?'checked':''}> Special occasion (circle this day on the calendar)</label>
     <details${open?' open':''}><summary>More details</summary>
       <div class="two"><div class="field"><label for="t-time">Due time (optional)</label><input id="t-time" type="time" value="${esc(v.time)}"></div>
       ${sel('t-group','Task group',[['','No group (standalone)'],...D.groups.map(g=>[g.id,g.name])],v.groupId)}</div>
@@ -766,12 +805,13 @@ function openTaskForm(t,preset={}){
     <div class="row"><button class="btn" type="submit">${t?'Save changes':'Add task'}</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button>${t?`<button type="button" class="btn danger" data-act="deltask" data-id="${t.id}" style="margin-left:auto">Delete task</button>`:''}</div></form>`);
 }
 function submitTask(form){
-  const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value;
+  const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value,special=$('#t-special').checked;
   const bad=m=>{err.textContent=m;err.hidden=false;return false};
   if(!title)return bad('Give the task a title.')&&0||$('#t-title').focus();
   if(due&&!parseYmd(due))return bad('That due date is not valid.');
   if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
-  const f={title,description:$('#t-desc').value.trim(),due,time:due?time:'',assigneeId:$('#t-who').value,groupId:$('#t-group').value};
+  if(special&&!due)return bad('Add a due date so the day can be circled.');
+  const f={title,description:$('#t-desc').value.trim(),due,time:due?time:'',special,assigneeId:$('#t-who').value,groupId:$('#t-group').value};
   const actor=me(),id=form.dataset.id;
   if(!id){
     const t=makeTask(f,actor);D.tasks.push(t);closeDlg();commit('Task added.','Task added: '+title);
@@ -784,7 +824,8 @@ function submitTask(form){
   if(t.description!==f.description)ch.push('description');
   if(t.due!==f.due)ch.push('due date');
   if(t.time!==f.time)ch.push('due time');
-  Object.assign(t,{title:f.title,description:f.description,due:f.due,time:f.time});
+  if(!!t.special!==f.special)ch.push('special occasion');
+  Object.assign(t,{title:f.title,description:f.description,due:f.due,time:f.time,special:f.special});
   if(ch.length)t.history.push(ev('edited',actor,null,{fields:ch.join(', ')}));
   applyAssign(t,f.assigneeId,actor);applyGroup(t,f.groupId,actor);
   closeDlg();commit('Task saved.','Task saved: '+title);
@@ -811,7 +852,7 @@ function detailHTML(t){
       <div class="muted small">This records who ticked the box, not who did the work.</div></div>`;
   }
   return`<div class="dbody">${dhead(t.title)}
-    <div class="row">${gTag(g)}${statusTag(t)}</div>
+    <div class="row">${gTag(g)}${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion, circled on the calendar</span>':''}</div>
     ${t.description?`<p style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(t.description)}</p>`:''}
     <dl class="facts">
       <dt>Assigned to</dt><dd>${whoTag(t.assigneeId)}</dd>
@@ -820,10 +861,10 @@ function detailHTML(t){
       ${done?`<dt>Marked complete by</dt><dd>${esc(t.completedByName||'Unknown')}</dd><dt>Completed at</dt><dd>${esc(fmtStamp(t.completedAt))}</dd>`:''}</dl>
     ${call}
     <div class="row"><button class="btn" data-act="toggletask" data-id="${t.id}">${done?'Reopen task':'Mark complete'}</button><button class="btn soft" data-act="edittask" data-id="${t.id}">Edit</button><button class="btn danger" data-act="deltask" data-id="${t.id}">Delete</button></div>
-    <p class="muted small">${CL.on?'Actions are recorded under your own sign-in, <strong>'+esc(me().name)+'</strong>. The server writes the name, not this page.':'Actions are recorded under <strong>'+esc(me().name)+'</strong>, the profile selected as “Acting as”.'}</p>
+    <p class="muted small">${CL.on?'Actions are recorded under your own sign-in, <strong>'+esc(me().name)+'</strong>. The server writes the name, not this page.':'Recorded under <strong>'+esc(me().name)+'</strong>, which is you. This copy is private to this device.'}</p>
     <section><h3 style="font-size:22px">Activity history</h3>
       <ol class="hist">${t.history.map(h=>`<li><time datetime="${esc(h.at)}">${esc(fmtStamp(h.at))}</time>${histLine(h)}</li>`).join('')||'<li>No activity recorded.</li>'}</ol>
-      <p class="muted small">${CL.on?'Shared mode: each entry was recorded by the server using the signed-in person’s account, and entries cannot be edited from this page.':'Demo mode: names come from the profile picker, so this is not a verified audit trail. Real verification needs sign-in on a backend.'}</p></section></div>`;
+      <p class="muted small">${CL.on?'Shared mode: each entry was recorded by the server using the signed-in person’s account, and entries cannot be edited from this page.':'Local mode: this is your own private record on this device. Shared mode keeps a record that each person’s own sign-in writes.'}</p></section></div>`;
 }
 function openDetail(id){const t=task(id);if(t){openDlg(detailHTML(t),id);if(CL.on)cloudShowDetail(t)}}
 function refreshDetail(){const d=$('#dlg'),t=task(d.dataset.task);if(!t){closeDlg();return}d.innerHTML=detailHTML(t);const b=d.querySelector('[data-act=toggletask]');if(b)b.focus()}
@@ -859,10 +900,10 @@ function openDeleteGroup(g){
 
 /* ---- members & workspace dialogs ---- */
 function openMemberForm(m){
-  openDlg(`<form id="mform" class="dbody" data-id="${m.id}" novalidate>${dhead('Edit profile')}
+  openDlg(`<form id="mform" class="dbody" data-id="${m.id}" novalidate>${dhead(CL.on?'Edit profile':'Rename')}
     <p class="err" id="mferr" role="alert" hidden></p>
     ${CL.on?`<p><strong>${esc(m.name)}</strong> chooses their own display name.</p>`:`<div class="field"><label for="mf-name">Display name</label><input id="mf-name" type="text" maxlength="40" value="${esc(m.name)}"></div>`}
-    ${sel('mf-role','Role',[['owner','Owner'],['admin','Admin'],['member','Member']],m.role)}
+    ${CL.on?sel('mf-role','Role',[['owner','Owner'],['admin','Admin'],['member','Member']],m.role):''}
     <div class="row"><button class="btn" type="submit">Save</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
 }
 function openNewWs(){
@@ -917,9 +958,9 @@ document.addEventListener('change',async e=>{
   if(CL.on&&await cloudChange(t))return;
   if(t.dataset.cb){const tk=task(t.dataset.cb);if(tk)setComplete(tk,t.checked,t);return}
   const a=t.dataset.act;if(!a)return;
-  if(a==='actas'){D.currentUserId=t.value;save();render();say('Now acting as '+me().name);return}
   if(a==='filter'){UI.f[t.dataset.k]=t.value;render();return}
   if(a==='theme'){ST.theme=t.value;saveSettings();applyTheme();render();return}
+  if(a==='crossoff'){ST.crossOff=t.checked;saveSettings();render();return}
   if(a==='large'){ST.large=t.checked;saveSettings();applyTheme();render();return}
   if(a==='cursor'){ST.cursor=t.checked;saveSettings();setupCursor();render();return}
   if(a==='effects'){ST.effects=t.checked;saveSettings();render();return}
@@ -970,21 +1011,18 @@ document.addEventListener('click',async e=>{
     case'editmember':openMemberForm(member(id));break;
     case'rmmember':{
       const m=member(id);if(!m)break;
-      if(!canManage()){toast('Only an owner or admin profile can remove members.',true);break}
-      if(D.members.length<2){toast('A workspace needs at least one member.',true);break}
-      if(m.role==='owner'&&D.members.filter(x=>x.role==='owner').length<2){toast('Make someone else an owner before removing the only owner.',true);break}
+      if(id===D.currentUserId){toast('That is you, so it cannot be removed.',true);break}
       const n=D.tasks.filter(t=>t.assigneeId===id).length;
-      const ok=await confirmBox(`Remove ${m.name}?`,n?`${n} task${n===1?'':'s'} assigned to ${m.name} will become unassigned. Past activity entries keep their name.`:`${m.name}’s profile will be removed. Past activity entries keep their name.`,'Remove',true);
+      const ok=await confirmBox(`Remove ${m.name}?`,n?`${n} task${n===1?'':'s'} assigned to ${m.name} will become unassigned. Past activity entries keep their name.`:`${m.name} will be removed from your list. Past activity entries keep their name.`,'Remove',true);
       if(!ok)break;
-      const actor=me().id===id?D.members.find(x=>x.id!==id):me();
+      const actor=me();
       D.tasks.forEach(t=>{if(t.assigneeId===id)applyAssign(t,'',actor)});
       D.members=D.members.filter(x=>x.id!==id);
-      if(D.currentUserId===id)D.currentUserId=D.members[0].id;
-      commit('Profile removed.');break;
+      commit('Name removed.');break;
     }
     case'newws':openNewWs();break;
     case'rmsample':{
-      const ok=await confirmBox('Remove all sample data?','The sample profiles, groups and tasks will be deleted. Anything you added yourself stays.','Remove sample data',true);
+      const ok=await confirmBox('Remove all sample data?','The sample names, groups and tasks will be deleted. Anything you added yourself stays.','Remove sample data',true);
       if(!ok)break;
       const sm=new Set(D.members.filter(m=>m.sample).map(m=>m.id)),sg=new Set(D.groups.filter(g=>g.sample).map(g=>g.id));
       D.tasks=D.tasks.filter(t=>!t.sample);
@@ -1030,17 +1068,17 @@ document.addEventListener('submit',e=>{
   }
   if(f.id==='addmember'){
     const name=$('#mname').value.trim(),er=$('#merr');
-    if(!name){er.textContent='Enter a name for the new profile.';er.hidden=false;$('#mname').focus();return}
-    if(D.members.some(m=>m.name.toLowerCase()===name.toLowerCase())){er.textContent='A profile with that name already exists.';er.hidden=false;return}
+    if(!name){er.textContent='Enter a name to add.';er.hidden=false;$('#mname').focus();return}
+    if(D.members.some(m=>m.name.toLowerCase()===name.toLowerCase())){er.textContent='That name is already in your list.';er.hidden=false;return}
     D.members.push({id:uid(),name,role:'member',color:PALETTE[D.members.length%PALETTE.length].hex,sample:false});
-    commit('Local profile added.');return;
+    commit('Name added.');return;
   }
   if(f.id==='mform'){
-    const m=member(f.dataset.id),name=$('#mf-name').value.trim(),role=$('#mf-role').value,er=$('#mferr');
+    const m=member(f.dataset.id),name=$('#mf-name').value.trim(),role=$('#mf-role')?$('#mf-role').value:m.role,er=$('#mferr');
     if(!name){er.textContent='Enter a display name.';er.hidden=false;return}
-    if(D.members.some(x=>x.id!==m.id&&x.name.toLowerCase()===name.toLowerCase())){er.textContent='Another profile already uses that name.';er.hidden=false;return}
+    if(D.members.some(x=>x.id!==m.id&&x.name.toLowerCase()===name.toLowerCase())){er.textContent='Someone in your list already has that name.';er.hidden=false;return}
     if(m.role==='owner'&&role!=='owner'&&D.members.filter(x=>x.role==='owner').length<2){er.textContent='There must be at least one owner.';er.hidden=false;return}
-    Object.assign(m,{name,role});closeDlg();commit('Profile saved.');return;
+    Object.assign(m,{name,role});closeDlg();commit('Name saved.');return;
   }
   if(f.id==='wsform'){
     const n=$('#wsname').value.trim();if(!n){toast('Enter a workspace name.',true);return}
@@ -1178,7 +1216,7 @@ async function cloudLoad(){
   if(!members.some(m=>m.id===CL.session.user_id))throw new Error('You are no longer a member of this workspace.');
   const old=new Map(((D&&D.tasks)||[]).map(t=>[t.id,t.history]));
   const tasks=tsk.map(t=>({id:t.id,title:t.title,description:t.description||'',due:t.due_date||'',time:t.due_time?String(t.due_time).slice(0,5):'',
-    assigneeId:t.assignee_id||'',groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',
+    assigneeId:t.assignee_id||'',groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',special:!!t.special,
     completedBy:t.completed_by||'',completedByName:t.completed_by_name||'',completedForId:t.completed_for_id||'',completedForName:t.completed_for_name||'',
     completedAt:t.completed_at||'',createdAt:t.created_at||'',sample:false,history:old.get(t.id)||[]}));
   const groups=grp.map(g=>({id:g.id,name:g.name,description:g.description||'',color:HEX.test(g.color)?g.color:PALETTE[0].hex,sample:false}));
@@ -1229,7 +1267,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshQui
 async function cloudDo(fn,okMsg){
   if(CL.busy){toast('One moment, the last change is still saving.',true);render();return false}
   CL.busy=true;
-  try{await fn()}catch(e){CL.busy=false;toast(e.message||'That did not work.',true);render();return false}
+  try{await fn()}catch(e){CL.busy=false;toast(/special/i.test(e.message||'')?'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.':(e.message||'That did not work.'),true);render();return false}
   try{await cloudLoad()}catch(e){CL.busy=false;CL.stale=true;render();toast('Your change was saved, but the screen could not refresh. '+e.message,true);return true}
   CL.busy=false;render();
   if(okMsg)toast(okMsg);
@@ -1438,13 +1476,15 @@ function cloudSubmit(f){
     return true;
   }
   if(id==='tform'){
-    const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value;
+    const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value,special=$('#t-special').checked;
     const bad=m=>{err.textContent=m;err.hidden=false;return true};
     if(!title){err.textContent='Give the task a title.';err.hidden=false;$('#t-title').focus();return true}
     if(due&&!parseYmd(due))return bad('That due date is not valid.');
     if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
+    if(special&&!due)return bad('Add a due date so the day can be circled.');
     const body={title,description:$('#t-desc').value.trim(),due_date:due||null,due_time:due&&time?time:null,assignee_id:$('#t-who').value||null,group_id:$('#t-group').value||null};
     const tid=f.dataset.id;
+    if(special||(tid&&task(tid)&&task(tid).special))body.special=special;   // only sent when needed, so older databases keep working
     cloudDo(async()=>{
       if(tid)await patchTask(tid,body);
       else await api('/rest/v1/tasks',{method:'POST',body:{workspace_id:CL.wsId,...body},prefer:'return=minimal'});
@@ -1552,7 +1592,8 @@ function cloudMembersView(){
 const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
-      <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label></section>
+      <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
       <label class="chk"><input type="checkbox" data-act="cursor" ${ST.cursor?'checked':''} data-fk="s-cursor"> Custom cursor (mouse and trackpad only; never on touch screens)</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="effects" ${ST.effects?'checked':''} data-fk="s-effects"> Click ripples and the sparkle when a task is completed</label>
