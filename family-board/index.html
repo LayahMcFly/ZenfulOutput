@@ -145,6 +145,19 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 /* avatars, chips */
 .av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c,#6f4a33);color:#fff;font:700 11px/1 var(--label);flex:none}
 .av{overflow:hidden}
+.cyd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font:600 14px var(--label);background:var(--field);color:var(--ink)}
+.cyd.on{border-color:transparent}
+.cyd.today{outline:2px solid var(--accent);outline-offset:1px}
+.cyd.pad{border:0;background:none}
+.cygrid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-width:420px}
+.cygrid .dh{font:700 11px var(--label);text-align:center;color:var(--ink-soft);letter-spacing:.06em}
+.sw{display:inline-block;width:18px;height:18px;border-radius:4px;border:1px solid rgba(0,0,0,.25);vertical-align:-4px;margin-right:6px}
+.hv{display:grid;grid-template-columns:repeat(5,1fr);gap:8px}
+.hv label{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px 4px;border:2px solid var(--line);border-radius:8px;cursor:pointer;font-size:12px;text-align:center}
+.hv input{position:absolute;opacity:0;pointer-events:none}
+.hv label:has(input:checked){border-color:var(--accent);background:var(--wash)}
+.hv label:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
+.hv .sw{width:100%;height:22px;margin:0}
 .bell{position:relative}
 .bell .nb{position:absolute;top:-7px;right:-7px;min-width:20px;height:20px;padding:0 5px;border-radius:10px;background:var(--mark,#b3261e);color:#fff;font:700 12px/20px var(--sans,system-ui);text-align:center}
 .nlist{display:grid;gap:8px;margin:0;padding:0;list-style:none}
@@ -363,6 +376,17 @@ function save(){
 }
 function saveSettings(){try{localStorage.setItem(SKEY,JSON.stringify(ST))}catch{}}
 
+const MAXSTEPS=30;
+const cleanSteps=a=>(Array.isArray(a)?a:[]).filter(s=>s&&typeof s.text==='string'&&s.text.trim()).slice(0,MAXSTEPS).map(s=>({id:(typeof s.id==='string'&&s.id?s.id:uid()).slice(0,40),text:s.text.trim().slice(0,120),done:!!s.done}));
+const stepStat=t=>{const s=t.steps||[];return s.length?{n:s.length,d:s.filter(x=>x.done).length}:null};
+function parseSteps(text,old){
+  const pool=(old||[]).slice(),out=[];
+  String(text||'').split('\n').map(l=>l.replace(/^\s*(?:[-*•]|\d+[.)])\s+/,'').trim()).filter(Boolean).slice(0,MAXSTEPS).forEach(line=>{
+    line=line.slice(0,120);const i=pool.findIndex(p=>p.text.toLowerCase()===line.toLowerCase());
+    if(i>=0){const p=pool.splice(i,1)[0];out.push({id:p.id,text:line,done:p.done})}else out.push({id:uid(),text:line,done:false});
+  });
+  return out;
+}
 const ROLES=['owner','admin','member'];
 const EVTYPES=['created','assigned','completed','reopened','group','edited'];
 function normalize(d){
@@ -383,7 +407,7 @@ function normalize(d){
       id:t.id.slice(0,40),title:str(t.title,120).trim(),description:str(t.description,2000),
       due:parseYmd(t.due)?t.due:'',time:parseYmd(t.due)&&validTime(t.time)?t.time:'',
       assigneeId:mids.has(t.assigneeId)?t.assigneeId:'',groupId:gids.has(t.groupId)?t.groupId:'',
-      status:done?'complete':'open',special:!!t.special&&!!parseYmd(t.due),
+      status:done?'complete':'open',special:!!t.special&&!!parseYmd(t.due),steps:cleanSteps(t.steps),
       completedBy:done?str(t.completedBy,40):'',completedByName:done?str(t.completedByName,60):'',
       completedForId:done?str(t.completedForId,40):'',completedForName:done?str(t.completedForName,60):'',
       completedAt:done?str(t.completedAt,40):'',createdAt:str(t.createdAt,40),sample:!!t.sample,
@@ -425,7 +449,7 @@ const isOverdue=t=>t.status!=='complete'&&t.due&&t.due<todayStr();
 
 function ev(type,actor,at,extra){return{id:uid(),type,at:at||new Date().toISOString(),actorId:actor.id,actorName:actor.name,...extra}}
 function makeTask(f,actor,at){
-  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',assigneeId:f.assigneeId||'',groupId:f.groupId||'',special:!!(f.special&&f.due),
+  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',assigneeId:f.assigneeId||'',groupId:f.groupId||'',special:!!(f.special&&f.due),steps:cleanSteps(f.steps),
     status:'open',completedBy:'',completedByName:'',completedForId:'',completedForName:'',completedAt:'',createdAt:at||new Date().toISOString(),sample:!!f.sample,history:[]};
   t.history.push(ev('created',actor,t.createdAt,{assigneeName:t.assigneeId?mName(t.assigneeId):''}));
   return t;
@@ -566,13 +590,14 @@ const gTag=g=>g?`<span class="gtag" style="--gc:${esc(g.color)}">${esc(g.name)}<
 const dueText=t=>t.due?fmtDate(t.due,{weekday:'short',month:'short',day:'numeric'})+(t.time?' · '+fmtTime(t.time):''):'No due date';
 const statusTag=t=>t.status==='complete'?'<span class="stat ok">✓ Complete</span>':isOverdue(t)?'<span class="stat late">! Overdue</span>':'<span class="stat">Incomplete</span>';
 
+function statTag(t){const s=stepStat(t);return s?`<span class="stat" title="Steps finished">☑ ${s.d} of ${s.n} steps</span>`:''}
 function taskRow(t,ctx){
   const g=group(t.groupId),done=t.status==='complete';
   return`<div class="task${done?' done':''}${UI.popId===t.id?' pop':''}" style="--gc:${g?esc(g.color):'transparent'}">
     <input type="checkbox" class="cb" data-cb="${t.id}" data-fk="cb-${ctx}-${t.id}" ${done?'checked':''} aria-label="Mark “${esc(t.title)}” complete">
     <button type="button" class="tmain" data-act="open" data-id="${t.id}" data-fk="open-${ctx}-${t.id}">
       <span class="ttitle">${esc(t.title)}</span>
-      <span class="tmeta">${whoTag(t.assigneeId)}${gTag(g)}<span>${esc(dueText(t))}</span>${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion</span>':''}</span>
+      <span class="tmeta">${whoTag(t.assigneeId)}${gTag(g)}<span>${esc(dueText(t))}</span>${statTag(t)}${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion</span>':''}</span>
     </button></div>`;
 }
 function chip(t){
@@ -581,7 +606,7 @@ function chip(t){
     <input type="checkbox" class="cb" data-cb="${t.id}" data-fk="cb-cal-${t.id}" ${done?'checked':''} aria-label="Mark “${esc(t.title)}” complete">
     <button type="button" class="tmain" data-act="open" data-id="${t.id}" data-fk="open-cal-${t.id}">
       <span class="ttitle">${esc(t.title)}${done?'<span class="sr"> (complete)</span>':''}</span>
-      <span class="cm">${esc(m?m.name:'Unassigned')}${g?' · '+esc(g.name):''}${t.time?' · '+esc(fmtTime(t.time)):''}</span>
+      <span class="cm">${esc(m?m.name:'Unassigned')}${g?' · '+esc(g.name):''}${t.time?' · '+esc(fmtTime(t.time)):''}${stepStat(t)?' · '+stepStat(t).d+'/'+stepStat(t).n:''}</span>
     </button></div>`;
 }
 const pass=t=>{
@@ -597,7 +622,7 @@ const pass=t=>{
 const sel=(id,label,opts,val,extra='')=>`<div class="field"><label for="${id}">${label}</label><select id="${id}" ${extra}>${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
 
 function tabsNav(){
-  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],...(CL.on?[['workspaces','Workspaces']]:[]),['settings','Settings']];
+  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],...(CL.on?[['workspaces','Workspaces']]:[]),...(cyOn()?[['cycle','Cycle 🔒']]:[]),['settings','Settings']];
   return`<nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav>`;
 }
 function header(){
@@ -753,6 +778,7 @@ function settingsView(){
       <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="60" value="${esc(D.workspace.name)}"></div><button class="btn" type="submit">Save name</button></form>
       <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws2">Create a new empty workspace</button></div>
       <p class="muted small" style="margin-top:8px">The workspace lives only in this browser. It is private to this device, not protected by a password.</p></section>
+    ${privatePanel()}
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
@@ -774,14 +800,15 @@ function settingsView(){
 /* ---- render ---- */
 function render(){
   const ae=document.activeElement,fk=ae&&ae.dataset&&ae.dataset.fk,sy=window.scrollY;
-  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,settings:settingsViewCloud}
-    :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,settings:settingsView};
+  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,cycle:cycleGuard,settings:settingsViewCloud}
+    :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,cycle:cycleGuard,settings:settingsView};
+  {const src=CL.on?'cloud':'local';if(CY.src!==src){cyReset();CY.src=src}if(!CY.loaded&&!CL.on)cyLoad()}
   if(CL.on&&CL.stage!=='ready'){
     const gates={loading:cloudLoadingView,gate:cloudGateView,name:cloudNameView,workspace:cloudWorkspaceView};
     $('#app').innerHTML=headerCloud()+`<main id="main"><div class="sheet" style="margin-top:20px">${(gates[CL.stage]||cloudLoadingView)()}</div></main>`;
     return;
   }
-  $('#app').innerHTML=header()+`<main id="main">${tabsNav()}<div class="sheet">${banners()}${(views[UI.view]||calendarView)()}</div></main>`;
+  $('#app').innerHTML=header()+`<main id="main">${tabsNav()}<div class="sheet">${UI.view==='cycle'?'':banners()}${(views[UI.view]||calendarView)()}</div></main>`;
   if(fk){const n=$('#app').querySelector('[data-fk="'+CSS.escape(fk)+'"]');if(n)n.focus({preventScroll:true})}
   window.scrollTo(0,sy);
   if(UI.popId){const id=UI.popId;setTimeout(()=>{if(UI.popId===id)UI.popId=''},700)}
@@ -827,6 +854,8 @@ function openTaskForm(t,preset={}){
     <div class="field"><label for="t-title">Task title</label><input id="t-title" type="text" maxlength="120" required autocomplete="off" value="${esc(v.title)}" placeholder="What needs doing?"></div>
     <div class="two"><div class="field"><label for="t-due">Due date (optional)</label><input id="t-due" type="date" value="${esc(v.due)}"></div>
       ${sel('t-who','Assigned to',[['','Unassigned'],...D.members.map(m=>[m.id,m.name])],v.assigneeId)}</div>
+    <div class="field"><label for="t-steps">Steps (optional)</label><textarea id="t-steps" rows="3" maxlength="4000" placeholder="One step per line, for example:&#10;Wash the car&#10;Vacuum the seats&#10;Wipe the windows">${esc((v.steps||[]).map(s=>s.text).join('\n'))}</textarea>
+      <p class="muted small" style="margin:4px 0 0">Use this when one task has several parts. Up to ${MAXSTEPS} steps. You tick each step off from the task’s page.</p></div>
     <label class="chk"><input type="checkbox" id="t-special" ${v.special?'checked':''}> Special occasion (circle this day on the calendar)</label>
     <details${open?' open':''}><summary>More details</summary>
       <div class="two"><div class="field"><label for="t-time">Due time (optional)</label><input id="t-time" type="time" value="${esc(v.time)}"></div>
@@ -843,6 +872,7 @@ function submitTask(form){
   if(special&&!due)return bad('Add a due date so the day can be circled.');
   const f={title,description:$('#t-desc').value.trim(),due,time:due?time:'',special,assigneeId:$('#t-who').value,groupId:$('#t-group').value};
   const actor=me(),id=form.dataset.id;
+  f.steps=parseSteps($('#t-steps').value,id&&task(id)?task(id).steps:[]);
   if(!id){
     const t=makeTask(f,actor);D.tasks.push(t);closeDlg();commit('Task added.','Task added: '+title);
     if(due){const d=parseYmd(due);UI.month=new Date(d.getFullYear(),d.getMonth(),1);render()}
@@ -855,7 +885,8 @@ function submitTask(form){
   if(t.due!==f.due)ch.push('due date');
   if(t.time!==f.time)ch.push('due time');
   if(!!t.special!==f.special)ch.push('special occasion');
-  Object.assign(t,{title:f.title,description:f.description,due:f.due,time:f.time,special:f.special});
+  if(JSON.stringify(t.steps.map(s=>s.text))!==JSON.stringify(f.steps.map(s=>s.text)))ch.push('steps');
+  Object.assign(t,{title:f.title,description:f.description,due:f.due,time:f.time,special:f.special,steps:f.steps});
   if(ch.length)t.history.push(ev('edited',actor,null,{fields:ch.join(', ')}));
   applyAssign(t,f.assigneeId,actor);applyGroup(t,f.groupId,actor);
   closeDlg();commit('Task saved.','Task saved: '+title);
@@ -873,6 +904,29 @@ function histLine(h){
     default:return`${a} edited the ${esc(h.fields||'details')}.`;
   }
 }
+function stepsHTML(t){
+  const s=t.steps||[];if(!s.length)return'';
+  const d=s.filter(x=>x.done).length;
+  return`<section aria-labelledby="stp-h" style="margin:12px 0"><h3 id="stp-h" style="font-size:20px;margin:0 0 6px">Steps <span class="muted small">${d} of ${s.length} done</span></h3>
+    <div class="bar" style="height:8px;border-radius:4px;background:var(--line);overflow:hidden;margin-bottom:8px"><div style="height:100%;width:${Math.round(d/s.length*100)}%;background:var(--ok)"></div></div>
+    <ul style="list-style:none;margin:0;padding:0;display:grid;gap:6px">${s.map(x=>`<li><label class="chk" style="align-items:flex-start"><input type="checkbox" data-step="${esc(t.id)}|${esc(x.id)}" ${x.done?'checked':''}><span style="${x.done?'text-decoration:line-through;color:var(--ink-soft);':''}overflow-wrap:anywhere;min-width:0">${esc(x.text)}</span></label></li>`).join('')}</ul></section>`;
+}
+async function toggleStep(tid,sid,on){
+  const t=task(tid);if(!t)return;
+  const steps=t.steps.map(x=>x.id===sid?{...x,done:on}:x);
+  const allDone=steps.length&&steps.every(x=>x.done);
+  if(CL.on){
+    const ok=await cloudDo(()=>patchTask(tid,{steps}),null);
+    if(ok&&allDone&&t.status!=='complete')toast('All steps are done. Mark the task complete when you are ready.');
+    return;
+  }
+  t.steps=steps;commit(null);
+  if(allDone&&t.status!=='complete')toast('All steps are done. Mark the task complete when you are ready.');
+}
+document.addEventListener('change',e=>{
+  const c=e.target;if(!c.dataset||!c.dataset.step)return;
+  const[tid,sid]=c.dataset.step.split('|');toggleStep(tid,sid,c.checked);
+});
 function detailHTML(t){
   const g=group(t.groupId),done=t.status==='complete';
   let call='';
@@ -884,6 +938,7 @@ function detailHTML(t){
   return`<div class="dbody">${dhead(t.title)}
     <div class="row">${gTag(g)}${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion, circled on the calendar</span>':''}</div>
     ${t.description?`<p style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(t.description)}</p>`:''}
+    ${stepsHTML(t)}
     <dl class="facts">
       <dt>Assigned to</dt><dd>${whoTag(t.assigneeId)}</dd>
       <dt>Due</dt><dd>${esc(t.due?fmtDate(t.due)+(t.time?' at '+fmtTime(t.time):''):'No due date')}</dd>
@@ -1192,7 +1247,7 @@ function refreshSession(){
   return refreshing;
 }
 function signOutLocal(msg){
-  saveSession(null);CL.profile=null;CL.workspaces=[];CL.wsId='';CL.stage='gate';CL.err=msg||'';CL.sent='';
+  cyReset();saveSession(null);CL.profile=null;CL.workspaces=[];CL.wsId='';CL.stage='gate';CL.err=msg||'';CL.sent='';
   clearInterval(CL.poll);CL.poll=0;render();
 }
 
@@ -1260,7 +1315,7 @@ async function cloudLoad(){
   const tasks=tsk.map(t=>({id:t.id,title:t.title,description:t.description||'',due:t.due_date||'',time:t.due_time?String(t.due_time).slice(0,5):'',
     assigneeId:t.assignee_id||'',groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',special:!!t.special,
     completedBy:t.completed_by||'',completedByName:t.completed_by_name||'',completedForId:t.completed_for_id||'',completedForName:t.completed_for_name||'',
-    completedAt:t.completed_at||'',createdAt:t.created_at||'',sample:false,history:old.get(t.id)||[]}));
+    completedAt:t.completed_at||'',createdAt:t.created_at||'',sample:false,steps:cleanSteps(t.steps),history:old.get(t.id)||[]}));
   const groups=grp.map(g=>({id:g.id,name:g.name,description:g.description||'',color:HEX.test(g.color)?g.color:PALETTE[0].hex,sample:false}));
   D={app:'family-board',version:1,workspace:{name:ws?ws.name:'Workspace',createdAt:''},members,groups,tasks,currentUserId:CL.session.user_id};
   const me0=members.find(m=>m.id===CL.session.user_id);
@@ -1296,11 +1351,54 @@ async function cloudBoot(){
     render();
   }
 }
-function startPolling(){clearInterval(CL.poll);clearInterval(CL.npoll);CL.poll=setInterval(refreshQuiet,20000);CL.npoll=setInterval(pollNotes,20000);pollNotes()}
+function startPolling(){clearInterval(CL.poll);clearInterval(CL.npoll);CL.poll=setInterval(refreshQuiet,20000);CL.npoll=setInterval(pollNotes,20000);pollNotes();if(!CY.loaded)cyLoad().then(render)}
 const unreadCount=()=>CL.notes.filter(n=>!n.read_at).length;
+const NPREF='familyBoard.notifyprefs.v1';
+function notePrefs(){let p={};try{p=JSON.parse(localStorage.getItem(NPREF)||'{}')||{}}catch{}return{popups:p.popups!==false,sound:p.sound!==false}}
+function setNotePref(k,v){const p=notePrefs();p[k]=v;try{localStorage.setItem(NPREF,JSON.stringify(p))}catch{toast('This browser is blocking storage, so this choice will not be remembered.',true)}}
+let AC=null;
+function audioCtx(){
+  if(AC)return AC;
+  try{const C=window.AudioContext||window.webkitAudioContext;if(C)AC=new C()}catch{}
+  return AC;
+}
+['pointerdown','keydown'].forEach(ev=>document.addEventListener(ev,()=>{const c=audioCtx();if(c&&c.state==='suspended')c.resume().catch(()=>{})},{passive:true}));   // browsers only allow sound after a first tap or key press
+function playChime(){
+  const c=audioCtx();if(!c)return false;
+  try{
+    if(c.state==='suspended')c.resume().catch(()=>{});
+    const t0=c.currentTime+0.02;
+    [[880,0],[1318.5,0.16]].forEach(([f,d])=>{
+      const o=c.createOscillator(),g=c.createGain();
+      o.type='sine';o.frequency.value=f;
+      g.gain.setValueAtTime(0.0001,t0+d);g.gain.exponentialRampToValueAtTime(0.25,t0+d+0.02);g.gain.exponentialRampToValueAtTime(0.0001,t0+d+0.55);
+      o.connect(g);g.connect(c.destination);o.start(t0+d);o.stop(t0+d+0.6);
+    });
+    return c.state==='running'||c.state==='suspended';
+  }catch{return false}
+}
+function notePrefsHTML(){
+  const p=notePrefs();
+  return`<div class="np" style="display:grid;gap:8px;padding:10px 12px;border:1px solid var(--line);border-radius:8px;margin-bottom:12px">
+    <label class="chk"><input type="checkbox" data-np="popups" ${p.popups?'checked':''}> <span><strong>Pop-up alerts</strong><br><span class="muted small">When this is off, new notifications are still saved here and counted on the bell, but nothing pops up on screen and no sound plays.</span></span></label>
+    <label class="chk"><input type="checkbox" data-np="sound" ${p.sound?'checked':''}> <span><strong>Play a sound</strong> when an alert pops up</span></label>
+    <div class="row"><button type="button" class="btn soft sm" data-act="testsound" data-fk="tsnd">Play test sound</button></div>
+    <p class="muted small" style="margin:0">These choices are saved on this device only.</p></div>`;
+}
+document.addEventListener('change',e=>{
+  const c=e.target;if(!c.dataset||!c.dataset.np)return;
+  setNotePref(c.dataset.np,c.checked);
+  if(c.dataset.np==='sound'&&c.checked)playChime();
+  document.querySelectorAll('[data-np="'+c.dataset.np+'"]').forEach(x=>{x.checked=c.checked});
+  if(c.dataset.np==='popups'){const bell=$('.bell');if(bell){bell.firstChild.textContent=c.checked?'🔔':'🔕'}toast(c.checked?'Pop-up alerts are on.':'Pop-up alerts are off. New notifications will wait in the bell.')}
+});
 const NSEEN='familyBoard.notified.v1';
 function noteText(n){
   const due=n.due_date?' Due '+new Date(n.due_date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+'.':'';
+  if(n.kind==='completed'){
+    const who=n.actor_name||'Someone';
+    return n.for_name?`${who} finished “${n.task_title}” for ${n.for_name} in ${n.workspace_name}.`:`${who} finished “${n.task_title}” in ${n.workspace_name}.`;
+  }
   return`${n.actor_name||'Someone'} assigned you “${n.task_title}” in ${n.workspace_name}.${due}`;
 }
 function updateBadge(){
@@ -1313,15 +1411,17 @@ async function pollNotes(){
   let rows;
   try{rows=await api('/rest/v1/notifications?select=*&order=created_at.desc&limit=30')}
   catch(e){if(/notifications/i.test(e.message||'')){CL.noNotes=true;render()}return}
-  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id);
+  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id&&['assigned','completed'].includes(n.kind));
   let seen=null;try{seen=JSON.parse(localStorage.getItem(NSEEN)||'null')}catch{}
   const first=!Array.isArray(seen);seen=Array.isArray(seen)?seen:[];
   const fresh=CL.notes.filter(n=>!n.read_at&&!seen.includes(n.id));
-  if(fresh.length){
+  const pref=notePrefs();
+  if(fresh.length&&pref.popups){
+    if(pref.sound)playChime();
     if(first&&fresh.length>1)toast('You have '+fresh.length+' task assignments waiting. Tap the bell to see them.');
     else fresh.slice(0,3).forEach((n,i)=>setTimeout(()=>{toast(noteText(n));say(noteText(n))},i*4300));
     if(!first||fresh.length===1)fresh.slice(0,3).forEach(n=>{
-      if(alertsOn())showAlert('New task for you',noteText(n),n.id);
+      if(alertsOn())showAlert(n.kind==='completed'?'Task finished':'New task for you',noteText(n),n.id);
     });
   }
   try{localStorage.setItem(NSEEN,JSON.stringify([...new Set([...seen,...CL.notes.map(n=>n.id)])].slice(-200)))}catch{}
@@ -1330,8 +1430,9 @@ async function pollNotes(){
 function openNotes(){
   const list=CL.notes.slice();
   openDlg(`<div class="dbody">${dhead('Notifications')}
+    ${notePrefsHTML()}
     ${list.length?`<ul class="nlist">${list.map(n=>`<li><button type="button" class="nitem${n.read_at?'':' new'}" data-act="opennote" data-id="${esc(n.id)}">${n.read_at?'':'<strong>New · </strong>'}${esc(noteText(n))}<small>${esc(new Date(n.created_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))}</small></button></li>`).join('')}</ul>`
-      :'<p class="muted">Nothing yet. When someone assigns you a task, it shows up here.</p>'}
+      :'<p class="muted">Nothing yet. You will see it here when someone assigns you a task, or when anyone in the workspace finishes one.</p>'}
   </div>`);
   if(unreadCount()){
     rpc('mark_notifications_read',{}).then(()=>{CL.notes.forEach(n=>{if(!n.read_at)n.read_at=new Date().toISOString()});updateBadge()}).catch(()=>{});
@@ -1370,7 +1471,9 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshQu
 /* ---- doing things ---- */
 function dbHint(m){
   m=m||'';
+  if(/steps/i.test(m))return'Your database needs a small update before task steps can be saved. Run supabase-update-all.sql in Supabase.';
   if(/special/i.test(m))return'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.';
+  if(/private_profiles|cycle_logs/i.test(m))return'Your database needs a small update before the private tracker works. Run supabase-update-all.sql in Supabase.';
   if(/avatar/i.test(m))return'Your database needs a small update before profile photos work. Run supabase-update-avatar.sql in Supabase.';
   return m||'That did not work.';
 }
@@ -1487,6 +1590,148 @@ function openDeleteWs(w){
     }
   });
 }
+/* ---- private cycle tracker: stays on this device in local mode, and in your own private rows in shared mode ---- */
+const CYKEY='familyBoard.private.v1';
+const CY={src:'',loaded:false,gender:'none',on:false,logs:[],noDb:false,month:new Date(new Date().getFullYear(),new Date().getMonth(),1)};
+const HEAVY=[['#f6c9c4','Light'],['#ec9a94','Fairly light'],['#d9625c','Medium'],['#b3332a','Heavy'],['#7a1411','Very heavy']];
+const YMDRE=/^\d{4}-\d{2}-\d{2}$/;
+const cyOn=()=>CY.gender==='female'&&CY.on&&!CY.noDb;
+const cycleGuard=()=>cyOn()?cycleView():calendarView();
+const daysBetween=(a,b)=>Math.round((parseYmd(b)-parseYmd(a))/864e5);
+const addDays=(s,n)=>{const d=parseYmd(s);d.setDate(d.getDate()+n);return ymd(d)};
+function cyReset(){CY.loaded=false;CY.gender='none';CY.on=false;CY.logs=[];CY.noDb=false}
+function cyClean(l){
+  if(!l||!YMDRE.test(l.start_date||''))return null;
+  const e=l.end_date&&YMDRE.test(l.end_date)&&l.end_date>=l.start_date?l.end_date:'';
+  return{id:String(l.id||uid()).slice(0,60),start_date:l.start_date,end_date:e,pain:Math.min(10,Math.max(0,parseInt(l.pain,10)||0)),heaviness:Math.min(5,Math.max(1,parseInt(l.heaviness,10)||3))};
+}
+const cySort=()=>CY.logs.sort((a,b)=>b.start_date<a.start_date?-1:b.start_date>a.start_date?1:0);
+function cyLocalSave(){try{localStorage.setItem(CYKEY,JSON.stringify({gender:CY.gender,on:CY.on,logs:CY.logs}))}catch{toast('This browser is blocking storage, so the tracker cannot save.',true)}}
+async function cyLoad(){
+  if(!CL.on){
+    try{const d=JSON.parse(localStorage.getItem(CYKEY)||'null')||{};
+      CY.gender=['male','female'].includes(d.gender)?d.gender:'none';CY.on=!!d.on;CY.logs=(Array.isArray(d.logs)?d.logs:[]).map(cyClean).filter(Boolean).slice(0,500);}
+    catch{}
+    cySort();CY.loaded=true;return;
+  }
+  try{
+    const[p,l]=await Promise.all([api('/rest/v1/private_profiles?select=gender,tracker_on'),api('/rest/v1/cycle_logs?select=*&order=start_date.desc&limit=300')]);
+    const r=p&&p[0];CY.gender=r&&['male','female'].includes(r.gender)?r.gender:'none';CY.on=!!(r&&r.tracker_on);
+    CY.logs=(l||[]).map(cyClean).filter(Boolean);cySort();CY.noDb=false;
+  }catch(e){if(/private_profiles|cycle_logs|schema cache|relation/i.test(e.message||''))CY.noDb=true}
+  CY.loaded=true;
+}
+async function cySaveProfile(){
+  if(!CL.on){cyLocalSave();return}
+  await api('/rest/v1/private_profiles?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates',body:{user_id:CL.session.user_id,gender:CY.gender,tracker_on:CY.on,updated_at:new Date().toISOString()}});
+}
+function privatePanel(){
+  if(CY.noDb)return`<section class="panel"><h3>About you</h3><p class="err">Your database needs a small update before this works. Run supabase-update-all.sql in Supabase.</p></section>`;
+  const g=CY.gender;
+  const opt=(v,t)=>`<label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="radio" name="cygender" value="${v}" data-cy="gender" ${g===v?'checked':''}> ${t}</label>`;
+  return`<section class="panel"><h3>About you <span class="pill">Private</span></h3>
+    <p class="muted">Only you can see this. It is never shown to anyone in a workspace${CL.on?', and it is saved in your own private rows that other members cannot read':', and it stays in this browser'}.</p>
+    <fieldset style="border:0;padding:0;margin:10px 0 0"><legend class="small muted">Gender</legend>${opt('none','Prefer not to say')}${opt('male','Male')}${opt('female','Female')}</fieldset>
+    ${g==='female'?`<label style="display:flex;gap:8px;align-items:center;margin:12px 0 4px"><input type="checkbox" data-cy="tracker" ${CY.on?'checked':''}> <span><strong>Period tracker</strong>, shown as a private “Cycle” tab</span></label>
+      <p class="muted small">Turning it off hides the tab. Your entries are kept, so turning it back on brings them back.</p>
+      ${CY.logs.length?`<div class="row" style="margin-top:8px"><button type="button" class="btn danger sm" data-cy="delall" data-fk="cydelall">Delete all my cycle entries</button></div>`:''}`:''}</section>`;
+}
+function cycleView(){
+  const logs=CY.logs,today=todayStr(),open=logs.find(l=>!l.end_date);
+  const cover=d=>logs.find(l=>l.start_date<=d&&d<=(l.end_date||today));
+  const y=CY.month.getFullYear(),m=CY.month.getMonth(),first=new Date(y,m,1).getDay(),dim=new Date(y,m+1,0).getDate();
+  let cells='';for(let i=0;i<first;i++)cells+='<div class="cyd pad"></div>';
+  for(let d=1;d<=dim;d++){
+    const s=y+'-'+pad(m+1)+'-'+pad(d),l=cover(s),hv=l&&HEAVY[l.heaviness-1];
+    cells+=`<div class="cyd${l?' on':''}${s===today?' today':''}" ${l?`style="background:${hv[0]};color:${l.heaviness>=3?'#fff':'#3b281d'}"`:''} role="img" aria-label="${esc(fmtDate(s,{month:'long',day:'numeric'}))}${l?', period, '+hv[1].toLowerCase()+' flow, pain '+l.pain+' of 10':''}">${d}</div>`;
+  }
+  const starts=logs.map(l=>l.start_date).sort();
+  const gaps=[];for(let i=1;i<starts.length;i++)gaps.push(daysBetween(starts[i-1],starts[i]));
+  const recent=gaps.slice(-6),avg=recent.length?Math.round(recent.reduce((a,b)=>a+b,0)/recent.length):0;
+  const closed=logs.filter(l=>l.end_date).slice(0,6),plen=closed.length?Math.round(closed.reduce((a,l)=>a+daysBetween(l.start_date,l.end_date)+1,0)/closed.length):0;
+  const next=avg&&starts.length?addDays(starts[starts.length-1],avg):'';
+  const row=l=>{const hv=HEAVY[l.heaviness-1],n=l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1;
+    return`<div class="mem" style="grid-template-columns:1fr auto"><div><div class="nm">${esc(fmtDate(l.start_date,{month:'short',day:'numeric',year:'numeric'}))}${l.end_date?' to '+esc(fmtDate(l.end_date,{month:'short',day:'numeric',year:'numeric'})):' <span class="pill">Ongoing</span>'}</div>
+      <div class="muted small">${n} ${n===1?'day':'days'} · Pain ${l.pain} of 10 · <span class="sw" style="background:${hv[0]}"></span>${hv[1]} flow</div></div>
+      <div class="row">${l.end_date?'':`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}" data-fk="cyend-${esc(l.id)}">End period</button>`}<button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}" data-fk="cye-${esc(l.id)}" aria-label="Edit entry from ${esc(fmtDate(l.start_date))}">Edit</button><button type="button" class="btn soft sm" data-cy="del" data-id="${esc(l.id)}" data-fk="cyd-${esc(l.id)}" aria-label="Delete entry from ${esc(fmtDate(l.start_date))}">Delete</button></div></div>`};
+  return`<div class="page-head"><h2>Period tracker</h2><button type="button" class="btn" data-cy="log" data-fk="cylog">${open?'+ Add an entry':'+ Log period start'}</button></div>
+    <p class="muted"><span class="pill">Only you can see this</span> Other people in your workspaces never see this tab or what is in it.</p>
+    ${open?`<section class="panel"><h3>Current period</h3><p>Started <strong>${esc(fmtDate(open.start_date,{weekday:'long',month:'long',day:'numeric'}))}</strong>, day ${daysBetween(open.start_date,today)+1}.</p><div class="row"><button type="button" class="btn" data-cy="end" data-id="${esc(open.id)}" data-fk="cyend2">End period</button></div></section>`:''}
+    <section class="panel"><div class="row" style="justify-content:space-between;align-items:center"><button type="button" class="btn soft sm" data-cy="mprev" data-fk="cyprev" aria-label="Previous month">‹ Prev</button><h3 style="margin:0">${esc(CY.month.toLocaleDateString('en-US',{month:'long',year:'numeric'}))}</h3><button type="button" class="btn soft sm" data-cy="mnext" data-fk="cynext" aria-label="Next month">Next ›</button></div>
+      <div class="cygrid" style="margin-top:12px">${['S','M','T','W','T','F','S'].map(x=>`<div class="dh" aria-hidden="true">${x}</div>`).join('')}${cells}</div>
+      <p class="muted small" style="margin-top:10px">Heaviness, light to dark: ${HEAVY.map((x,i)=>`<span class="sw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')}</p></section>
+    ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
+      <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}
+    <section class="panel"><h3>Entries</h3>${logs.length?logs.map(row).join(''):'<p class="muted">Nothing logged yet. Choose “Log period start” when your period begins, then “End period” when it finishes.</p>'}</section>`;
+}
+function openCycleForm(l,endNow){
+  const v=l||{id:'',start_date:todayStr(),end_date:'',pain:0,heaviness:3};
+  const ongoing=!v.end_date&&!endNow;
+  openDlg(`<form id="cyform" class="dbody" novalidate>${dhead(l?(endNow?'End your period':'Edit entry'):'Log period start')}
+    <p class="err" id="cyerr" role="alert" hidden></p>
+    <div class="two"><div class="field"><label for="cy-s">First day</label><input id="cy-s" type="date" max="${todayStr()}" value="${esc(v.start_date)}"></div>
+      <div class="field"><label for="cy-e">Last day</label><input id="cy-e" type="date" max="${todayStr()}" value="${esc(endNow?todayStr():v.end_date)}" ${ongoing?'disabled':''}></div></div>
+    <label style="display:flex;gap:8px;align-items:center;margin:4px 0 12px"><input type="checkbox" id="cy-on" ${ongoing?'checked':''}> Still going, no last day yet</label>
+    <div class="field"><label for="cy-p">Pain at its worst: <output id="cy-po">${v.pain}</output> of 10 <span class="muted small">(0 none, 10 the worst)</span></label><input id="cy-p" type="range" min="0" max="10" step="1" value="${v.pain}"></div>
+    <fieldset style="border:0;padding:0;margin:12px 0"><legend class="small muted" style="margin-bottom:6px">Heaviness, light red to dark red</legend><div class="hv">${HEAVY.map((x,i)=>`<label><input type="radio" name="cyh" value="${i+1}" ${v.heaviness===i+1?'checked':''}><span class="sw" style="background:${x[0]}"></span><span>${i+1}<br>${x[1]}</span></label>`).join('')}</div></fieldset>
+    <div class="row"><button class="btn" type="submit">Save</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  $('#cy-p').addEventListener('input',e=>{$('#cy-po').textContent=e.target.value});
+  $('#cy-on').addEventListener('change',e=>{$('#cy-e').disabled=e.target.checked;if(e.target.checked)$('#cy-e').value=''});
+  $('#cyform').addEventListener('submit',async ev=>{
+    ev.preventDefault();
+    const er=$('#cyerr'),bad=t=>{er.textContent=t;er.hidden=false};
+    const s=$('#cy-s').value,on=$('#cy-on').checked,e=on?'':$('#cy-e').value,t=todayStr();
+    if(!YMDRE.test(s))return bad('Choose the first day.');
+    if(s>t)return bad('The first day cannot be in the future.');
+    if(!on&&!YMDRE.test(e))return bad('Choose the last day, or tick “Still going”.');
+    if(e&&e<s)return bad('The last day cannot be before the first day.');
+    if(e&&e>t)return bad('The last day cannot be in the future.');
+    if(on&&CY.logs.some(x=>!x.end_date&&x.id!==v.id))return bad('You already have a period that is still going. End it first.');
+    const rec=cyClean({id:v.id,start_date:s,end_date:e,pain:$('#cy-p').value,heaviness:(document.querySelector('input[name=cyh]:checked')||{}).value});
+    if(await cySaveLog(rec,!!l))closeDlg();
+  });
+}
+async function cySaveLog(rec,isEdit){
+  try{
+    if(CL.on){
+      const body={start_date:rec.start_date,end_date:rec.end_date||null,pain:rec.pain,heaviness:rec.heaviness};
+      if(isEdit){const r=await changeRows('/rest/v1/cycle_logs?id=eq.'+rec.id,'PATCH',body);rec=cyClean(r[0])}
+      else{const r=await changeRows('/rest/v1/cycle_logs','POST',{...body,user_id:CL.session.user_id});rec=cyClean(r[0])}
+    }else if(!isEdit)rec.id=uid();
+    CY.logs=CY.logs.filter(x=>x.id!==rec.id);CY.logs.push(rec);cySort();
+    if(!CL.on)cyLocalSave();
+    render();toast('Saved.');return true;
+  }catch(e){toast(dbHint(e.message),true);return false}
+}
+async function cyDelete(ids){
+  try{
+    if(CL.on){await api('/rest/v1/cycle_logs?'+(ids?'id=eq.'+ids:'user_id=eq.'+CL.session.user_id),{method:'DELETE'})}
+    CY.logs=ids?CY.logs.filter(x=>x.id!==ids):[];
+    if(!CL.on)cyLocalSave();
+    render();toast(ids?'Entry deleted.':'All cycle entries deleted.');
+  }catch(e){toast(dbHint(e.message),true)}
+}
+document.addEventListener('change',async e=>{
+  const t=e.target;if(!t.dataset||!t.dataset.cy)return;
+  const prev={g:CY.gender,on:CY.on};
+  if(t.dataset.cy==='gender'){CY.gender=t.value;if(t.value!=='female'&&UI.view==='cycle')UI.view='settings'}
+  else if(t.dataset.cy==='tracker'){CY.on=t.checked;if(!t.checked&&UI.view==='cycle')UI.view='settings'}
+  else return;
+  try{await cySaveProfile();render()}catch(err){CY.gender=prev.g;CY.on=prev.on;render();toast(dbHint(err.message),true)}
+});
+document.addEventListener('click',async e=>{
+  const b=e.target.closest&&e.target.closest('[data-cy]');if(!b||b.type==='radio'||b.type==='checkbox')return;
+  const id=b.dataset.id,l=CY.logs.find(x=>x.id===id);
+  switch(b.dataset.cy){
+    case'log':openCycleForm(null);break;
+    case'edit':if(l)openCycleForm(l);break;
+    case'end':if(l)openCycleForm(l,true);break;
+    case'del':if(l&&await confirmBox('Delete this entry?','The entry is removed from your tracker.','Delete',true))await cyDelete(id);break;
+    case'delall':if(await confirmBox('Delete all cycle entries?','Every entry in your tracker is removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
+    case'mprev':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()-1,1);render();break;
+    case'mnext':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()+1,1);render();break;
+  }
+});
 function openMyName(){
   openDlg(`<form id="dnform" class="dbody" novalidate>${dhead('Change my display name')}
     <p class="err" id="dnerr" role="alert" hidden></p>
@@ -1567,6 +1812,7 @@ async function cloudClick(a,b,id){
       else toast('That task is no longer there.',true);
       return true;
     }
+    case'testsound':{const ok=playChime();if(!ok)toast('This browser could not play a sound. Tap anywhere on the page once and try again.',true);return true}
     case'alertson':await enableAlerts();return true;
     case'alertsoff':disableAlerts();return true;
     case'delws':{
@@ -1692,6 +1938,8 @@ function cloudSubmit(f){
     if(special&&!due)return bad('Add a due date so the day can be circled.');
     const body={title,description:$('#t-desc').value.trim(),due_date:due||null,due_time:due&&time?time:null,assignee_id:$('#t-who').value||null,group_id:$('#t-group').value||null};
     const tid=f.dataset.id;
+    {const old=tid&&task(tid)?task(tid).steps:[],st=parseSteps($('#t-steps').value,old);
+      if(st.length||old.length)body.steps=st}   // only sent when needed, so older databases keep working
     if(special||(tid&&task(tid)&&task(tid).special))body.special=special;   // only sent when needed, so older databases keep working
     cloudDo(async()=>{
       if(tid)await patchTask(tid,body);
@@ -1787,7 +2035,7 @@ function headerCloud(){
     <div class="brand">${LOGO}<div><h1>Family Board</h1><div class="ws">${ready&&D?esc(D.workspace.name):'Shared mode'}</div></div></div>
     <div class="who-box"><span class="pill">Shared · online</span>
       ${ready&&CL.workspaces.length>1?`<label for="wssel">Workspace</label><select id="wssel" data-act="switchws" data-fk="wssel" style="width:auto;min-width:140px">${CL.workspaces.map(w=>`<option value="${esc(w.id)}"${w.id===CL.wsId?' selected':''}>${esc(w.name)}</option>`).join('')}</select>`:''}
-      ${CL.session?`${ready&&!CL.noNotes?`<button type="button" class="btn soft sm bell" data-act="notes" data-fk="bell" aria-label="Notifications${unreadCount()?', '+unreadCount()+' new':''}">🔔<span class="nb" id="nbadge"${unreadCount()?'':' hidden'}>${unreadCount()}</span></button>`:''}<span class="who">${ready&&D&&me()?avatar(me()):''}<span>Signed in as <strong>${esc(nm)}</strong></span></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
+      ${CL.session?`${ready&&!CL.noNotes?`<button type="button" class="btn soft sm bell" data-act="notes" data-fk="bell" aria-label="Notifications${unreadCount()?', '+unreadCount()+' new':''}${notePrefs().popups?'':', pop-ups off'}">${notePrefs().popups?'🔔':'🔕'}<span class="nb" id="nbadge"${unreadCount()?'':' hidden'}>${unreadCount()}</span></button>`:''}<span class="who">${ready&&D&&me()?avatar(me()):''}<span>Signed in as <strong>${esc(nm)}</strong></span></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
 }
 function cloudBanners(){
   let h='';
@@ -1851,9 +2099,11 @@ function settingsViewCloud(){
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
         <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div></section>
+    ${privatePanel()}
     <section class="panel"><h3>Assignment alerts</h3>
       ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
-      <p>When someone assigns you a task, a message appears here and a red number shows on the bell at the top. Tasks you assign to yourself do not alert you.</p>
+      ${notePrefsHTML()}
+      <p>You get a message and a red number on the bell when someone assigns you a task. Only the person it is assigned to gets that one. When anyone finishes a task, everyone else in the workspace is told who did it. You are never alerted about your own actions.</p>
       ${alertsOn()?'<p><strong>Desktop alerts are on for this device.</strong></p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off desktop alerts</button></div>':'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on desktop alerts</button></div>'}
       <p class="muted small" style="margin-top:10px">Desktop alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent. On an iPhone, alerts only work after you add Family Board to your Home Screen (Share, then Add to Home Screen).</p>`}</section>
     ${appearancePanels()}
