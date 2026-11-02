@@ -144,7 +144,12 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 
 /* avatars, chips */
 .av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c,#6f4a33);color:#fff;font:700 11px/1 var(--label);flex:none}
+.av{overflow:hidden}
+.av img{width:100%;height:100%;object-fit:cover;display:block}
 .av.lg{width:44px;height:44px;font-size:15px}
+.av.xl{width:84px;height:84px;font-size:28px}
+input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-color:var(--accent)}
+#ph-cv{display:block;width:192px;height:192px;margin:0 auto;border-radius:50%;border:2px solid var(--line);background:var(--linen)}
 .av.none{background:transparent;color:var(--ink-soft);border:1.5px dashed var(--ink-soft)}
 .who{display:inline-flex;align-items:center;gap:6px}
 .gtag{display:inline-flex;align-items:center;gap:6px;font:700 11px/1.2 var(--label);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-left:5px solid var(--gc,#b0845b);background:var(--linen);padding:3px 8px 3px 6px;border-radius:2px}
@@ -333,7 +338,7 @@ const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKE
 const CLOUD_CONFIG={url:'https://nxiyujunhqhlyzggymqb.supabase.co',anonKey:'sb_publishable_WJtf61r3ldDk5YPXBX_sww_7JxKMm-p'};
 
 /* Shared-mode state. CL.on is true only when the person chose shared mode AND connection details exist. */
-const CL={on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces:[],wsId:'',invites:[],
+const CL={noAvatar:false,on:false,cfg:null,stage:'loading',session:null,profile:null,workspaces:[],wsId:'',invites:[],
   err:'',sent:'',email:'',busy:false,stale:false,poll:0,pending:''};
 
 /* =====================================================================
@@ -547,7 +552,9 @@ DARKQ.addEventListener&&DARKQ.addEventListener('change',applyTheme);
    5. Rendering pieces
    ===================================================================== */
 const LOGO='<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="4" style="fill:var(--accent)"/><rect x="6" y="9" width="20" height="17" rx="1.5" style="fill:var(--card)"/><rect x="10" y="5" width="3" height="8" rx="1.5" style="fill:var(--card)"/><rect x="19" y="5" width="3" height="8" rx="1.5" style="fill:var(--card)"/><path d="M11 18l4 4 6-7" fill="none" style="stroke:var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-const avatar=(m,cls='')=>m?`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true">${esc(initials(m.name))}</span>`:`<span class="av none ${cls}" aria-hidden="true">?</span>`;
+const AVRE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
+const okAvatar=a=>typeof a==='string'&&a.length<=60000&&AVRE.test(a);   // checked again here, because other people's profiles are untrusted
+const avatar=(m,cls='')=>m?`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>`:`<span class="av none ${cls}" aria-hidden="true">?</span>`;
 const whoTag=id=>{const m=member(id);return`<span class="who">${avatar(m)}<span>${esc(m?m.name:'Unassigned')}</span></span>`};
 const gTag=g=>g?`<span class="gtag" style="--gc:${esc(g.color)}">${esc(g.name)}</span>`:'';
 const dueText=t=>t.due?fmtDate(t.due,{weekday:'short',month:'short',day:'numeric'})+(t.time?' · '+fmtTime(t.time):''):'No due date';
@@ -584,7 +591,7 @@ const pass=t=>{
 const sel=(id,label,opts,val,extra='')=>`<div class="field"><label for="${id}">${label}</label><select id="${id}" ${extra}>${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
 
 function tabsNav(){
-  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],['settings','Settings']];
+  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],...(CL.on?[['workspaces','Workspaces']]:[]),['settings','Settings']];
   return`<nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav>`;
 }
 function header(){
@@ -761,7 +768,7 @@ function settingsView(){
 /* ---- render ---- */
 function render(){
   const ae=document.activeElement,fk=ae&&ae.dataset&&ae.dataset.fk,sy=window.scrollY;
-  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,settings:settingsViewCloud}
+  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,settings:settingsViewCloud}
     :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,settings:settingsView};
   if(CL.on&&CL.stage!=='ready'){
     const gates={loading:cloudLoadingView,gate:cloudGateView,name:cloudNameView,workspace:cloudWorkspaceView};
@@ -1220,16 +1227,28 @@ const patchTask=(id,body)=>changeRows('/rest/v1/tasks?id=eq.'+id,'PATCH',body);
 /* ---- loading ---- */
 async function loadMemberships(){
   const rows=await api('/rest/v1/members?user_id=eq.'+CL.session.user_id+'&select=workspace_id,role,workspaces(name)');
-  CL.workspaces=(rows||[]).map(r=>({id:r.workspace_id,name:(r.workspaces&&r.workspaces.name)||'Workspace',role:r.role}));
+  CL.workspaces=(rows||[]).map(r=>({id:r.workspace_id,name:(r.workspaces&&r.workspaces.name)||'Workspace',role:r.role,count:0}));
+  if(CL.workspaces.length){
+    try{
+      const all=await api('/rest/v1/members?select=workspace_id&workspace_id=in.('+CL.workspaces.map(w=>w.id).join(',')+')');
+      const n={};(all||[]).forEach(r=>{n[r.workspace_id]=(n[r.workspace_id]||0)+1});
+      CL.workspaces.forEach(w=>{w.count=n[w.id]||0});
+    }catch{}   // the counts are a nicety, so a failure here must not block the app
+  }
 }
 async function cloudLoad(){
   const w=CL.wsId,get=p=>api('/rest/v1/'+p);
+  const memQ=async()=>{
+    const q=()=>get('members?workspace_id=eq.'+w+'&select=user_id,role,joined_at,profiles('+(CL.noAvatar?'display_name':'display_name,avatar')+')&order=joined_at');
+    try{return await q()}
+    catch(e){if(!CL.noAvatar&&/avatar/i.test(e.message||'')){CL.noAvatar=true;return await q()}throw e}   // older database without profile photos
+  };
   const[mem,grp,tsk]=await Promise.all([
-    get('members?workspace_id=eq.'+w+'&select=user_id,role,joined_at,profiles(display_name)&order=joined_at'),
+    memQ(),
     get('groups?workspace_id=eq.'+w+'&select=*&order=created_at'),
     get('tasks?workspace_id=eq.'+w+'&select=*&order=created_at')]);
   const ws=CL.workspaces.find(x=>x.id===w);
-  const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),sample:false}));
+  const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),avatar:okAvatar(m.profiles&&m.profiles.avatar)?m.profiles.avatar:'',sample:false}));
   if(!members.some(m=>m.id===CL.session.user_id))throw new Error('You are no longer a member of this workspace.');
   const old=new Map(((D&&D.tasks)||[]).map(t=>[t.id,t.history]));
   const tasks=tsk.map(t=>({id:t.id,title:t.title,description:t.description||'',due:t.due_date||'',time:t.due_time?String(t.due_time).slice(0,5):'',
@@ -1281,10 +1300,16 @@ async function refreshQuiet(){
 document.addEventListener('visibilitychange',()=>{if(!document.hidden)refreshQuiet()});
 
 /* ---- doing things ---- */
+function dbHint(m){
+  m=m||'';
+  if(/special/i.test(m))return'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.';
+  if(/avatar/i.test(m))return'Your database needs a small update before profile photos work. Run supabase-update-avatar.sql in Supabase.';
+  return m||'That did not work.';
+}
 async function cloudDo(fn,okMsg){
   if(CL.busy){toast('One moment, the last change is still saving.',true);render();return false}
   CL.busy=true;
-  try{await fn()}catch(e){CL.busy=false;toast(/special/i.test(e.message||'')?'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.':(e.message||'That did not work.'),true);render();return false}
+  try{await fn()}catch(e){CL.busy=false;toast(dbHint(e.message),true);render();return false}
   try{await cloudLoad()}catch(e){CL.busy=false;CL.stale=true;render();toast('Your change was saved, but the screen could not refresh. '+e.message,true);return true}
   CL.busy=false;render();
   if(okMsg)toast(okMsg);
@@ -1321,6 +1346,55 @@ function openNewWsCloud(){
     <p class="muted small">You will be its owner. You can invite people afterward.</p>
     <div class="row"><button class="btn" type="submit">Create workspace</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
 }
+const PH={im:null};
+function drawCrop(cv,size){
+  const ctx=cv.getContext('2d'),im=PH.im;
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,size,size);
+  if(!im)return;
+  const z=+$('#ph-zoom').value||1,hx=+$('#ph-x').value||0,hy=+$('#ph-y').value||0;
+  const base=Math.min(im.naturalWidth,im.naturalHeight),sz=base/z;
+  const sx=(im.naturalWidth-sz)/2*(1+hx),sy=(im.naturalHeight-sz)/2*(1+hy);
+  ctx.imageSmoothingQuality='high';
+  ctx.drawImage(im,Math.max(0,sx),Math.max(0,sy),sz,sz,0,0,size,size);
+}
+function openPhotoDialog(){
+  if(CL.noAvatar){toast(dbHint('avatar'),true);return}
+  PH.im=null;
+  openDlg(`<form id="phform" class="dbody" novalidate>${dhead('Your profile photo')}
+    <p class="err" id="pherr" role="alert" hidden></p>
+    <p>Choose a picture from your device. It is shrunk to a small square, and everyone in your workspaces can see it.</p>
+    <div class="field"><label for="ph-file">Picture</label><input id="ph-file" type="file" accept="image/*"></div>
+    <div id="ph-edit" hidden style="display:grid;gap:12px">
+      <canvas id="ph-cv" width="192" height="192" role="img" aria-label="Preview of your photo"></canvas>
+      <div class="field"><label for="ph-zoom">Zoom</label><input id="ph-zoom" type="range" min="1" max="3" step="0.05" value="1"></div>
+      <div class="two"><div class="field"><label for="ph-x">Move left or right</label><input id="ph-x" type="range" min="-1" max="1" step="0.02" value="0"></div>
+      <div class="field"><label for="ph-y">Move up or down</label><input id="ph-y" type="range" min="-1" max="1" step="0.02" value="0"></div></div></div>
+    <div class="row"><button class="btn" type="submit" id="ph-save" disabled>Save photo</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  const err=$('#pherr'),edit=$('#ph-edit'),cv=$('#ph-cv');
+  const bad=m=>{err.textContent=m;err.hidden=false};
+  const redraw=()=>drawCrop(cv,192);
+  ['ph-zoom','ph-x','ph-y'].forEach(i=>$('#'+i).addEventListener('input',redraw));
+  $('#ph-file').addEventListener('change',e=>{
+    const f=e.target.files[0];err.hidden=true;PH.im=null;$('#ph-save').disabled=true;edit.hidden=true;
+    if(!f)return;
+    if(!/^image\//.test(f.type)){bad('That file is not a picture. Choose a JPEG, PNG or WebP image.');return}
+    if(f.size>20e6){bad('That picture is very large. Choose one under 20 MB.');return}
+    const url=URL.createObjectURL(f),im=new Image();
+    im.onload=()=>{URL.revokeObjectURL(url);if(!im.naturalWidth){bad('That picture could not be read.');return}
+      PH.im=im;$('#ph-zoom').value=1;$('#ph-x').value=0;$('#ph-y').value=0;edit.hidden=false;$('#ph-save').disabled=false;redraw()};
+    im.onerror=()=>{URL.revokeObjectURL(url);bad('That picture could not be read. Try a JPEG or PNG. Some phone formats, such as HEIC, are not supported in every browser.')};
+    im.src=url;
+  });
+  $('#phform').addEventListener('submit',ev=>{
+    ev.preventDefault();
+    if(!PH.im)return bad('Choose a picture first.');
+    const out=document.createElement('canvas');out.width=out.height=96;drawCrop(out,96);
+    let q=.85,data=out.toDataURL('image/jpeg',q);
+    while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
+    if(!okAvatar(data))return bad('That picture could not be prepared. Try a different one.');
+    cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok)closeDlg()});
+  });
+}
 function openMyName(){
   openDlg(`<form id="dnform" class="dbody" novalidate>${dhead('Change my display name')}
     <p class="err" id="dnerr" role="alert" hidden></p>
@@ -1346,6 +1420,12 @@ async function cloudClick(a,b,id){
       return true;
     case'dismisserr':CL.err='';render();return true;
     case'mydisplayname':openMyName();return true;
+    case'photo':openPhotoDialog();return true;
+    case'rmphoto':{
+      const ok=await confirmBox('Remove your photo?','Your initials will show instead, for everyone in your workspaces.','Remove photo',true);
+      if(ok)await cloudDo(()=>rpc('set_avatar',{p_data:null}),'Photo removed.');
+      return true;
+    }
     case'toggletask':{
       const t=task(id);if(!t)return true;
       const going=t.status!=='complete';
@@ -1386,6 +1466,7 @@ async function cloudClick(a,b,id){
       return true;
     }
     case'newws':openNewWsCloud();return true;
+    case'openws':await cloudSwitch(id);return true;
     case'createinvite':{
       let tok='';
       const ok=await cloudDo(async()=>{tok=await rpc('create_invite',{p_ws:CL.wsId})},null);
@@ -1424,14 +1505,18 @@ async function cloudChange(t){
     await cloudDo(()=>patchTask(tk.id,{group_id:none?null:t.value}),none?'Task removed from the group and kept as a standalone task.':'Task moved.');
     return true;
   }
-  if(t.dataset.act==='switchws'){
-    CL.wsId=t.value;try{localStorage.setItem(WSKEY,CL.wsId)}catch{}
-    UI.view='calendar';UI.f={person:'all',group:'all',status:'all'};D=null;
-    CL.busy=true;
-    try{await cloudLoad();CL.busy=false;render()}catch(e){CL.busy=false;toast(e.message,true);render()}
-    return true;
-  }
+  if(t.dataset.act==='switchws'){await cloudSwitch(t.value);return true}
   return false;
+}
+async function cloudSwitch(id){
+  if(CL.busy||!id||id===CL.wsId)return;
+  const prev=CL.wsId;CL.wsId=id;CL.busy=true;
+  try{
+    await cloudLoad();
+    try{localStorage.setItem(WSKEY,id)}catch{}
+    UI.view='calendar';UI.f={person:'all',group:'all',status:'all'};
+    CL.busy=false;render();window.scrollTo(0,0);
+  }catch(e){CL.wsId=prev;CL.busy=false;toast(e.message,true);render()}
 }
 function cloudSubmit(f){
   const id=f.id;
@@ -1471,7 +1556,7 @@ function cloudSubmit(f){
   if(id==='joinform'){
     const raw=$('#join-code').value.trim(),m=/invite=([A-Za-z0-9]+)/.exec(raw),tok=m?m[1]:raw;
     if(!/^[A-Za-z0-9]{20,100}$/.test(tok)){CL.err='Paste the full invite link you were sent.';render();return true}
-    cloudStep(async()=>{CL.wsId=await rpc('accept_invite',{p_token:tok});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}await cloudAfterAuth();toast('You joined the workspace.')});
+    cloudStep(async()=>{CL.wsId=await rpc('accept_invite',{p_token:tok});try{localStorage.setItem(WSKEY,CL.wsId)}catch{}UI.view='calendar';await cloudAfterAuth();toast('You joined the workspace.')});
     return true;
   }
   if(id==='dnform'){
@@ -1558,6 +1643,19 @@ function cloudGateView(){
     ${CL.pending?'<p class="muted">You have an invite link waiting. Sign in and it will be used automatically.</p>':''}
     <div class="row" style="margin-top:12px">${CL.session?'<button class="btn" data-act="retryboot">Try again</button>':''}<button class="btn soft" data-act="uselocal">Use local demo mode instead</button></div></section>`;
 }
+function cloudWorkspacesView(){
+  const row=w=>`<div class="mem" style="grid-template-columns:1fr auto"><div><div class="nm">${esc(w.name)}${w.id===CL.wsId?' <span class="pill">Open now</span>':''}</div><div class="muted small">You are ${w.role==='owner'?'the owner':w.role==='admin'?'an admin':'a member'} · ${w.count} ${w.count===1?'person':'people'}</div></div>
+    <div class="row">${w.id===CL.wsId?'':`<button class="btn soft sm" data-act="openws" data-id="${esc(w.id)}" data-fk="ow-${esc(w.id)}" aria-label="Open ${esc(w.name)}">Open</button>`}</div></div>`;
+  const mine=CL.workspaces.filter(w=>w.role==='owner'),joined=CL.workspaces.filter(w=>w.role!=='owner');
+  const block=(h,l,empty)=>`<section class="panel"><h3>${h} (${l.length})</h3>${l.length?l.map(row).join(''):`<p class="muted">${empty}</p>`}</section>`;
+  return`<div class="page-head"><h2>Workspaces</h2><button class="btn" data-act="newws" data-fk="newws-tab">+ New workspace</button></div>
+    <p class="muted">A workspace is one family’s calendar. You can belong to several and switch between them here.</p>
+    ${block('Workspaces I started',mine,'You have not started one yet. Use “New workspace” above.')}
+    ${block('Workspaces I joined',joined,'You have not joined anyone else’s workspace yet.')}
+    <section class="panel"><h3>Join someone else’s workspace</h3>
+      <p>Paste the invite link they sent you. Each link works once and expires after 7 days. You can also just open their link while you are signed in.</p>
+      <form id="joinform" class="row" style="align-items:end;margin-top:12px" novalidate><div class="field" style="flex:1 1 260px"><label for="join-code">Invite link</label><input id="join-code" type="text" autocomplete="off" placeholder="Paste the link you were sent"></div><button class="btn" type="submit" ${CL.busy?'disabled':''}>Join</button></form></section>`;
+}
 function cloudNameView(){
   return`<section class="panel" style="margin-top:0"><h2>What should we call you?</h2>
     <p>Your display name shows next to tasks you create, tasks assigned to you, and tasks you check off.</p>
@@ -1583,7 +1681,7 @@ function headerCloud(){
     <div class="brand">${LOGO}<div><h1>Family Board</h1><div class="ws">${ready&&D?esc(D.workspace.name):'Shared mode'}</div></div></div>
     <div class="who-box"><span class="pill">Shared · online</span>
       ${ready&&CL.workspaces.length>1?`<label for="wssel">Workspace</label><select id="wssel" data-act="switchws" data-fk="wssel" style="width:auto;min-width:140px">${CL.workspaces.map(w=>`<option value="${esc(w.id)}"${w.id===CL.wsId?' selected':''}>${esc(w.name)}</option>`).join('')}</select>`:''}
-      ${CL.session?`<span>Signed in as <strong>${esc(nm)}</strong></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
+      ${CL.session?`<span class="who">${ready&&D&&me()?avatar(me()):''}<span>Signed in as <strong>${esc(nm)}</strong></span></span><button type="button" class="btn soft sm" data-act="signout" data-fk="signout">Sign out</button>`:''}</div></div></header>`;
 }
 function cloudBanners(){
   let h='';
@@ -1598,7 +1696,7 @@ function cloudMembersView(){
       ${D.members.map(m=>{
         const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner');
         return`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${self?' (you)':''}</div><div class="muted small">${roleLabel(m.role)}</div></div>
-          <div class="row">${self?'<button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}</div></div>`}).join('')}
+          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}</div></div>`}).join('')}
       <p class="muted small" style="margin-top:12px">Everyone signs in with their own email address. Names on completed tasks come from each person’s own sign-in, not from a menu.</p></section>
     <section class="panel"><h3>Invitations</h3>
       ${mg?`<p>Create a single-use link and send it to the person yourself, by text or email. <strong>Nothing is emailed from this page.</strong> Each link works once and expires after 7 days.</p>
@@ -1642,6 +1740,10 @@ function settingsViewCloud(){
       <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="80" value="${esc(D.workspace.name)}" ${admin?'':'disabled'}></div><button class="btn" type="submit" ${admin?'':'disabled'}>Save name</button></form>
       ${admin?'':'<p class="muted small" style="margin-top:8px">Only an owner or admin can rename the workspace.</p>'}
       <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws3">Create another workspace</button></div></section>
+    <section class="panel"><h3>Your profile</h3>
+      <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
+        <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
+        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div></section>
     ${appearancePanels()}
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
