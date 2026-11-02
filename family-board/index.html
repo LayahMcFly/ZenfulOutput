@@ -200,6 +200,13 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 #ph-cv{display:block;width:192px;height:192px;margin:0 auto;border-radius:50%;border:2px solid var(--line);background:var(--linen)}
 .av.none{background:transparent;color:var(--ink-soft);border:1.5px dashed var(--ink-soft)}
 .who{display:inline-flex;align-items:center;gap:6px}
+.who .av+.av{margin-left:-10px}
+.whopick{border:0;padding:0;margin:0 0 14px}
+.whopick legend{padding:0;margin-bottom:6px;font:700 12px/1.2 var(--label);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft)}
+.wp{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:8px}
+.wpi{border:2px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--field);cursor:pointer;min-height:44px}
+.wpi:has(input:checked){border-color:var(--accent);background:var(--wash)}
+.wpi .av{flex:none}
 .gtag{display:inline-flex;align-items:center;gap:6px;font:700 11px/1.2 var(--label);letter-spacing:.05em;text-transform:uppercase;border:1px solid var(--line);border-left:5px solid var(--gc,#b0845b);background:var(--linen);padding:3px 8px 3px 6px;border-radius:2px}
 .stat{font:700 11px/1.2 var(--label);letter-spacing:.06em;text-transform:uppercase}
 .stat.ok{color:var(--ok)} .stat.late{color:var(--warn)}
@@ -438,7 +445,7 @@ function nextDates(t){   // the next copy of a repeating task: the first date af
   const d=parseYmd(n);d.setDate(d.getDate()-span);
   return{due:n,start:span?ymd(d):''};
 }
-const nextExists=(t,nx)=>D.tasks.some(x=>x.id!==t.id&&x.status!=='complete'&&x.title===t.title&&x.repeat===t.repeat&&x.due===nx.due&&(x.assigneeId||'')===(t.assigneeId||''));
+const nextExists=(t,nx)=>D.tasks.some(x=>x.id!==t.id&&x.status!=='complete'&&x.title===t.title&&x.repeat===t.repeat&&x.due===nx.due&&sameIds(aIds(x),aIds(t)));
 const nextWhen=nx=>fmtDate(nx.due,{weekday:'short',month:'short',day:'numeric'});
 const stepStat=t=>{const s=t.steps||[];return s.length?{n:s.length,d:s.filter(x=>x.done).length}:null};
 function parseSteps(text,old){
@@ -469,15 +476,15 @@ function normalize(d){
       id:t.id.slice(0,40),title:str(t.title,120).trim(),description:str(t.description,2000),
       due:parseYmd(t.due)?t.due:'',time:parseYmd(t.due)&&validTime(t.time)?t.time:'',
       start:parseYmd(t.due)&&parseYmd(t.start)&&t.start<t.due?t.start:'',perDay:PERDAY.some(p=>p[0]===t.perDay)?t.perDay:0,repeat:parseYmd(t.due)&&REPCODES.has(t.repeat)?t.repeat:'',
-      assigneeId:mids.has(t.assigneeId)?t.assigneeId:'',groupId:gids.has(t.groupId)?t.groupId:'',
+      assigneeIds:(()=>{const a=uniqIds(Array.isArray(t.assigneeIds)?t.assigneeIds:[t.assigneeId]).filter(x=>mids.has(x)).slice(0,MAXWHO);return a})(),groupId:gids.has(t.groupId)?t.groupId:'',
       status:done?'complete':'open',special:!!t.special&&!!parseYmd(t.due),steps:cleanSteps(t.steps),
       completedBy:done?str(t.completedBy,40):'',completedByName:done?str(t.completedByName,60):'',
-      completedForId:done?str(t.completedForId,40):'',completedForName:done?str(t.completedForName,60):'',
+      completedForId:done?str(t.completedForId,40):'',completedForName:done?str(t.completedForName,200):'',
       completedAt:done?str(t.completedAt,40):'',createdAt:str(t.createdAt,40),sample:!!t.sample,
       history:(Array.isArray(t.history)?t.history:[]).filter(h=>h&&EVTYPES.includes(h.type)&&typeof h.at==='string').map(h=>({
         id:str(h.id,40)||uid(),type:h.type,at:h.at.slice(0,40),actorId:str(h.actorId,40),actorName:str(h.actorName,60)||'Unknown',
-        fromName:str(h.fromName,80),toName:str(h.toName,80),forName:str(h.forName,60),fields:str(h.fields,120),
-        assigneeName:str(h.assigneeName,60)}))
+        fromName:str(h.fromName,200),toName:str(h.toName,200),forName:str(h.forName,200),fields:str(h.fields,120),
+        assigneeName:str(h.assigneeName,200)}))
     };
   });
   return{app:'family-board',version:1,
@@ -504,6 +511,11 @@ const group=id=>D.groups.find(g=>g.id===id)||null;
 const task=id=>D.tasks.find(t=>t.id===id)||null;
 const me=()=>member(D.currentUserId)||D.members[0];
 const mName=id=>{const m=member(id);return m?m.name:'Unassigned'};
+const aIds=t=>(t&&Array.isArray(t.assigneeIds)?t.assigneeIds:[]);
+const uniqIds=a=>[...new Set((Array.isArray(a)?a:[]).filter(x=>typeof x==='string'&&x))];
+const namesOf=ids=>ids.length?ids.map(mName).join(', '):'Unassigned';
+const sameIds=(a,b)=>JSON.stringify([...a].sort())===JSON.stringify([...b].sort());
+const MAXWHO=20;
 const canManage=()=>!CL.on||['owner','admin'].includes(me().role);   // local mode is one person, so they manage everything
 const tasksIn=g=>D.tasks.filter(t=>t.groupId===g.id);
 const progress=g=>{const l=tasksIn(g);return{done:l.filter(t=>t.status==='complete').length,total:l.length}};
@@ -512,16 +524,16 @@ const isOverdue=t=>t.status!=='complete'&&t.due&&t.due<todayStr();
 
 function ev(type,actor,at,extra){return{id:uid(),type,at:at||new Date().toISOString(),actorId:actor.id,actorName:actor.name,...extra}}
 function makeTask(f,actor,at){
-  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',start:f.due?(f.start||''):'',perDay:f.perDay||0,repeat:f.due?(f.repeat||''):'',assigneeId:f.assigneeId||'',groupId:f.groupId||'',special:!!(f.special&&f.due),steps:cleanSteps(f.steps),
+  const t={id:uid(),title:f.title,description:f.description||'',due:f.due||'',time:f.due?(f.time||''):'',start:f.due?(f.start||''):'',perDay:f.perDay||0,repeat:f.due?(f.repeat||''):'',assigneeIds:uniqIds(f.assigneeIds||[f.assigneeId]).slice(0,MAXWHO),groupId:f.groupId||'',special:!!(f.special&&f.due),steps:cleanSteps(f.steps),
     status:'open',completedBy:'',completedByName:'',completedForId:'',completedForName:'',completedAt:'',createdAt:at||new Date().toISOString(),sample:!!f.sample,history:[]};
-  t.history.push(ev('created',actor,t.createdAt,{assigneeName:t.assigneeId?mName(t.assigneeId):''}));
+  t.history.push(ev('created',actor,t.createdAt,{assigneeName:aIds(t).length?namesOf(aIds(t)):''}));
   return t;
 }
 function applyComplete(t,actor,at){
   if(t.status==='complete')return;
-  const a=member(t.assigneeId);
+  const as=aIds(t).map(member).filter(Boolean),forM=as.length<=1?as:as.filter(m=>m.id!==actor.id);
   t.status='complete';t.completedBy=actor.id;t.completedByName=actor.name;t.completedAt=at||new Date().toISOString();
-  t.completedForId=a?a.id:'';t.completedForName=a?a.name:'';
+  t.completedForId=forM[0]?forM[0].id:'';t.completedForName=forM.map(m=>m.name).join(', ');
   t.history.push(ev('completed',actor,t.completedAt,{forName:t.completedForName}));
 }
 function applyReopen(t,actor){
@@ -529,10 +541,11 @@ function applyReopen(t,actor){
   t.history.push(ev('reopened',actor,null,{fromName:t.completedByName}));
   t.status='open';t.completedBy='';t.completedByName='';t.completedForId='';t.completedForName='';t.completedAt='';
 }
-function applyAssign(t,newId,actor){
-  if((t.assigneeId||'')===(newId||''))return;
-  t.history.push(ev('assigned',actor,null,{fromName:t.assigneeId?mName(t.assigneeId):'Unassigned',toName:newId?mName(newId):'Unassigned'}));
-  t.assigneeId=newId||'';
+function applyAssign(t,newIds,actor){
+  newIds=uniqIds(newIds).slice(0,MAXWHO);
+  if(sameIds(aIds(t),newIds))return;
+  t.history.push(ev('assigned',actor,null,{fromName:namesOf(aIds(t)),toName:namesOf(newIds)}));
+  t.assigneeIds=newIds;
 }
 function applyGroup(t,newId,actor){
   if((t.groupId||'')===(newId||''))return;
@@ -648,6 +661,9 @@ const LOGO='<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height=
 const AVRE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
 const okAvatar=a=>typeof a==='string'&&a.length<=60000&&AVRE.test(a);   // checked again here, because other people's profiles are untrusted
 const avatar=(m,cls='')=>m?`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>`:`<span class="av none ${cls}" aria-hidden="true">?</span>`;
+const whoTags=t=>{const ms=aIds(t).map(member).filter(Boolean);
+  if(ms.length<=1)return whoTag(ms[0]?ms[0].id:'');
+  return`<span class="who">${ms.slice(0,4).map(m=>avatar(m)).join('')}<span>${esc(ms.map(m=>m.name).join(', '))}</span></span>`};
 const whoTag=id=>{const m=member(id);return`<span class="who">${avatar(m)}<span>${esc(m?m.name:'Unassigned')}</span></span>`};
 const gTag=g=>g?`<span class="gtag" style="--gc:${esc(g.color)}">${esc(g.name)}</span>`:'';
 const dueText=t=>t.due?(isLong(t)?spanText(t):fmtDate(t.due,{weekday:'short',month:'short',day:'numeric'}))+(t.time?' · '+fmtTime(t.time):''):'No due date';
@@ -660,22 +676,22 @@ function taskRow(t,ctx){
     <input type="checkbox" class="cb" data-cb="${t.id}" data-fk="cb-${ctx}-${t.id}" ${done?'checked':''} aria-label="Mark “${esc(t.title)}” complete">
     <button type="button" class="tmain" data-act="open" data-id="${t.id}" data-fk="open-${ctx}-${t.id}">
       <span class="ttitle">${esc(t.title)}</span>
-      <span class="tmeta">${whoTag(t.assigneeId)}${gTag(g)}<span>${esc(dueText(t))}</span>${t.repeat?`<span class="stat" title="Repeats">↻ ${esc(repLabel(t.repeat))}</span>`:''}${perDayText(t.perDay)?`<span class="stat">${esc(perDayText(t.perDay))}</span>`:''}${statTag(t)}${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion</span>':''}</span>
+      <span class="tmeta">${whoTags(t)}${gTag(g)}<span>${esc(dueText(t))}</span>${t.repeat?`<span class="stat" title="Repeats">↻ ${esc(repLabel(t.repeat))}</span>`:''}${perDayText(t.perDay)?`<span class="stat">${esc(perDayText(t.perDay))}</span>`:''}${statTag(t)}${statusTag(t)}${t.special?'<span class="stat spc">◯ Special occasion</span>':''}</span>
     </button></div>`;
 }
 function chip(t,k){
-  const g=group(t.groupId),m=member(t.assigneeId),done=t.status==='complete';
+  const g=group(t.groupId),done=t.status==='complete';
   return`<div class="chip${done?' done':''}${UI.popId===t.id?' pop':''}" style="--gc:${g?esc(g.color):'var(--caramel)'}">
     <input type="checkbox" class="cb" data-cb="${t.id}" data-fk="cb-cal-${t.id}" ${done?'checked':''} aria-label="Mark “${esc(t.title)}” complete">
     <button type="button" class="tmain" data-act="open" data-id="${t.id}" data-fk="open-cal-${t.id}">
       <span class="ttitle">${t.repeat?'<span aria-hidden="true">↻ </span>':''}${esc(t.title)}${done?'<span class="sr"> (complete)</span>':''}</span>
-      <span class="cm">${isLong(t)&&k?'Day '+(Math.round((parseYmd(k)-parseYmd(t.start))/864e5)+1)+' of '+(Math.round((parseYmd(t.due)-parseYmd(t.start))/864e5)+1)+' · ':''}${esc(m?m.name:'Unassigned')}${g?' · '+esc(g.name):''}${t.time?' · '+esc(fmtTime(t.time)):''}${stepStat(t)?' · '+stepStat(t).d+'/'+stepStat(t).n:''}</span>
+      <span class="cm">${isLong(t)&&k?'Day '+(Math.round((parseYmd(k)-parseYmd(t.start))/864e5)+1)+' of '+(Math.round((parseYmd(t.due)-parseYmd(t.start))/864e5)+1)+' · ':''}${esc(namesOf(aIds(t)))}${g?' · '+esc(g.name):''}${t.time?' · '+esc(fmtTime(t.time)):''}${stepStat(t)?' · '+stepStat(t).d+'/'+stepStat(t).n:''}</span>
     </button></div>`;
 }
 const pass=t=>{
   const f=UI.f;
-  if(f.person==='none'&&t.assigneeId)return false;
-  if(f.person!=='all'&&f.person!=='none'&&t.assigneeId!==f.person)return false;
+  if(f.person==='none'&&aIds(t).length)return false;
+  if(f.person!=='all'&&f.person!=='none'&&!aIds(t).includes(f.person))return false;
   if(f.group==='none'&&t.groupId)return false;
   if(f.group!=='all'&&f.group!=='none'&&t.groupId!==f.group)return false;
   if(f.status==='open'&&t.status==='complete')return false;
@@ -764,7 +780,7 @@ function calendarView(){
 /* ---- my tasks ---- */
 function myView(){
   const u=me();
-  const mine=D.tasks.filter(t=>t.assigneeId===u.id);
+  const mine=D.tasks.filter(t=>aIds(t).includes(u.id));
   const open=mine.filter(t=>t.status!=='complete').sort(byDate);
   const done=mine.filter(t=>t.status==='complete').sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
   const forOthers=D.tasks.filter(t=>t.status==='complete'&&t.completedBy===u.id&&t.completedForId&&t.completedForId!==u.id).sort((a,b)=>String(b.completedAt).localeCompare(String(a.completedAt)));
@@ -911,13 +927,14 @@ const dhead=(t)=>`<div class="dhead"><h2 id="dtitle">${esc(t)}</h2><button type=
 
 /* ---- task form ---- */
 function openTaskForm(t,preset={}){
-  const v=t||{title:'',description:'',due:preset.due||'',time:'',start:'',perDay:0,repeat:'',assigneeId:preset.assigneeId||'',groupId:preset.groupId||'',special:false};
+  const v=t||{title:'',description:'',due:preset.due||'',time:'',start:'',perDay:0,repeat:'',assigneeIds:preset.assigneeId?[preset.assigneeId]:[],groupId:preset.groupId||'',special:false};
   const open=!!(v.time||v.description||v.groupId);
   openDlg(`<form id="tform" class="dbody" data-id="${t?t.id:''}" novalidate>${dhead(t?'Edit task':'Add a task')}
     <p class="err" id="terr" role="alert" hidden></p>
     <div class="field"><label for="t-title">Task title</label><input id="t-title" type="text" maxlength="120" required autocomplete="off" value="${esc(v.title)}" placeholder="What needs doing?"></div>
-    <div class="two"><div class="field"><label for="t-due">Due date (optional)</label><input id="t-due" type="date" value="${esc(v.due)}"></div>
-      ${sel('t-who','Assigned to',[['','Unassigned'],...D.members.map(m=>[m.id,m.name])],v.assigneeId)}</div>
+    <div class="field"><label for="t-due">Due date (optional)</label><input id="t-due" type="date" value="${esc(v.due)}"></div>
+    <fieldset class="whopick"><legend>Assigned to</legend><div class="wp">${D.members.map(m=>`<label class="chk wpi"><input type="checkbox" name="t-who" value="${esc(m.id)}" ${aIds(v).includes(m.id)?'checked':''}>${avatar(m)}<span>${esc(m.name)}</span></label>`).join('')}</div>
+      <p class="muted small" style="margin:6px 0 0">Tick one person, or several to share the task. Leave all unticked for unassigned.</p></fieldset>
     <div class="two"><div class="field"><label for="t-start">Starts on (optional)</label><input id="t-start" type="date" value="${esc(v.start||'')}"></div>
       ${sel('t-perday','Time per day (optional)',PERDAY.map(p=>[String(p[0]),p[1]]),String(v.perDay||0))}</div>
     <p class="muted small" style="margin:-4px 0 12px">For a long task, such as reading or studying for a test: pick the day it starts and the due date. It shows on every day in between.</p>
@@ -932,6 +949,7 @@ function openTaskForm(t,preset={}){
       <div class="field"><label for="t-desc">Description (optional)</label><textarea id="t-desc" maxlength="2000">${esc(v.description)}</textarea></div></details>
     <div class="row"><button class="btn" type="submit">${t?'Save changes':'Add task'}</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button>${t?`<button type="button" class="btn danger" data-act="deltask" data-id="${t.id}" style="margin-left:auto">Delete task</button>`:''}</div></form>`);
 }
+const whoPicked=()=>$$('input[name=t-who]:checked').map(x=>x.value);
 function readLong(due){   // shared by local and shared mode
   const start=($('#t-start')||{}).value||'',perDay=+(($('#t-perday')||{}).value||0),repeat=($('#t-repeat')||{}).value||'';
   if(start&&!parseYmd(start))return{err:'That start date is not valid.'};
@@ -951,7 +969,7 @@ function submitTask(form){
   if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
   if(special&&!due)return bad('Add a due date so the day can be circled.');
   const lg=readLong(due);if(lg.err)return bad(lg.err);
-  const f={title,description:$('#t-desc').value.trim(),due,time:due?time:'',start:lg.start,perDay:lg.perDay,repeat:lg.repeat,special,assigneeId:$('#t-who').value,groupId:$('#t-group').value};
+  const f={title,description:$('#t-desc').value.trim(),due,time:due?time:'',start:lg.start,perDay:lg.perDay,repeat:lg.repeat,special,assigneeIds:whoPicked(),groupId:$('#t-group').value};
   const actor=me(),id=form.dataset.id;
   f.steps=parseSteps($('#t-steps').value,id&&task(id)?task(id).steps:[]);
   if(!id){
@@ -972,7 +990,7 @@ function submitTask(form){
   if(JSON.stringify(t.steps.map(s=>s.text))!==JSON.stringify(f.steps.map(s=>s.text)))ch.push('steps');
   Object.assign(t,{title:f.title,description:f.description,due:f.due,time:f.time,start:f.start,perDay:f.perDay,repeat:f.repeat,special:f.special,steps:f.steps});
   if(ch.length)t.history.push(ev('edited',actor,null,{fields:ch.join(', ')}));
-  applyAssign(t,f.assigneeId,actor);applyGroup(t,f.groupId,actor);
+  applyAssign(t,f.assigneeIds,actor);applyGroup(t,f.groupId,actor);
   closeDlg();commit('Task saved.','Task saved: '+title);
 }
 
@@ -1024,7 +1042,7 @@ function detailHTML(t){
     ${t.description?`<p style="white-space:pre-wrap;overflow-wrap:anywhere">${esc(t.description)}</p>`:''}
     ${stepsHTML(t)}
     <dl class="facts">
-      <dt>Assigned to</dt><dd>${whoTag(t.assigneeId)}</dd>
+      <dt>Assigned to</dt><dd>${whoTags(t)}</dd>
       ${isLong(t)?`<dt>Runs</dt><dd>${esc(fmtDate(t.start)+' to '+fmtDate(t.due))} (${taskDays(t).length} days)</dd>`:''}
       <dt>Due</dt><dd>${esc(t.due?fmtDate(t.due)+(t.time?' at '+fmtTime(t.time):''):'No due date')}</dd>
       ${perDayText(t.perDay)?`<dt>Plan</dt><dd>${esc(perDayText(t.perDay))}</dd>`:''}
@@ -1121,7 +1139,7 @@ function setComplete(t,checked,srcEl){
     if(fxOn()){UI.popId=t.id;if(srcEl)sparkle(x,y)}
     const nx=nextDates(t);let added=false;
     if(nx&&!nextExists(t,nx)){
-      D.tasks.push(makeTask({title:t.title,description:t.description,due:nx.due,time:t.time,start:nx.start,perDay:t.perDay,repeat:t.repeat,special:t.special,assigneeId:t.assigneeId,groupId:t.groupId,steps:(t.steps||[]).map(s=>({text:s.text,done:false}))},actor));added=true;
+      D.tasks.push(makeTask({title:t.title,description:t.description,due:nx.due,time:t.time,start:nx.start,perDay:t.perDay,repeat:t.repeat,special:t.special,assigneeIds:aIds(t),groupId:t.groupId,steps:(t.steps||[]).map(s=>({text:s.text,done:false}))},actor));added=true;
     }
     commit(null,`“${t.title}” marked complete by ${actor.name}`);
     if(added)toast('Next one added for '+nextWhen(nx)+'.');
@@ -1189,11 +1207,11 @@ document.addEventListener('click',async e=>{
     case'rmmember':{
       const m=member(id);if(!m)break;
       if(id===D.currentUserId){toast('That is you, so it cannot be removed.',true);break}
-      const n=D.tasks.filter(t=>t.assigneeId===id).length;
+      const n=D.tasks.filter(t=>aIds(t).includes(id)).length;
       const ok=await confirmBox(`Remove ${m.name}?`,n?`${n} task${n===1?'':'s'} assigned to ${m.name} will become unassigned. Past activity entries keep their name.`:`${m.name} will be removed from your list. Past activity entries keep their name.`,'Remove',true);
       if(!ok)break;
       const actor=me();
-      D.tasks.forEach(t=>{if(t.assigneeId===id)applyAssign(t,'',actor)});
+      D.tasks.forEach(t=>{if(aIds(t).includes(id))applyAssign(t,aIds(t).filter(x=>x!==id),actor)});
       D.members=D.members.filter(x=>x.id!==id);
       commit('Name removed.');break;
     }
@@ -1203,7 +1221,7 @@ document.addEventListener('click',async e=>{
       if(!ok)break;
       const sm=new Set(D.members.filter(m=>m.sample).map(m=>m.id)),sg=new Set(D.groups.filter(g=>g.sample).map(g=>g.id));
       D.tasks=D.tasks.filter(t=>!t.sample);
-      D.tasks.forEach(t=>{if(sm.has(t.assigneeId))t.assigneeId='';if(sg.has(t.groupId))t.groupId=''});
+      D.tasks.forEach(t=>{t.assigneeIds=aIds(t).filter(x=>!sm.has(x));if(sg.has(t.groupId))t.groupId=''});
       D.groups=D.groups.filter(g=>!g.sample);D.members=D.members.filter(m=>!m.sample);
       if(!D.members.length)D.members.push({id:uid(),name:'Me',role:'owner',color:PALETTE[0].hex,sample:false});
       if(!D.members.some(m=>m.role==='owner'))D.members[0].role='owner';
@@ -1404,8 +1422,9 @@ async function cloudLoad(){
   const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),avatar:okAvatar(m.profiles&&m.profiles.avatar)?m.profiles.avatar:'',sample:false}));
   if(!members.some(m=>m.id===CL.session.user_id))throw new Error('You are no longer a member of this workspace.');
   const old=new Map(((D&&D.tasks)||[]).map(t=>[t.id,t.history]));
+  const mset=new Set(members.map(m=>m.id));
   const tasks=tsk.map(t=>({id:t.id,title:t.title,description:t.description||'',due:t.due_date||'',time:t.due_time?String(t.due_time).slice(0,5):'',
-    assigneeId:t.assignee_id||'',groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',special:!!t.special,
+    assigneeIds:uniqIds(Array.isArray(t.assignee_ids)&&t.assignee_ids.length?t.assignee_ids:[t.assignee_id]).filter(x=>mset.has(x)).slice(0,MAXWHO),groupId:t.group_id||'',status:t.status==='complete'?'complete':'open',special:!!t.special,
     completedBy:t.completed_by||'',completedByName:t.completed_by_name||'',completedForId:t.completed_for_id||'',completedForName:t.completed_for_name||'',
     completedAt:t.completed_at||'',createdAt:t.created_at||'',sample:false,steps:cleanSteps(t.steps),start:t.start_date||'',perDay:PERDAY.some(p=>p[0]===t.per_day)?t.per_day:0,repeat:REPCODES.has(t.repeat)?t.repeat:'',history:old.get(t.id)||[]}));
   const groups=grp.map(g=>({id:g.id,name:g.name,description:g.description||'',color:HEX.test(g.color)?g.color:PALETTE[0].hex,sample:false}));
@@ -1641,6 +1660,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshQu
 /* ---- doing things ---- */
 function dbHint(m){
   m=m||'';
+  if(/assignee_ids/i.test(m))return'Your database needs a small update before a task can be shared with several people. Run supabase-update-all.sql in Supabase.';
   if(/start_date|per_day|repeat/i.test(m))return'Your database needs a small update before repeating and long tasks can be saved. Run supabase-update-all.sql in Supabase.';
   if(/steps/i.test(m))return'Your database needs a small update before task steps can be saved. Run supabase-update-all.sql in Supabase.';
   if(/special/i.test(m))return'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.';
@@ -2165,7 +2185,8 @@ async function cloudComplete(tk,going){
   const ok=await cloudDo(async()=>{
     await patchTask(tk.id,{status:going?'complete':'open'});
     if(add){
-      const body={workspace_id:CL.wsId,title:tk.title,description:tk.description||'',due_date:nx.due,due_time:tk.time||null,assignee_id:tk.assigneeId||null,group_id:tk.groupId||null,repeat:tk.repeat};
+      const body={workspace_id:CL.wsId,title:tk.title,description:tk.description||'',due_date:nx.due,due_time:tk.time||null,assignee_id:aIds(tk)[0]||null,group_id:tk.groupId||null,repeat:tk.repeat};
+      if(aIds(tk).length>1)body.assignee_ids=aIds(tk);
       if(nx.start)body.start_date=nx.start;
       if(tk.perDay)body.per_day=tk.perDay;
       if(tk.special)body.special=true;
@@ -2272,8 +2293,9 @@ function cloudSubmit(f){
     if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
     if(special&&!due)return bad('Add a due date so the day can be circled.');
     const lg=readLong(due);if(lg.err)return bad(lg.err);
-    const body={title,description:$('#t-desc').value.trim(),due_date:due||null,due_time:due&&time?time:null,assignee_id:$('#t-who').value||null,group_id:$('#t-group').value||null};
+    const body={title,description:$('#t-desc').value.trim(),due_date:due||null,due_time:due&&time?time:null,assignee_id:whoPicked()[0]||null,group_id:$('#t-group').value||null};
     const tid=f.dataset.id;
+    {const w=whoPicked(),o=tid&&task(tid);if(w.length>1||(o&&aIds(o).length>1)){body.assignee_ids=w}}
     {const o=tid&&task(tid);   // only sent when needed, so older databases keep working
       if(lg.start||lg.perDay||lg.repeat||(o&&(o.start||o.perDay||o.repeat))){body.start_date=lg.start||null;body.per_day=lg.perDay||null;body.repeat=lg.repeat||null}}
     {const old=tid&&task(tid)?task(tid).steps:[],st=parseSteps($('#t-steps').value,old);
@@ -2483,4 +2505,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-  </html>
+</html>
