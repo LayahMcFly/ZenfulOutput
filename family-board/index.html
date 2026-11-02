@@ -189,6 +189,9 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .nlist{display:grid;gap:8px;margin:0;padding:0;list-style:none}
 .nitem{display:block;width:100%;text-align:left;padding:10px 12px;border:1px solid var(--line);border-radius:8px;background:var(--card,#fff);color:inherit;font:inherit;cursor:pointer}
 .nitem.new{border-left:5px solid var(--accent)}
+.nitem.req{cursor:default}
+.nitem .rq{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.nitem .rs{display:block;margin-top:6px;font-weight:600}
 .nitem small{display:block;color:var(--muted,#6b5e54);margin-top:2px}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
 .av.lg{width:44px;height:44px;font-size:15px}
@@ -1420,14 +1423,26 @@ document.addEventListener('change',e=>{
   if(c.dataset.np==='popups'){pushSync().then(()=>{if(UI.view==='settings')render()});const bell=$('.bell');if(bell){bell.firstChild.textContent=c.checked?'🔔':'🔕'}toast(c.checked?'Pop-up alerts are on.':'Pop-up alerts are off. New notifications will wait in the bell.')}
 });
 const NSEEN='familyBoard.notified.v1';
+async function askOwner(kind,extra){
+  if(CL.busy)return;
+  CL.busy=true;
+  try{await rpc('request_change',{p_ws:CL.wsId,p_kind:kind,...extra});CL.busy=false;toast('Request sent. The owner has been notified and will accept, reject or ignore it.');await pollNotes()}
+  catch(e){CL.busy=false;toast(/request_change|change_requests/i.test(e.message||'')?'Your database needs a small update. Run supabase-update-all.sql in Supabase.':(e.message||'That did not work.'),true)}
+  render();
+}
 function noteText(n){
   const due=n.due_date?' Due '+new Date(n.due_date+'T12:00:00').toLocaleDateString(undefined,{weekday:'short',month:'short',day:'numeric'})+'.':'';
   if(n.kind==='completed'){
     const who=n.actor_name||'Someone';
     return n.for_name?`${who} finished “${n.task_title}” for ${n.for_name} in ${n.workspace_name}.`:`${who} finished “${n.task_title}” in ${n.workspace_name}.`;
   }
+  if(n.kind==='request')return`${n.actor_name||'Someone'} asks to ${n.task_title} in ${n.workspace_name}.`;
+  if(n.kind==='request_result')return`${n.actor_name||'An owner'} ${n.outcome==='approved'?'approved':'rejected'} your request to ${n.task_title}.`;
   return`${n.actor_name||'Someone'} assigned you “${n.task_title}” in ${n.workspace_name}.${due}`;
 }
+const NKINDS=['assigned','completed','request','request_result'];
+const noteTitle=n=>n.kind==='completed'?'Task finished':n.kind==='request'?'Request waiting':n.kind==='request_result'?'Request '+(n.outcome==='approved'?'approved':'rejected'):'New task for you';
+const reqOf=id=>(CL.reqs||[]).find(r=>r.id===id);
 function updateBadge(){
   const b=$('#nbadge');if(!b)return;const c=unreadCount();
   b.textContent=c;b.hidden=!c;
@@ -1438,7 +1453,8 @@ async function pollNotes(){
   let rows;
   try{rows=await api('/rest/v1/notifications?select=*&order=created_at.desc&limit=30')}
   catch(e){if(/notifications/i.test(e.message||'')){CL.noNotes=true;render()}return}
-  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id&&['assigned','completed'].includes(n.kind));
+  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id&&NKINDS.includes(n.kind));
+  try{if(!CL.noReq)CL.reqs=await api('/rest/v1/change_requests?select=*&order=created_at.desc&limit=40')}catch(e){if(/change_requests/i.test(e.message||''))CL.noReq=true}
   let seen=null;try{seen=JSON.parse(localStorage.getItem(NSEEN)||'null')}catch{}
   const first=!Array.isArray(seen);seen=Array.isArray(seen)?seen:[];
   const fresh=CL.notes.filter(n=>!n.read_at&&!seen.includes(n.id));
@@ -1448,18 +1464,36 @@ async function pollNotes(){
     if(first&&fresh.length>1)toast('You have '+fresh.length+' task assignments waiting. Tap the bell to see them.');
     else fresh.slice(0,3).forEach((n,i)=>setTimeout(()=>{toast(noteText(n));say(noteText(n))},i*4300));
     if(!first||fresh.length===1)fresh.slice(0,3).forEach(n=>{
-      if(alertsOn())showAlert(n.kind==='completed'?'Task finished':'New task for you',noteText(n),n.id);
+      if(alertsOn())showAlert(noteTitle(n),noteText(n),n.id);
     });
   }
   try{localStorage.setItem(NSEEN,JSON.stringify([...new Set([...seen,...CL.notes.map(n=>n.id)])].slice(-200)))}catch{}
   updateBadge();
 }
+const noteWhen=n=>esc(new Date(n.created_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}));
+function noteItem(n){
+  const flag=n.read_at?'':'<strong>New · </strong>';
+  if(n.kind==='request'){
+    const r=reqOf(n.request_id),isOwner=me().role==='owner';
+    let tail='';
+    if(r&&r.status==='approved')tail=`<span class="rs">Accepted by ${esc(r.decided_by_name||'an owner')}</span>`;
+    else if(r&&r.status==='rejected')tail=`<span class="rs">Rejected by ${esc(r.decided_by_name||'an owner')}</span>`;
+    else if(r&&r.status==='ignored')tail=`<span class="rs">Ignored by ${esc(r.decided_by_name||'an owner')}</span>`;
+    else if(r&&isOwner)tail=`<div class="rq"><button type="button" class="btn sm" data-act="decidereq" data-id="${esc(r.id)}" data-d="approve">Accept</button><button type="button" class="btn soft sm" data-act="decidereq" data-id="${esc(r.id)}" data-d="reject">Reject</button><button type="button" class="btn soft sm" data-act="decidereq" data-id="${esc(r.id)}" data-d="ignore">Ignore</button></div>`;
+    return`<li><div class="nitem req${n.read_at?'':' new'}">${flag}${esc(noteText(n))}${tail}<small>${noteWhen(n)}</small></div></li>`;
+  }
+  if(n.kind==='request_result'){
+    const r=reqOf(n.request_id),link=r&&r.kind==='invite'&&n.outcome==='approved'&&r.result_token;
+    return`<li><div class="nitem req${n.read_at?'':' new'}">${flag}${esc(noteText(n))}${link?`<div class="rq"><button type="button" class="btn sm" data-act="reqlink" data-id="${esc(r.id)}">Show the invite link</button></div>`:''}<small>${noteWhen(n)}</small></div></li>`;
+  }
+  return`<li><button type="button" class="nitem${n.read_at?'':' new'}" data-act="opennote" data-id="${esc(n.id)}">${flag}${esc(noteText(n))}<small>${noteWhen(n)}</small></button></li>`;
+}
 function openNotes(){
   const list=CL.notes.slice();
   openDlg(`<div class="dbody">${dhead('Notifications')}
     ${notePrefsHTML()}
-    ${list.length?`<ul class="nlist">${list.map(n=>`<li><button type="button" class="nitem${n.read_at?'':' new'}" data-act="opennote" data-id="${esc(n.id)}">${n.read_at?'':'<strong>New · </strong>'}${esc(noteText(n))}<small>${esc(new Date(n.created_at).toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'}))}</small></button></li>`).join('')}</ul>`
-      :'<p class="muted">Nothing yet. You will see it here when someone assigns you a task, or when anyone in the workspace finishes one.</p>'}
+    ${list.length?`<ul class="nlist">${list.map(noteItem).join('')}</ul>`
+      :'<p class="muted">Nothing yet. You will see it here when someone assigns you a task, when anyone in the workspace finishes one, or when a member asks an owner for something.</p>'}
   </div>`);
   if(unreadCount()){
     rpc('mark_notifications_read',{}).then(()=>{CL.notes.forEach(n=>{if(!n.read_at)n.read_at=new Date().toISOString()});updateBadge()}).catch(()=>{});
@@ -2005,6 +2039,22 @@ async function cloudClick(a,b,id){
     case'newws':openNewWsCloud();return true;
     case'openws':await cloudSwitch(id);return true;
     case'notes':openNotes();return true;
+    case'decidereq':{
+      const dec=b.dataset.d,r=reqOf(id);if(!r)return true;
+      if(dec==='approve'){
+        const what=r.kind==='rename'?'Rename the workspace to “'+r.new_name+'”?':r.kind==='invite'?'Create an invite link for '+r.requester_name+'?':'Remove '+r.target_name+' from the workspace?';
+        const msg=r.kind==='invite'?'The link works once and expires after 7 days. '+r.requester_name+' will be able to see it and send it on.':r.kind==='remove_member'?'Tasks assigned to '+r.target_name+' become unassigned.':'Everyone will see the new name.';
+        if(!await confirmBox(what,msg,'Accept',false))return true;
+      }
+      const ok=await cloudDo(async()=>{await rpc('decide_request',{p_id:id,p_decision:dec});await loadMemberships()},dec==='approve'?'Accepted.':dec==='reject'?'Rejected. '+r.requester_name+' will be told.':'Ignored. '+r.requester_name+' is not told.');
+      if(ok){await pollNotes();render();openNotes()}
+      return true;
+    }
+    case'reqlink':{const r=reqOf(id);if(r&&r.result_token){closeDlg();openInviteDialog(r.result_token)}return true}
+    case'reqinvite':await askOwner('invite',{});return true;
+    case'reqremove':{const m=member(id);if(!m)return true;
+      if(!await confirmBox('Ask an owner to remove '+m.name+'?','An owner will see your request and can accept, reject or ignore it. Nothing changes until they accept.','Send request',false))return true;
+      await askOwner('remove_member',{p_target:id});return true}
     case'opennote':{
       const n=CL.notes.find(x=>x.id===id);closeDlg();if(!n)return true;
       if(n.workspace_id!==CL.wsId)await cloudSwitch(n.workspace_id);
@@ -2131,6 +2181,7 @@ function cloudSubmit(f){
   if(id==='wsform'){
     const n=$('#wsname').value.trim();
     if(!n){toast('Enter a workspace name.',true);return true}
+    if(!canManage()){askOwner('rename',{p_name:n});return true}
     cloudDo(async()=>{await changeRows('/rest/v1/workspaces?id=eq.'+CL.wsId,'PATCH',{name:n});await loadMemberships()},'Workspace name saved.');
     return true;
   }
@@ -2248,20 +2299,29 @@ function cloudBanners(){
   if(CL.err&&CL.stage!=='gate'&&CL.stage!=='name'&&CL.stage!=='workspace')h+=`<div class="banner bad" role="alert"><p>${esc(CL.err)}</p><button class="btn soft sm" data-act="dismisserr">Dismiss</button></div>`;
   return h;
 }
+function myRequestsHTML(){
+  if(CL.noReq||canManage())return'';
+  const mine=(CL.reqs||[]).filter(r=>r.requester_id===D.currentUserId&&r.workspace_id===CL.wsId).slice(0,8);
+  if(!mine.length)return'';
+  const what=r=>r.kind==='rename'?'Rename the workspace to “'+r.new_name+'”':r.kind==='invite'?'Invite link':'Remove '+r.target_name;
+  const st=r=>r.status==='approved'?'Accepted':r.status==='rejected'?'Rejected':'Waiting for an owner';
+  return`<section class="panel"><h3>Your requests</h3>${mine.map(r=>`<div class="mem" style="grid-template-columns:1fr auto"><div><div>${esc(what(r))}</div><div class="muted small">${esc(fmtStamp(r.created_at))}</div></div><div class="row">${r.kind==='invite'&&r.status==='approved'&&r.result_token?`<button class="btn soft sm" data-act="reqlink" data-id="${esc(r.id)}">Show the link</button>`:''}<span class="pill">${st(r)}</span></div></div>`).join('')}</section>`;
+}
 function cloudMembersView(){
   const u=me(),isOwner=u.role==='owner',mg=canManage(),now=Date.now();
   return`<div class="page-head"><h2>Members and invitations</h2></div>
     <section class="panel" style="margin-top:0"><h3>People in “${esc(D.workspace.name)}”</h3>
       ${D.members.map(m=>{
-        const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner');
+        const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner'),canAsk=!mg&&!self&&m.role!=='owner'&&!CL.noReq;
         return`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${self?' (you)':''}</div><div class="muted small">${roleLabel(m.role)}</div></div>
-          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}</div></div>`}).join('')}
+          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}${canAsk?`<button class="btn soft sm" data-act="reqremove" data-id="${esc(m.id)}" data-fk="rq-${esc(m.id)}" aria-label="Ask an owner to remove ${esc(m.name)}">Ask to remove</button>`:''}</div></div>`}).join('')}
       <p class="muted small" style="margin-top:12px">Everyone signs in with their own email address. Names on completed tasks come from each person’s own sign-in, not from a menu.</p></section>
     <section class="panel"><h3>Invitations</h3>
       ${mg?`<p>Create a single-use link and send it to the person yourself, by text or email. <strong>Nothing is emailed from this page.</strong> Each link works once and expires after 7 days.</p>
         <div class="row" style="margin:12px 0"><button class="btn" data-act="createinvite" data-fk="mkinv">Create invite link</button></div>
         ${CL.invites.length?CL.invites.map(i=>{const exp=new Date(i.expires_at).getTime()<now;return`<div class="mem" style="grid-template-columns:1fr auto"><div><div>Link created ${esc(fmtStamp(i.created_at))}</div><div class="muted small">${exp?'Expired':'Expires '+esc(fmtStamp(i.expires_at))} · works once</div></div><div class="row">${exp?'':`<button class="btn soft sm" data-act="copylink" data-token="${esc(i.token)}" aria-label="Copy invite link created ${esc(fmtStamp(i.created_at))}">Copy link</button>`}<button class="btn soft sm" data-act="revokeinvite" data-id="${esc(i.id)}" aria-label="Revoke invite link created ${esc(fmtStamp(i.created_at))}">Revoke</button></div></div>`}).join(''):'<p class="muted">No unused invite links.</p>'}`
-      :'<p class="muted">Only an owner or admin can create invite links.</p>'}</section>`;
+      :`<p class="muted">Only an owner or admin can create invite links. You can ask an owner to make one for you.</p>
+        ${CL.noReq?'':'<div class="row" style="margin:12px 0"><button class="btn" data-act="reqinvite" data-fk="rqinv">Ask an owner for an invite link</button></div>'}`}</section>${myRequestsHTML()}`;
 }
 const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
@@ -2297,8 +2357,8 @@ function settingsViewCloud(){
   const admin=canManage();
   return`<div class="page-head"><h2>Settings</h2></div>
     <section class="panel" style="margin-top:0"><h3>Workspace</h3>
-      <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="80" value="${esc(D.workspace.name)}" ${admin?'':'disabled'}></div><button class="btn" type="submit" ${admin?'':'disabled'}>Save name</button></form>
-      ${admin?'':'<p class="muted small" style="margin-top:8px">Only an owner or admin can rename the workspace.</p>'}
+      <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="80" value="${esc(D.workspace.name)}" ${admin||!CL.noReq?'':'disabled'}></div><button class="btn" type="submit" ${admin||!CL.noReq?'':'disabled'}>${admin?'Save name':'Ask the owner to rename'}</button></form>
+      ${admin?'':'<p class="muted small" style="margin-top:8px">Only an owner or admin can rename the workspace. Type a new name and press the button to ask an owner. They can accept, reject or ignore it.</p>'}
       <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws3">Create another workspace</button></div></section>
     <section class="panel"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
