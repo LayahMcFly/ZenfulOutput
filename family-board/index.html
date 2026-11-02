@@ -168,7 +168,11 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .hv label:has(input:focus-visible){outline:3px solid var(--accent);outline-offset:2px}
 .hv .sw{width:100%;height:22px;margin:0}
 .dayrow{padding:10px 0;border-top:1px solid var(--line)}
-.dayrow .dt{display:flex;gap:10px;align-items:baseline;flex-wrap:wrap}
+.dayrow .dt{display:flex;gap:10px;align-items:center;flex-wrap:wrap}
+.xb{margin-left:auto;width:40px;height:40px;display:inline-flex;align-items:center;justify-content:center;border:1.5px solid var(--line);border-radius:8px;background:var(--field);color:var(--mark);cursor:pointer;padding:0}
+.xb:hover{border-color:var(--mark)}
+.xb:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
+.xb svg{width:20px;height:20px}
 .ctl{display:grid;grid-template-columns:44px 1fr;gap:8px;align-items:center;margin-top:8px}
 .ctl .lbl{font:700 11px var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
 .pn{display:flex;flex-wrap:wrap;gap:5px}
@@ -1745,7 +1749,7 @@ function cycleView(){
   const next=avg&&starts.length?addDays(starts[starts.length-1],avg):'';
   const dayRow=(l,d,n)=>{
     const r=l.days.find(x=>x.d===d)||{pain:null,heaviness:null};
-    return`<div class="dayrow"><div class="dt"><strong>Day ${n}</strong><span class="muted">${esc(cyDate(d))}${d===today?' (today)':''}</span></div>
+    return`<div class="dayrow"><div class="dt"><strong>Day ${n}</strong><span class="muted">${esc(cyDate(d))}${d===today?' (today)':''}</span><button type="button" class="xb" data-cy="rmday" data-id="${esc(l.id)}" data-d="${d}" aria-label="Remove ${esc(cyDate(d))} from the period" title="Remove this day from the period"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M5 5L19 19M19 5L5 19" fill="none" stroke="currentColor" stroke-width="2.8" stroke-linecap="round"/></svg></button></div>
       <div class="ctl"><span class="lbl" id="p-${esc(l.id)}-${d}">Pain</span><div class="pn" role="group" aria-labelledby="p-${esc(l.id)}-${d}">${Array.from({length:11},(_,i)=>`<button type="button" class="pb${r.pain===i?' on':''}" aria-pressed="${r.pain===i}" aria-label="Pain ${i} of 10" data-cy="pain" data-id="${esc(l.id)}" data-d="${d}" data-v="${i}">${i}</button>`).join('')}</div></div>
       <div class="ctl"><span class="lbl" id="f-${esc(l.id)}-${d}">Flow</span><div class="fl" role="group" aria-labelledby="f-${esc(l.id)}-${d}">${HEAVY.map((x,i)=>`<button type="button" class="fb${r.heaviness===i+1?' on':''}" aria-pressed="${r.heaviness===i+1}" data-cy="flow" data-id="${esc(l.id)}" data-d="${d}" data-v="${i+1}"><span class="sw" style="background:${x[0]}"></span>${x[1]}</button>`).join('')}</div></div></div>`;
   };
@@ -1798,9 +1802,9 @@ function cyDayHTML(d){
   return`<div class="dbody">${dhead(title)}
     <p class="muted small" style="margin:0">Day ${n} of the period that ${l.end_date?'ran '+esc(cyDate(l.start_date))+' to '+esc(cyDate(l.end_date)):'started '+esc(cyDate(l.start_date))+' and is still going'}.</p>
     ${sum}${ctl}
-    <div class="row" style="margin-top:14px">${r.pain!=null||r.heaviness!=null?`<button type="button" class="btn soft sm" data-cy="clearday" data-id="${esc(l.id)}" data-d="${d}">Clear this day’s pain and flow</button>`:''}${(d===l.start_date||d===l.end_date)?`<button type="button" class="btn soft sm" data-cy="rmday" data-id="${esc(l.id)}" data-d="${d}">Remove this day from the period</button>`:''}</div>
+    <div class="row" style="margin-top:14px">${r.pain!=null||r.heaviness!=null?`<button type="button" class="btn soft sm" data-cy="clearday" data-id="${esc(l.id)}" data-d="${d}">Clear this day’s pain and flow</button>`:''}<button type="button" class="btn soft sm" data-cy="rmday" data-id="${esc(l.id)}" data-d="${d}">Remove this day from the period</button></div>
     <div class="row" style="margin-top:10px"><button type="button" class="btn soft sm" data-cy="edit" data-id="${esc(l.id)}">Change dates</button>${l.end_date?'':`<button type="button" class="btn sm" data-cy="end" data-id="${esc(l.id)}">End period</button>`}</div>
-    <div style="margin-top:18px;padding-top:12px;border-top:1px solid var(--line)"><p class="muted small" style="margin:0 0 8px">This only affects ${esc(cyDate(d))}, unless you use the button below, which removes every day of the period.</p><button type="button" class="btn danger sm" data-cy="del" data-id="${esc(l.id)}">Delete the whole period (${l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1} ${(l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1)===1?'day':'days'})</button></div></div>`;
+    <div style="margin-top:18px;padding-top:12px;border-top:1px solid var(--line)"><p class="muted small" style="margin:0 0 8px">This only affects ${esc(cyDate(d))}, unless you use the red button below, which removes every day of the period.</p><button type="button" class="btn danger sm" data-cy="del" data-id="${esc(l.id)}">Delete the whole period (${l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1} ${(l.end_date?daysBetween(l.start_date,l.end_date)+1:daysBetween(l.start_date,today)+1)===1?'day':'days'})</button></div></div>`;
 }
 function cyRefreshDay(){
   const dlg=$('#dlg');if(!dlg.open||!dlg.dataset.cyday)return;
@@ -1903,12 +1907,24 @@ document.addEventListener('click',async e=>{
     case'clearday':{const x=CY.logs.find(y=>y.id===id),d=b.dataset.d;if(x&&d){x.days=x.days.filter(r=>r.d!==d);cySummary(x);render();cyRefreshDay();cyQueueSave(x.id);toast('That day’s pain and flow were cleared.')}break}
     case'rmday':{
       const x=CY.logs.find(y=>y.id===id),d=b.dataset.d;if(!x||!d)break;
-      if(x.start_date===d&&(x.end_date===d||(!x.end_date&&d===todayStr()))){
-        if(await confirmBox('Remove the only day?','This is the only day in the period, so the whole period is deleted.','Delete the period',true)){await cyDelete(id);closeDlg()}
-        break;
+      const today=todayStr(),only=x.start_date===d&&(x.end_date===d||(!x.end_date&&d===today));
+      const middle=d>x.start_date&&((x.end_date&&d<x.end_date)||(!x.end_date&&d<today));
+      const hasData=x.days.some(r=>r.d===d);
+      if(only||middle||hasData){
+        const msg=only?'This is the only day in the period, so the whole period is deleted.'
+          :middle?cyDate(d)+' will no longer count as a period day, and its pain and flow are deleted. The period is split into two.'
+          :cyDate(d)+' will no longer count as a period day, and its pain and flow are deleted.';
+        if(!await confirmBox(only?'Delete the period?':'Remove this day?',msg,only?'Delete the period':'Remove day',true))break;
       }
-      const ns=d===x.start_date?addDays(d,1):x.start_date,ne=x.end_date&&d===x.end_date?addDays(d,-1):x.end_date;
-      await cySaveLog(cyClean({id:x.id,start_date:ns,end_date:ne,days:x.days}),true);break;
+      if(only){await cyDelete(id);closeDlg();break}
+      if(d===x.start_date){await cySaveLog(cyClean({id:x.id,start_date:addDays(d,1),end_date:x.end_date,days:x.days}),true);break}
+      if(x.end_date&&d===x.end_date){await cySaveLog(cyClean({id:x.id,start_date:x.start_date,end_date:addDays(d,-1),days:x.days}),true);break}
+      if(!x.end_date&&d===today){await cySaveLog(cyClean({id:x.id,start_date:x.start_date,end_date:addDays(d,-1),days:x.days}),true);toast('Today was removed, so the period now ends yesterday.');break}
+      // middle day: keep the days before it in this period and start a second period after it
+      const first=cyClean({id:x.id,start_date:x.start_date,end_date:addDays(d,-1),days:x.days});
+      const second=cyClean({id:'',start_date:addDays(d,1),end_date:x.end_date,days:x.days});
+      if(await cySaveLog(first,true))await cySaveLog(second,false);
+      break;
     }
     case'delall':if(await confirmBox('Delete all cycle entries?','All '+CY.logs.length+' '+(CY.logs.length===1?'period':'periods')+' and every pain and flow entry are removed. This cannot be undone.','Delete everything',true))await cyDelete('');break;
     case'mprev':CY.month=new Date(CY.month.getFullYear(),CY.month.getMonth()-1,1);render();break;
