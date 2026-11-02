@@ -1446,20 +1446,36 @@ async function showAlert(title,body,tag){
   try{const nt=new Notification(title,{body,tag});nt.onclick=()=>{window.focus();nt.close()};return true}catch{}
   return false;
 }
+const AL={msg:''};
+const isIOS=()=>/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==='MacIntel'&&navigator.maxTouchPoints>1);
+const isAndroid=()=>/Android/i.test(navigator.userAgent);
+function alertHelp(kind){
+  if(kind==='unsupported')return isIOS()
+    ?'This iPhone browser cannot show alerts from a web page. Apple only allows it for a web app added to the Home Screen: tap Share, then Add to Home Screen, and open Family Board from that icon. Even then, alerts only appear while the app is open. The bell, the pop-up message and the sound inside the page work without any of this.'
+    :'This browser does not support alerts from web pages. The bell, the pop-up message and the sound inside the page still work.';
+  if(kind==='denied')return isAndroid()
+    ?'Your phone has blocked notifications for this site. To change it in Chrome: tap the ⋮ menu, then Settings, Site settings, Notifications, find this site and set it to Allow. Or tap the lock icon beside the address, then Permissions. Then reload this page and tap the button again. If you opened this link from inside another app such as Gmail or Messenger, open it in Chrome instead, because those built-in browsers block alerts.'
+    :isIOS()
+    ?'Notifications are blocked for this site. Open Settings, then Notifications, find Family Board and allow them. Then reload the page and try again.'
+    :'Your browser has blocked notifications for this site. Click the lock icon beside the address, set Notifications to Allow, then reload this page and try again.';
+  if(kind==='dismissed')return'The permission question was closed without an answer. Tap the button again and choose Allow.';
+  return'';
+}
 async function enableAlerts(){
-  if(!('Notification' in window)){toast('This browser does not support desktop alerts.',true);return}
+  AL.msg='';
+  if(!('Notification' in window)){AL.msg=alertHelp('unsupported');render();return}
   let p=Notification.permission;
-  if(p==='default')p=await Notification.requestPermission();
+  if(p==='default'){try{p=await Notification.requestPermission()}catch{p=Notification.permission}}
   if(p==='granted'){
     try{localStorage.setItem('familyBoard.alerts.v1','on')}catch{}
     try{if('serviceWorker' in navigator)await navigator.serviceWorker.register('sw.js')}catch{}
     const shown=await showAlert('Family Board','You will see an alert like this when someone assigns you a task.','test');
     toast(shown?'Alerts are on for this device.':'Alerts are on, but this browser could not show a test alert. You will still see the bell and the message in the app.',!shown);
   }
-  else toast('Alerts are blocked. Allow notifications for this site in your browser settings, then try again.',true);
+  else AL.msg=alertHelp(p==='denied'?'denied':'dismissed');
   render();
 }
-function disableAlerts(){try{localStorage.removeItem('familyBoard.alerts.v1')}catch{}toast('Alerts are off for this device.');render()}
+function disableAlerts(){AL.msg='';try{localStorage.removeItem('familyBoard.alerts.v1')}catch{}toast('Alerts are off for this device.');render()}
 async function refreshQuiet(){
   if(!CL.on||CL.stage!=='ready'||CL.busy||document.hidden||$('#dlg').open||$('#cdlg').open)return;
   const ae=document.activeElement;
@@ -1625,17 +1641,19 @@ async function cySaveProfile(){
   if(!CL.on){cyLocalSave();return}
   await api('/rest/v1/private_profiles?on_conflict=user_id',{method:'POST',prefer:'resolution=merge-duplicates',body:{user_id:CL.session.user_id,gender:CY.gender,tracker_on:CY.on,updated_at:new Date().toISOString()}});
 }
-function privatePanel(){
-  if(CY.noDb)return`<section class="panel"><h3>About you</h3><p class="err">Your database needs a small update before this works. Run supabase-update-all.sql in Supabase.</p></section>`;
+function privateFields(){
+  if(CY.noDb)return`<p class="err">Your database needs a small update before this works. Run supabase-update-all.sql in Supabase.</p>`;
   const g=CY.gender;
-  const opt=(v,t)=>`<label style="display:flex;gap:8px;align-items:center;margin:6px 0"><input type="radio" name="cygender" value="${v}" data-cy="gender" ${g===v?'checked':''}> ${t}</label>`;
-  return`<section class="panel"><h3>About you <span class="pill">Private</span></h3>
-    <p class="muted">Only you can see this. It is never shown to anyone in a workspace${CL.on?', and it is saved in your own private rows that other members cannot read':', and it stays in this browser'}.</p>
-    <fieldset style="border:0;padding:0;margin:10px 0 0"><legend class="small muted">Gender</legend>${opt('none','Prefer not to say')}${opt('male','Male')}${opt('female','Female')}</fieldset>
-    ${g==='female'?`<label style="display:flex;gap:8px;align-items:center;margin:12px 0 4px"><input type="checkbox" data-cy="tracker" ${CY.on?'checked':''}> <span><strong>Period tracker</strong>, shown as a private “Cycle” tab</span></label>
+  const opt=(v,t)=>`<label class="chk" style="margin:6px 0"><input type="radio" name="cygender" value="${v}" data-cy="gender" ${g===v?'checked':''}> ${t}</label>`;
+  return`<h4 style="margin:0 0 4px;font-size:18px">About you <span class="pill">Private</span></h4>
+    <p class="muted small">Only you can see this. It is never shown to anyone in a workspace${CL.on?', and it is saved in your own private rows that other members cannot read':', and it stays in this browser'}.</p>
+    <fieldset style="border:0;padding:0;margin:8px 0 0"><legend class="small muted">Gender</legend>${opt('none','Prefer not to say')}${opt('male','Male')}${opt('female','Female')}</fieldset>
+    ${g==='female'?`<label class="chk" style="margin:12px 0 4px"><input type="checkbox" data-cy="tracker" ${CY.on?'checked':''}> <span><strong>Period tracker</strong>, shown as a private “Cycle” tab</span></label>
       <p class="muted small">Turning it off hides the tab. Your entries are kept, so turning it back on brings them back.</p>
-      ${CY.logs.length?`<div class="row" style="margin-top:8px"><button type="button" class="btn danger sm" data-cy="delall" data-fk="cydelall">Delete all my cycle entries</button></div>`:''}`:''}</section>`;
+      ${CY.logs.length?`<div class="row" style="margin-top:8px"><button type="button" class="btn danger sm" data-cy="delall" data-fk="cydelall">Delete all my cycle entries</button></div>`:''}`:''}`;
 }
+/* local mode has no separate profile panel, so it gets its own "Your profile" panel */
+function privatePanel(){return`<section class="panel"><h3>Your profile</h3>${privateFields()}</section>`}
 function cycleView(){
   const logs=CY.logs,today=todayStr(),open=logs.find(l=>!l.end_date);
   const cover=d=>logs.find(l=>l.start_date<=d&&d<=(l.end_date||today));
@@ -2098,14 +2116,15 @@ function settingsViewCloud(){
     <section class="panel"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
-        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div></section>
-    ${privatePanel()}
+        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
+      <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">${privateFields()}</div></section>
     <section class="panel"><h3>Assignment alerts</h3>
       ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
       ${notePrefsHTML()}
       <p>You get a message and a red number on the bell when someone assigns you a task. Only the person it is assigned to gets that one. When anyone finishes a task, everyone else in the workspace is told who did it. You are never alerted about your own actions.</p>
-      ${alertsOn()?'<p><strong>Desktop alerts are on for this device.</strong></p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off desktop alerts</button></div>':'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on desktop alerts</button></div>'}
-      <p class="muted small" style="margin-top:10px">Desktop alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent. On an iPhone, alerts only work after you add Family Board to your Home Screen (Share, then Add to Home Screen).</p>`}</section>
+      ${AL.msg?`<div class="banner bad" role="alert"><p>${esc(AL.msg)}</p></div>`:('Notification' in window&&Notification.permission==='denied'&&!alertsOn()?`<p class="muted small">Notifications are currently blocked for this site in your browser. The button below will explain how to allow them.</p>`:'')}
+      ${alertsOn()?'<p><strong>Device alerts are on.</strong></p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off device alerts</button></div>':'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on device alerts</button></div>'}
+      <p class="muted small" style="margin-top:10px">Device alerts appear while Family Board is open in a browser tab, even in the background. They do not arrive when the page is closed, and no email is sent. On an iPhone, alerts only work after you add Family Board to your Home Screen (Share, then Add to Home Screen).</p>`}</section>
     ${appearancePanels()}
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
