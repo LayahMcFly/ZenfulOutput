@@ -1337,6 +1337,7 @@ function readSession(){
     const p=new URLSearchParams(h.slice(1));
     history.replaceState(null,'',location.pathname+location.search);
     if(p.get('error')){CL.err=(p.get('error_description')||'The sign-in link did not work.')+' Request a new link below.';return null}
+    if(p.get('type')==='recovery')CL.recovery=true;
     try{return sessionFrom({access_token:p.get('access_token'),refresh_token:p.get('refresh_token'),expires_in:p.get('expires_in')})}
     catch{CL.err='The sign-in link could not be read. Request a new one below.';return null}
   }
@@ -1357,7 +1358,7 @@ function refreshSession(){
   return refreshing;
 }
 function signOutLocal(msg){
-  cyReset();saveSession(null);CL.profile=null;CL.workspaces=[];CL.wsId='';CL.stage='gate';CL.err=msg||'';CL.sent='';
+  cyReset();saveSession(null);CL.profile=null;CL.workspaces=[];CL.wsId='';CL.stage='gate';CL.err=msg||'';CL.sent='';CL.authMode='in';
   clearInterval(CL.poll);CL.poll=0;render();
 }
 
@@ -1456,6 +1457,7 @@ async function cloudBoot(){
     if(CL.session)saveSession(CL.session);
     if(!CL.session){CL.stage='gate';render();return}
     await cloudAfterAuth();
+    if(CL.recovery){CL.recovery=false;if(CL.stage==='ready')openPasswordDialog(true)}
   }catch(e){
     if(CL.stage!=='gate'||!CL.err)CL.err=e.message;
     if(CL.stage!=='name'&&CL.stage!=='workspace'&&CL.stage!=='ready')CL.stage='gate';
@@ -2069,6 +2071,21 @@ async function cloudClick(a,b,id){
       try{await api('/auth/v1/logout',{method:'POST'})}catch{}
       signOutLocal('');toast('Signed out.');return true;
     case'retryboot':cloudBoot();return true;
+    case'authmode':{const x=$('#si-email');if(x)CL.email=x.value;CL.authMode=b.dataset.m==='up'?'up':'in';CL.err='';CL.sent='';render();return true}
+    case'forgotpw':case'maillink':{
+      const em=($('#si-email')||{}).value.trim();CL.email=em;CL.err='';CL.sent='';
+      if(!validEmail(em)){CL.err='Type your email address above first.';render();const x=$('#si-email');if(x)x.focus();return true}
+      const reset=a==='forgotpw';
+      cloudStep(async()=>{
+        try{
+          if(reset)await api('/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:{email:em},auth:false});
+          else await api('/auth/v1/otp?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:{email:em,create_user:true},auth:false});
+        }catch(e){throw new Error(authErr(e.message))}
+        CL.sentKind=reset?'reset':'link';CL.sent=em;
+      });
+      return true;
+    }
+    case'setpw':openPasswordDialog(false);return true;
     case'retryload':
       try{await cloudLoad();render();toast('Up to date.')}catch(e){toast(e.message,true)}
       return true;
@@ -2198,6 +2215,7 @@ async function cloudComplete(tk,going){
   return ok;
 }
 async function cloudChange(t){
+  if(t.dataset.act==='togglepw'){$$('input[type=password],input[data-pw="1"]').forEach(i=>{i.type=t.checked?'text':'password';i.dataset.pw='1'});return true}
   if(t.dataset.cb){
     const tk=task(t.dataset.cb);if(!tk)return true;
     const going=t.checked;
@@ -2238,14 +2256,35 @@ function cloudSubmit(f){
   }
   if(!CL.on)return false;
 
-  if(id==='signin'){
-    const em=$('#si-email').value.trim();CL.email=em;
-    if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(em)){CL.err='Enter a valid email address.';render();const i=$('#si-email');if(i)i.focus();return true}
-    CL.sent='';
+  if(id==='pwform'){
+    const em=$('#si-email').value.trim(),pw=$('#si-pw').value,up=CL.authMode==='up';
+    CL.email=em;CL.sent='';CL.err='';
+    const bad=(m,sel)=>{CL.err=m;render();const x=$(sel);if(x)x.focus();return true};
+    if(!validEmail(em))return bad('Enter a valid email address.','#si-email');
+    if(!pw)return bad('Enter your password.','#si-pw');
+    if(up&&pw.length<8)return bad('Choose a password with at least 8 characters.','#si-pw');
     cloudStep(async()=>{
-      await api('/auth/v1/otp?redirect_to='+encodeURIComponent(location.origin+location.pathname),{method:'POST',body:{email:em,create_user:true},auth:false});
-      CL.sent=em;
+      try{
+        if(up){
+          const r=await api('/auth/v1/signup',{method:'POST',body:{email:em,password:pw},auth:false});
+          if(r&&r.access_token){saveSession(sessionFrom(r));await cloudAfterAuth();return}
+          CL.sentKind='confirm';CL.sent=em;return;
+        }
+        const t=await api('/auth/v1/token?grant_type=password',{method:'POST',body:{email:em,password:pw},auth:false});
+        saveSession(sessionFrom(t));await cloudAfterAuth();
+      }catch(e){throw new Error(authErr(e.message))}
     });
+    return true;
+  }
+  if(id==='pwchange'){
+    const a=$('#pw1').value,b2=$('#pw2').value,er=$('#pwerr');
+    const bad=m=>{er.textContent=m;er.hidden=false;return true};
+    if(a.length<8)return bad('Choose a password with at least 8 characters.');
+    if(a!==b2)return bad('The two passwords are not the same.');
+    (async()=>{
+      try{await api('/auth/v1/user',{method:'PUT',body:{password:a}});closeDlg();toast('Password saved. You can use it to sign in.')}
+      catch(e){er.textContent=authErr(e.message);er.hidden=false}
+    })();
     return true;
   }
   if(id==='nameform'){
@@ -2344,17 +2383,46 @@ function cloudSubmit(f){
 /* ---- views (shared mode) ---- */
 const roleLabel=r=>r==='owner'?'Owner':r==='admin'?'Admin':'Member';
 function cloudLoadingView(){return'<section class="panel" style="margin-top:0"><h2>Connecting…</h2><p class="muted">Checking your sign-in.</p></section>'}
+function authErr(m){
+  m=m||'';
+  if(/invalid login credentials/i.test(m))return'That email and password do not match. If you have not made an account yet, choose Create account.';
+  if(/already (been )?registered/i.test(m))return'That email already has an account. Choose Sign in instead.';
+  if(/not confirmed/i.test(m))return'This email has not been confirmed yet. Open the confirmation email we sent, or ask the person who runs the site to turn off email confirmation in Supabase.';
+  if(/rate limit|too many|seconds/i.test(m))return'Too many tries in a short time. Wait a minute and try again.';
+  if(/signups? (not allowed|are disabled)|disabled/i.test(m))return'New accounts are turned off in Supabase. Ask the person who runs the site to turn on email sign-ups.';
+  if(/reauth|recent login|nonce/i.test(m))return'For safety, sign out, sign back in, and then try again.';
+  if(/same password|different from the old/i.test(m))return'Pick a password you have not used on this account before.';
+  return m||'That did not work.';
+}
+const validEmail=e=>/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(e);
+function openPasswordDialog(fromReset){
+  openDlg(`<form id="pwchange" class="dbody" novalidate>${dhead(fromReset?'Choose a new password':'Sign-in password')}
+    <p class="muted">${fromReset?'You are signed in. Pick a new password so you can sign in with it next time.':'Set or change the password you use to sign in. You can still use an emailed sign-in link too.'}</p>
+    <p class="err" id="pwerr" role="alert" hidden></p>
+    <div class="field"><label for="pw1">New password (at least 8 characters)</label><input id="pw1" type="password" autocomplete="new-password" minlength="8"></div>
+    <div class="field"><label for="pw2">Type it again</label><input id="pw2" type="password" autocomplete="new-password"></div>
+    <label class="chk" style="margin:4px 0 12px"><input type="checkbox" data-act="togglepw"> Show passwords</label>
+    <div class="row"><button class="btn" type="submit">Save password</button><button type="button" class="btn soft" data-act="closedlg">${fromReset?'Not now':'Cancel'}</button></div></form>`);
+}
 function cloudGateView(){
-  const file=location.protocol==='file:';
-  return`<section class="panel" style="margin-top:0"><h2>Sign in to your family workspace</h2>
-    ${file?'<p class="err">Shared mode needs this page opened from its web address (for example your GitHub site), not from a downloaded file, because the sign-in link has to come back to this page.</p>':''}
-    <p>Enter your email address and we will send you a sign-in link. There is no password.</p>
-    ${CL.err?`<p class="err" role="alert">${esc(CL.err)}</p>`:''}
-    <form id="signin" class="row" style="align-items:end;margin:14px 0" novalidate>
-      <div class="field" style="flex:1 1 260px"><label for="si-email">Email address</label><input id="si-email" type="email" autocomplete="email" value="${esc(CL.email||'')}" placeholder="you@example.com" ${file?'disabled':''}></div>
-      <button class="btn" type="submit" ${file||CL.busy?'disabled':''}>${CL.busy?'Sending…':'Email me a sign-in link'}</button></form>
-    ${CL.sent?`<div class="callout"><strong>A sign-in link was sent to ${esc(CL.sent)}.</strong><div class="muted small">Open it on this device. It can take a minute, and it may land in spam.</div></div>`:''}
+  const file=location.protocol==='file:',up=CL.authMode==='up';
+  const sentMsg=CL.sentKind==='confirm'?`<strong>Almost there.</strong> We emailed ${esc(CL.sent)} to confirm the address. Open that message, then come back here and sign in.`
+    :CL.sentKind==='reset'?`<strong>A password reset link was sent to ${esc(CL.sent)}.</strong> Open it on this device. It signs you in, and then you can choose a new password.`
+    :`<strong>A sign-in link was sent to ${esc(CL.sent)}.</strong> Open it on this device.`;
+  return`<section class="panel" style="margin-top:0"><h2>${up?'Create your account':'Sign in to your family workspace'}</h2>
+    <p>${up?'Use your email address and pick a password. You only do this once.':'Use your email address and password. New here? Choose Create account.'}</p>
+    <span class="seg" style="margin-top:8px" role="group" aria-label="Sign in or create an account"><button type="button" class="btn soft" data-act="authmode" data-m="in" aria-pressed="${!up}" data-fk="am-in">Sign in</button><button type="button" class="btn soft" data-act="authmode" data-m="up" aria-pressed="${up}" data-fk="am-up">Create account</button></span>
+    ${CL.err?`<p class="err" role="alert" style="margin-top:12px">${esc(CL.err)}</p>`:''}
+    <form id="pwform" style="margin:14px 0;display:grid;gap:12px;max-width:420px" novalidate>
+      <div class="field"><label for="si-email">Email address</label><input id="si-email" type="email" autocomplete="email" value="${esc(CL.email||'')}" placeholder="you@example.com"></div>
+      <div class="field"><label for="si-pw">Password${up?' (at least 8 characters)':''}</label><input id="si-pw" type="password" autocomplete="${up?'new-password':'current-password'}"></div>
+      <label class="chk"><input type="checkbox" data-act="togglepw"> Show password</label>
+      <div class="row"><button class="btn" type="submit" ${CL.busy?'disabled':''}>${CL.busy?'Working…':up?'Create account':'Sign in'}</button></div></form>
+    ${CL.sent?`<div class="callout">${sentMsg}<div class="muted small">It can take a minute, and it may land in spam.</div></div>`:''}
     ${CL.pending?'<p class="muted">You have an invite link waiting. Sign in and it will be used automatically.</p>':''}
+    <details style="margin-top:12px"><summary>Other ways to sign in</summary>
+      <div class="row" style="margin-top:10px"><button type="button" class="btn soft sm" data-act="forgotpw" ${file||CL.busy?'disabled':''}>I forgot my password</button><button type="button" class="btn soft sm" data-act="maillink" ${file||CL.busy?'disabled':''}>Email me a sign-in link instead</button></div>
+      <p class="muted small">Both of these use the email address typed above and send one email.${file?' They need this page opened from its web address.':''}</p></details>
     <div class="row" style="margin-top:12px">${CL.session?'<button class="btn" data-act="retryboot">Try again</button>':''}<button class="btn soft" data-act="uselocal">Use local demo mode instead</button></div></section>`;
 }
 function cloudWorkspacesView(){
@@ -2464,6 +2532,9 @@ function settingsViewCloud(){
       <form id="wsform" class="row" style="align-items:end" novalidate><div class="field" style="flex:1 1 260px"><label for="wsname">Workspace name</label><input id="wsname" type="text" maxlength="80" value="${esc(D.workspace.name)}" ${admin||!CL.noReq?'':'disabled'}></div><button class="btn" type="submit" ${admin||!CL.noReq?'':'disabled'}>${admin?'Save name':'Ask the owner to rename'}</button></form>
       ${admin?'':'<p class="muted small" style="margin-top:8px">Only an owner or admin can rename the workspace. Type a new name and press the button to ask an owner. They can accept, reject or ignore it.</p>'}
       <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws3">Create another workspace</button></div></section>
+    <section class="panel"><h3>Sign-in password</h3>
+      <p>Set or change the password you use to sign in. This lets you skip the emailed link.</p>
+      <div class="row"><button class="btn soft" data-act="setpw" data-fk="setpw">Set or change password</button></div></section>
     <section class="panel"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
