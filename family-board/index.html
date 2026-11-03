@@ -965,6 +965,7 @@ function submitTask(form){
   const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value,special=$('#t-special').checked;
   const bad=m=>{err.textContent=m;err.hidden=false;return false};
   if(!title)return bad('Give the task a title.')&&0||$('#t-title').focus();
+  if(!form.dataset.id&&title.toLowerCase()==='testtt'){closeDlg();toast('Test emails only work in shared mode, where you are signed in.',true);return}
   if(due&&!parseYmd(due))return bad('That due date is not valid.');
   if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
   if(special&&!due)return bad('Add a due date so the day can be circled.');
@@ -2346,6 +2347,16 @@ function cloudSubmit(f){
     const err=$('#terr'),title=$('#t-title').value.trim(),due=$('#t-due').value,time=$('#t-time').value,special=$('#t-special').checked;
     const bad=m=>{err.textContent=m;err.hidden=false;return true};
     if(!title){err.textContent='Give the task a title.';err.hidden=false;$('#t-title').focus();return true}
+    if(!f.dataset.id&&title.toLowerCase()==='testtt'){
+      (async()=>{
+        try{
+          const r=await rpc('send_test_email',{});
+          closeDlg();
+          toast(r==='sent'?'Test email requested. Check your inbox in a minute (and spam).':r==='wait'?'A test was just sent. Wait a minute and try again.':r==='opted_out'?'Reminder emails are turned off in your Settings, so no test was sent.':'Email is not set up yet. Finish the email setup steps first.',r!=='sent');
+        }catch(e){toast(/send_test_email/i.test(e.message||'')?'Your database needs a small update. Run supabase-step-8-test-email.sql in Supabase.':(e.message||'That did not work.'),true)}
+      })();
+      return true;
+    }
     if(due&&!parseYmd(due))return bad('That due date is not valid.');
     if(time&&!due){$('#t-time').closest('details').open=true;return bad('Add a due date to use a due time, or clear the time.')}
     if(special&&!due)return bad('Add a due date so the day can be circled.');
