@@ -1464,7 +1464,17 @@ async function cloudBoot(){
     render();
   }
 }
-function startPolling(){clearInterval(CL.poll);clearInterval(CL.npoll);CL.poll=setInterval(refreshQuiet,20000);CL.npoll=setInterval(pollNotes,20000);pollNotes();if(!CY.loaded)cyLoad().then(render);if(alertsOn())pushSync().then(render)}
+const TZKEY='familyBoard.tz.v1';
+async function syncPrefs(){
+  if(CL.noPrefs)return;
+  try{
+    const tz=Intl.DateTimeFormat().resolvedOptions().timeZone;
+    let old='';try{old=localStorage.getItem(TZKEY)||''}catch{}
+    if(tz&&tz!==old){await rpc('set_prefs',{p_tz:tz});try{localStorage.setItem(TZKEY,tz)}catch{}}
+    const r=await api('/rest/v1/user_prefs?select=*');CL.prefs=(r&&r[0])||{email_reminders:true};
+  }catch(e){if(/set_prefs|user_prefs/i.test(e.message||''))CL.noPrefs=true}
+}
+function startPolling(){syncPrefs().then(()=>{if(UI.view==='settings')render()});clearInterval(CL.poll);clearInterval(CL.npoll);CL.poll=setInterval(refreshQuiet,20000);CL.npoll=setInterval(pollNotes,20000);pollNotes();if(!CY.loaded)cyLoad().then(render);if(alertsOn())pushSync().then(render)}
 const unreadCount=()=>CL.notes.filter(n=>!n.read_at).length;
 const NPREF='familyBoard.notifyprefs.v1';
 function notePrefs(){let p={};try{p=JSON.parse(localStorage.getItem(NPREF)||'{}')||{}}catch{}return{popups:p.popups!==false,sound:p.sound!==false}}
@@ -1519,12 +1529,13 @@ function noteText(n){
     const who=n.actor_name||'Someone';
     return n.for_name?`${who} finished “${n.task_title}” for ${n.for_name} in ${n.workspace_name}.`:`${who} finished “${n.task_title}” in ${n.workspace_name}.`;
   }
+  if(n.kind==='reminder')return`“${n.task_title}” is due ${n.outcome} in ${n.workspace_name}.`;
   if(n.kind==='request')return`${n.actor_name||'Someone'} asks to ${n.task_title} in ${n.workspace_name}.`;
   if(n.kind==='request_result')return`${n.actor_name||'An owner'} ${n.outcome==='approved'?'approved':'rejected'} your request to ${n.task_title}.`;
   return`${n.actor_name||'Someone'} assigned you “${n.task_title}” in ${n.workspace_name}.${due}`;
 }
-const NKINDS=['assigned','completed','request','request_result'];
-const noteTitle=n=>n.kind==='completed'?'Task finished':n.kind==='request'?'Request waiting':n.kind==='request_result'?'Request '+(n.outcome==='approved'?'approved':'rejected'):'New task for you';
+const NKINDS=['assigned','completed','request','request_result','reminder'];
+const noteTitle=n=>n.kind==='completed'?'Task finished':n.kind==='request'?'Request waiting':n.kind==='request_result'?'Request '+(n.outcome==='approved'?'approved':'rejected'):n.kind==='reminder'?'Coming up':'New task for you';
 const reqOf=id=>(CL.reqs||[]).find(r=>r.id===id);
 function updateBadge(){
   const b=$('#nbadge');if(!b)return;const c=unreadCount();
@@ -1662,6 +1673,7 @@ document.addEventListener('visibilitychange',()=>{if(!document.hidden){refreshQu
 /* ---- doing things ---- */
 function dbHint(m){
   m=m||'';
+  if(/set_prefs|user_prefs/i.test(m))return'Your database needs a small update before reminder settings can be saved. Run supabase-step-6-reminders.sql in Supabase.';
   if(/assignee_ids/i.test(m))return'Your database needs a small update before a task can be shared with several people. Run supabase-update-all.sql in Supabase.';
   if(/start_date|per_day|repeat/i.test(m))return'Your database needs a small update before repeating and long tasks can be saved. Run supabase-update-all.sql in Supabase.';
   if(/steps/i.test(m))return'Your database needs a small update before task steps can be saved. Run supabase-update-all.sql in Supabase.';
@@ -2215,6 +2227,12 @@ async function cloudComplete(tk,going){
   return ok;
 }
 async function cloudChange(t){
+  if(t.dataset.act==='emailrem'){
+    const on=t.checked;
+    try{await rpc('set_prefs',{p_email:on});CL.prefs=Object.assign(CL.prefs||{},{email_reminders:on});toast(on?'Reminder emails are on.':'Reminder emails are off.')}
+    catch(e){t.checked=!on;toast(dbHint(e.message),true)}
+    return true;
+  }
   if(t.dataset.act==='togglepw'){$$('input[type=password],input[data-pw="1"]').forEach(i=>{i.type=t.checked?'text':'password';i.dataset.pw='1'});return true}
   if(t.dataset.cb){
     const tk=task(t.dataset.cb);if(!tk)return true;
@@ -2547,6 +2565,11 @@ function settingsViewCloud(){
       ${AL.msg?`<div class="banner bad" role="alert"><p>${esc(AL.msg)}</p></div>`:('Notification' in window&&Notification.permission==='denied'&&!alertsOn()?`<p class="muted small">Notifications are currently blocked for this site in your browser. The button below will explain how to allow them.</p>`:'')}
       ${alertsOn()?`<p><strong>Device alerts are on.</strong> ${AL.push==='on'?'Alerts also arrive when Family Board is closed.':AL.push==='nodb'?'Background alerts need a database update (run supabase-update-all.sql). Until then, alerts only show while the page is open.':AL.push==='fail'?'Background alerts could not be set up on this device, so alerts only show while the page is open.':pushOK()?'Setting up background alerts…':'This browser can only show alerts while the page is open.'}</p><div class="row"><button class="btn soft" data-act="alertsoff" data-fk="aoff">Turn off device alerts</button>${AL.push==='on'?'<button class="btn soft" data-act="pushtest" data-fk="ptest">Send me a test alert</button>':''}</div>`:'<div class="row"><button class="btn" data-act="alertson" data-fk="aon">Turn on device alerts</button></div>'}
       <p class="muted small" style="margin-top:10px">When device alerts are on and background alerts are set up, your phone or computer shows an alert when a task is assigned to you or finished, even if Family Board is closed. The sound for those alerts is your device’s own notification sound. The chime only plays while the page is open. On an iPhone, alerts only work after you add Family Board to your Home Screen (Share, then Add to Home Screen) and open it from there. No email is sent.</p>`}</section>
+    <section class="panel"><h3>Reminders before a task is due</h3>
+      ${CL.noPrefs?'<p class="err">Your database needs a small update before reminders work. Run supabase-step-6-reminders.sql in Supabase.</p>':`
+      <p>The person who made a task and everyone assigned to it get a reminder a month, a week, 3 days, 2 days and 1 day before it is due. A task with a due time also gets one 12, 6, 3 and 1 hours and 30 minutes before. Reminders show on the bell and as pop-up and phone alerts, in your own time zone (${esc((()=>{try{return Intl.DateTimeFormat().resolvedOptions().timeZone}catch{return'your device'}})())}).</p>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="emailrem" data-fk="emrem" ${!CL.prefs||CL.prefs.email_reminders!==false?'checked':''}> <span>Also email me these reminders</span></label>
+      <p class="muted small" style="margin-top:6px">Emails only go out once the person who runs this site has set up an email sender. Until then, reminders arrive as alerts.</p>`}</section>
     ${appearancePanels()}
     <section class="panel"><h3>Data backup</h3>
       <p class="muted">Export saves a copy of this workspace’s members, groups, tasks and activity history as a file. A shared workspace cannot be restored from a file, because the server keeps the real record.</p>
