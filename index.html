@@ -21,15 +21,15 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>Our Family Hub</title>
-<meta name="description" content="Our family recipe book and shared calendar, in one place.">
+<meta name="description" content="Our family recipe book, shared calendar, pantry planner, period tracker and coloring game, in one place.">
 <meta property="og:type" content="website">
 <meta property="og:title" content="Our Family Hub">
-<meta property="og:description" content="The family recipe book and the shared calendar.">
+<meta property="og:description" content="The family recipe book, the shared calendar, a pantry planner, a period tracker and a coloring game.">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/">
 <meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/hub-preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Our Family Hub: the recipe book and the shared calendar">
+<meta property="og:image:alt" content="Our Family Hub: the recipe book, the shared calendar and Color Bloom">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="Our Family Hub">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/hub-preview.png">
@@ -128,14 +128,30 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
         <span class="go">Open Color Bloom</span>
       </a>
     </li>
+    <li>
+      <a class="card" href="pantryledger/" style="--c:#66744a">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="4" fill="#6f4a33"/><rect x="11" y="6.5" width="10" height="3.5" rx="1" fill="#b0845b"/><path d="M11.5 10h9l1.5 2.5V24a2.5 2.5 0 0 1-2.5 2.5h-8A2.5 2.5 0 0 1 10 24V12.5z" fill="#f7efdf"/><rect x="12.5" y="15.5" width="7" height="5.5" rx="1" fill="#93573a"/></svg>
+        <h2>Pantry Ledger</h2>
+        <p>Plan food by calories and budget, and see how long each bag lasts.</p>
+        <span class="go">Open ledger</span>
+      </a>
+    </li>
+    <li>
+      <a class="card" href="petal/" style="--c:#9b5565">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="4" fill="#6f4a33"/><path d="M16 6.5c4.8 4.2 7 7.9 7 11.2a7 7 0 0 1-14 0c0-3.3 2.2-7 7-11.2z" fill="#f7efdf"/><path d="M16 13c2.3 2 3.3 3.7 3.3 5.2a3.3 3.3 0 0 1-6.6 0c0-1.5 1-3.2 3.3-5.2z" fill="#93573a"/></svg>
+        <h2>Petal</h2>
+        <p>A private period tracker and journal, plus things to learn.</p>
+        <span class="go">Open Petal</span>
+      </a>
+    </li>
   </ul>
-  <p class="note">Each app saves its data in the browser on the device you use, so recipes and games do not sync between devices. The calendar can share tasks once it is connected to its online database.</p>
+  <p class="note">Recipes, game progress, journal entries, pantry plans and the calendar’s private mode are saved on the device you use. The recipe book can also save to your own Google Drive, and the calendar can share tasks once it is connected to its online database.</p>
 </main>
 <footer class="foot">
   <div class="in">
     <section aria-labelledby="f-about">
       <h2 id="f-about">About</h2>
-      <p>A small family corner of the web: recipes, a shared calendar and a coloring game. Made at home, for home.</p>
+      <p>A small family corner of the web: recipes, a shared calendar, a pantry planner, a period tracker and a coloring game. Made at home, for home.</p>
     </section>
     <nav aria-labelledby="f-apps">
       <h2 id="f-apps">The apps</h2>
@@ -143,12 +159,14 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
         <li><a href="recipe-book/">Family Recipe Book</a></li>
         <li><a href="family-board/">Family Board</a></li>
         <li><a href="color-bloom/">Color Bloom</a></li>
+        <li><a href="pantryledger/">Pantry Ledger</a></li>
+        <li><a href="petal/">Petal</a></li>
       </ul>
     </nav>
     <section aria-labelledby="f-legal">
       <h2 id="f-legal">License and privacy</h2>
       <p>The code is free software, released under the <a href="LICENSE.txt">GNU General Public License, version 3</a>.</p>
-      <p style="margin-top:8px">The recipe book and Color Bloom keep their data only in your own browser. The Family Board does the same until you turn on shared mode, which stores tasks and sign-in emails with our hosting provider, Supabase, where only the people in your workspace can see them.</p>
+      <p style="margin-top:8px">Color Bloom saves your progress in your own browser. The recipe book does too, and only goes online if you choose to: saving to your Google Drive, fetching new recipes from TheMealDB, or sending ingredients to an AI service you set up. Petal keeps its entries in your own browser and never goes online. The Pantry Ledger keeps its data in your browser too, and only goes online when you search for a food, which sends the words you typed to Open Food Facts. The Family Board stays in your browser until you use shared mode, which stores tasks and sign-in emails with our hosting provider, Supabase, where only the people in your workspace can see them.</p>
     </section>
     <section aria-labelledby="f-more">
       <h2 id="f-more">More from Leia</h2>
