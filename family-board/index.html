@@ -343,8 +343,28 @@ summary{font:700 12px/1.2 var(--label);letter-spacing:.09em;text-transform:upper
   dl.facts{grid-template-columns:1fr;gap:2px}
   dl.facts dd{margin-bottom:8px}
 }
+
+.story{text-align:center;padding:8px 0 4px}
+.story svg{width:100%;max-width:360px;height:auto;display:block;margin:0 auto}
+.story .lines{position:relative;height:3.2em;margin-top:6px}
+.story .ln{position:absolute;inset:0;display:grid;place-items:center;opacity:0;font:italic 1.05rem/1.35 var(--serif,Georgia,serif);color:var(--ink);animation:stln 12s infinite}
+.story .ln:nth-child(2){animation-delay:3s}.story .ln:nth-child(3){animation-delay:6s}.story .ln:nth-child(4){animation-delay:9s}
+@keyframes stln{0%{opacity:0;transform:translateY(6px)}4%,22%{opacity:1;transform:none}26%,100%{opacity:0}}
+.story .walker{animation:stwalk 12s infinite}
+@keyframes stwalk{0%{transform:translateX(0)}50%,56%{transform:translateX(158px);opacity:1}64%{transform:translateX(168px);opacity:0}99%{transform:translateX(168px);opacity:0}100%{transform:translateX(0);opacity:0}}
+.story .bob{animation:stbob .5s ease-in-out infinite alternate}
+@keyframes stbob{to{transform:translateY(-2px)}}
+.story .door{transform-box:fill-box;transform-origin:left center;animation:stdoor 12s infinite}
+@keyframes stdoor{0%,48%{transform:scaleX(1)}56%,70%{transform:scaleX(.15)}78%,100%{transform:scaleX(1)}}
+.story .glow{animation:stglow 12s infinite}
+@keyframes stglow{0%,20%{opacity:.25}30%,62%{opacity:1}70%,100%{opacity:.25}}
+.story .star{animation:sttw 2.4s ease-in-out infinite alternate}.story .star:nth-of-type(2n){animation-delay:.8s}
+@keyframes sttw{from{opacity:.3}to{opacity:1}}
+.story .note{opacity:0;animation:stnote 12s infinite}
+@keyframes stnote{0%,72%{opacity:0;transform:translateY(8px)}80%,96%{opacity:1;transform:none}100%{opacity:0}}
 @media (prefers-reduced-motion:reduce){
   *{transition:none!important;animation:none!important;scroll-behavior:auto!important}
+  .story .ln:first-child{opacity:1}.story .glow{opacity:1}.story .walker{transform:translateX(100px)}.story .note{opacity:1}
 }
 @media print{nav.tabs,.btn,#ring,#fx{display:none!important}.sheet::before{display:none}.sheet{padding-top:20px}}
 </style>
@@ -884,9 +904,11 @@ function render(){
   const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,cycle:cycleGuard,settings:settingsViewCloud}
     :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,cycle:cycleGuard,settings:settingsView};
   {const src=CL.on?'cloud':'local';if(CY.src!==src){cyReset();CY.src=src}if(!CY.loaded&&!CL.on)cyLoad()}
-  if(CL.on&&CL.stage!=='ready'){
+  let stage=CL.stage;
+  if(CL.on&&CL.minUntil&&Date.now()<CL.minUntil){stage='loading';clearTimeout(render.mt);render.mt=setTimeout(render,CL.minUntil-Date.now()+30)}
+  if(CL.on&&stage!=='ready'){
     const gates={loading:cloudLoadingView,gate:cloudGateView,name:cloudNameView,workspace:cloudWorkspaceView};
-    $('#app').innerHTML=headerCloud()+`<main id="main"><div class="sheet" style="margin-top:20px">${(gates[CL.stage]||cloudLoadingView)()}</div></main>`;
+    $('#app').innerHTML=headerCloud()+`<main id="main"><div class="sheet" style="margin-top:20px">${(gates[stage]||cloudLoadingView)()}</div></main>`;
     return;
   }
   $('#app').innerHTML=header()+`<main id="main">${tabsNav()}<div class="sheet">${UI.view==='cycle'?'':banners()}${(views[UI.view]||calendarView)()}</div></main>`;
@@ -1458,6 +1480,7 @@ async function cloudBoot(){
     CL.session=readSession();
     if(CL.session)saveSession(CL.session);
     if(!CL.session){CL.stage='gate';render();return}
+    CL.minUntil=Date.now()+3200;   // let the first lines of the loading story play
     await cloudAfterAuth();
     if(CL.recovery){CL.recovery=false;if(CL.stage==='ready')openPasswordDialog(true)}
   }catch(e){
@@ -1735,6 +1758,9 @@ function drawCrop(cv,size){
   ctx.imageSmoothingQuality='high';
   ctx.drawImage(im,Math.max(0,sx),Math.max(0,sy),sz,sz,0,0,size,size);
 }
+const PK={kind:'familyBoard.pfpKind.v1',src:'familyBoard.photoSrc.v1',out:'familyBoard.photoOut.v1',adj:'familyBoard.photoAdj.v1',aout:'familyBoard.avatarOut.v1'};
+const lsGet=k=>{try{return localStorage.getItem(k)||''}catch{return''}};
+const lsSet=(k,v)=>{try{if(v)localStorage.setItem(k,v);else localStorage.removeItem(k)}catch{}};
 const AV={skin:['#f9d9c3','#f1c27d','#e0a370','#c68642','#8d5524','#5b3a24'],
   hair:['#2b1d14','#5a3825','#8a5a2b','#c9a45c','#b0382e','#555555','#7a4bd1','#2f6fd1','#e86fa0','#f2f2f2'],
   bg:['#f6d6d6','#f8e3b8','#d9ecc8','#c9e8f0','#d8d6f3','#f3d3ea','#e2e2e2','#ffd9a8'],
@@ -1806,15 +1832,47 @@ function openAvatarBuilder(){
       while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
       if(!okAvatar(data))return bad('That avatar could not be prepared. Try again.');
       try{localStorage.setItem('familyBoard.avatar.v1',JSON.stringify(c))}catch{}
-      cloudDo(()=>rpc('set_avatar',{p_data:data}),'Avatar saved.').then(ok=>{if(ok)closeDlg()});
+      cloudDo(()=>rpc('set_avatar',{p_data:data}),'Avatar saved.').then(ok=>{if(ok){lsSet(PK.aout,data);lsSet(PK.kind,'avatar');closeDlg()}});
     };
     img.onerror=()=>bad('Your browser could not draw the avatar. Try the photo option instead.');
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(avatarSVG(c));
   });
 }
-function openPhotoDialog(){
+function smallCopy(im){
+  const m=Math.min(1,320/Math.max(im.naturalWidth,im.naturalHeight)),c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(im.naturalWidth*m));c.height=Math.max(1,Math.round(im.naturalHeight*m));
+  c.getContext('2d').drawImage(im,0,0,c.width,c.height);
+  let q=.85,d=c.toDataURL('image/jpeg',q);while(d.length>90000&&q>.4){q-=.15;d=c.toDataURL('image/jpeg',q)}
+  return d.length>120000?'':d;
+}
+function openPfpMenu(){
   if(CL.noAvatar){toast(dbHint('avatar'),true);return}
-  PH.im=null;
+  const m=me();let kind=lsGet(PK.kind);
+  if(m.avatar&&kind!=='photo'&&kind!=='avatar'){kind='photo';lsSet(PK.kind,'photo');if(!lsGet(PK.src))lsSet(PK.src,m.avatar);if(!lsGet(PK.out))lsSet(PK.out,m.avatar)}
+  const cur=!m.avatar?'letter':kind==='avatar'?'avatar':'photo';
+  const hasPhoto=!!lsGet(PK.out),hasSrc=!!lsGet(PK.src),hasAv=!!lsGet(PK.aout);
+  const b=(act,label,soft=true)=>`<button type="button" class="btn${soft?' soft':''}" data-act="${act}">${label}</button>`;
+  const now={letter:'your letter',photo:'your photo',avatar:'your avatar'}[cur];
+  openDlg(`<div class="dbody">${dhead('Profile picture')}
+    <div style="display:flex;justify-content:center">${avatar(m,'xl')}</div>
+    <p style="text-align:center">Right now everyone sees ${now}. Your photo and avatar stay saved on this device, so you can switch back without choosing them again.</p>
+    <div style="display:grid;gap:8px">
+      ${cur!=='letter'?b('pfpletter','Use my letter'):''}
+      ${hasPhoto&&cur!=='photo'?b('pfpusephoto','Use my saved photo',false):''}
+      ${hasSrc?b('pfpadjust','Adjust my photo'):''}
+      ${b('pfpnewphoto',hasPhoto?'Choose a different photo':'Choose a photo')}
+      ${hasAv&&cur!=='avatar'?b('pfpuseavatar','Use my saved avatar',false):''}
+      ${b('avatar',hasAv?'Customize my avatar':'Build an avatar')}
+      ${hasPhoto||hasSrc?b('pfpforget','Remove my photo'):''}
+    </div></div>`);
+}
+async function pfpSet(data,msg,kind){
+  const ok=await cloudDo(()=>rpc('set_avatar',{p_data:data}),msg);
+  if(ok){lsSet(PK.kind,kind);closeDlg()}
+}
+function openPhotoDialog(pre){
+  if(CL.noAvatar){toast(dbHint('avatar'),true);return}
+  PH.im=null;PH.src='';
   openDlg(`<form id="phform" class="dbody" novalidate>${dhead('Your profile photo')}
     <p class="err" id="pherr" role="alert" hidden></p>
     <p>Choose a picture from your device. It is shrunk to a small square, and everyone in your workspaces can see it.</p>
@@ -1836,10 +1894,11 @@ function openPhotoDialog(){
     if(f.size>20e6){bad('That picture is very large. Choose one under 20 MB.');return}
     const url=URL.createObjectURL(f),im=new Image();
     im.onload=()=>{URL.revokeObjectURL(url);if(!im.naturalWidth){bad('That picture could not be read.');return}
-      PH.im=im;$('#ph-zoom').value=1;$('#ph-x').value=0;$('#ph-y').value=0;edit.hidden=false;$('#ph-save').disabled=false;redraw()};
+      PH.im=im;PH.src=smallCopy(im);$('#ph-zoom').value=1;$('#ph-x').value=0;$('#ph-y').value=0;edit.hidden=false;$('#ph-save').disabled=false;redraw()};
     im.onerror=()=>{URL.revokeObjectURL(url);bad('That picture could not be read. Try a JPEG or PNG. Some phone formats, such as HEIC, are not supported in every browser.')};
     im.src=url;
   });
+  if(pre&&pre.src){const im=new Image();im.onload=()=>{PH.im=im;PH.src=pre.src;const a=pre.adj||{};$('#ph-zoom').value=a.z||1;$('#ph-x').value=a.x||0;$('#ph-y').value=a.y||0;edit.hidden=false;$('#ph-save').disabled=false;redraw()};im.src=pre.src}
   $('#phform').addEventListener('submit',ev=>{
     ev.preventDefault();
     if(!PH.im)return bad('Choose a picture first.');
@@ -1847,7 +1906,7 @@ function openPhotoDialog(){
     let q=.85,data=out.toDataURL('image/jpeg',q);
     while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
     if(!okAvatar(data))return bad('That picture could not be prepared. Try a different one.');
-    cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok)closeDlg()});
+    cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok){if(PH.src)lsSet(PK.src,PH.src);lsSet(PK.out,data);lsSet(PK.adj,JSON.stringify({z:+$('#ph-zoom').value,x:+$('#ph-x').value,y:+$('#ph-y').value}));lsSet(PK.kind,'photo');closeDlg()}});
   });
 }
 function openDeleteWs(w){
@@ -2184,6 +2243,20 @@ async function cloudClick(a,b,id){
     case'mydisplayname':openMyName();return true;
     case'photo':openPhotoDialog();return true;
     case'avatar':openAvatarBuilder();return true;
+    case'pfp':openPfpMenu();return true;
+    case'pfpletter':pfpSet(null,'Back to your letter.','letter');return true;
+    case'pfpusephoto':pfpSet(lsGet(PK.out),'Using your saved photo.','photo');return true;
+    case'pfpuseavatar':pfpSet(lsGet(PK.aout),'Using your saved avatar.','avatar');return true;
+    case'pfpnewphoto':openPhotoDialog();return true;
+    case'pfpadjust':{let adj=null;try{adj=JSON.parse(lsGet(PK.adj)||'null')}catch{}openPhotoDialog({src:lsGet(PK.src),adj});return true}
+    case'pfpforget':{
+      const ok=await confirmBox('Remove your photo?','This deletes your saved photo from this device.'+(me().avatar&&lsGet(PK.kind)==='photo'?' Everyone will see your letter instead.':' Your current picture stays as it is.'),'Remove photo',true);
+      if(!ok)return true;
+      const wasCur=me().avatar&&lsGet(PK.kind)==='photo';
+      lsSet(PK.src,'');lsSet(PK.out,'');lsSet(PK.adj,'');
+      if(wasCur)await pfpSet(null,'Photo removed. Your letter is showing.','letter');else{toast('Saved photo removed from this device.');closeDlg()}
+      return true;
+    }
     case'avrandom':{const f=$('#avform');if(f&&f._random)f._random();return true}
     case'rmphoto':{
       const ok=await confirmBox('Go back to your letter?','Your initials will show instead of your photo or avatar, for everyone in your workspaces.','Use my letter',true);
@@ -2491,7 +2564,29 @@ function cloudSubmit(f){
 
 /* ---- views (shared mode) ---- */
 const roleLabel=r=>r==='owner'?'Owner':r==='admin'?'Admin':'Member';
-function cloudLoadingView(){return'<section class="panel" style="margin-top:0"><h2>Connecting…</h2><p class="muted">Checking your sign-in.</p></section>'}
+function cloudLoadingView(){
+  const star=(x,y)=>`<circle class="star" cx="${x}" cy="${y}" r="1.6" fill="var(--caramel)"/>`;
+  return`<section class="panel story" role="status" aria-label="Connecting to your family board"><span class="sr" style="position:absolute;left:-9999px">Connecting…</span>
+  <svg viewBox="0 0 360 170" aria-hidden="true" focusable="false">
+    ${star(40,24)}${star(110,14)}${star(250,20)}${star(320,36)}${star(180,30)}
+    <rect x="0" y="140" width="360" height="30" fill="var(--paper-lo)"/>
+    <path d="M0 140H360" stroke="var(--line)" stroke-width="2"/>
+    <rect x="205" y="70" width="110" height="70" fill="var(--card)" stroke="var(--walnut)" stroke-width="3"/>
+    <path d="M195 72L260 28L325 72Z" fill="var(--rust)" stroke="var(--walnut)" stroke-width="3" stroke-linejoin="round"/>
+    <rect x="224" y="86" width="26" height="24" fill="#f2c45a" class="glow"/><path d="M237 86V110M224 98H250" stroke="var(--walnut)" stroke-width="2"/>
+    <rect x="268" y="96" width="30" height="44" fill="#f2c45a" class="glow" opacity=".5"/>
+    <rect x="268" y="96" width="30" height="44" fill="var(--walnut)" class="door"/>
+    <circle cx="293" cy="120" r="1.8" fill="#f2c45a"/>
+    <g class="note"><rect x="214" y="118" width="22" height="18" rx="2" fill="#fff6b0" stroke="var(--caramel)"/><path d="M219 124H231M219 129H227" stroke="var(--ink-soft)" stroke-width="1.5"/></g>
+    <g class="walker"><g class="bob">
+      <circle cx="40" cy="108" r="8" fill="var(--accent)"/>
+      <rect x="33" y="117" width="14" height="19" rx="5" fill="var(--accent)"/>
+      <rect x="46" y="120" width="11" height="13" rx="2" fill="var(--caramel)"/>
+      <path d="M36 136V141M44 136V141" stroke="var(--ink)" stroke-width="3" stroke-linecap="round"/>
+    </g></g>
+  </svg>
+  <div class="lines" aria-hidden="true"><div class="ln">Someone is walking home with the groceries.</div><div class="ln">The porch light is on. Good sign.</div><div class="ln">Knock, knock. The door swings open.</div><div class="ln">Everyone's tasks are already on the fridge.</div></div>
+  </section>`}
 function authErr(m){
   m=m||'';
   if(/invalid login credentials/i.test(m))return'That email and password do not match. If you have not made an account yet, choose Create account.';
@@ -2595,7 +2690,7 @@ function cloudMembersView(){
       ${D.members.map(m=>{
         const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner'),canAsk=!mg&&!self&&m.role!=='owner'&&!CL.noReq;
         return`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${self?' (you)':''}</div><div class="muted small">${roleLabel(m.role)}</div></div>
-          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="avatar" data-fk="myav">Build avatar</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}${canAsk?`<button class="btn soft sm" data-act="reqremove" data-id="${esc(m.id)}" data-fk="rq-${esc(m.id)}" aria-label="Ask an owner to remove ${esc(m.name)}">Ask to remove</button>`:''}</div></div>`}).join('')}
+          <div class="row">${self?'<button class="btn soft sm" data-act="pfp" data-fk="myph">Profile picture</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}${canAsk?`<button class="btn soft sm" data-act="reqremove" data-id="${esc(m.id)}" data-fk="rq-${esc(m.id)}" aria-label="Ask an owner to remove ${esc(m.name)}">Ask to remove</button>`:''}</div></div>`}).join('')}
       <p class="muted small" style="margin-top:12px">Everyone signs in with their own email address. Names on completed tasks come from each person’s own sign-in, not from a menu.</p></section>
     <section class="panel"><h3>Invitations</h3>
       ${mg?`<p>Create a single-use link and send it to the person yourself, by text or email. <strong>Nothing is emailed from this page.</strong> Each link works once and expires after 7 days.</p>
@@ -2647,7 +2742,7 @@ function settingsViewCloud(){
     <section class="panel"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
-        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button><button class="btn" data-act="avatar" data-fk="av">Build an avatar</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Use my letter instead</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
+        <div class="row" style="margin-top:10px"><button class="btn" data-act="pfp" data-fk="ph">Profile picture</button><button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">${privateFields()}</div></section>
     <section class="panel"><h3>Assignment alerts</h3>
       ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
@@ -2690,4 +2785,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-  </html>
+</html>
