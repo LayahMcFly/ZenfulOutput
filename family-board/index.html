@@ -71,20 +71,20 @@ html[data-style=boyish]:not([data-theme=dark]){--paper:#dde3ea;--paper-lo:#cbd3d
 html[data-style=boyish][data-theme=dark]{--paper:#0d1117;--paper-lo:#131a22;--linen:#161e28;--card:#1a232e;--field:#121921;--ink:#e6edf3;--ink-soft:#9fb0c3;--walnut:#79a8e0;--caramel:#5d7fa3;--rust:#4aa3ff;--line:#2c3a4a;--shadow:rgba(0,0,0,.65);--accent:#4aa3ff;--on-accent:#07131f;--wash:rgba(74,163,255,.14);--wknd:#151d27;--today:#14304d;--hole:#080b10;--coil:#6f8299;--grid:transparent;--ok:#6fd08c;--warn:#ff8f84;--mark:#ff9a6b;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
 
 /* Bread mode: the original warm-paper look, with toasted loaf buttons (crust border, crumb dots, two bumps on top). */
-html[data-style=bread] .btn:not(.quiet):not(.bare){position:relative;isolation:isolate;margin-top:6px;--crust:#7a4318;--toast1:#e6b068;--toast2:#c9843a;--toast3:#a9622a;--bt:#3a1f0d;
+html[data-style=bread] .btn:not(.quiet):not(.bare){position:relative;isolation:isolate;margin-top:4px;--crust:#7a4318;--toast1:#e6b068;--toast2:#c9843a;--toast3:#a9622a;--bt:#3a1f0d;
   background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),radial-gradient(circle at 47% 70%,rgba(90,45,15,.28) 0 1.4px,transparent 2.2px),radial-gradient(circle at 78% 30%,rgba(255,240,200,.5) 0 1.6px,transparent 2.4px),radial-gradient(circle at 90% 72%,rgba(90,45,15,.25) 0 1.3px,transparent 2.1px),linear-gradient(var(--toast1),var(--toast2) 62%,var(--toast3));
   color:var(--bt);border:2px solid var(--crust);border-radius:20px 20px 12px 12px;text-shadow:0 1px 0 rgba(255,235,190,.55);
   box-shadow:inset 0 3px 0 rgba(255,240,200,.6),inset 0 -3px 0 rgba(90,45,15,.3),0 3px 0 var(--crust),0 6px 8px -4px var(--shadow)}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::before,html[data-style=bread] .btn:not(.quiet):not(.bare)::after{content:"";position:absolute;top:-7px;height:13px;width:30%;z-index:-1;background:linear-gradient(var(--toast1),var(--toast2));border:2px solid var(--crust);border-bottom:0;border-radius:14px 14px 0 0}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::before{left:12%}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::after{right:12%}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::before,html[data-style=bread] .btn:not(.quiet):not(.bare)::after{content:"";position:absolute;top:-6px;height:11px;width:26%;z-index:-1;background:var(--toast1);border:2px solid var(--crust);border-bottom:0;border-radius:12px 12px 0 0}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::before{left:14%}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::after{right:14%}
 html[data-style=bread] .btn:not(.quiet):not(.bare).soft{--toast1:#f6e2b4;--toast2:#ecc98a;--toast3:#dfae66;color:#5a3216}
 html[data-style=bread] .btn.soft:not(.quiet):not(.bare):hover{background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),linear-gradient(#fbeec9,#f0d296 62%,#e4b872)}
 html[data-style=bread] .btn:not(.quiet):not(.bare).danger{--toast1:#b5562c;--toast2:#933e1c;--toast3:#762f14;--bt:#fff1dc;--crust:#4d1f0a;text-shadow:0 1px 0 rgba(0,0,0,.35)}
 html[data-style=bread] .btn:not(.quiet):not(.bare)[aria-pressed=true],html[data-style=bread] .btn.soft:not(.quiet):not(.bare)[aria-pressed=true]{--toast1:#c98a3e;--toast2:#a9692a;--toast3:#8a5120;--bt:#fff1dc;text-shadow:0 1px 0 rgba(0,0,0,.3)}
 html[data-style=bread] .btn:hover{filter:brightness(1.06)}
 html[data-style=bread] .btn:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(255,240,200,.5),inset 0 -2px 0 rgba(90,45,15,.3),0 1px 0 var(--crust)}
-html[data-style=bread] .btn.sm::before,html[data-style=bread] .btn.sm::after{top:-6px;height:11px}
+html[data-style=bread] .btn.sm::before,html[data-style=bread] .btn.sm::after{top:-5px;height:9px}
 html[data-style=bread] .seg .btn,html[data-style=bread] .seg .btn::before,html[data-style=bread] .seg .btn::after{border-radius:12px}
 @media print{html[data-style=bread] .btn{display:none}}
 html[data-style=neutral] .sheet::before,html[data-style=boyish] .sheet::before{display:none}
@@ -106,6 +106,7 @@ p{margin:0}
 a{color:var(--rust)}
 button,select,input,textarea{font:inherit;color:inherit}
 :focus-visible{outline:3px solid var(--rust);outline-offset:2px}
+.verline{text-align:center;padding:0 14px 28px;font:12px/1.4 var(--label);letter-spacing:.06em;color:var(--ink-soft)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 [hidden]{display:none!important}
 .label,label,.lab{font:700 12px/1.2 var(--label);letter-spacing:.09em;text-transform:uppercase;color:var(--ink-soft)}
@@ -228,7 +229,7 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .nitem .rs{display:block;margin-top:6px;font-weight:600}
 .nitem small{display:block;color:var(--muted,#6b5e54);margin-top:2px}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
-.av>*{grid-area:1/1}.av .fb{display:grid;place-items:center;width:100%;height:100%}
+.av>*{grid-area:1/1}.av .avin{display:grid;place-items:center;width:100%;height:100%}
 .av img.dm{border-radius:50%;border:1px solid #CCC;padding:2px;background:#fff;box-sizing:border-box;opacity:0;transition:opacity .25s}.av.lg img.dm,.av.xl img.dm{padding:5px}.av img.dm.ok{opacity:1}
 .av.lg{width:44px;height:44px;font-size:15px}
 .av.xl{width:84px;height:84px;font-size:28px}
@@ -441,7 +442,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.0';
+const APP_VERSION='2.0.1';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -724,7 +725,7 @@ const DMRE=/^[A-Za-z0-9]{6,20}$/;   // DoppelMe keys are never longer than 20 ch
 const avatar=(m,cls='')=>{
   if(!m)return`<span class="av none ${cls}" aria-hidden="true">?</span>`;
   const dm=m.dm&&DMRE.test(m.dm)&&navigator.onLine!==false?`<img class="dm" src="https://www.doppelme.com/${cls==='lg'||cls==='xl'?'':'50/'}${esc(m.dm)}/cropb.png" alt="" referrerpolicy="no-referrer" loading="lazy">`:'';
-  return`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true"><span class="fb">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>${dm}</span>`};
+  return`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true"><span class="avin">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>${dm}</span>`};
 document.addEventListener('load',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('dm'))t.classList.add('ok')},true);
 document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('dm'))t.remove()},true);   // offline or DoppelMe down: the photo, avatar or letter underneath shows
 const whoTags=t=>{const ms=aIds(t).map(member).filter(Boolean);
@@ -928,8 +929,7 @@ function settingsView(){
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
-      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label>
-      <p class="muted small" style="margin-top:14px">Family Board v${APP_VERSION}</p></section>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
       <label class="chk"><input type="checkbox" data-act="cursor" ${ST.cursor?'checked':''} data-fk="s-cursor"> Custom cursor (mouse and trackpad only; never on touch screens)</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="effects" ${ST.effects?'checked':''} data-fk="s-effects"> Click ripples and the sparkle when a task is completed</label>
@@ -946,6 +946,7 @@ function settingsView(){
 }
 
 /* ---- render ---- */
+const verFoot=()=>`<footer class="verline">Family Board v${APP_VERSION}</footer>`;
 function render(){
   const ae=document.activeElement,fk=ae&&ae.dataset&&ae.dataset.fk,sy=window.scrollY;
   const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,cycle:cycleGuard,settings:settingsViewCloud}
@@ -955,10 +956,10 @@ function render(){
   if(CL.on&&CL.minUntil&&Date.now()<CL.minUntil){stage='loading';clearTimeout(render.mt);render.mt=setTimeout(render,CL.minUntil-Date.now()+30)}
   if(CL.on&&stage!=='ready'){
     const gates={loading:cloudLoadingView,gate:cloudGateView,name:cloudNameView,workspace:cloudWorkspaceView};
-    $('#app').innerHTML=headerCloud()+`<main id="main"><div class="sheet" style="margin-top:20px">${(gates[stage]||cloudLoadingView)()}</div></main>`;
+    $('#app').innerHTML=headerCloud()+`<main id="main"><div class="sheet" style="margin-top:20px">${(gates[stage]||cloudLoadingView)()}</div></main>${verFoot()}`;
     return;
   }
-  $('#app').innerHTML=header()+`<main id="main">${tabsNav()}<div class="sheet">${UI.view==='cycle'?'':banners()}${(views[UI.view]||calendarView)()}</div></main>`;
+  $('#app').innerHTML=header()+`<main id="main">${tabsNav()}<div class="sheet">${UI.view==='cycle'?'':banners()}${(views[UI.view]||calendarView)()}</div></main>${verFoot()}`;
   if(fk){const n=$('#app').querySelector('[data-fk="'+CSS.escape(fk)+'"]');if(n)n.focus({preventScroll:true})}
   window.scrollTo(0,sy);
   if(UI.popId){const id=UI.popId;setTimeout(()=>{if(UI.popId===id)UI.popId=''},700)}
@@ -1926,7 +1927,7 @@ function openDoppelDialog(){
     <p class="err" id="dmerr" role="alert" hidden></p>
     <p>No avatar yet? <a href="https://www.doppelme.com/" target="_blank" rel="noopener noreferrer">Make one on doppelme.com</a> (it opens in a new tab). DoppelMe gives you a key when you save it. The key looks like DM123456ABC. Come back and paste it, or a link to your avatar's picture, here. When you are online, everyone sees it in your circle. When DoppelMe cannot load, your photo, avatar or letter shows instead.</p>
     <div class="field"><label for="dm-key">DoppelMe key or picture link</label><input id="dm-key" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(cur)}" placeholder="DM123456ABC"></div>
-    <div style="display:flex;justify-content:center"><span class="av xl" style="--c:#999"><span class="fb" id="dm-fb">?</span><img class="dm" id="dm-img" alt="" hidden></span></div>
+    <div style="display:flex;justify-content:center"><span class="av xl" style="--c:#999"><span class="avin" id="dm-fb">?</span><img class="dm" id="dm-img" alt="" hidden></span></div>
     <p class="muted small">Everyone's phone loads this picture from doppelme.com while you are online.</p>
     <div class="row"><button class="btn" type="submit" id="dm-save" disabled>Save DoppelMe avatar</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
   const inp=$('#dm-key'),img=$('#dm-img'),save=$('#dm-save'),err=$('#dmerr');let key='',okKey='';
@@ -2791,8 +2792,7 @@ const appearancePanels=()=>`
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
-      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label>
-      <p class="muted small" style="margin-top:14px">Family Board v${APP_VERSION}</p></section>
+      <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
       <label class="chk"><input type="checkbox" data-act="cursor" ${ST.cursor?'checked':''} data-fk="s-cursor"> Custom cursor (mouse and trackpad only; never on touch screens)</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="effects" ${ST.effects?'checked':''} data-fk="s-effects"> Click ripples and the sparkle when a task is completed</label>
