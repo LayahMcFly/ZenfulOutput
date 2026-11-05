@@ -195,6 +195,8 @@ button.cyd:focus-visible{outline:3px solid var(--accent);outline-offset:2px}
 .nitem .rs{display:block;margin-top:6px;font-weight:600}
 .nitem small{display:block;color:var(--muted,#6b5e54);margin-top:2px}
 .av img{width:100%;height:100%;object-fit:cover;display:block}
+.av>*{grid-area:1/1}.av .fb{display:grid;place-items:center;width:100%;height:100%}
+.av img.dm{border-radius:50%;border:1px solid #CCC;padding:2px;background:#fff;box-sizing:border-box;opacity:0;transition:opacity .25s}.av.lg img.dm,.av.xl img.dm{padding:5px}.av img.dm.ok{opacity:1}
 .av.lg{width:44px;height:44px;font-size:15px}
 .av.xl{width:84px;height:84px;font-size:28px}
 input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-color:var(--accent)}
@@ -681,7 +683,13 @@ DARKQ.addEventListener&&DARKQ.addEventListener('change',applyTheme);
 const LOGO='<svg viewBox="0 0 32 32" aria-hidden="true"><rect width="32" height="32" rx="4" style="fill:var(--accent)"/><rect x="6" y="9" width="20" height="17" rx="1.5" style="fill:var(--card)"/><rect x="10" y="5" width="3" height="8" rx="1.5" style="fill:var(--card)"/><rect x="19" y="5" width="3" height="8" rx="1.5" style="fill:var(--card)"/><path d="M11 18l4 4 6-7" fill="none" style="stroke:var(--accent)" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>';
 const AVRE=/^data:image\/(jpeg|png|webp);base64,[A-Za-z0-9+\/=]+$/;
 const okAvatar=a=>typeof a==='string'&&a.length<=60000&&AVRE.test(a);   // checked again here, because other people's profiles are untrusted
-const avatar=(m,cls='')=>m?`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>`:`<span class="av none ${cls}" aria-hidden="true">?</span>`;
+const DMRE=/^[A-Za-z0-9]{6,40}$/;
+const avatar=(m,cls='')=>{
+  if(!m)return`<span class="av none ${cls}" aria-hidden="true">?</span>`;
+  const dm=m.dm&&DMRE.test(m.dm)&&navigator.onLine!==false?`<img class="dm" src="https://www.doppelme.com/${cls==='lg'||cls==='xl'?'':'50/'}${esc(m.dm)}/cropb.png" alt="" referrerpolicy="no-referrer" loading="lazy">`:'';
+  return`<span class="av ${cls}" style="--c:${esc(m.color)}" aria-hidden="true"><span class="fb">${okAvatar(m.avatar)?`<img src="${esc(m.avatar)}" alt="">`:esc(initials(m.name))}</span>${dm}</span>`};
+document.addEventListener('load',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('dm'))t.classList.add('ok')},true);
+document.addEventListener('error',e=>{const t=e.target;if(t&&t.tagName==='IMG'&&t.classList.contains('dm'))t.remove()},true);   // offline or DoppelMe down: the photo, avatar or letter underneath shows
 const whoTags=t=>{const ms=aIds(t).map(member).filter(Boolean);
   if(ms.length<=1)return whoTag(ms[0]?ms[0].id:'');
   return`<span class="who">${ms.slice(0,4).map(m=>avatar(m)).join('')}<span>${esc(ms.map(m=>m.name).join(', '))}</span></span>`};
@@ -1435,16 +1443,17 @@ async function loadMemberships(){
 async function cloudLoad(){
   const w=CL.wsId,get=p=>api('/rest/v1/'+p);
   const memQ=async()=>{
-    const q=()=>get('members?workspace_id=eq.'+w+'&select=user_id,role,joined_at,profiles('+(CL.noAvatar?'display_name':'display_name,avatar')+')&order=joined_at');
+    const q=()=>get('members?workspace_id=eq.'+w+'&select=user_id,role,joined_at,profiles('+(CL.noAvatar?'display_name':'display_name,avatar'+(CL.noDoppel?'':',doppelme'))+')&order=joined_at');
     try{return await q()}
-    catch(e){if(!CL.noAvatar&&/avatar/i.test(e.message||'')){CL.noAvatar=true;return await q()}throw e}   // older database without profile photos
+    catch(e){if(!CL.noDoppel&&/doppelme/i.test(e.message||'')){CL.noDoppel=true;return await q()}   // database without step 10
+      if(!CL.noAvatar&&/avatar/i.test(e.message||'')){CL.noAvatar=true;return await q()}throw e}   // older database without profile photos
   };
   const[mem,grp,tsk]=await Promise.all([
     memQ(),
     get('groups?workspace_id=eq.'+w+'&select=*&order=created_at'),
     get('tasks?workspace_id=eq.'+w+'&select=*&order=created_at')]);
   const ws=CL.workspaces.find(x=>x.id===w);
-  const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),avatar:okAvatar(m.profiles&&m.profiles.avatar)?m.profiles.avatar:'',sample:false}));
+  const members=mem.map(m=>({id:m.user_id,name:(m.profiles&&m.profiles.display_name)||'Member',role:m.role,color:colorFor(m.user_id),avatar:okAvatar(m.profiles&&m.profiles.avatar)?m.profiles.avatar:'',dm:m.profiles&&DMRE.test(m.profiles.doppelme||'')?m.profiles.doppelme:'',sample:false}));
   if(!members.some(m=>m.id===CL.session.user_id))throw new Error('You are no longer a member of this workspace.');
   const old=new Map(((D&&D.tasks)||[]).map(t=>[t.id,t.history]));
   const mset=new Set(members.map(m=>m.id));
@@ -1855,7 +1864,7 @@ function openPfpMenu(){
   const now={letter:'your letter',photo:'your photo',avatar:'your avatar'}[cur];
   openDlg(`<div class="dbody">${dhead('Profile picture')}
     <div style="display:flex;justify-content:center">${avatar(m,'xl')}</div>
-    <p style="text-align:center">Right now everyone sees ${now}. Your photo and avatar stay saved on this device, so you can switch back without choosing them again.</p>
+    <p style="text-align:center">Right now everyone sees ${now}${m.dm?', and your DoppelMe avatar on top of it while they are online':''}. Your photo and avatar stay saved on this device, so you can switch back without choosing them again.</p>
     <div style="display:grid;gap:8px">
       ${cur!=='letter'?b('pfpletter','Use my letter'):''}
       ${hasPhoto&&cur!=='photo'?b('pfpusephoto','Use my saved photo',false):''}
@@ -1863,8 +1872,34 @@ function openPfpMenu(){
       ${b('pfpnewphoto',hasPhoto?'Choose a different photo':'Choose a photo')}
       ${hasAv&&cur!=='avatar'?b('pfpuseavatar','Use my saved avatar',false):''}
       ${b('avatar',hasAv?'Customize my avatar':'Build an avatar')}
+      ${b('pfpdoppel',m.dm?'Change my DoppelMe key':'Use a DoppelMe avatar when online')}
+      ${m.dm?b('pfpdoppeloff','Stop using DoppelMe'):''}
       ${hasPhoto||hasSrc?b('pfpforget','Remove my photo'):''}
     </div></div>`);
+}
+const dmKey=s=>{s=(s||'').trim();const m=s.match(/doppelme\.com\/(?:\d+\/)?([A-Za-z0-9]{6,40})(?:\/|$)/i);if(m)return m[1];return DMRE.test(s)?s:''};
+function openDoppelDialog(){
+  if(CL.noDoppel){toast('Your database needs a small update. Run supabase-step-10-doppelme.sql in Supabase.',true);return}
+  const cur=me().dm||'';
+  openDlg(`<form id="dmform" class="dbody" novalidate>${dhead('DoppelMe avatar')}
+    <p class="err" id="dmerr" role="alert" hidden></p>
+    <p>Make your avatar on doppelme.com, then paste its key (a code like DM102009LPH) or a link to its picture here. When you are online, everyone sees it in your circle. When DoppelMe cannot load, your photo, avatar or letter shows instead.</p>
+    <div class="field"><label for="dm-key">DoppelMe key or picture link</label><input id="dm-key" type="text" autocomplete="off" autocapitalize="off" spellcheck="false" value="${esc(cur)}" placeholder="DM102009LPH"></div>
+    <div style="display:flex;justify-content:center"><span class="av xl" style="--c:#999"><span class="fb" id="dm-fb">?</span><img class="dm" id="dm-img" alt="" hidden></span></div>
+    <p class="muted small">Everyone's phone loads this picture from doppelme.com while you are online.</p>
+    <div class="row"><button class="btn" type="submit" id="dm-save" disabled>Save DoppelMe avatar</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  const inp=$('#dm-key'),img=$('#dm-img'),save=$('#dm-save'),err=$('#dmerr');let key='',okKey='';
+  const check=()=>{
+    key=dmKey(inp.value);if(key&&key===okKey){save.disabled=false;err.hidden=true;return}save.disabled=true;err.hidden=true;img.classList.remove('ok');img.hidden=true;
+    if(!key){if(inp.value.trim()){err.textContent='That does not look like a DoppelMe key. It is letters and numbers, like DM102009LPH.';err.hidden=false}return}
+    img.onload=()=>{okKey=key;img.hidden=false;img.classList.add('ok');save.disabled=false};
+    img.onerror=()=>{img.hidden=true;err.textContent='DoppelMe did not show a picture for that key. Check it, and check that you are online.';err.hidden=false};
+    img.referrerPolicy='no-referrer';img.src='https://www.doppelme.com/'+encodeURIComponent(key)+'/cropb.png';
+  };
+  inp.addEventListener('change',check);inp.addEventListener('input',()=>{clearTimeout(check.t);check.t=setTimeout(check,500)});
+  if(cur)check();
+  $('#dmform').addEventListener('submit',ev=>{ev.preventDefault();if(!key||save.disabled)return;
+    cloudDo(()=>rpc('set_doppelme',{p_key:key}),'DoppelMe avatar saved.').then(ok=>{if(ok)closeDlg()})});
 }
 async function pfpSet(data,msg,kind){
   const ok=await cloudDo(()=>rpc('set_avatar',{p_data:data}),msg);
@@ -2244,6 +2279,8 @@ async function cloudClick(a,b,id){
     case'photo':openPhotoDialog();return true;
     case'avatar':openAvatarBuilder();return true;
     case'pfp':openPfpMenu();return true;
+    case'pfpdoppel':openDoppelDialog();return true;
+    case'pfpdoppeloff':{const ok=await cloudDo(()=>rpc('set_doppelme',{p_key:null}),'DoppelMe avatar turned off.');if(ok)closeDlg();return true}
     case'pfpletter':pfpSet(null,'Back to your letter.','letter');return true;
     case'pfpusephoto':pfpSet(lsGet(PK.out),'Using your saved photo.','photo');return true;
     case'pfpuseavatar':pfpSet(lsGet(PK.aout),'Using your saved avatar.','avatar');return true;
