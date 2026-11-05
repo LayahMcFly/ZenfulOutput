@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light" data-style="neutral">
+<html lang="en" data-theme="light" data-style="neutral" data-breadbtn="on">
 <!--
   Family Board
   Copyright (C) 2026 Leia
@@ -71,22 +71,22 @@ html[data-style=boyish]:not([data-theme=dark]){--paper:#dde3ea;--paper-lo:#cbd3d
 html[data-style=boyish][data-theme=dark]{--paper:#0d1117;--paper-lo:#131a22;--linen:#161e28;--card:#1a232e;--field:#121921;--ink:#e6edf3;--ink-soft:#9fb0c3;--walnut:#79a8e0;--caramel:#5d7fa3;--rust:#4aa3ff;--line:#2c3a4a;--shadow:rgba(0,0,0,.65);--accent:#4aa3ff;--on-accent:#07131f;--wash:rgba(74,163,255,.14);--wknd:#151d27;--today:#14304d;--hole:#080b10;--coil:#6f8299;--grid:transparent;--ok:#6fd08c;--warn:#ff8f84;--mark:#ff9a6b;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
 
 /* Bread mode: the original warm-paper look, with toasted loaf buttons (crust border, crumb dots, two bumps on top). */
-html[data-style=bread] .btn:not(.quiet):not(.bare){position:relative;isolation:isolate;margin-top:4px;--crust:#7a4318;--toast1:#e6b068;--toast2:#c9843a;--toast3:#a9622a;--bt:#3a1f0d;
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare){position:relative;isolation:isolate;margin-top:4px;--crust:#7a4318;--toast1:#e6b068;--toast2:#c9843a;--toast3:#a9622a;--bt:#3a1f0d;
   background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),radial-gradient(circle at 47% 70%,rgba(90,45,15,.28) 0 1.4px,transparent 2.2px),radial-gradient(circle at 78% 30%,rgba(255,240,200,.5) 0 1.6px,transparent 2.4px),radial-gradient(circle at 90% 72%,rgba(90,45,15,.25) 0 1.3px,transparent 2.1px),linear-gradient(var(--toast1),var(--toast2) 62%,var(--toast3));
   color:var(--bt);border:2px solid var(--crust);border-radius:20px 20px 12px 12px;text-shadow:0 1px 0 rgba(255,235,190,.55);
-  box-shadow:inset 0 3px 0 rgba(255,240,200,.6),inset 0 -3px 0 rgba(90,45,15,.3),0 3px 0 var(--crust),0 6px 8px -4px var(--shadow)}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::before,html[data-style=bread] .btn:not(.quiet):not(.bare)::after{content:"";position:absolute;top:-6px;height:11px;width:26%;z-index:-1;background:var(--toast1);border:2px solid var(--crust);border-bottom:0;border-radius:12px 12px 0 0}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::before{left:14%}
-html[data-style=bread] .btn:not(.quiet):not(.bare)::after{right:14%}
-html[data-style=bread] .btn:not(.quiet):not(.bare).soft{--toast1:#f6e2b4;--toast2:#ecc98a;--toast3:#dfae66;color:#5a3216}
-html[data-style=bread] .btn.soft:not(.quiet):not(.bare):hover{background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),linear-gradient(#fbeec9,#f0d296 62%,#e4b872)}
-html[data-style=bread] .btn:not(.quiet):not(.bare).danger{--toast1:#b5562c;--toast2:#933e1c;--toast3:#762f14;--bt:#fff1dc;--crust:#4d1f0a;text-shadow:0 1px 0 rgba(0,0,0,.35)}
-html[data-style=bread] .btn:not(.quiet):not(.bare)[aria-pressed=true],html[data-style=bread] .btn.soft:not(.quiet):not(.bare)[aria-pressed=true]{--toast1:#c98a3e;--toast2:#a9692a;--toast3:#8a5120;--bt:#fff1dc;text-shadow:0 1px 0 rgba(0,0,0,.3)}
-html[data-style=bread] .btn:hover{filter:brightness(1.06)}
-html[data-style=bread] .btn:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(255,240,200,.5),inset 0 -2px 0 rgba(90,45,15,.3),0 1px 0 var(--crust)}
-html[data-style=bread] .btn.sm::before,html[data-style=bread] .btn.sm::after{top:-5px;height:9px}
-html[data-style=bread] .seg .btn,html[data-style=bread] .seg .btn::before,html[data-style=bread] .seg .btn::after{border-radius:12px}
-@media print{html[data-style=bread] .btn{display:none}}
+  box-shadow:inset 0 -3px 0 rgba(90,45,15,.3),0 3px 0 var(--crust),0 6px 8px -4px var(--shadow)}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare)::before,html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare)::after{content:"";position:absolute;top:-8px;height:8px;width:30%;box-sizing:border-box;z-index:-1;background:var(--toast1);border:2px solid var(--crust);border-bottom:0;border-radius:50% 50% 0 0 / 100% 100% 0 0}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare)::before{left:14%}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare)::after{right:14%}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare).soft{--toast1:#f6e2b4;--toast2:#ecc98a;--toast3:#dfae66;color:#5a3216}
+html[data-style=bread][data-breadbtn=on] .btn.soft:not(.quiet):not(.bare):hover{background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),linear-gradient(#fbeec9,#f0d296 62%,#e4b872)}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare).danger{--toast1:#b5562c;--toast2:#933e1c;--toast3:#762f14;--bt:#fff1dc;--crust:#4d1f0a;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+html[data-style=bread][data-breadbtn=on] .btn:not(.quiet):not(.bare)[aria-pressed=true],html[data-style=bread][data-breadbtn=on] .btn.soft:not(.quiet):not(.bare)[aria-pressed=true]{--toast1:#c98a3e;--toast2:#a9692a;--toast3:#8a5120;--bt:#fff1dc;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+html[data-style=bread][data-breadbtn=on] .btn:hover{filter:brightness(1.06)}
+html[data-style=bread][data-breadbtn=on] .btn:active{transform:translateY(2px);box-shadow:inset 0 -2px 0 rgba(90,45,15,.3),0 1px 0 var(--crust)}
+html[data-style=bread][data-breadbtn=on] .btn.sm::before,html[data-style=bread][data-breadbtn=on] .btn.sm::after{top:-7px;height:7px}
+html[data-style=bread][data-breadbtn=on] .seg .btn,html[data-style=bread][data-breadbtn=on] .seg .btn::before,html[data-style=bread][data-breadbtn=on] .seg .btn::after{border-radius:12px}
+@media print{html[data-style=bread][data-breadbtn=on] .btn{display:none}}
 html[data-style=neutral] .sheet::before,html[data-style=boyish] .sheet::before{display:none}
 html[data-style=neutral] .sheet,html[data-style=boyish] .sheet{padding-top:28px}
 html[data-style=boyish] h1,html[data-style=boyish] h2,html[data-style=boyish] h3,html[data-style=boyish] h4{font-weight:700;letter-spacing:-.01em}
@@ -442,7 +442,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.1';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.0.3';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -458,7 +458,7 @@ const CL={notes:[],noNotes:false,noAvatar:false,on:false,cfg:null,stage:'loading
    2. Data model, validation, storage
    ===================================================================== */
 let D=null;                 // workspace data
-let ST={style:'neutral',theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
+let ST={breadBtns:true,style:'neutral',theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
 let storageOK=true, loadNote='';
 const UI={view:'calendar',month:new Date(new Date().getFullYear(),new Date().getMonth(),1),f:{person:'all',group:'all',status:'all'},gid:'',popId:''};
 
@@ -710,6 +710,7 @@ function applyTheme(){
   document.documentElement.dataset.theme=dark?'dark':'light';
   if(!['girly','neutral','boyish','bread'].includes(ST.style))ST.style='neutral';
   document.documentElement.dataset.style=ST.style;
+  document.documentElement.dataset.breadbtn=ST.breadBtns===false?'off':'on';
   {const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||m.content}
   document.documentElement.classList.toggle('large',!!ST.large);
 }
@@ -928,6 +929,7 @@ function settingsView(){
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
+      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns!==false?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
@@ -1227,6 +1229,7 @@ document.addEventListener('change',async e=>{
   const a=t.dataset.act;if(!a)return;
   if(a==='filter'){UI.f[t.dataset.k]=t.value;render();return}
   if(a==='theme'){ST.theme=t.value;saveSettings();applyTheme();render();return}
+  if(a==='breadbtn'){ST.breadBtns=t.checked;saveSettings();applyTheme();render();return}
   if(a==='style'){ST.style=t.value;saveSettings();applyTheme();render();return}
   if(a==='crossoff'){ST.crossOff=t.checked;saveSettings();render();return}
   if(a==='large'){ST.large=t.checked;saveSettings();applyTheme();render();return}
@@ -2791,6 +2794,7 @@ const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
+      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns!==false?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
