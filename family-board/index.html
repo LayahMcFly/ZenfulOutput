@@ -147,6 +147,7 @@ html[data-theme=dark] .err{background:#4a2a20;color:#ffd9c9}
 /* avatars, chips */
 .av{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--c,#6f4a33);color:#fff;font:700 11px/1 var(--label);flex:none}
 .av{overflow:hidden}
+.avrow{display:flex;flex-wrap:wrap;gap:10px}.avsw{position:relative;width:36px;height:36px}.avsw input{position:absolute;inset:0;width:100%;height:100%;margin:0;opacity:0;cursor:pointer}.avsw span{display:block;width:100%;height:100%;border-radius:50%;background:var(--c);border:2px solid rgba(0,0,0,.25);box-sizing:border-box}.avsw input:checked+span{outline:3px solid currentColor;outline-offset:2px}.avsw input:focus-visible+span{outline:3px solid #06c;outline-offset:2px}.avprev{width:160px;height:160px;border-radius:50%;overflow:hidden;display:block;margin:0 auto}
 .cyd{aspect-ratio:1;display:flex;align-items:center;justify-content:center;border:1px solid var(--line);border-radius:6px;font:600 14px var(--label);background:var(--field);color:var(--ink)}
 .cyd.on{border-color:transparent}
 .dz{border:2px solid var(--warn);border-radius:8px;padding:16px 18px;margin-top:32px}
@@ -1734,6 +1735,83 @@ function drawCrop(cv,size){
   ctx.imageSmoothingQuality='high';
   ctx.drawImage(im,Math.max(0,sx),Math.max(0,sy),sz,sz,0,0,size,size);
 }
+const AV={skin:['#f9d9c3','#f1c27d','#e0a370','#c68642','#8d5524','#5b3a24'],
+  hair:['#2b1d14','#5a3825','#8a5a2b','#c9a45c','#b0382e','#555555','#7a4bd1','#2f6fd1','#e86fa0','#f2f2f2'],
+  bg:['#f6d6d6','#f8e3b8','#d9ecc8','#c9e8f0','#d8d6f3','#f3d3ea','#e2e2e2','#ffd9a8'],
+  shirt:['#d85a5a','#e9a23b','#4cae7a','#3b8fd8','#7a5bd0','#d86aa8','#4a4a55','#f2f2f2'],
+  style:[['short','Short'],['long','Long'],['curly','Curly'],['bun','Bun'],['buzz','Buzz cut'],['scarf','Headscarf'],['none','No hair']],
+  eyes:[['dots','Round'],['big','Big'],['happy','Happy'],['lashes','Lashes'],['sleepy','Sleepy']],
+  mouth:[['smile','Smile'],['grin','Grin'],['open','Open'],['flat','Calm']],
+  extra:[['none','None'],['glasses','Glasses'],['shades','Sunglasses'],['freckles','Freckles'],['blush','Blush']]};
+const avDefault=()=>({skin:1,hair:1,bg:3,shirt:3,style:'short',eyes:'dots',mouth:'smile',extra:'none'});
+function avatarSVG(c){
+  const skin=AV.skin[c.skin]||AV.skin[0],hair=AV.hair[c.hair]||AV.hair[0],bg=AV.bg[c.bg]||AV.bg[0],shirt=AV.shirt[c.shirt]||AV.shirt[0];
+  const st=c.style,scarf=st==='scarf';let s='';
+  s+=`<rect width="100" height="100" fill="${bg}"/>`;
+  s+=`<path d="M12 100C12 80 30 74 50 74C70 74 88 80 88 100Z" fill="${shirt}"/>`;
+  if(!scarf)s+=`<rect x="42" y="58" width="16" height="20" rx="6" fill="${skin}"/><rect x="42" y="58" width="16" height="20" rx="6" fill="#000" opacity=".1"/>`;
+  if(st==='long')s+=`<path d="M24 46C22 20 38 14 50 14C62 14 78 20 76 46L80 86C70 90 64 82 64 72L36 72C36 82 30 90 20 86Z" fill="${hair}"/>`;
+  if(st==='bun')s+=`<circle cx="50" cy="12" r="10" fill="${hair}"/>`;
+  if(st==='curly')s+=[[30,32],[38,22],[50,18],[62,22],[70,32],[25,46],[75,46]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="11" fill="${hair}"/>`).join('');
+  if(scarf)s+=`<path d="M50 12C29 12 21 29 21 48C21 62 25 72 16 88L84 88C75 72 79 62 79 48C79 29 71 12 50 12Z" fill="${hair}"/><path d="M50 12C29 12 21 29 21 48C21 62 25 72 16 88L84 88C75 72 79 62 79 48C79 29 71 12 50 12Z" fill="#000" opacity=".08"/>`;
+  if(!scarf)s+=`<circle cx="28" cy="49" r="4.5" fill="${skin}"/><circle cx="72" cy="49" r="4.5" fill="${skin}"/>`;
+  s+=scarf?`<ellipse cx="50" cy="49" rx="17" ry="21" fill="${skin}"/>`:`<ellipse cx="50" cy="46" rx="22" ry="25" fill="${skin}"/>`;
+  if(st==='short'||st==='long'||st==='bun')s+=`<path d="M27 46C24 22 38 15 50 15C64 15 76 22 73 46C68 32 58 26 46 28C38 30 30 36 27 46Z" fill="${hair}"/>`;
+  if(st==='buzz')s+=`<path d="M28 40C27 24 38 20 50 20C62 20 73 24 72 40C68 31 60 29 50 29C40 29 32 31 28 40Z" fill="${hair}"/>`;
+  if(st==='curly')s+=[[34,29],[44,24],[56,24],[66,29]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="9" fill="${hair}"/>`).join('');
+  if(scarf)s+=`<path d="M31 66C40 78 60 78 69 66L74 90L26 90Z" fill="${hair}"/><path d="M31 66C40 78 60 78 69 66L74 90L26 90Z" fill="#000" opacity=".12"/>`;
+  if(scarf)s+=`<path d="M32 40C34 29 42 26 50 26C58 26 66 29 68 40C62 33 56 32 50 32C44 32 38 33 32 40Z" fill="${hair}"/>`;
+  const ey=scarf?48:47,ink='#2b2b2b';
+  if(c.eyes==='dots')s+=`<circle cx="41" cy="${ey}" r="2.6" fill="${ink}"/><circle cx="59" cy="${ey}" r="2.6" fill="${ink}"/>`;
+  if(c.eyes==='big')s+=[41,59].map(x=>`<circle cx="${x}" cy="${ey}" r="3.6" fill="${ink}"/><circle cx="${x+1.2}" cy="${ey-1.2}" r="1.1" fill="#fff"/>`).join('');
+  if(c.eyes==='happy')s+=`<path d="M37 ${ey+2}Q41 ${ey-4} 45 ${ey+2}M55 ${ey+2}Q59 ${ey-4} 63 ${ey+2}" stroke="${ink}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  if(c.eyes==='lashes')s+=[41,59].map(x=>`<circle cx="${x}" cy="${ey}" r="2.6" fill="${ink}"/><path d="M${x-4} ${ey-3}L${x-6} ${ey-5}M${x+4} ${ey-3}L${x+6} ${ey-5}M${x} ${ey-4}L${x} ${ey-6.5}" stroke="${ink}" stroke-width="1.4" stroke-linecap="round"/>`).join('');
+  if(c.eyes==='sleepy')s+=`<path d="M37 ${ey}H45M55 ${ey}H63" stroke="${ink}" stroke-width="2.2" stroke-linecap="round"/>`;
+  const my=scarf?60:59,mc='#7a2e2e';
+  if(c.mouth==='smile')s+=`<path d="M43 ${my-2}Q50 ${my+6} 57 ${my-2}" stroke="${mc}" stroke-width="2.2" fill="none" stroke-linecap="round"/>`;
+  if(c.mouth==='grin')s+=`<path d="M42 ${my-3}Q50 ${my+10} 58 ${my-3}Z" fill="#fff" stroke="${mc}" stroke-width="2" stroke-linejoin="round"/>`;
+  if(c.mouth==='open')s+=`<ellipse cx="50" cy="${my}" rx="4" ry="3.4" fill="${mc}"/>`;
+  if(c.mouth==='flat')s+=`<path d="M44 ${my}H56" stroke="${mc}" stroke-width="2.2" stroke-linecap="round"/>`;
+  if(c.extra==='glasses')s+=`<circle cx="41" cy="${ey}" r="7" fill="none" stroke="#333" stroke-width="2"/><circle cx="59" cy="${ey}" r="7" fill="none" stroke="#333" stroke-width="2"/><path d="M48 ${ey}H52" stroke="#333" stroke-width="2"/>`;
+  if(c.extra==='shades')s+=`<rect x="33" y="${ey-5}" width="16" height="11" rx="4" fill="#222"/><rect x="51" y="${ey-5}" width="16" height="11" rx="4" fill="#222"/><path d="M49 ${ey-1}H51" stroke="#222" stroke-width="2"/>`;
+  if(c.extra==='freckles')s+=[[36,54],[40,56],[35,58],[60,56],[64,54],[65,58]].map(p=>`<circle cx="${p[0]}" cy="${p[1]}" r="1" fill="#9a5b36" opacity=".7"/>`).join('');
+  if(c.extra==='blush')s+=`<circle cx="35" cy="55" r="4" fill="#ff7a9a" opacity=".35"/><circle cx="65" cy="55" r="4" fill="#ff7a9a" opacity=".35"/>`;
+  return`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100" width="96" height="96">${s}</svg>`;
+}
+function openAvatarBuilder(){
+  if(CL.noAvatar){toast(dbHint('avatar'),true);return}
+  let c=avDefault();try{const k=JSON.parse(localStorage.getItem('familyBoard.avatar.v1')||'null');if(k&&typeof k==='object')c=Object.assign(c,k)}catch{}
+  const sw=(name,label,list)=>`<fieldset class="field" style="border:0;padding:0;margin:0"><legend class="muted small" style="padding:0">${label}</legend><div class="avrow">${list.map((col,i)=>`<label class="avsw"><input type="radio" name="av-${name}" value="${i}" aria-label="${label} ${i+1}" ${c[name]===i?'checked':''}><span style="--c:${col}"></span></label>`).join('')}</div></fieldset>`;
+  const sel=(name,label,list)=>`<div class="field"><label for="av-${name}">${label}</label><select id="av-${name}">${list.map(o=>`<option value="${o[0]}" ${c[name]===o[0]?'selected':''}>${o[1]}</option>`).join('')}</select></div>`;
+  openDlg(`<form id="avform" class="dbody" novalidate>${dhead('Build your avatar')}
+    <p class="err" id="averr" role="alert" hidden></p>
+    <div id="av-prev" class="avprev" role="img" aria-label="Preview of your avatar"></div>
+    <div class="row" style="justify-content:center"><button type="button" class="btn soft sm" data-act="avrandom">Surprise me</button></div>
+    ${sel('style','Hair',AV.style)}${sw('hair','Hair or headscarf color',AV.hair)}${sw('skin','Skin tone',AV.skin)}${sel('eyes','Eyes',AV.eyes)}${sel('mouth','Mouth',AV.mouth)}${sel('extra','Extra',AV.extra)}${sw('shirt','Shirt color',AV.shirt)}${sw('bg','Background',AV.bg)}
+    <p class="muted small">Everyone in your workspaces can see it. You can switch back to your letter any time with Remove photo.</p>
+    <div class="row"><button class="btn" type="submit">Save avatar</button><button type="button" class="btn soft" data-act="photo">Use a photo instead</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  const f=$('#avform'),prev=$('#av-prev');
+  const read=()=>{['hair','skin','shirt','bg'].forEach(k=>{const r=f.querySelector(`input[name=av-${k}]:checked`);if(r)c[k]=+r.value});['style','eyes','mouth','extra'].forEach(k=>{c[k]=$('#av-'+k).value})};
+  const draw=()=>{prev.innerHTML=avatarSVG(c).replace('width="96" height="96"','width="160" height="160"')};
+  const push=()=>{['hair','skin','shirt','bg'].forEach(k=>{const r=f.querySelector(`input[name=av-${k}][value="${c[k]}"]`);if(r)r.checked=true});['style','eyes','mouth','extra'].forEach(k=>{$('#av-'+k).value=c[k]})};
+  f.addEventListener('change',()=>{read();draw()});
+  f._random=()=>{const pick=a=>a[Math.floor(Math.random()*a.length)];c={skin:Math.floor(Math.random()*AV.skin.length),hair:Math.floor(Math.random()*AV.hair.length),bg:Math.floor(Math.random()*AV.bg.length),shirt:Math.floor(Math.random()*AV.shirt.length),style:pick(AV.style)[0],eyes:pick(AV.eyes)[0],mouth:pick(AV.mouth)[0],extra:pick(AV.extra)[0]};push();draw()};
+  draw();
+  f.addEventListener('submit',ev=>{
+    ev.preventDefault();read();
+    const img=new Image(),bad=m=>{const e=$('#averr');e.textContent=m;e.hidden=false};
+    img.onload=()=>{
+      const out=document.createElement('canvas');out.width=out.height=96;out.getContext('2d').drawImage(img,0,0,96,96);
+      let q=.9,data=out.toDataURL('image/jpeg',q);
+      while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
+      if(!okAvatar(data))return bad('That avatar could not be prepared. Try again.');
+      try{localStorage.setItem('familyBoard.avatar.v1',JSON.stringify(c))}catch{}
+      cloudDo(()=>rpc('set_avatar',{p_data:data}),'Avatar saved.').then(ok=>{if(ok)closeDlg()});
+    };
+    img.onerror=()=>bad('Your browser could not draw the avatar. Try the photo option instead.');
+    img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(avatarSVG(c));
+  });
+}
 function openPhotoDialog(){
   if(CL.noAvatar){toast(dbHint('avatar'),true);return}
   PH.im=null;
@@ -1746,7 +1824,7 @@ function openPhotoDialog(){
       <div class="field"><label for="ph-zoom">Zoom</label><input id="ph-zoom" type="range" min="1" max="3" step="0.05" value="1"></div>
       <div class="two"><div class="field"><label for="ph-x">Move left or right</label><input id="ph-x" type="range" min="-1" max="1" step="0.02" value="0"></div>
       <div class="field"><label for="ph-y">Move up or down</label><input id="ph-y" type="range" min="-1" max="1" step="0.02" value="0"></div></div></div>
-    <div class="row"><button class="btn" type="submit" id="ph-save" disabled>Save photo</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+    <div class="row"><button class="btn" type="submit" id="ph-save" disabled>Save photo</button><button type="button" class="btn soft" data-act="avatar">Build an avatar instead</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
   const err=$('#pherr'),edit=$('#ph-edit'),cv=$('#ph-cv');
   const bad=m=>{err.textContent=m;err.hidden=false};
   const redraw=()=>drawCrop(cv,192);
@@ -2105,8 +2183,10 @@ async function cloudClick(a,b,id){
     case'dismisserr':CL.err='';render();return true;
     case'mydisplayname':openMyName();return true;
     case'photo':openPhotoDialog();return true;
+    case'avatar':openAvatarBuilder();return true;
+    case'avrandom':{const f=$('#avform');if(f&&f._random)f._random();return true}
     case'rmphoto':{
-      const ok=await confirmBox('Remove your photo?','Your initials will show instead, for everyone in your workspaces.','Remove photo',true);
+      const ok=await confirmBox('Go back to your letter?','Your initials will show instead of your photo or avatar, for everyone in your workspaces.','Use my letter',true);
       if(ok)await cloudDo(()=>rpc('set_avatar',{p_data:null}),'Photo removed.');
       return true;
     }
@@ -2515,7 +2595,7 @@ function cloudMembersView(){
       ${D.members.map(m=>{
         const self=m.id===u.id,canRm=self||isOwner||(mg&&m.role!=='owner'),canAsk=!mg&&!self&&m.role!=='owner'&&!CL.noReq;
         return`<div class="mem">${avatar(m,'lg')}<div><div class="nm">${esc(m.name)}${self?' (you)':''}</div><div class="muted small">${roleLabel(m.role)}</div></div>
-          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}${canAsk?`<button class="btn soft sm" data-act="reqremove" data-id="${esc(m.id)}" data-fk="rq-${esc(m.id)}" aria-label="Ask an owner to remove ${esc(m.name)}">Ask to remove</button>`:''}</div></div>`}).join('')}
+          <div class="row">${self?'<button class="btn soft sm" data-act="photo" data-fk="myph">'+(m.avatar?'Change photo':'Add photo')+'</button><button class="btn soft sm" data-act="avatar" data-fk="myav">Build avatar</button><button class="btn soft sm" data-act="mydisplayname" data-fk="mydn">Change my name</button>':''}${isOwner&&!self?`<button class="btn soft sm" data-act="editmember" data-id="${esc(m.id)}" data-fk="em-${esc(m.id)}" aria-label="Change role for ${esc(m.name)}">Change role</button>`:''}${canRm?`<button class="btn soft sm" data-act="rmmember" data-id="${esc(m.id)}" data-fk="rm-${esc(m.id)}" aria-label="${self?'Leave workspace':'Remove '+esc(m.name)}">${self?'Leave workspace':'Remove'}</button>`:''}${canAsk?`<button class="btn soft sm" data-act="reqremove" data-id="${esc(m.id)}" data-fk="rq-${esc(m.id)}" aria-label="Ask an owner to remove ${esc(m.name)}">Ask to remove</button>`:''}</div></div>`}).join('')}
       <p class="muted small" style="margin-top:12px">Everyone signs in with their own email address. Names on completed tasks come from each person’s own sign-in, not from a menu.</p></section>
     <section class="panel"><h3>Invitations</h3>
       ${mg?`<p>Create a single-use link and send it to the person yourself, by text or email. <strong>Nothing is emailed from this page.</strong> Each link works once and expires after 7 days.</p>
@@ -2567,7 +2647,7 @@ function settingsViewCloud(){
     <section class="panel"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
-        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Remove photo</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
+        <div class="row" style="margin-top:10px"><button class="btn" data-act="photo" data-fk="ph">${me().avatar?'Change photo':'Add a photo'}</button><button class="btn" data-act="avatar" data-fk="av">Build an avatar</button>${me().avatar?'<button class="btn soft" data-act="rmphoto" data-fk="phrm">Use my letter instead</button>':''}<button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
       <div style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line)">${privateFields()}</div></section>
     <section class="panel"><h3>Assignment alerts</h3>
       ${CL.noNotes?'<p class="err">Your database needs a small update before alerts work. Run supabase-update-notifications.sql in Supabase.</p>':`
@@ -2610,4 +2690,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-</html>
+  </html>
