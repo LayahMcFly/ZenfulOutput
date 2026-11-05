@@ -249,6 +249,16 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 .stat.ok{color:var(--ok)} .stat.late{color:var(--warn)}
 
 /* panels */
+/* Animated panels mark the places where you can customize how Family Board looks (Appearance and Your profile). */
+@property --ga{syntax:'<angle>';initial-value:0deg;inherits:false}
+.panel.glow{--dot:var(--wash);position:relative;border:2px solid transparent;
+  background:radial-gradient(circle at 6px 6px,var(--dot) 0 2.5px,transparent 3px) 0 0/24px 24px padding-box,radial-gradient(circle at 18px 18px,var(--dot) 0 1.6px,transparent 2.2px) 0 0/24px 24px padding-box,linear-gradient(var(--linen),var(--linen)) padding-box,conic-gradient(from var(--ga),var(--accent),var(--caramel),var(--rust),var(--caramel),var(--accent)) border-box;
+  animation:glowspin 6s linear infinite,glowpulse 3s ease-in-out infinite,glowpan 7s linear infinite}
+@supports (background:color-mix(in srgb,red 20%,transparent)){.panel.glow{--dot:color-mix(in srgb,var(--accent) 30%,transparent)}}
+@keyframes glowpan{to{background-position:24px 24px,24px 24px,0 0,0 0}}
+.panel.glow::after{content:"Customize";position:absolute;top:-10px;right:14px;background:var(--accent);color:var(--on-accent);font:700 10px/1 var(--label);letter-spacing:.12em;text-transform:uppercase;padding:4px 8px}
+@keyframes glowspin{to{--ga:360deg}}
+@keyframes glowpulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px -2px var(--accent)}}
 .panel{background:var(--linen);border:1px solid var(--line);padding:18px 20px;margin-top:20px}
 .panel h2{font-size:28px;margin-bottom:10px}
 .panel h3+.muted,.panel h3+p{margin-bottom:12px}
@@ -445,7 +455,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.5';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.0.7';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -929,7 +939,7 @@ function settingsView(){
       <div class="row" style="margin-top:14px"><button class="btn soft" data-act="newws" data-fk="newws2">Create a new empty workspace</button></div>
       <p class="muted small" style="margin-top:8px">The workspace lives only in this browser. It is private to this device, not protected by a password.</p></section>
     ${privatePanel()}
-    <section class="panel"><h3>Appearance</h3><div class="two">
+    <section class="panel glow"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns===true?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
@@ -2794,7 +2804,7 @@ function cloudMembersView(){
         ${CL.noReq?'':'<div class="row" style="margin:12px 0"><button class="btn" data-act="reqinvite" data-fk="rqinv">Ask an owner for an invite link</button></div>'}`}</section>${myRequestsHTML()}`;
 }
 const appearancePanels=()=>`
-    <section class="panel"><h3>Appearance</h3><div class="two">
+    <section class="panel glow"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns===true?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
@@ -2835,7 +2845,7 @@ function settingsViewCloud(){
     <section class="panel"><h3>Sign-in password</h3>
       <p>Set or change the password you use to sign in. This lets you skip the emailed link.</p>
       <div class="row"><button class="btn soft" data-act="setpw" data-fk="setpw">Set or change password</button></div></section>
-    <section class="panel"><h3>Your profile</h3>
+    <section class="panel glow"><h3>Your profile</h3>
       <div class="mem" style="grid-template-columns:auto 1fr">${avatar(me(),'xl')}<div><div class="nm">${esc(me().name)}</div>
         <p class="muted small">Everyone in your workspaces sees your name and photo. When you change them, others see the update within about 20 seconds.</p>
         <div class="row" style="margin-top:10px"><button class="btn" data-act="pfp" data-fk="ph">Profile picture</button><button class="btn soft" data-act="mydisplayname" data-fk="mydn2">Change my name</button></div></div></div>
