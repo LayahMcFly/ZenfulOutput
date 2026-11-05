@@ -1546,9 +1546,9 @@ function updateBadge(){
 async function pollNotes(){
   if(!CL.on||CL.stage!=='ready'||CL.noNotes||!CL.session)return;
   let rows;
-  try{rows=await api('/rest/v1/notifications?select=*&order=created_at.desc&limit=30')}
+  try{rows=await api('/rest/v1/notifications?select=*&created_at=gte.'+encodeURIComponent(new Date(Date.now()-7*864e5).toISOString())+'&order=created_at.desc&limit=30')}
   catch(e){if(/notifications/i.test(e.message||'')){CL.noNotes=true;render()}return}
-  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id&&NKINDS.includes(n.kind));
+  CL.notes=(rows||[]).filter(n=>typeof n.task_title==='string'&&n.id&&NKINDS.includes(n.kind)&&!(n.created_at&&Date.now()-new Date(n.created_at).getTime()>7*864e5));
   try{if(!CL.noReq)CL.reqs=await api('/rest/v1/change_requests?select=*&order=created_at.desc&limit=40')}catch(e){if(/change_requests/i.test(e.message||''))CL.noReq=true}
   let seen=null;try{seen=JSON.parse(localStorage.getItem(NSEEN)||'null')}catch{}
   const first=!Array.isArray(seen);seen=Array.isArray(seen)?seen:[];
