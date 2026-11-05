@@ -1,0 +1,1412 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="lavender">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta name="referrer" content="no-referrer">
+<meta name="theme-color" content="#ecdfc8">
+<title>My Journal</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='%236f4a33'/%3E%3Crect x='6' y='3' width='23' height='26' rx='2' fill='%23f7efdf'/%3E%3Cg fill='%23a77ee0'%3E%3Ccircle cx='19.5' cy='10.5' r='4.2'/%3E%3Ccircle cx='24' cy='15' r='4.2'/%3E%3Ccircle cx='21.6' cy='20.6' r='4.2'/%3E%3Ccircle cx='15.8' cy='20.4' r='4.2'/%3E%3Ccircle cx='14.8' cy='14.4' r='4.2'/%3E%3C/g%3E%3Ccircle cx='19.3' cy='16.2' r='2.6' fill='%23e0a93a'/%3E%3C/svg%3E">
+<style>
+/* Look: an inside-cover page of a handed-down journal, in a stitched, scalloped pillowcase border.
+   Beige paper and brown ink stay the same in every theme. Each theme adds one secondary color (--accent). */
+:root{
+  --paper:#ecdfc8;--paper-lo:#e0cfb0;--linen:#f7efdf;--card:#fbf5e8;
+  --ink:#40291d;--ink-soft:#6b4e3b;--walnut:#6f4a33;--caramel:#b0845b;--line:#d9c6a6;--input-border:#8a6849;
+  --btn:#6f4a33;--on-btn:#f7efdf;--shadow:rgba(64,41,29,.35);--focus:#1D4ED8;
+  --err:#8a2f1f;--danger-bg:#8a2f1f;--on-danger:#FFFFFF;
+  --warn-bg:#f5e6bf;--warn-text:#4a2f08;--warn-border:#8a5a14;
+  --urgent-bg:#f6d9d3;--urgent-text:#5a1a10;--urgent-border:#8a2f1f;
+  --fw:30px;--nav-h:64px;--gutter:calc(var(--fw) + clamp(12px,3.5vw,32px));
+  --display:'IM Fell English','Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+  --body:'Crimson Pro','Iowan Old Style','Palatino Linotype',Palatino,Georgia,'Times New Roman',serif;
+  --hand:'Segoe Script','Bradley Hand','Snell Roundhand','Apple Chancery',cursive;
+  --label:'Courier Prime','Courier New',Courier,monospace;
+  color-scheme:light;
+}
+/* Secondary color per theme */
+:root[data-theme="lavender"]{--accent:#6D4AA5;--accent-strong:#553885;--soft:#e5daef;--on-accent:#FFFFFF}
+:root[data-theme="peach"]{--accent:#A44939;--accent-strong:#7F3326;--soft:#f2d6c9;--on-accent:#FFFFFF}
+:root[data-theme="sage"]{--accent:#426B50;--accent-strong:#2F5039;--soft:#d8e3d1;--on-accent:#FFFFFF}
+:root[data-theme="midnight"]{color-scheme:dark;--paper:#241b25;--paper-lo:#1c141d;--linen:#2f2431;--card:#35283a;--ink:#f5efe8;--ink-soft:#cfc0c8;--walnut:#d9bf94;--caramel:#a98466;--line:#4d3d52;--input-border:#a392b0;
+  --btn:#d9bf94;--on-btn:#2a1d14;--shadow:rgba(0,0,0,.5);--focus:#FFD36E;--accent:#D5B5FA;--accent-strong:#E6D2FF;--soft:#46365a;--on-accent:#1E1926;
+  --err:#FFB3B3;--danger-bg:#FFB3B3;--on-danger:#2A0E0E;--warn-bg:#3F3012;--warn-text:#FFE0A8;--warn-border:#E0A63A;--urgent-bg:#4A2327;--urgent-text:#FFD6D6;--urgent-border:#FF9C9C}
+@media (max-width:520px){:root{--fw:22px}}
+
+/* ===== Base ===== */
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;background:var(--paper)}
+body{margin:0;min-height:100dvh;color:var(--ink);font:400 18px/1.55 var(--body);overflow-wrap:anywhere;background-color:var(--paper);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 .45 0 0 0 0 .3 0 0 0 0 .2 0 0 0 .1 0'/%3E%3C/filter%3E%3Crect width='160' height='160' filter='url(%23n)'/%3E%3C/svg%3E")}
+:root[data-theme="midnight"] body{background-image:none}
+h1,h2,h3{font-family:var(--display);font-weight:400;line-height:1.15;margin:0;text-wrap:balance}
+h1{font-size:clamp(30px,6vw,44px);margin:.2rem 0 .5rem}
+h2{font-size:23px;margin:0 0 .5rem}
+h3{font-size:19px;margin:1rem 0 .3rem}
+p{margin:.4rem 0}
+ul,ol{padding-left:1.25rem;margin:.4rem 0}
+a{color:var(--accent-strong);text-underline-offset:3px}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px;border-radius:3px}
+[tabindex="-1"]:focus{outline:none}
+label,legend{font:700 13px/1.35 var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.sr-only{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.skip{position:absolute;left:8px;top:-80px;background:var(--card);color:var(--ink);padding:10px 14px;border-radius:3px;z-index:100;border:2px solid var(--accent)}
+.skip:focus{top:8px}
+.ico{display:inline-flex;vertical-align:middle;flex:none}
+
+/* ===== Pillowcase border and stitching ===== */
+.frame{position:fixed;inset:0;z-index:60;pointer-events:none;border:var(--fw) solid transparent;border-image-slice:30;border-image-width:var(--fw);border-image-repeat:round}
+.stitch{position:fixed;inset:calc(var(--fw) + 6px);z-index:59;pointer-events:none;border:1.5px dashed var(--caramel);border-radius:3px;opacity:.8}
+
+/* ===== Scrollbar ===== */
+@supports not selector(::-webkit-scrollbar){html{scrollbar-width:auto;scrollbar-color:var(--caramel) var(--linen)}}
+::-webkit-scrollbar{width:16px;height:16px}
+::-webkit-scrollbar-track{background:var(--linen);border-left:1px dashed var(--caramel)}
+::-webkit-scrollbar-thumb{background:var(--caramel) repeating-linear-gradient(0deg,rgba(247,239,223,.28) 0 2px,transparent 2px 9px);border:3px solid var(--linen);border-radius:10px}
+::-webkit-scrollbar-thumb:hover{background-color:var(--accent)}
+::-webkit-scrollbar-button{display:none}
+
+/* ===== Layout ===== */
+.top,#banners,main{max-width:860px;margin-inline:auto;padding-inline:var(--gutter)}
+.top{padding-top:calc(var(--fw) + 14px);display:grid;gap:2px;justify-items:center;text-align:center}
+.topline{display:flex;justify-content:flex-end;width:100%;min-height:44px}
+.masthead{display:grid;justify-items:center;gap:0}
+.script{font:400 15px/1.6 var(--hand);color:var(--accent-strong);margin:0}
+.book-title{display:flex;align-items:center;gap:10px;font:400 clamp(38px,8vw,60px)/1.05 var(--display);color:var(--ink)}
+.book-title .ico{color:var(--accent)}
+.divider{display:block;width:min(340px,80%);margin:8px auto 4px}
+#banners{display:grid;gap:10px;margin-top:6px}
+#banners:empty{margin:0}
+main{padding-top:10px;padding-bottom:calc(var(--nav-h) + var(--fw) + 36px + env(safe-area-inset-bottom))}
+.nav{position:fixed;left:var(--fw);right:var(--fw);bottom:calc(var(--fw) + env(safe-area-inset-bottom));z-index:20;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--linen);border:1px solid var(--line);border-top:1.5px dashed var(--caramel);border-radius:3px;padding:3px;box-shadow:0 -6px 14px -10px var(--shadow)}
+.nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:54px;border:0;border-top:3px solid transparent;background:transparent;color:var(--ink-soft);font:700 11px/1.2 var(--label);letter-spacing:.04em;text-transform:uppercase;border-radius:2px;cursor:pointer}
+.nav button[aria-current="page"]{color:var(--ink);background:var(--soft);border-top-color:var(--accent)}
+@media (min-width:860px){
+  :root{--gutter:28px}
+  .shell{padding-left:calc(var(--fw) + 190px);padding-right:var(--fw)}
+  .nav{left:var(--fw);right:auto;top:calc(var(--fw) + 8px);bottom:calc(var(--fw) + 8px);width:182px;grid-template-columns:1fr;align-content:start;gap:4px;padding:10px 8px;border-top:1px solid var(--line);border-right:1.5px dashed var(--caramel);box-shadow:none}
+  .nav button{flex-direction:row;justify-content:flex-start;gap:12px;padding:8px 12px;min-height:48px;font-size:13px;border-top:0;border-left:4px solid transparent}
+  .nav button[aria-current="page"]{border-left-color:var(--accent)}
+  main{padding-bottom:calc(var(--fw) + 40px)}
+  .toast{bottom:calc(var(--fw) + 14px)!important}
+}
+.grid{display:grid;gap:22px 18px;margin:16px 0}
+@media (min-width:640px){.grid.two{grid-template-columns:1fr 1fr}.grid.two>.card:nth-child(odd){transform:rotate(-.3deg)}.grid.two>.card:nth-child(even){transform:rotate(.25deg)}}
+
+/* ===== Cards, notices ===== */
+.card{background:var(--card);border:1px solid var(--line);border-radius:2px;padding:14px 16px 18px;box-shadow:0 1px 0 rgba(255,255,255,.7) inset,0 8px 14px -10px var(--shadow);margin-bottom:14px}
+.grid>.card{margin-bottom:0}
+.card.soft{background:var(--soft)}
+.big{font:400 24px/1.25 var(--display);margin:.2rem 0}
+.muted{color:var(--ink-soft)}
+.small{font-size:16px}
+.notice,.urgent,.info{border-radius:3px;padding:12px 14px;border:2px solid}
+.notice{background:var(--warn-bg);color:var(--warn-text);border-color:var(--warn-border)}
+.urgent{background:var(--urgent-bg);color:var(--urgent-text);border-color:var(--urgent-border)}
+.info{background:var(--soft);border:1.5px dashed var(--caramel);color:var(--ink)}
+.notice a,.urgent a{color:inherit}
+.tag{display:inline-block;font:700 12px/1 var(--label);letter-spacing:.08em;text-transform:uppercase;padding:6px 12px;margin-right:6px;border:1px solid var(--accent);color:var(--accent-strong);background:var(--soft);border-radius:2px 14px 14px 2px}
+.tag.urgent-tag{border-color:var(--urgent-border);color:var(--urgent-text);background:var(--urgent-bg)}
+
+/* ===== Buttons ===== */
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;min-height:44px;min-width:44px;padding:12px 16px;border:0;border-radius:3px;font:700 13px/1.1 var(--label);letter-spacing:.08em;text-transform:uppercase;text-decoration:none;cursor:pointer;
+  background:var(--linen);color:var(--walnut);box-shadow:inset 0 0 0 1px var(--line);outline:1.5px dashed var(--caramel);outline-offset:-5px}
+.btn:hover{background:#fff8e8}
+:root[data-theme="midnight"] .btn:hover{background:#3c2f43}
+.btn:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.btn.primary{background:var(--btn);color:var(--on-btn);box-shadow:none;outline-color:rgba(247,239,223,.7)}
+:root[data-theme="midnight"] .btn.primary{outline-color:rgba(42,29,20,.6)}
+.btn.primary:hover{background:var(--accent);color:var(--on-accent)}
+.btn.danger{color:var(--err);box-shadow:inset 0 0 0 1.5px var(--err);outline-color:transparent}
+.btn.danger.solid{background:var(--danger-bg);color:var(--on-danger);box-shadow:none}
+.btn.icon{padding:8px}
+.btn.big-btn{width:100%;min-height:56px;font-size:15px;margin:6px 0 4px}
+.btn.quiet{background:none;box-shadow:none;outline:none;text-decoration:underline;text-underline-offset:4px;padding:8px 6px}
+.btn[disabled]{opacity:.6;cursor:not-allowed;outline-style:dotted}
+.btn-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:10px}
+
+/* ===== Forms ===== */
+.field{margin:0 0 16px}
+fieldset{border:0;margin:0 0 16px;padding:0;min-width:0}
+legend{padding:0;margin-bottom:6px}
+.hint{color:var(--ink-soft);font-size:16px;margin:2px 0 6px;font-weight:400;font-family:var(--body);text-transform:none;letter-spacing:0}
+input[type=text],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=search],select,textarea{width:100%;min-height:44px;font:inherit;color:var(--ink);background:var(--linen);border:1.5px solid var(--input-border);border-radius:3px;padding:8px 12px}
+textarea{min-height:120px;resize:vertical;line-height:29px;padding:6px 12px;background-image:repeating-linear-gradient(transparent 0 28px,rgba(176,132,91,.28) 28px 29px);background-attachment:local;background-position:0 6px}
+select{width:auto;max-width:100%}
+[aria-invalid="true"]{border-color:var(--err);border-width:3px}
+.field-err{color:var(--err);font-weight:700;margin:4px 0 0}
+.field-err::before{content:"\26A0  "}
+.form-err{margin-top:12px;border:2px solid var(--err);background:var(--urgent-bg);color:var(--urgent-text);border-radius:3px;padding:10px 14px}
+.form-err[hidden]{display:none}
+.form-err ul{margin:.3rem 0 0}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chip{position:relative;display:inline-flex;text-transform:none;letter-spacing:0}
+.chip input{position:absolute;opacity:0;width:100%;height:100%;margin:0;cursor:pointer}
+.chip span{display:inline-flex;align-items:center;gap:8px;min-height:44px;padding:8px 14px 8px 12px;border:1.5px solid var(--input-border);border-radius:2px 16px 16px 2px;background:var(--linen);color:var(--ink);font:700 13px/1.25 var(--label);letter-spacing:.05em;text-transform:uppercase}
+.chip span::before{content:"";width:18px;height:18px;border:2px solid var(--input-border);border-radius:3px;flex:none;display:inline-flex;align-items:center;justify-content:center;font-size:.8rem;line-height:1;background:var(--card)}
+.chip input[type=radio]+span::before{border-radius:50%}
+.chip input:checked+span{background:var(--soft);border-color:var(--accent);border-width:2.5px;padding:7px 13px 7px 11px;color:var(--ink)}
+.chip input:checked+span::before{content:"\2713";background:var(--accent);border-color:var(--accent);color:var(--on-accent)}
+.chip input:focus-visible+span{outline:3px solid var(--focus);outline-offset:3px}
+.chip.num span::before{display:none}
+.chip.num span{min-width:44px;justify-content:center;padding:8px 0;border-radius:3px}
+.chip.num input:checked+span{background:var(--accent);color:var(--on-accent);border-color:var(--accent);padding:7px 0}
+details.more{margin:6px 0 14px;border-top:1.5px dashed var(--caramel);padding-top:4px}
+details.more>summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:700 13px/1.2 var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong)}
+.symrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin-bottom:8px}
+.datebar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;margin:6px 0 14px}
+.datebar input{width:auto}
+
+/* ===== Dialogs ===== */
+dialog{border:1px solid var(--caramel);padding:6px;border-radius:3px;background:var(--card);color:var(--ink);width:min(580px,calc(100% - 16px));max-height:calc(100dvh - 20px);box-shadow:0 14px 40px rgba(0,0,0,.4);scrollbar-color:var(--caramel) var(--linen)}
+dialog::backdrop{background:rgba(40,25,15,.62)}
+.dlg-in{padding:12px 14px 20px;border:1.5px dashed var(--caramel);border-radius:2px}
+.dlg-head{display:flex;justify-content:space-between;align-items:flex-start;gap:8px;margin-bottom:8px}
+.dlg-head h2{margin:6px 0;font-size:26px}
+.actions{display:flex;flex-wrap:wrap;gap:10px;margin-top:16px}
+.logmenu{display:grid;gap:10px;margin-top:8px}
+.logmenu .btn{justify-content:flex-start;text-align:left;width:100%;min-height:58px;text-transform:none;letter-spacing:0;font:700 17px/1.2 var(--body)}
+.logmenu small{display:block;font:400 15px/1.3 var(--body);color:var(--ink-soft)}
+button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:inherit;background:none;border:0;padding:2px 0;cursor:pointer;text-decoration:underline dotted;text-decoration-thickness:2px;text-underline-offset:4px}
+
+/* ===== Activity, calendar, bars ===== */
+.activity{list-style:none;margin:0;padding:0;display:grid;gap:10px}
+.activity li{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:2px;padding:10px 12px;background:var(--linen)}
+.activity .time{font:700 12px/1.4 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.activity .t{font:400 20px/1.25 var(--display)}
+.seg{display:inline-flex}
+.seg button{margin-left:-2px}
+.seg button:first-child{margin-left:0}
+.seg button[aria-pressed="true"]{background:var(--btn);color:var(--on-btn);outline-color:rgba(247,239,223,.7)}
+.cal{width:100%;border-collapse:separate;border-spacing:3px;table-layout:fixed}
+.cal th{font:700 11px/1 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft);padding:4px 0}
+.cal td{padding:0}
+.day{width:100%;min-height:56px;display:flex;flex-direction:column;align-items:center;gap:0;border:1.5px solid var(--line);border-radius:2px;background:var(--linen);color:var(--ink);font:inherit;padding:3px 0;cursor:pointer}
+.day .n{font:700 16px/1.3 var(--label)}
+.day .sym{font-size:.74rem;line-height:1.15;min-height:.85rem;letter-spacing:1px;color:var(--accent-strong)}
+.day.bleed{background:var(--soft)}
+.day.today{border:2px solid var(--ink)}
+.day.today .n{text-decoration:underline}
+.day.inperiod{border-color:var(--accent);border-width:2px}
+.day.est{border:2px dashed var(--accent)}
+.day.sel{background:var(--btn);color:var(--on-btn);border-color:var(--btn)}
+.day.sel .sym{color:inherit}
+.legend{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:16px}
+.daylist{list-style:none;padding:0;margin:0;display:grid;gap:6px}
+.daylist .btn{width:100%;justify-content:flex-start;text-align:left;text-transform:none;letter-spacing:0;font:400 17px/1.3 var(--body);outline:none}
+.daylist .btn.sel{background:var(--btn);color:var(--on-btn)}
+.bar{height:12px;border-radius:2px;background:var(--linen);border:1px solid var(--caramel);overflow:hidden;margin:2px 0 8px}
+.bar>span{display:block;height:100%;background:var(--accent)}
+.kv{display:grid;grid-template-columns:auto 1fr;gap:4px 14px;margin:8px 0}
+.kv dt{font:700 12px/1.6 var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.kv dd{margin:0}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + var(--fw) + 14px + env(safe-area-inset-bottom));width:max-content;max-width:min(88vw,520px);background:var(--btn);color:var(--on-btn);padding:12px 18px;border-radius:3px;z-index:61;font-weight:600;outline:1.5px dashed rgba(247,239,223,.6);outline-offset:-5px;box-shadow:0 8px 18px -8px var(--shadow)}
+.toast:empty{display:none}
+.pday{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:end;border-top:1px dashed var(--caramel);padding:8px 0}
+.pday-t{flex:1 0 100%;margin:0;font:700 13px/1.3 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
+.pday .field{margin:0}
+.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.quick .btn{flex-direction:column;gap:4px;min-height:68px;font-size:11px;text-align:center;padding:8px 4px}
+.theme-opt .sw{display:inline-flex;gap:2px}
+.theme-opt .sw i{width:14px;height:14px;border-radius:50%;border:1px solid #6b4e3b;display:inline-block}
+#printArea{display:none}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important;scroll-behavior:auto!important}}
+@media print{
+  body{background:#fff;color:#000;font-size:11pt}
+  .skip,.shell,.toast,dialog,.frame,.stitch{display:none!important}
+  #printArea{display:block}
+  #printArea h1{font-size:18pt} #printArea h2{font-size:13pt;margin-top:14pt}
+  #printArea table{width:100%;border-collapse:collapse;font-size:10pt;margin-bottom:8pt}
+  #printArea th,#printArea td{border:1px solid #444;padding:3pt 5pt;text-align:left;vertical-align:top}
+  #printArea tr{break-inside:avoid}
+}
+</style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to main content</a>
+<div class="frame" id="frame" aria-hidden="true"></div>
+<div class="stitch" aria-hidden="true"></div>
+<div id="app" class="shell">
+  <header class="top">
+    <div class="topline"><button type="button" class="btn" id="helpBtn">When to get help</button></div>
+    <div class="masthead">
+      <p class="script">a private page, just for you</p>
+      <div class="book-title" id="brand"></div>
+      <svg class="divider" viewBox="0 0 400 20" aria-hidden="true" focusable="false"><line x1="0" y1="10" x2="172" y2="10" stroke="#b0845b" stroke-width="1.5" stroke-dasharray="5 5"/><g transform="translate(200 10)"><g style="fill:var(--accent)"><circle cx="5.5" cy="0" r="3.4"/><circle cx="1.7" cy="5.2" r="3.4"/><circle cx="-4.4" cy="3.2" r="3.4"/><circle cx="-4.4" cy="-3.2" r="3.4"/><circle cx="1.7" cy="-5.2" r="3.4"/></g><circle r="2.4" fill="#b0845b"/></g><line x1="228" y1="10" x2="400" y2="10" stroke="#b0845b" stroke-width="1.5" stroke-dasharray="5 5"/></svg>
+    </div>
+  </header>
+  <div id="banners"></div>
+  <main id="main" tabindex="-1"></main>
+  <nav class="nav" id="nav" aria-label="Main"></nav>
+</div>
+<div id="status" class="toast" role="status" aria-live="polite"></div>
+<dialog id="dlg"></dialog>
+<dialog id="confirm" aria-labelledby="cfTitle"></dialog>
+<dialog id="gloss" aria-labelledby="glTitle" aria-describedby="glDef"></dialog>
+<div id="printArea"></div>
+<noscript><p style="padding:16px">This journal needs JavaScript to run. Nothing is sent anywhere.</p></noscript>
+<script>
+(function () {
+'use strict';
+
+/* ================= 1. Constants and reference lists ================= */
+const VERSION = 1;
+const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
+const CHECKED_ON = '2026-11-01';
+const THEMES = [
+  { id: 'lavender', name: 'Lavender Journal', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
+  { id: 'peach', name: 'Peach Notebook', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
+  { id: 'sage', name: 'Sage Calm', sw: ['#ecdfc8', '#426B50', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#426B50', P: '#cfe0cc', LF: '#8fa585' } },
+  { id: 'midnight', name: 'Midnight Plum', sw: ['#241b25', '#D5B5FA', '#d9bf94'], fr: { L: '#3a2c3f', C: '#a98466', R: '#D5B5FA', P: '#5a4668', LF: '#7d8a6b' } }
+];
+// Stitched, scalloped border tile (same idea as the recipe book), tinted with the theme's secondary color.
+function frameSVG(c) {
+  const flower = (x, y) => '<g transform="translate(' + x + ' ' + y + ')"><g fill="' + c.P + '" stroke="' + c.R + '" stroke-width=".9"><circle cx="6" cy="0" r="3.7"/><circle cx="1.85" cy="5.7" r="3.7"/><circle cx="-4.85" cy="3.53" r="3.7"/><circle cx="-4.85" cy="-3.53" r="3.7"/><circle cx="1.85" cy="-5.7" r="3.7"/></g><circle r="2.7" fill="' + c.C + '"/></g>';
+  const leaf = (x, y, a) => '<ellipse cx="' + x + '" cy="' + y + '" rx="5" ry="2.1" transform="rotate(' + a + ' ' + x + ' ' + y + ')" fill="' + c.LF + '" opacity=".85"/>';
+  const arc = 'fill="none" stroke="' + c.C + '" stroke-width="1.4"', dash = 'stroke="' + c.C + '" stroke-width="1.3" stroke-dasharray="3 3" stroke-linecap="round"';
+  return '<svg xmlns="http://www.w3.org/2000/svg" width="90" height="90" viewBox="0 0 90 90"><g fill="' + c.L + '"><rect width="30" height="30"/><rect x="60" width="30" height="30"/><rect y="60" width="30" height="30"/><rect x="60" y="60" width="30" height="30"/>' +
+    '<path d="M30 0V16A15 13.2 0 0 0 60 16V0Z"/><path d="M30 90V74A15 13.2 0 0 1 60 74V90Z"/><path d="M0 30H16A13.2 15 0 0 1 16 60H0Z"/><path d="M90 30H74A13.2 15 0 0 0 74 60H90Z"/></g>' +
+    '<path d="M30 16A15 13.2 0 0 0 60 16" ' + arc + '/><path d="M30 74A15 13.2 0 0 1 60 74" ' + arc + '/><path d="M16 30A13.2 15 0 0 1 16 60" ' + arc + '/><path d="M74 30A13.2 15 0 0 0 74 60" ' + arc + '/>' +
+    '<line x1="30" y1="5" x2="60" y2="5" ' + dash + '/><line x1="30" y1="85" x2="60" y2="85" ' + dash + '/><line x1="5" y1="30" x2="5" y2="60" ' + dash + '/><line x1="85" y1="30" x2="85" y2="60" ' + dash + '/>' +
+    '<g fill="' + c.R + '"><circle cx="45" cy="15" r="2.2"/><circle cx="45" cy="75" r="2.2"/><circle cx="15" cy="45" r="2.2"/><circle cx="75" cy="45" r="2.2"/></g>' +
+    leaf(23, 23, 45) + leaf(67, 23, -45) + leaf(23, 67, -45) + leaf(67, 67, 45) + flower(14, 14) + flower(76, 14) + flower(14, 76) + flower(76, 76) + '</svg>';
+}
+const FLOW = [['none', 'None'], ['spotting', 'Spotting'], ['light', 'Light'], ['moderate', 'Moderate'], ['heavy', 'Heavy']];
+const PRODUCTS = [['pad', 'Pad'], ['tampon', 'Tampon'], ['cup', 'Cup'], ['disc', 'Disc'], ['underwear', 'Period underwear'], ['other', 'Other']];
+const ACTION_LABELS = {
+  pad: { on: 'Put on', changed: 'Changed', off: 'Removed' },
+  tampon: { on: 'Inserted', changed: 'Changed (took one out, put a new one in)', off: 'Removed' },
+  cup: { on: 'Inserted', changed: 'Emptied and put back', off: 'Removed' },
+  disc: { on: 'Inserted', changed: 'Emptied and put back', off: 'Removed' },
+  underwear: { on: 'Put on', changed: 'Changed into a fresh pair', off: 'Took off' },
+  other: { on: 'Put on or started', changed: 'Changed', off: 'Removed' },
+  '': { on: 'Put on or inserted', changed: 'Changed', off: 'Removed or emptied' }
+};
+const FULLNESS = [['light', 'Lightly used'], ['partly', 'Partly full'], ['full', 'Fully soaked or full'], ['overflow', 'Overflow or leak']];
+const REASONS = [['full', 'It was full'], ['comfort', 'For comfort'], ['bathroom', 'Bathroom break'], ['bedtime', 'Bedtime'], ['other', 'Other']];
+const PAIN_LOC = [['lower_abdomen', 'Lower abdomen'], ['pelvis', 'Pelvis'], ['lower_back', 'Lower back'], ['head', 'Head'], ['other', 'Other']];
+const PAIN_TYPE = [['cramping', 'Cramping'], ['aching', 'Aching'], ['sharp', 'Sharp'], ['throbbing', 'Throbbing'], ['other', 'Other']];
+const IMPACT = [['none', 'No disruption'], ['slowed', 'Slowed me down'], ['sleep', 'Interrupted sleep'], ['missed', 'Missed school or work'], ['unable', 'Unable to do usual activities']];
+const PAIN_RELIEF = [['heat', 'Heat'], ['rest', 'Rest'], ['movement', 'Gentle movement'], ['medication', 'Medication'], ['other', 'Something else']];
+const MOODS = [['calm', 'Calm'], ['happy', 'Happy'], ['sad', 'Sad'], ['anxious', 'Anxious'], ['irritable', 'Irritable'], ['sensitive', 'Sensitive'], ['overwhelmed', 'Overwhelmed'], ['other', 'Other']];
+const ENERGY = [['very_low', 'Very low'], ['low', 'Low'], ['middle', 'In the middle'], ['high', 'High'], ['very_high', 'Very high']];
+const SLEEPQ = [['rough', 'Rough'], ['okay', 'Okay'], ['good', 'Good']];
+const SYMPTOMS = ['Bloating', 'Breast tenderness', 'Headache', 'Nausea', 'Dizziness', 'Acne', 'Cravings', 'Constipation', 'Diarrhea'];
+const SEVERITY = [['', 'Skip severity'], ['mild', 'Mild'], ['moderate', 'Moderate'], ['strong', 'Strong']];
+const NONMED = [['heat', 'Heat'], ['rest', 'Rest'], ['movement', 'Gentle movement'], ['other', 'Something else']];
+const HELPED = [['', 'Skip'], ['unsure', 'Not yet sure'], ['no', 'No'], ['little', 'A little'], ['lot', 'A lot']];
+const ACTIONS = ['on', 'changed', 'off'];
+
+const GLOSSARY = {
+  cycle: ['Cycle', 'The time from the first day of one period to the first day of the next.'],
+  flow: ['Flow', 'How much period bleeding you are having.'],
+  spotting: ['Spotting', 'A small amount of bleeding, lighter than a period.'],
+  absorbency: ['Absorbency', 'How much liquid a product is designed to hold.'],
+  pelvis: ['Pelvis', 'The lower part of your body between your belly and the tops of your legs.'],
+  symptom: ['Symptom', 'A change in how your body feels or works.'],
+  median: ['Median', 'The middle value after numbers are put in order. If there are two middle numbers, it is halfway between them.'],
+  cramps: ['Cramps', 'Pain, often in the lower belly or back, that can come and go around a period.'],
+  tss: ['Toxic shock syndrome (TSS)', 'A serious illness that can come on quickly. The FDA connects it with tampon use and lists warning signs. Get medical care right away if you have them.'],
+  cup: ['Menstrual cup', 'A small, soft cup worn inside the body to collect period blood instead of soaking it up.'],
+  disc: ['Menstrual disc', 'A flexible disc worn inside the body to collect period blood.'],
+  healthpro: ['Healthcare professional', 'A doctor, nurse, or other trained health worker.'],
+  severity: ['Severity', 'How strong or bothersome something is.'],
+  estimate: ['Estimate', 'A careful guess based on your past entries. It can be wrong.'],
+  storage: ['Browser storage', 'Space inside your web browser where this page keeps your entries on your own device.']
+};
+
+const SOURCES = {
+  fda: { label: 'FDA: The Facts on Tampons and Tampon Safety', url: 'https://www.fda.gov/consumers/consumer-updates/facts-tampons-and-tampon-safety',
+    status: 'Checked on ' + CHECKED_ON + ' while this app was written. The 4 to 8 hour guidance, the 8-hour limit, and the toxic shock warning signs were read on this page. This is not a medical review.' },
+  acog: { label: 'ACOG: Abnormal Uterine Bleeding', url: 'https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding',
+    status: 'Suggested source. Check for current guidance. This page could not be opened when this app was written, so its content was not checked.' },
+  diary: { label: 'ACOG: Abnormal Bleeding Diary', url: 'https://www.acog.org/womens-health/health-tools/abnormal-bleeding-diary',
+    status: 'Suggested source. Check for current guidance. This page could not be opened when this app was written, so its content was not checked.' },
+  kids: { label: 'Nemours KidsHealth: I Think I Had My First Period. How Can I Be Sure?', url: 'https://kidshealth.org/en/teens/expert-period.html',
+    status: 'Checked on ' + CHECKED_ON + ' while this app was written. The notes about brown blood, short and light first periods, and periods changing in the first couple of years were read on this page. The page does not give a step-by-step checklist, so this app does not present one as sourced. This is not a medical review.' }
+};
+
+/* ================= 2. Small helpers ================= */
+const $ = (s) => document.querySelector(s);
+const labelOf = (list, v) => { const f = list.find((x) => x[0] === v); return f ? f[1] : ''; };
+const inList = (list, v) => list.some((x) => x[0] === v);
+
+function add(el, kids) {
+  for (const k of kids) {
+    if (k === null || k === undefined || k === false) continue;
+    if (Array.isArray(k)) add(el, k);
+    else el.append(k.nodeType ? k : document.createTextNode(String(k)));
+  }
+}
+// Safe DOM builder: text always goes in as text, never as HTML.
+function h(tag, props, ...kids) {
+  const el = document.createElement(tag);
+  if (props) {
+    for (const k in props) {
+      const v = props[k];
+      if (v === undefined || v === null || v === false) continue;
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else if (k.slice(0, 2) === 'on' && typeof v === 'function') el.addEventListener(k.slice(2), v);
+      else if (k === 'value' || k === 'checked' || k === 'disabled' || k === 'hidden' || k === 'selected') el[k] = v;
+      else el.setAttribute(k, v === true ? '' : String(v));
+    }
+  }
+  add(el, kids);
+  return el;
+}
+const ICONS = {
+  today: '<circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2M5.6 5.6l1.4 1.4M17 17l1.4 1.4M5.6 18.4L7 17M17 7l1.4-1.4"/>',
+  calendar: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
+  learn: '<path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5C4.7 19 4 18.3 4 17.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z"/>',
+  settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+  plus: '<path d="M12 5v14M5 12h14"/>', close: '<path d="M6 6l12 12M18 6L6 18"/>',
+  prev: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>',
+  drop: '<path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3z"/>',
+  product: '<rect x="7" y="3" width="10" height="18" rx="5"/>',
+  pain: '<path d="M13 3L5 14h6l-1 7 8-11h-6z"/>',
+  mood: '<circle cx="12" cy="12" r="9"/><path d="M8.5 14.5c1 1.2 2.1 1.8 3.5 1.8s2.5-.6 3.5-1.8M9 9.5h.01M15 9.5h.01"/>',
+  relief: '<path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.5A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/>',
+  flow: '<path d="M12 3s5 5.3 5 9a5 5 0 0 1-10 0c0-3.700 5-9 5-9zM9 20h6"/>'
+};
+function icon(name, size) {
+  const s = document.createElement('span');
+  s.className = 'ico'; s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = '<svg viewBox="0 0 24 24" width="' + (size || 22) + '" height="' + (size || 22) + '" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" focusable="false">' + ICONS[name] + '</svg>'; // static markup only
+  return s;
+}
+function flowerIcon(size) {
+  const s = document.createElement('span');
+  s.className = 'ico'; s.setAttribute('aria-hidden', 'true');
+  s.innerHTML = '<svg viewBox="0 0 32 32" width="' + size + '" height="' + size + '" focusable="false"><g fill="currentColor" opacity=".75"><circle cx="16" cy="7" r="6"/><circle cx="25" cy="14" r="6"/><circle cx="21.5" cy="25" r="6"/><circle cx="10.5" cy="25" r="6"/><circle cx="7" cy="14" r="6"/></g><circle cx="16" cy="16" r="5" fill="#FFD36E" stroke="currentColor" stroke-width="1.5"/></svg>'; // static markup only
+  return s;
+}
+function uid() {
+  try { if (window.crypto && crypto.randomUUID) return crypto.randomUUID(); } catch (e) { /* fall through */ }
+  return 'id-' + Date.now().toString(36) + '-' + Math.random().toString(36).slice(2, 10);
+}
+
+/* ---- Dates: date-only values are local calendar dates (YYYY-MM-DD), never UTC timestamps ---- */
+const pad2 = (n) => String(n).padStart(2, '0');
+function fmtDate(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+function todayStr() { return fmtDate(new Date()); }
+function isDateStr(s) {
+  if (typeof s !== 'string' || !/^\d{4}-\d{2}-\d{2}$/.test(s)) return false;
+  const [y, m, d] = s.split('-').map(Number);
+  const dt = new Date(Date.UTC(y, m - 1, d));
+  return y >= 1900 && y <= 2200 && dt.getUTCFullYear() === y && dt.getUTCMonth() === m - 1 && dt.getUTCDate() === d;
+}
+function dayNum(s) { const [y, m, d] = s.split('-').map(Number); return Math.round(Date.UTC(y, m - 1, d) / 86400000); } // DST-proof
+function fromDayNum(n) { const dt = new Date(n * 86400000); return dt.getUTCFullYear() + '-' + pad2(dt.getUTCMonth() + 1) + '-' + pad2(dt.getUTCDate()); }
+function addDays(s, n) { return fromDayNum(dayNum(s) + n); }
+function dayDiff(a, b) { return dayNum(b) - dayNum(a); }
+function localDate(s) { const [y, m, d] = s.split('-').map(Number); return new Date(y, m - 1, d); }
+function fmtLong(s) { return localDate(s).toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric', year: 'numeric' }); }
+function fmtShort(s) { return localDate(s).toLocaleDateString(undefined, { month: 'short', day: 'numeric', year: 'numeric' }); }
+function fmtTime(iso) { return new Date(iso).toLocaleTimeString(undefined, { hour: 'numeric', minute: '2-digit' }); }
+function fmtWhen(iso) { const d = dateOfIso(iso); return (d === todayStr() ? 'Today' : fmtShort(d)) + ' at ' + fmtTime(iso); }
+function toLocalInput(iso) { const d = new Date(iso); return fmtDate(d) + 'T' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()); }
+function nowLocalInput() { return toLocalInput(new Date().toISOString()); }
+function isoFromLocalInput(v) { if (!/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}/.test(v || '')) return null; const d = new Date(v); return isNaN(d.getTime()) ? null : d.toISOString(); }
+function dateOfIso(iso) { return fmtDate(new Date(iso)); }
+function isIso(s) { return typeof s === 'string' && /^\d{4}-\d{2}-\d{2}T/.test(s) && !isNaN(new Date(s).getTime()); }
+function atTime(date, hh, mm) { const [y, m, d] = date.split('-').map(Number); return new Date(y, m - 1, d, hh, mm).toISOString(); }
+function median(a) { const s = a.slice().sort((x, y) => x - y), n = s.length; return n % 2 ? s[(n - 1) / 2] : (s[n / 2 - 1] + s[n / 2]) / 2; }
+
+/* ================= 3. State, data model, validation ================= */
+const emptyData = () => ({ periods: [], flow: [], products: [], pain: [], moods: [], relief: [] });
+const defaultSettings = () => ({ theme: 'lavender', estimates: false, tamponTimer: false, reminderHours: 6, hiddenSymptoms: [], customSymptoms: [], introDismissed: false });
+let data = emptyData();
+let settings = defaultSettings();
+const state = {
+  view: 'today', sel: todayStr(), calMonth: todayStr().slice(0, 7), calMode: 'grid',
+  learnTab: 'articles', learnQ: '', learnCat: 'All', article: null, glossQ: '',
+  demo: false, stash: null,
+  storage: { mode: 'ok', raw: null, reason: '' }, // mode: ok | memory | blocked
+  saveError: '', timerLevels: {}, timerDismissed: {}
+};
+
+const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
+const cStr = (v, max) => (typeof v === 'string' ? v.slice(0, max || 2000) : '');
+const isId = (v) => typeof v === 'string' && v.length > 0 && v.length <= 80;
+
+// Validates a whole journal object. Returns {errors, journal}. Nothing is applied here.
+function cleanJournal(raw) {
+  const errors = [];
+  const err = (m) => { if (errors.length < 12) errors.push(m); else if (errors.length === 12) errors.push('More problems were found but are not listed.'); };
+  const out = emptyData();
+  if (!isObj(raw)) { return { errors: ['The journal section is missing or is not an object.'], journal: out }; }
+  const arr = (k) => { if (!Array.isArray(raw[k])) { err('"' + k + '" must be a list.'); return []; } if (raw[k].length > 20000) { err('"' + k + '" has too many records.'); return []; } return raw[k]; };
+  const ids = new Set();
+  const chkId = (r, p) => { if (!isId(r.id)) err(p + 'needs an id.'); else if (ids.has(r.id)) err(p + 'has a repeated id.'); else ids.add(r.id); };
+  const enumOpt = (list, v, p, what) => { if (v === undefined || v === null || v === '') return ''; if (!inList(list, v)) { err(p + what + ' has an unknown value.'); return ''; } return v; };
+  const enumArr = (list, v, p, what) => { if (v === undefined) return []; if (!Array.isArray(v) || v.length > 20) { err(p + what + ' must be a short list.'); return []; } const o = []; v.forEach((x) => { if (!inList(list, x)) err(p + what + ' has an unknown value.'); else if (!o.includes(x)) o.push(x); }); return o; };
+  const numOpt = (v, min, max, p, what) => { if (v === undefined || v === null || v === '') return null; if (typeof v !== 'number' || !isFinite(v) || v < min || v > max) { err(p + what + ' must be a number from ' + min + ' to ' + max + '.'); return null; } return v; };
+
+  arr('periods').forEach((r, i) => { const p = 'Period ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isDateStr(r.start)) err(p + 'start date is not valid.');
+    if (r.end !== null && r.end !== undefined && !isDateStr(r.end)) err(p + 'end date is not valid.');
+    if (isDateStr(r.start) && isDateStr(r.end) && r.end < r.start) err(p + 'ends before it starts.');
+    out.periods.push({ id: r.id, start: r.start, end: r.end || null, note: cStr(r.note) }); });
+  const sorted = out.periods.filter((p) => isDateStr(p.start)).sort((a, b) => (a.start < b.start ? -1 : 1));
+  if (sorted.filter((p) => !p.end).length > 1) err('More than one period is marked ongoing.');
+  for (let i = 1; i < sorted.length; i++) { if (sorted[i].start <= (sorted[i - 1].end || '9999-12-31')) { err('Periods starting ' + sorted[i - 1].start + ' and ' + sorted[i].start + ' overlap.'); break; } }
+
+  const flowDates = new Set();
+  arr('flow').forEach((r, i) => { const p = 'Flow entry ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isDateStr(r.date)) err(p + 'date is not valid.'); else if (flowDates.has(r.date)) err(p + 'there is more than one flow entry for ' + r.date + '.'); else flowDates.add(r.date);
+    if (!inList(FLOW, r.level)) err(p + 'flow level is not valid.');
+    out.flow.push({ id: r.id, date: r.date, level: r.level, leaks: r.leaks === true, between: r.between === true, overnight: r.overnight === true, note: cStr(r.note) }); });
+
+  arr('products').forEach((r, i) => { const p = 'Product entry ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isIso(r.ts)) err(p + 'time is not valid.');
+    if (!inList(PRODUCTS, r.product)) err(p + 'product is not valid.');
+    if (!ACTIONS.includes(r.action)) err(p + 'action is not valid.');
+    out.products.push({ id: r.id, ts: r.ts, product: r.product, action: r.action, absorbency: cStr(r.absorbency, 80), fullness: enumOpt(FULLNESS, r.fullness, p, 'fullness'), reason: enumOpt(REASONS, r.reason, p, 'reason'), overnight: r.overnight === true, double: r.double === true, note: cStr(r.note) }); });
+
+  arr('pain').forEach((r, i) => { const p = 'Pain entry ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isIso(r.ts)) err(p + 'time is not valid.');
+    const n = numOpt(r.intensity, 0, 10, p, 'intensity'); if (n === null || !Number.isInteger(n)) err(p + 'intensity must be a whole number from 0 to 10.');
+    out.pain.push({ id: r.id, ts: r.ts, intensity: n, locations: enumArr(PAIN_LOC, r.locations, p, 'location'), types: enumArr(PAIN_TYPE, r.types, p, 'type'),
+      startTime: typeof r.startTime === 'string' && /^\d{2}:\d{2}$/.test(r.startTime) ? r.startTime : '', duration: numOpt(r.duration, 1, 1440, p, 'duration'),
+      impact: enumOpt(IMPACT, r.impact, p, 'impact'), relief: enumArr(PAIN_RELIEF, r.relief, p, 'relief'), note: cStr(r.note) }); });
+
+  arr('moods').forEach((r, i) => { const p = 'Mood entry ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isDateStr(r.date)) err(p + 'date is not valid.'); if (!isIso(r.created)) err(p + 'created time is not valid.');
+    let syms = []; if (r.symptoms !== undefined) { if (!Array.isArray(r.symptoms) || r.symptoms.length > 60) err(p + 'symptoms must be a list.'); else syms = r.symptoms.map((s) => { if (!isObj(s) || typeof s.name !== 'string' || !s.name.trim() || s.name.length > 40) { err(p + 'a symptom is not valid.'); return null; } return { name: s.name.trim(), severity: enumOpt(SEVERITY, s.severity, p, 'severity') }; }).filter(Boolean); }
+    if (r.noSymptoms === true && syms.length) err(p + 'cannot say "no symptoms" and list symptoms.');
+    out.moods.push({ id: r.id, date: r.date, created: r.created, moods: enumArr(MOODS, r.moods, p, 'mood'), energy: enumOpt(ENERGY, r.energy, p, 'energy'), sleepHours: numOpt(r.sleepHours, 0, 24, p, 'sleep hours'), sleepQuality: enumOpt(SLEEPQ, r.sleepQuality, p, 'sleep quality'), symptoms: syms, noSymptoms: r.noSymptoms === true, note: cStr(r.note) }); });
+
+  arr('relief').forEach((r, i) => { const p = 'Relief entry ' + (i + 1) + ': '; if (!isObj(r)) { err(p + 'is not a record.'); return; } chkId(r, p);
+    if (!isIso(r.ts)) err(p + 'time is not valid.');
+    out.relief.push({ id: r.id, ts: r.ts, medication: cStr(r.medication, 80), dose: cStr(r.dose, 80), nonMed: enumArr(NONMED, r.nonMed, p, 'relief method'), before: numOpt(r.before, 0, 10, p, 'pain before'), after: numOpt(r.after, 0, 10, p, 'pain after'), helped: enumOpt(HELPED, r.helped, p, 'did it help'), note: cStr(r.note) }); });
+  return { errors, journal: out };
+}
+function cleanSettings(raw) {
+  const errors = []; const d = defaultSettings();
+  if (!isObj(raw)) return { errors: ['Settings are missing or invalid.'], settings: d };
+  if (inList(THEMES.map((t) => [t.id]), raw.theme)) d.theme = raw.theme; else if (raw.theme !== undefined) errors.push('Unknown theme.');
+  d.estimates = raw.estimates === true; d.tamponTimer = raw.tamponTimer === true; d.introDismissed = raw.introDismissed === true;
+  if ([4, 6, 8].includes(raw.reminderHours)) d.reminderHours = raw.reminderHours; else if (raw.reminderHours !== undefined) errors.push('Reminder hours must be 4, 6, or 8.');
+  const names = (v, what) => { if (v === undefined) return []; if (!Array.isArray(v) || v.length > 60 || v.some((x) => typeof x !== 'string' || !x.trim() || x.length > 40)) { errors.push(what + ' is not valid.'); return []; } return v.map((x) => x.trim()); };
+  d.hiddenSymptoms = names(raw.hiddenSymptoms, 'Hidden symptoms'); d.customSymptoms = names(raw.customSymptoms, 'Custom symptoms');
+  return { errors, settings: d };
+}
+
+/* ---- Derived data helpers ---- */
+const byTs = (a, b) => (a.ts < b.ts ? -1 : a.ts > b.ts ? 1 : 0);
+const periodsSorted = () => data.periods.slice().sort((a, b) => (a.start < b.start ? -1 : 1));
+const getOngoing = () => data.periods.find((p) => !p.end) || null;
+const flowOn = (date) => data.flow.find((f) => f.date === date) || null;
+const periodOn = (date) => data.periods.find((p) => date >= p.start && date <= (p.end || todayStr())) || null;
+function periodOverlap(start, end, exceptId) { const e = end || '9999-12-31'; return data.periods.find((p) => p.id !== exceptId && start <= (p.end || '9999-12-31') && p.start <= e) || null; }
+function intervals() { const p = periodsSorted(), o = []; for (let i = 1; i < p.length; i++) o.push({ from: p[i - 1].start, to: p[i].start, days: dayDiff(p[i - 1].start, p[i].start) }); return o; }
+function entriesOn(date) {
+  return { products: data.products.filter((x) => dateOfIso(x.ts) === date).sort(byTs), pain: data.pain.filter((x) => dateOfIso(x.ts) === date).sort(byTs),
+    moods: data.moods.filter((x) => x.date === date).sort((a, b) => (a.created < b.created ? -1 : 1)), relief: data.relief.filter((x) => dateOfIso(x.ts) === date).sort(byTs), flow: flowOn(date) };
+}
+function computeEstimate() {
+  if (!settings.estimates) return { state: 'off' };
+  const iv = intervals(); if (iv.length < 3) return { state: 'insufficient', have: iv.length };
+  const recent = iv.slice(-6).map((x) => x.days), m = Math.round(median(recent)), mn = Math.min.apply(null, recent), mx = Math.max.apply(null, recent);
+  const ps = periodsSorted(), last = ps[ps.length - 1].start;
+  const lo = addDays(last, m - Math.max(2, m - mn)), hi = addDays(last, m + Math.max(2, mx - m));
+  return { state: hi < todayStr() ? 'stale' : 'ok', lo, hi, m, n: recent.length, last, mn, mx };
+}
+// Tampon sequence: 'on' while one is in is a conflict; 'changed' swaps; 'off' clears.
+function tamponState(products) {
+  const now = new Date().toISOString(), list = products.filter((e) => e.product === 'tampon' && e.ts <= now).sort(byTs);
+  let active = null; const conflicts = [];
+  list.forEach((e) => { if (e.action === 'on') { if (active) conflicts.push(e.id); active = e; } else if (e.action === 'changed') active = e; else active = null; });
+  return { active, conflicts };
+}
+
+/* ================= 4. Storage ================= */
+function ls() { try { return window.localStorage; } catch (e) { return null; } }
+function initStorage() {
+  const s = ls();
+  try { if (!s) throw new Error('none'); s.setItem(KEY_T, '1'); s.removeItem(KEY_T); } catch (e) { state.storage.mode = 'memory'; return; }
+  let rawS = null, rawJ = null;
+  try { rawS = s.getItem(KEY_S); rawJ = s.getItem(KEY_J); } catch (e) { state.storage.mode = 'memory'; return; }
+  const bad = (reason, raw) => { state.storage.mode = 'blocked'; state.storage.raw = raw; state.storage.reason = reason; };
+  if (rawS) { try { const p = JSON.parse(rawS); if (p.version !== VERSION) return bad('Your saved settings were written by a different version of Petal.', rawS); const c = cleanSettings(p.settings); if (c.errors.length) return bad('Your saved settings could not be read.', rawS); settings = c.settings; } catch (e) { return bad('Your saved settings could not be read.', rawS); } }
+  if (rawJ) {
+    try { const p = JSON.parse(rawJ); if (!isObj(p) || p.version !== VERSION) return bad('Your saved journal was written by a different version of Petal.', rawJ);
+      const c = cleanJournal(p.journal); if (c.errors.length) return bad('Your saved journal has entries that could not be read: ' + c.errors[0], rawJ); data = c.journal;
+    } catch (e) { return bad('Your saved journal could not be read.', rawJ); }
+  }
+}
+function persist() {
+  if (state.demo) return { ok: true, demo: true };
+  if (state.storage.mode === 'blocked') return { ok: false, reason: 'Saved data that could not be read is still in this browser. Petal will not overwrite it until you choose what to do.' };
+  const s = ls();
+  try {
+    if (!s) throw new Error('none');
+    s.setItem(KEY_J, JSON.stringify({ app: 'petal', version: VERSION, savedAt: new Date().toISOString(), journal: data }));
+    s.setItem(KEY_S, JSON.stringify({ version: VERSION, settings: settings }));
+    return { ok: true };
+  } catch (e) { return { ok: false, reason: e && e.name === 'QuotaExceededError' ? 'This browser has no storage space left for Petal.' : 'This browser is not letting Petal store data. Private browsing or strict privacy settings can cause this.' }; }
+}
+// Called after any change. Only says "saved" once storage has succeeded.
+function saved(okMsg) {
+  const r = persist();
+  if (r.ok) { state.saveError = ''; toast(r.demo ? 'Done. Demo entries are not saved anywhere.' : okMsg || 'Your entry is saved.'); }
+  else { state.saveError = r.reason; }
+  render();
+  return r;
+}
+let toastTimer = null;
+function toast(msg) { const t = $('#status'); t.textContent = ''; clearTimeout(toastTimer); setTimeout(() => { t.textContent = msg; }, 40); toastTimer = setTimeout(() => { t.textContent = ''; }, 9000); }
+function applyTheme() {
+  document.documentElement.setAttribute('data-theme', settings.theme);
+  const t = THEMES.find((x) => x.id === settings.theme) || THEMES[0], f = document.getElementById('frame');
+  if (f) f.style.borderImageSource = 'url("data:image/svg+xml,' + encodeURIComponent(frameSVG(t.fr)) + '")';
+}
+
+/* ================= 5. UI primitives: dialogs, glossary, form helpers ================= */
+function restoreFocus(el, id) {
+  const t = (el && document.contains(el) && el) || (id && document.getElementById(id)) || $('#viewTitle');
+  if (t && t.focus) t.focus();
+}
+function openDialog(d) { if (!d.open) { d._opener = document.activeElement; d._openerId = d._opener && d._opener.id; d.showModal(); } }
+function wireDialog(d) { d.addEventListener('close', () => { const o = d._opener, id = d._openerId; d._opener = null; restoreFocus(o, id); }); }
+
+function confirmBox(o) {
+  return new Promise((resolve) => {
+    const d = $('#confirm'); d._res = false;
+    const keep = h('button', { type: 'button', class: 'btn', text: o.cancelText || 'Keep it', onclick: () => d.close() });
+    d.replaceChildren(h('div', { class: 'dlg-in' }, h('h2', { id: 'cfTitle', text: o.title }), h('p', { text: o.body }),
+      h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn ' + (o.danger ? 'danger solid' : 'primary'), text: o.okText, onclick: () => { d._res = true; d.close(); } }), keep)));
+    d.addEventListener('close', () => resolve(d._res), { once: true });
+    openDialog(d); keep.focus();
+  });
+}
+function openGloss(key, opener) {
+  const g = GLOSSARY[key]; if (!g) return; const d = $('#gloss');
+  d.replaceChildren(h('div', { class: 'dlg-in' }, h('div', { class: 'dlg-head' }, h('h2', { id: 'glTitle', text: g[0] }),
+    h('button', { type: 'button', class: 'btn icon', 'aria-label': 'Close definition', onclick: () => d.close() }, icon('close'))),
+    h('p', { id: 'glDef', text: g[1] })));
+  d._opener = opener; d._openerId = opener && opener.id; if (!d.open) d.showModal();
+}
+function glossBtn(key, label) {
+  if (!GLOSSARY[key]) return document.createTextNode(label || key);
+  return h('button', { type: 'button', class: 'gloss', 'aria-haspopup': 'dialog', onclick: (e) => openGloss(key, e.currentTarget) }, label || GLOSSARY[key][0], h('span', { class: 'sr-only', text: ' (tap for meaning)' }));
+}
+// Text with {{key}} or {{key|shown words}} becomes plain text plus glossary buttons.
+function rich(el, text) {
+  const re = /\{\{([a-z0-9-]+)(?:\|([^}]+))?\}\}/g; let last = 0, m;
+  while ((m = re.exec(text))) { if (m.index > last) el.append(text.slice(last, m.index)); el.append(glossBtn(m[1], m[2])); last = re.lastIndex; }
+  if (last < text.length) el.append(text.slice(last));
+  return el;
+}
+const plain = (t) => t.replace(/\{\{([a-z0-9-]+)(?:\|([^}]+))?\}\}/g, (m, k, l) => l || (GLOSSARY[k] ? GLOSSARY[k][0] : k));
+const hintEl = (id, text) => rich(h('p', { class: 'hint', id: id }), text);
+
+function chips(o) {
+  const fs = h('fieldset', { id: o.id, class: 'field' }, h('legend', { text: o.legend }));
+  if (o.hint) { fs.append(hintEl(o.id + '-hint', o.hint)); fs.setAttribute('aria-describedby', o.id + '-hint'); }
+  const wrap = h('div', { class: 'chips' });
+  o.options.forEach(([v, l]) => wrap.append(h('label', { class: 'chip' + (o.num ? ' num' : '') }, h('input', { type: o.type, name: o.name, value: v, checked: o.values.includes(v) }), h('span', { text: l }))));
+  fs.append(wrap); return fs;
+}
+function textField(o) {
+  const input = h('input', { type: o.type || 'text', id: o.id, name: o.id, value: o.value === undefined || o.value === null ? '' : o.value, maxlength: o.maxlen, min: o.min, max: o.max, step: o.step, autocomplete: 'off', 'aria-describedby': o.hint ? o.id + '-hint' : null });
+  return h('div', { class: 'field' }, h('label', { for: o.id, text: o.label }), o.hint ? hintEl(o.id + '-hint', o.hint) : null, input);
+}
+function areaField(o) {
+  return h('div', { class: 'field' }, h('label', { for: o.id, text: o.label }), o.hint ? hintEl(o.id + '-hint', o.hint) : null,
+    h('textarea', { id: o.id, name: o.id, maxlength: 1000, rows: 3, value: o.value || '', 'aria-describedby': o.hint ? o.id + '-hint' : null }));
+}
+function selectField(o) {
+  const sel = h('select', { id: o.id, name: o.id }, o.options.map(([v, l]) => h('option', { value: v, selected: String(o.value) === String(v), text: l })));
+  return h('div', { class: 'field' }, h('label', { for: o.id, text: o.label }), sel);
+}
+function checkField(o) {
+  return h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: o.id, name: o.id, checked: !!o.checked }), h('span', { text: o.label }))));
+}
+function details(children, open) { return h('details', { class: 'more', open: open ? '' : null }, h('summary', { text: 'Add details' }), children); }
+const getVals = (f, name) => Array.from(f.querySelectorAll('input[name="' + name + '"]:checked')).map((i) => i.value);
+const getVal = (f, name) => getVals(f, name)[0] || '';
+const val = (f, id) => { const e = f.querySelector('[id="' + id + '"]'); return e ? e.value.trim() : ''; };
+
+function showErrors(form, errs) {
+  form.querySelectorAll('.field-err').forEach((n) => n.remove());
+  form.querySelectorAll('[aria-invalid]').forEach((n) => n.removeAttribute('aria-invalid'));
+  form.querySelectorAll('[aria-describedby]').forEach((n) => { const t = n.getAttribute('aria-describedby').split(' ').filter((x) => x && !/-err$/.test(x)).join(' '); if (t) n.setAttribute('aria-describedby', t); else n.removeAttribute('aria-describedby'); });
+  const box = form.querySelector('.form-err'); box.replaceChildren();
+  if (!errs.length) { box.hidden = true; return; }
+  box.hidden = false;
+  box.append(h('strong', { text: 'Please fix ' + (errs.length === 1 ? 'this' : 'these') + ' before saving:' }), h('ul', null, errs.map((e) => h('li', { text: e.msg }))));
+  let first = null;
+  errs.forEach((e) => {
+    const f = e.id && form.querySelector('[id="' + e.id + '"]'); if (!f) return;
+    f.setAttribute('aria-invalid', 'true');
+    const p = h('p', { class: 'field-err', id: e.id + '-err', text: e.msg });
+    if (f.tagName === 'FIELDSET') f.append(p); else f.insertAdjacentElement('afterend', p);
+    f.setAttribute('aria-describedby', ((f.getAttribute('aria-describedby') || '') + ' ' + e.id + '-err').trim());
+    if (!first) first = f;
+  });
+  const target = first ? (first.tagName === 'FIELDSET' ? first.querySelector('input') : first) : box;
+  if (target) target.focus();
+}
+
+// Generic form dialog. o.build(form) returns content; o.submit(form) returns error list or null.
+function openForm(o) {
+  const d = $('#dlg');
+  const form = h('form', { novalidate: '', class: 'form' });
+  form.append(o.build(form));
+  form.append(h('div', { class: 'form-err', role: 'alert', tabindex: '-1', hidden: true }));
+  const actions = h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn primary', id: 'formSave', text: o.saveLabel || 'Save', onclick: () => doSubmit() }), h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => d.close() }));
+  if (o.onDelete) actions.append(h('button', { type: 'button', class: 'btn danger', text: 'Delete', onclick: async () => { if (await confirmBox({ title: o.confirmTitle || 'Delete this entry?', body: o.confirmBody || 'This removes it from your journal. This cannot be undone.', okText: 'Delete entry', danger: true })) { o.onDelete(); d.close(); } } }));
+  form.append(actions);
+  // Saving does not rely on a real form submit: sandboxed preview panes block form submission.
+  const doSubmit = () => { const errs = o.submit(form); if (errs && errs.length) { showErrors(form, errs); return; } d.close(); };
+  form.addEventListener('submit', (ev) => ev.preventDefault());
+  form.addEventListener('keydown', (ev) => { if (ev.key === 'Enter' && ev.target.tagName === 'INPUT' && ev.target.type !== 'checkbox' && ev.target.type !== 'radio') { ev.preventDefault(); doSubmit(); } });
+  d.replaceChildren(h('div', { class: 'dlg-in' }, h('div', { class: 'dlg-head' }, h('h2', { id: 'dlgTitle', text: o.title }), h('button', { type: 'button', class: 'btn icon', 'aria-label': 'Close', onclick: () => d.close() }, icon('close'))), form));
+  d.setAttribute('aria-labelledby', 'dlgTitle');
+  openDialog(d);
+  const first = form.querySelector('input:not([type=hidden]),textarea,select'); if (first && !o.noFocus) first.focus();
+}
+function openInfoDialog(title, nodes) {
+  const d = $('#dlg');
+  d.replaceChildren(h('div', { class: 'dlg-in' }, h('div', { class: 'dlg-head' }, h('h2', { id: 'dlgTitle', text: title }), h('button', { type: 'button', class: 'btn icon', 'aria-label': 'Close', onclick: () => d.close() }, icon('close'))), nodes));
+  d.setAttribute('aria-labelledby', 'dlgTitle'); openDialog(d);
+}
+function upsert(arr, rec) { const i = arr.findIndex((x) => x.id === rec.id); if (i >= 0) arr[i] = rec; else arr.push(rec); }
+function remove(arr, id) { const i = arr.findIndex((x) => x.id === id); if (i >= 0) arr.splice(i, 1); }
+const logDate = () => (state.sel > todayStr() ? todayStr() : state.sel);
+function extLink(src) { return h('a', { href: src.url, target: '_blank', rel: 'noopener noreferrer' }, src.label, h('span', { class: 'sr-only', text: ' (opens in a new tab, needs internet)' })); }
+
+/* ================= 6. Logging forms ================= */
+function openLogMenu() {
+  const items = [
+    ['period', 'drop', 'Start or end period', 'Mark when bleeding starts or stops'],
+    ['flow', 'flow', 'Log flow', 'How much bleeding today'],
+    ['product', 'product', 'Log product change', 'Pad, tampon, cup, disc, or period underwear'],
+    ['pain', 'pain', 'Log pain', 'How strong, where, and what helped'],
+    ['mood', 'mood', 'Log mood or symptoms', 'Mood, energy, sleep, and how your body feels'],
+    ['relief', 'relief', 'Log medication or relief', 'A personal record of what you tried']
+  ];
+  const go = { period: () => { const o = getOngoing(); openPeriodForm(o ? { mode: 'end', id: o.id } : { mode: 'start' }); }, flow: () => openFlowForm(), product: () => openProductForm(), pain: () => openPainForm(), mood: () => openMoodForm(), relief: () => openReliefForm() };
+  openInfoDialog('Log something', [h('p', { class: 'hint', text: "You can skip anything you don't want to track." }),
+    h('div', { class: 'logmenu' }, items.map((i) => h('button', { type: 'button', class: 'btn', onclick: go[i[0]] }, icon(i[1]), h('span', null, i[2], h('small', { text: i[3] })))))]);
+}
+
+/* ---- Periods ---- */
+function openPeriodForm(o) {
+  const ex = o.id ? data.periods.find((p) => p.id === o.id) : null, mode = o.mode, ongoingOther = data.periods.find((p) => !p.end && (!ex || p.id !== ex.id));
+  const today = todayStr();
+  const title = mode === 'end' ? 'End this period?' : ex ? 'Edit period' : 'Add a period';
+  openForm({
+    title, saveLabel: mode === 'end' ? 'Yes, end period' : 'Save',
+    onDelete: ex && mode !== 'end' ? () => { remove(data.periods, ex.id); saved('The period record is deleted.'); } : null,
+    confirmTitle: 'Delete this period record?', confirmBody: 'Flow, pain, and other entries you logged on those days stay in your journal. Only the period record is removed.',
+    build: (f) => {
+      const frag = document.createDocumentFragment();
+      if (mode === 'end') {
+        const defEnd = state.sel >= ex.start && state.sel <= today ? state.sel : today;
+        frag.append(h('p', { text: 'This period started on ' + fmtLong(ex.start) + '. Pick the last day of bleeding. Petal will not end a period for you.' }), textField({ id: 'pe-end', type: 'date', label: 'Last day of this period', value: defEnd, min: ex.start, max: today }), areaField({ id: 'pe-note', label: 'Note (optional)', value: ex.note }));
+      } else {
+        const ongoingDefault = ex ? !ex.end : !ongoingOther && !o.past;
+        frag.append(textField({ id: 'pe-start', type: 'date', label: 'First day', value: ex ? ex.start : logDate(), max: today }),
+          h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: 'pe-ongoing', name: 'pe-ongoing', checked: ongoingDefault, disabled: !!ongoingOther, onchange: (e) => { f.querySelector('#pe-end').disabled = e.target.checked; } }), h('span', { text: 'This period is still going' }))),
+            ongoingOther ? h('p', { class: 'hint', text: 'Another period is marked as ongoing (started ' + fmtShort(ongoingOther.start) + '). Only one can be ongoing, so add an end date here, or end that one first.' }) : null),
+          textField({ id: 'pe-end', type: 'date', label: 'Last day', value: ex && ex.end ? ex.end : '', max: today, hint: 'Leave empty only if the period is still going.' }), areaField({ id: 'pe-note', label: 'Note (optional)', value: ex ? ex.note : '' }));
+        setTimeout(() => { const c = f.querySelector('#pe-ongoing'), e = f.querySelector('#pe-end'); if (c && e) e.disabled = c.checked; }, 0);
+      }
+      frag.append(h('details', { class: 'more', open: '' }, h('summary', { text: 'How much, and pain, for each day (optional)' }), h('div', { id: 'pe-days' })));
+      const refresh = () => {
+        const host = f.querySelector('#pe-days'), keep = {}; host.querySelectorAll('select').forEach((x) => { keep[x.id] = x.value; }); host.replaceChildren();
+        const st = mode === 'end' ? ex.start : val(f, 'pe-start'), on = mode !== 'end' && f.querySelector('#pe-ongoing').checked, en = on ? today : val(f, 'pe-end');
+        if (!isDateStr(st) || !isDateStr(en || '') || en < st || st > today) { host.append(h('p', { class: 'hint', text: 'Pick valid dates above to add details for each day.' })); return; }
+        const last = en > today ? today : en, n = dayDiff(st, last) + 1, cap = Math.min(n, 31);
+        host.append(h('p', { class: 'hint', text: n + (n === 1 ? ' day' : ' days') + (on ? ' so far, up to today' : '') + '. Choose how much bleeding and any pain for each day, or skip. Add products, mood, or relief from the buttons on a day.' + (n > 31 ? ' Showing the first 31 days.' : '') }));
+        const flowOpts = [['', 'Skip']].concat(FLOW), painOpts = [['', 'Skip']].concat(Array.from({ length: 11 }, (_, i) => [String(i), String(i)]));
+        for (let i = 0; i < cap; i++) {
+          const d = addDays(st, i), cur = flowOn(d), fid = 'pd-f-' + d, pid = 'pd-p-' + d;
+          host.append(h('div', { class: 'pday' }, h('p', { class: 'pday-t', text: 'Day ' + (i + 1) + ': ' + fmtShort(d) }),
+            selectField({ id: fid, label: 'How much', options: flowOpts, value: keep[fid] !== undefined ? keep[fid] : cur ? cur.level : '' }),
+            selectField({ id: pid, label: 'Pain (0 to 10)', options: painOpts, value: keep[pid] !== undefined ? keep[pid] : '' })));
+        }
+      };
+      setTimeout(() => { refresh(); ['pe-start', 'pe-end', 'pe-ongoing'].forEach((id) => { const e = f.querySelector('#' + id); if (e) e.addEventListener('change', refresh); }); }, 0);
+      return frag;
+    },
+    submit: (f) => {
+      const errs = []; let start, end;
+      if (mode === 'end') { start = ex.start; end = val(f, 'pe-end'); if (!isDateStr(end)) errs.push({ id: 'pe-end', msg: 'Choose the last day of this period.' }); }
+      else {
+        start = val(f, 'pe-start'); const on = f.querySelector('#pe-ongoing').checked; end = on ? null : val(f, 'pe-end');
+        if (!isDateStr(start)) errs.push({ id: 'pe-start', msg: 'Choose a valid first day.' });
+        if (!on && !isDateStr(end || '')) errs.push({ id: 'pe-end', msg: 'Add a last day, or tick "This period is still going".' });
+        if (on && ongoingOther) errs.push({ id: 'pe-ongoing', msg: 'Another period is already marked as ongoing.' });
+      }
+      if (isDateStr(start) && start > today) errs.push({ id: mode === 'end' ? 'pe-end' : 'pe-start', msg: 'The first day cannot be in the future.' });
+      if (end && isDateStr(end)) { if (end > today) errs.push({ id: 'pe-end', msg: 'The last day cannot be in the future.' }); if (isDateStr(start) && end < start) errs.push({ id: 'pe-end', msg: 'The last day is before the first day (' + fmtShort(start) + '). Choose the same day or later.' }); }
+      if (!errs.length) { const ov = periodOverlap(start, end, ex && ex.id); if (ov) errs.push({ id: mode === 'end' ? 'pe-end' : 'pe-start', msg: 'These dates overlap a period you already logged (' + fmtShort(ov.start) + (ov.end ? ' to ' + fmtShort(ov.end) : ', ongoing') + '). Edit that one or choose different dates.' }); }
+      if (errs.length) return errs;
+      upsert(data.periods, { id: ex ? ex.id : uid(), start, end: end || null, note: val(f, 'pe-note').slice(0, 1000) });
+      // Per-day extras: only days inside this period, and only what the person chose.
+      const lastDay = end || today, nowIso = new Date().toISOString();
+      f.querySelectorAll('#pe-days select').forEach((sel) => {
+        const m = /^pd-([fp])-(\d{4}-\d{2}-\d{2})$/.exec(sel.id); if (!m || sel.value === '' || m[2] < start || m[2] > lastDay) return;
+        if (m[1] === 'f') { const cur = flowOn(m[2]); upsert(data.flow, { id: cur ? cur.id : uid(), date: m[2], level: sel.value, leaks: cur ? cur.leaks : false, between: cur ? cur.between : false, overnight: cur ? cur.overnight : false, note: cur ? cur.note : '' }); }
+        else { let t = atTime(m[2], 12, 0); if (t > nowIso) t = new Date(Date.now() - 60000).toISOString(); data.pain.push({ id: uid(), ts: t, intensity: Number(sel.value), locations: [], types: [], startTime: '', duration: null, impact: '', relief: [], note: '' }); }
+      });
+      saved(mode === 'end' ? 'Your period is marked as ended.' : 'Your period record is saved.'); return null;
+    }
+  });
+}
+
+/* ---- Flow ---- */
+function openFlowForm(id) {
+  const ex = id ? data.flow.find((x) => x.id === id) : flowOn(logDate()), today = todayStr();
+  openForm({
+    title: ex ? 'Edit flow' : 'Log flow', onDelete: ex ? () => { remove(data.flow, ex.id); saved('The flow entry is deleted.'); } : null,
+    build: (f) => {
+      const frag = document.createDocumentFragment();
+      const note = h('p', { class: 'hint', id: 'fl-exists' });
+      const dateF = textField({ id: 'fl-date', type: 'date', label: 'Date', value: ex ? ex.date : logDate(), max: today });
+      dateF.querySelector('input').addEventListener('change', (e) => { const x = flowOn(e.target.value); note.textContent = x ? 'You already have a flow entry for this day. Saving will update it.' : ''; });
+      frag.append(dateF, note,
+        chips({ id: 'fl-level', name: 'level', type: 'radio', legend: 'How is your {{flow}} today?'.replace(/\{\{flow\}\}/, '{{flow}}'), options: FLOW, values: ex ? [ex.level] : [], hint: '"None" means you had no bleeding. If you did not track, just leave this closed. {{spotting}} is a small amount of bleeding.' }),
+        details([checkField({ id: 'fl-leaks', label: 'Leaks', checked: ex && ex.leaks }), checkField({ id: 'fl-between', label: 'Bleeding between periods', checked: ex && ex.between }), checkField({ id: 'fl-night', label: 'Overnight bleeding issues', checked: ex && ex.overnight }), areaField({ id: 'fl-note', label: 'Note (optional)', value: ex ? ex.note : '' })], ex && (ex.leaks || ex.between || ex.overnight || ex.note)));
+      // legend with glossary: rebuild legend text safely
+      const lg = frag.querySelector('#fl-level legend'); lg.replaceChildren(); rich(lg, 'How is your {{flow}} today?');
+      return frag;
+    },
+    submit: (f) => {
+      const errs = [], date = val(f, 'fl-date'), level = getVal(f, 'level');
+      if (!isDateStr(date)) errs.push({ id: 'fl-date', msg: 'Choose a valid date.' }); else if (date > today) errs.push({ id: 'fl-date', msg: 'You can log flow for today or earlier.' });
+      if (!level) errs.push({ id: 'fl-level', msg: 'Choose one option.' });
+      if (errs.length) return errs;
+      const same = flowOn(date);
+      upsert(data.flow, { id: ex ? ex.id : same ? same.id : uid(), date, level, leaks: f.querySelector('#fl-leaks').checked, between: f.querySelector('#fl-between').checked, overnight: f.querySelector('#fl-night').checked, note: val(f, 'fl-note') });
+      if (ex && same && ex.id !== same.id) remove(data.flow, ex.id);
+      saved('Your flow entry is saved.'); return null;
+    }
+  });
+}
+
+/* ---- Products ---- */
+function openProductForm(id, pre) {
+  const ex = id ? data.products.find((x) => x.id === id) : null; pre = pre || {};
+  const lastP = data.products.slice().sort(byTs).pop();
+  const startProduct = ex ? ex.product : pre.product || (lastP ? lastP.product : '');
+  openForm({
+    title: ex ? 'Edit product entry' : 'Log product change', onDelete: ex ? () => {
+      const before = tamponState(data.products).conflicts.length; remove(data.products, ex.id);
+      const after = tamponState(data.products).conflicts.length; saved('The product entry is deleted.');
+      if (after > before) toast('Heads up: your tampon entries now show two insertions with no removal between them. Check your product entries.');
+    } : null,
+    build: (f) => {
+      const frag = document.createDocumentFragment(); const host = h('div', { id: 'pr-actionHost' });
+      const fill = () => { const p = getVal(f, 'product'), cur = getVal(f, 'action') || (ex ? ex.action : '') || pre.action || ''; const L = ACTION_LABELS[p] || ACTION_LABELS['']; host.replaceChildren(chips({ id: 'pr-action', name: 'action', type: 'radio', legend: 'What happened?', options: ACTIONS.map((a) => [a, L[a]]), values: cur ? [cur] : [] })); };
+      const prod = chips({ id: 'pr-product', name: 'product', type: 'radio', legend: 'Product', options: PRODUCTS, values: startProduct ? [startProduct] : [] });
+      prod.addEventListener('change', fill);
+      frag.append(prod, host, textField({ id: 'pr-ts', type: 'datetime-local', label: 'Date and time', value: ex ? toLocalInput(ex.ts) : nowLocalInput(), max: nowLocalInput() }),
+        details([textField({ id: 'pr-abs', label: 'Absorbency or product description (optional)', value: ex ? ex.absorbency : '', maxlen: 80, hint: 'For example "regular" or "overnight". {{absorbency}} is how much a product is designed to hold.' }),
+          chips({ id: 'pr-full', name: 'fullness', type: 'radio', legend: 'How full was it? (optional)', options: FULLNESS, values: ex && ex.fullness ? [ex.fullness] : [], hint: 'Changing for comfort is different from a fully soaked product. Log whichever is true for you. Petal never turns this into an amount of blood.' }),
+          chips({ id: 'pr-reason', name: 'reason', type: 'radio', legend: 'Why did you change it? (optional)', options: REASONS, values: ex && ex.reason ? [ex.reason] : [] }),
+          checkField({ id: 'pr-night', label: 'Overnight change', checked: ex && ex.overnight }), checkField({ id: 'pr-double', label: 'Used more than one product at once', checked: ex && ex.double }),
+          areaField({ id: 'pr-note', label: 'Note (optional)', value: ex ? ex.note : '' })], ex && (ex.absorbency || ex.fullness || ex.reason || ex.overnight || ex.double || ex.note)));
+      fill(); return frag;
+    },
+    submit: (f) => {
+      const errs = [], product = getVal(f, 'product'), action = getVal(f, 'action'), ts = isoFromLocalInput(val(f, 'pr-ts'));
+      if (!product) errs.push({ id: 'pr-product', msg: 'Choose a product.' });
+      if (!action) errs.push({ id: 'pr-action', msg: 'Choose what happened.' });
+      if (!ts) errs.push({ id: 'pr-ts', msg: 'Enter a valid date and time.' }); else if (new Date(ts).getTime() > Date.now() + 60000) errs.push({ id: 'pr-ts', msg: 'Product entries cannot be in the future. Log it when it happens.' });
+      const rec = { id: ex ? ex.id : uid(), ts, product, action, absorbency: val(f, 'pr-abs'), fullness: getVal(f, 'fullness'), reason: getVal(f, 'reason'), overnight: f.querySelector('#pr-night').checked, double: f.querySelector('#pr-double').checked, note: val(f, 'pr-note') };
+      if (!errs.length && product === 'tampon') {
+        const old = new Set(tamponState(data.products).conflicts), cand = data.products.filter((x) => x.id !== rec.id).concat([rec]);
+        const bad = tamponState(cand).conflicts.filter((c) => !old.has(c));
+        if (bad.length) errs.push({ id: 'pr-action', msg: 'Your log already shows a tampon in at that time, so this would mean two at once. Choose "Changed", or add a "Removed" entry first.' });
+      }
+      if (errs.length) return errs;
+      upsert(data.products, rec); saved('Your product entry is saved.'); return null;
+    }
+  });
+}
+
+/* ---- Pain ---- */
+function openPainForm(id) {
+  const ex = id ? data.pain.find((x) => x.id === id) : null;
+  openForm({
+    title: ex ? 'Edit pain entry' : 'Log pain', onDelete: ex ? () => { remove(data.pain, ex.id); saved('The pain entry is deleted.'); } : null,
+    build: (f) => {
+      const frag = document.createDocumentFragment(); const read = h('p', { class: 'big', id: 'pn-read', 'aria-hidden': 'true', text: ex ? 'Pain: ' + ex.intensity + ' of 10' : 'Choose a number' });
+      const nums = chips({ id: 'pn-int', name: 'intensity', type: 'radio', num: true, legend: 'How strong is the pain? (0 to 10)', options: Array.from({ length: 11 }, (_, i) => [String(i), String(i)]), values: ex ? [String(ex.intensity)] : [] });
+      nums.addEventListener('change', () => { read.textContent = 'Pain: ' + getVal(f, 'intensity') + ' of 10'; });
+      frag.append(textField({ id: 'pn-ts', type: 'datetime-local', label: 'Date and time', value: ex ? toLocalInput(ex.ts) : nowLocalInput(), max: nowLocalInput() }), nums, read,
+        h('p', { class: 'hint', text: '0 is "No pain". 10 is "Worst pain you can imagine". Pain that bothers you is worth writing down.' }),
+        chips({ id: 'pn-loc', name: 'loc', type: 'checkbox', legend: 'Where? (pick any)', options: PAIN_LOC, values: ex ? ex.locations : [], hint: 'The {{pelvis}} is the lower part of your body between your belly and the tops of your legs.' }),
+        details([chips({ id: 'pn-type', name: 'ptype', type: 'checkbox', legend: 'What does it feel like?', options: PAIN_TYPE, values: ex ? ex.types : [] }),
+          textField({ id: 'pn-start', type: 'time', label: 'When did it start? (optional)', value: ex ? ex.startTime : '' }), textField({ id: 'pn-dur', type: 'number', label: 'How long did it last, in minutes? (optional)', value: ex && ex.duration ? ex.duration : '', min: 1, max: 1440, step: 1 }),
+          chips({ id: 'pn-impact', name: 'impact', type: 'radio', legend: 'How much did it get in the way?', options: IMPACT, values: ex && ex.impact ? [ex.impact] : [] }),
+          chips({ id: 'pn-relief', name: 'prelief', type: 'checkbox', legend: 'What did you try?', options: PAIN_RELIEF, values: ex ? ex.relief : [] }),
+          areaField({ id: 'pn-note', label: 'Note (optional)', value: ex ? ex.note : '' })], ex && (ex.types.length || ex.startTime || ex.duration || ex.impact || ex.relief.length || ex.note)));
+      return frag;
+    },
+    submit: (f) => {
+      const errs = [], ts = isoFromLocalInput(val(f, 'pn-ts')), inten = getVal(f, 'intensity'), durS = val(f, 'pn-dur');
+      if (!ts) errs.push({ id: 'pn-ts', msg: 'Enter a valid date and time.' }); else if (new Date(ts).getTime() > Date.now() + 60000) errs.push({ id: 'pn-ts', msg: 'Pain entries cannot be in the future.' });
+      if (inten === '') errs.push({ id: 'pn-int', msg: 'Choose a number from 0 to 10.' });
+      let dur = null; if (durS) { dur = Number(durS); if (!Number.isInteger(dur) || dur < 1 || dur > 1440) errs.push({ id: 'pn-dur', msg: 'Use a whole number of minutes from 1 to 1440.' }); }
+      if (errs.length) return errs;
+      upsert(data.pain, { id: ex ? ex.id : uid(), ts, intensity: Number(inten), locations: getVals(f, 'loc'), types: getVals(f, 'ptype'), startTime: val(f, 'pn-start'), duration: dur, impact: getVal(f, 'impact'), relief: getVals(f, 'prelief'), note: val(f, 'pn-note') });
+      saved('Your pain entry is saved.'); return null;
+    }
+  });
+}
+
+/* ---- Mood, energy, sleep, symptoms ---- */
+function symptomChoices(extra) {
+  const hid = settings.hiddenSymptoms, list = SYMPTOMS.concat(settings.customSymptoms).filter((n) => !hid.includes(n));
+  (extra || []).forEach((n) => { if (!list.includes(n)) list.push(n); });
+  return list;
+}
+function openMoodForm(id) {
+  const ex = id ? data.moods.find((x) => x.id === id) : null, today = todayStr();
+  openForm({
+    title: ex ? 'Edit mood and symptoms' : 'Log mood or symptoms', onDelete: ex ? () => { remove(data.moods, ex.id); saved('The entry is deleted.'); } : null,
+    build: (f) => {
+      const frag = document.createDocumentFragment(), cur = ex ? ex.symptoms : [];
+      const symWrap = h('fieldset', { id: 'md-sym', class: 'field' }, h('legend', { text: 'Symptoms (pick any)' }));
+      symWrap.append(hintEl('md-sym-hint', 'A {{symptom}} is a change in how your body feels or works. Set how strong it is if you want to.'));
+      symptomChoices(cur.map((s) => s.name)).forEach((name, i) => {
+        const c = cur.find((s) => s.name === name);
+        const sev = h('select', { id: 'sev-' + i, 'data-sym': name, 'aria-label': 'Severity of ' + name, hidden: !c }, SEVERITY.map(([v, l]) => h('option', { value: v, selected: c && c.severity === v, text: l })));
+        const box = h('input', { type: 'checkbox', name: 'sym', value: name, checked: !!c, onchange: (e) => { sev.hidden = !e.target.checked; if (e.target.checked) f.querySelector('#md-none').checked = false; } });
+        symWrap.append(h('div', { class: 'symrow' }, h('label', { class: 'chip' }, box, h('span', { text: name })), sev));
+      });
+      const none = h('input', { type: 'checkbox', id: 'md-none', name: 'nosym', checked: !!(ex && ex.noSymptoms), onchange: (e) => { if (e.target.checked) { f.querySelectorAll('input[name="sym"]').forEach((b) => { b.checked = false; const s = f.querySelector('[data-sym="' + b.value.replace(/"/g, '\\"') + '"]'); if (s) s.hidden = true; }); } } });
+      symWrap.append(h('div', { class: 'symrow' }, h('label', { class: 'chip' }, none, h('span', { text: 'No symptoms today' }))), h('p', { class: 'hint', text: 'Pick this to record that you had none. If you leave everything empty, Petal records nothing for symptoms.' }));
+      frag.append(textField({ id: 'md-date', type: 'date', label: 'Date', value: ex ? ex.date : logDate(), max: today }),
+        chips({ id: 'md-mood', name: 'mood', type: 'checkbox', legend: 'How are you feeling?', options: MOODS, values: ex ? ex.moods : [] }),
+        chips({ id: 'md-energy', name: 'energy', type: 'radio', legend: 'Energy', options: ENERGY, values: ex && ex.energy ? [ex.energy] : [] }), symWrap,
+        details([textField({ id: 'md-sleep', type: 'number', label: 'Hours slept (optional)', value: ex && ex.sleepHours !== null ? ex.sleepHours : '', min: 0, max: 24, step: 0.5 }),
+          chips({ id: 'md-sq', name: 'sq', type: 'radio', legend: 'How was your sleep? (optional)', options: SLEEPQ, values: ex && ex.sleepQuality ? [ex.sleepQuality] : [] }),
+          areaField({ id: 'md-note', label: 'Anything else today?', value: ex ? ex.note : '' })], ex && (ex.sleepHours !== null || ex.sleepQuality || ex.note)));
+      return frag;
+    },
+    submit: (f) => {
+      const errs = [], date = val(f, 'md-date'), sleepS = val(f, 'md-sleep');
+      if (!isDateStr(date)) errs.push({ id: 'md-date', msg: 'Choose a valid date.' }); else if (date > today) errs.push({ id: 'md-date', msg: 'You can log for today or earlier.' });
+      let sleep = null; if (sleepS) { sleep = Number(sleepS); if (!isFinite(sleep) || sleep < 0 || sleep > 24) errs.push({ id: 'md-sleep', msg: 'Hours slept must be from 0 to 24.' }); }
+      const syms = getVals(f, 'sym').map((n) => { const s = f.querySelector('[data-sym="' + n.replace(/"/g, '\\"') + '"]'); return { name: n, severity: s ? s.value : '' }; });
+      const none = f.querySelector('#md-none').checked, moods = getVals(f, 'mood'), energy = getVal(f, 'energy'), sq = getVal(f, 'sq'), note = val(f, 'md-note');
+      if (!errs.length && !moods.length && !energy && !syms.length && !none && sleep === null && !sq && !note) errs.push({ id: 'md-mood', msg: 'Choose at least one thing to record, or close this window.' });
+      if (errs.length) return errs;
+      upsert(data.moods, { id: ex ? ex.id : uid(), date, created: ex ? ex.created : new Date().toISOString(), moods, energy, sleepHours: sleep, sleepQuality: sq, symptoms: syms, noSymptoms: none, note });
+      saved('Your entry is saved.'); return null;
+    }
+  });
+}
+
+/* ---- Medication and relief ---- */
+function openReliefForm(id) {
+  const ex = id ? data.relief.find((x) => x.id === id) : null; const nums = [['', 'Skip']].concat(Array.from({ length: 11 }, (_, i) => [String(i), String(i)]));
+  openForm({
+    title: ex ? 'Edit medication or relief' : 'Log medication or relief', onDelete: ex ? () => { remove(data.relief, ex.id); saved('The entry is deleted.'); } : null,
+    build: (f) => {
+      const frag = document.createDocumentFragment();
+      frag.append(h('p', { class: 'info', text: 'This is a personal record, not medication guidance. Petal does not suggest doses, timing, or check interactions. Ask a pharmacist, doctor, or a trusted adult what is right for you.' }),
+        textField({ id: 'rl-ts', type: 'datetime-local', label: 'Date and time', value: ex ? toLocalInput(ex.ts) : nowLocalInput(), max: nowLocalInput() }),
+        textField({ id: 'rl-med', label: 'Medication name (optional)', value: ex ? ex.medication : '', maxlen: 80 }),
+        textField({ id: 'rl-dose', label: 'Dose, in your own words (optional)', value: ex ? ex.dose : '', maxlen: 80, hint: 'Write what the label or a trusted adult told you. Petal does not check it.' }),
+        chips({ id: 'rl-non', name: 'nonmed', type: 'checkbox', legend: 'Other things you tried (optional)', options: NONMED, values: ex ? ex.nonMed : [] }),
+        details([selectField({ id: 'rl-before', label: 'Pain before (0 to 10, optional)', options: nums, value: ex && ex.before !== null ? ex.before : '' }), selectField({ id: 'rl-after', label: 'Pain after (0 to 10, optional)', options: nums, value: ex && ex.after !== null ? ex.after : '' }),
+          chips({ id: 'rl-help', name: 'helped', type: 'radio', legend: 'Did it help? (optional)', options: HELPED, values: [ex ? ex.helped : ''] }),
+          areaField({ id: 'rl-note', label: 'Note (optional)', value: ex ? ex.note : '' })], ex && (ex.before !== null || ex.after !== null || ex.helped || ex.note)));
+      return frag;
+    },
+    submit: (f) => {
+      const errs = [], ts = isoFromLocalInput(val(f, 'rl-ts')), med = val(f, 'rl-med'), non = getVals(f, 'nonmed');
+      if (!ts) errs.push({ id: 'rl-ts', msg: 'Enter a valid date and time.' }); else if (new Date(ts).getTime() > Date.now() + 60000) errs.push({ id: 'rl-ts', msg: 'Entries cannot be in the future. Log it after it happens.' });
+      if (!med && !non.length) errs.push({ id: 'rl-med', msg: 'Add a medication name, or pick something else you tried.' });
+      if (errs.length) return errs;
+      const n = (id) => { const v = val(f, id); return v === '' ? null : Number(v); };
+      upsert(data.relief, { id: ex ? ex.id : uid(), ts, medication: med, dose: val(f, 'rl-dose'), nonMed: non, before: n('rl-before'), after: n('rl-after'), helped: getVal(f, 'helped'), note: val(f, 'rl-note') });
+      saved('Your entry is saved.'); return null;
+    }
+  });
+}
+function editEntry(type, id) { ({ period: () => openPeriodForm({ id, mode: 'edit' }), flow: () => openFlowForm(id), product: () => openProductForm(id), pain: () => openPainForm(id), mood: () => openMoodForm(id), relief: () => openReliefForm(id) })[type](); }
+
+/* ================= 7. Shared view pieces ================= */
+function card(title, kids, cls, id) { return h('section', { class: 'card' + (cls ? ' ' + cls : ''), id: id || null, 'aria-label': id ? null : null }, title ? h('h2', { text: title }) : null, kids); }
+function flowText(f) { return f ? (f.level === 'none' ? 'None (you logged no bleeding)' : labelOf(FLOW, f.level)) : ''; }
+function joinLabels(list, vals) { return vals.map((v) => labelOf(list, v)).join(', '); }
+function actionShort(p, a) { if (a === 'changed') return p === 'cup' || p === 'disc' ? 'emptied and put back' : p === 'underwear' ? 'changed' : 'changed'; if (a === 'on') return ['tampon', 'cup', 'disc'].includes(p) ? 'inserted' : 'put on'; return p === 'underwear' ? 'taken off' : 'removed'; }
+const productName = (p) => labelOf(PRODUCTS, p);
+
+// Everything logged on a date as a list of {t, type, id, title, detail}
+function dayItems(date) {
+  const items = [], base = localDate(date).getTime();
+  data.periods.forEach((p) => {
+    if (p.start === date && p.end === date) items.push({ t: base, type: 'period', id: p.id, title: 'Period started and ended', detail: p.note });
+    else if (p.start === date) items.push({ t: base, type: 'period', id: p.id, title: 'Period started', detail: p.note });
+    else if (p.end === date) items.push({ t: base + 2, type: 'period', id: p.id, title: 'Period ended', detail: p.note });
+  });
+  const pd = periodOn(date);
+  if (pd && pd.start !== date && pd.end !== date) items.push({ t: base + 1, type: 'period', id: pd.id, title: 'Period day ' + (dayDiff(pd.start, date) + 1), detail: pd.end ? '' : 'Still going' });
+  else if (pd && !pd.end && pd.start === date) items[items.length - 1].detail = (items[items.length - 1].detail ? items[items.length - 1].detail + '. ' : '') + 'Still going';
+  const e = entriesOn(date);
+  if (e.flow) { const f = e.flow, bits = [f.leaks && 'leaks', f.between && 'bleeding between periods', f.overnight && 'overnight bleeding issues', f.note].filter(Boolean); items.push({ t: base + 1, type: 'flow', id: f.id, title: 'Flow: ' + (f.level === 'none' ? 'none' : labelOf(FLOW, f.level).toLowerCase()), detail: bits.join('. ') }); }
+  e.products.forEach((x) => items.push({ t: new Date(x.ts).getTime(), time: fmtTime(x.ts), type: 'product', id: x.id, title: productName(x.product) + ' ' + actionShort(x.product, x.action), detail: [x.absorbency, x.fullness && labelOf(FULLNESS, x.fullness), x.reason && labelOf(REASONS, x.reason), x.overnight && 'overnight', x.double && 'double protection', x.note].filter(Boolean).join('. ') }));
+  e.pain.forEach((x) => items.push({ t: new Date(x.ts).getTime(), time: fmtTime(x.ts), type: 'pain', id: x.id, title: 'Pain: ' + x.intensity + ' of 10', detail: [joinLabels(PAIN_LOC, x.locations), joinLabels(PAIN_TYPE, x.types).toLowerCase(), x.impact && labelOf(IMPACT, x.impact), x.duration && x.duration + ' min', x.note].filter(Boolean).join('. ') }));
+  e.moods.forEach((x) => items.push({ t: new Date(x.created).getTime(), type: 'mood', id: x.id, title: 'Mood and symptoms', detail: moodSummary(x) }));
+  e.relief.forEach((x) => items.push({ t: new Date(x.ts).getTime(), time: fmtTime(x.ts), type: 'relief', id: x.id, title: 'Medication or relief' + (x.medication ? ': ' + x.medication : ''), detail: [x.dose && 'Dose noted: ' + x.dose, joinLabels(NONMED, x.nonMed), x.helped && 'Did it help: ' + labelOf(HELPED, x.helped).toLowerCase(), x.note].filter(Boolean).join('. ') }));
+  return items.sort((a, b) => a.t - b.t);
+}
+function moodSummary(x) {
+  return [x.moods.length && 'Mood: ' + joinLabels(MOODS, x.moods).toLowerCase(), x.energy && 'Energy: ' + labelOf(ENERGY, x.energy).toLowerCase(), x.sleepHours !== null && 'Sleep: ' + x.sleepHours + ' h' + (x.sleepQuality ? ' (' + labelOf(SLEEPQ, x.sleepQuality).toLowerCase() + ')' : ''),
+    x.symptoms.length && 'Symptoms: ' + x.symptoms.map((s) => s.name + (s.severity ? ' (' + s.severity + ')' : '')).join(', '), x.noSymptoms && 'No symptoms today', x.note].filter(Boolean).join('. ');
+}
+function quickRow() {
+  const q = [['drop', 'Start or end period', () => { const o = getOngoing(); const inP = periodOn(logDate()); if (o && !inP) openPeriodForm({ mode: 'end', id: o.id }); else if (inP) openPeriodForm({ mode: 'edit', id: inP.id }); else openPeriodForm({ mode: 'start' }); }], ['flow', 'How much (flow)', () => openFlowForm()], ['product', 'Product', () => openProductForm()], ['pain', 'Pain', () => openPainForm()], ['mood', 'Mood and symptoms', () => openMoodForm()], ['relief', 'Medication or relief', () => openReliefForm()]];
+  return h('div', { class: 'quick', role: 'group', 'aria-label': 'Add to ' + fmtShort(logDate()) }, q.map((x) => h('button', { type: 'button', class: 'btn', onclick: x[2] }, icon(x[0], 20), x[1])));
+}
+function activityList(date) {
+  const items = dayItems(date);
+  if (!items.length) return h('p', { class: 'muted', text: "Nothing logged yet. Add an entry whenever you're ready." });
+  return h('ol', { class: 'activity' }, items.map((i) => h('li', null, h('span', { class: 'time', text: i.time || 'All day' }),
+    h('div', null, h('div', { class: 't', text: i.title }), i.detail ? h('p', { class: 'muted small', text: i.detail }) : null),
+    h('button', { type: 'button', class: 'btn', id: 'edit-' + i.id, 'aria-label': 'Edit: ' + i.title, onclick: () => editEntry(i.type, i.id) }, icon('edit', 18), 'Edit'))));
+}
+
+/* ================= 8. Today ================= */
+function viewToday(root) {
+  const today = todayStr(), sel = state.sel, ongoing = getOngoing(), e = entriesOn(sel);
+  root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: sel === today ? 'Today' : 'Journal' }), h('p', { class: 'muted', text: fmtLong(sel) }));
+  if (!settings.introDismissed && !state.demo) root.append(introCard());
+  root.append(h('div', { class: 'datebar' },
+    h('button', { type: 'button', class: 'btn icon', id: 'prevDay', 'aria-label': 'Previous day', onclick: () => { state.sel = addDays(sel, -1); render('prevDay'); } }, icon('prev')),
+    h('label', { class: 'sr-only', for: 'selDate', text: 'Choose a date' }), h('input', { type: 'date', id: 'selDate', value: sel, onchange: (ev) => { if (isDateStr(ev.target.value)) { state.sel = ev.target.value; render('selDate'); } } }),
+    h('button', { type: 'button', class: 'btn icon', id: 'nextDay', 'aria-label': 'Next day', onclick: () => { state.sel = addDays(sel, 1); render('nextDay'); } }, icon('next')),
+    sel !== today ? h('button', { type: 'button', class: 'btn', id: 'backToday', text: 'Back to today', onclick: () => { state.sel = today; render('logBtn'); } }) : null));
+  if (sel > today) root.append(h('p', { class: 'info', text: 'This is a future date. You can log things once the day arrives. Logging below uses today.' }));
+  root.append(h('button', { type: 'button', class: 'btn primary big-btn', id: 'logBtn', onclick: openLogMenu }, icon('plus'), 'Log something'));
+
+  // Period status
+  const stat = h('div');
+  if (ongoing) { const n = dayDiff(ongoing.start, today) + 1; stat.append(h('p', { class: 'big', text: 'Period ongoing: day ' + n }), h('p', { class: 'muted', text: 'Started ' + fmtLong(ongoing.start) + '. Petal only ends it when you say so.' }), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'End period', onclick: () => openPeriodForm({ mode: 'end', id: ongoing.id }) }), h('button', { type: 'button', class: 'btn', text: 'Edit period', onclick: () => openPeriodForm({ mode: 'edit', id: ongoing.id }) }))); }
+  else {
+    const ps = periodsSorted(), last = ps[ps.length - 1];
+    stat.append(h('p', { class: 'big', text: 'No period marked as ongoing' }), h('p', { class: 'muted', text: last ? 'Your last logged period started ' + fmtShort(last.start) + ' and ended ' + fmtShort(last.end) + '.' : 'No period logged yet. Add one whenever you are ready.' }),
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Start period', onclick: () => openPeriodForm({ mode: 'start' }) })));
+  }
+  const pOn = periodOn(sel); if (pOn && sel !== today) stat.append(h('p', { class: 'small', text: 'This date is inside a period you logged (day ' + (dayDiff(pOn.start, sel) + 1) + ').' }));
+
+  // Bleeding
+  const bl = h('div');
+  if (e.flow) { bl.append(h('p', { class: 'big', text: flowText(e.flow) }), e.flow.leaks || e.flow.between || e.flow.overnight ? h('p', { class: 'muted small', text: [e.flow.leaks && 'Leaks', e.flow.between && 'Bleeding between periods', e.flow.overnight && 'Overnight issues'].filter(Boolean).join(', ') }) : null, h('button', { type: 'button', class: 'btn', text: 'Edit flow', onclick: () => openFlowForm(e.flow.id) })); }
+  else { bl.append(h('p', { class: 'big', text: 'Not logged' }), h('p', { class: 'muted small', text: '"Not logged" is different from "None". Petal does not assume either.' }), h('button', { type: 'button', class: 'btn', text: 'Log flow', onclick: () => openFlowForm() })); }
+  if (e.flow && e.flow.level !== 'none' && !periodOn(sel)) bl.append(h('p', { class: 'small', text: 'You logged bleeding on this day, but no period record covers it.' }), h('button', { type: 'button', class: 'btn', text: 'Add a period record', onclick: () => openPeriodForm({ mode: 'start' }) }));
+
+  // Pain, mood, product
+  const pain = e.pain[e.pain.length - 1], pn = h('div');
+  if (pain) pn.append(h('p', { class: 'big', text: pain.intensity + ' of 10' }), h('p', { class: 'muted small', text: [fmtTime(pain.ts), joinLabels(PAIN_LOC, pain.locations), pain.impact && labelOf(IMPACT, pain.impact)].filter(Boolean).join(' · ') }), h('button', { type: 'button', class: 'btn', text: 'Edit', onclick: () => openPainForm(pain.id) }));
+  else pn.append(h('p', { class: 'muted', text: 'Nothing logged yet.' }), h('button', { type: 'button', class: 'btn', text: 'Log pain', onclick: () => openPainForm() }));
+  const mood = e.moods[e.moods.length - 1], md = h('div');
+  if (mood) md.append(h('p', { text: moodSummary(mood) || 'Entry saved with no details.' }), h('button', { type: 'button', class: 'btn', text: 'Edit', onclick: () => openMoodForm(mood.id) }));
+  else md.append(h('p', { class: 'muted', text: 'Nothing logged yet.' }), h('button', { type: 'button', class: 'btn', text: 'Log mood or symptoms', onclick: () => openMoodForm() }));
+  const endOfSel = localDate(addDays(sel, 1)).toISOString(), lastProd = data.products.filter((x) => x.ts < endOfSel).sort(byTs).pop(), pr = h('div');
+  if (lastProd) pr.append(h('p', { class: 'big', text: productName(lastProd.product) + ' ' + actionShort(lastProd.product, lastProd.action) }), h('p', { class: 'muted small', text: fmtWhen(lastProd.ts) }), h('button', { type: 'button', class: 'btn', text: 'Edit', onclick: () => openProductForm(lastProd.id) }));
+  else pr.append(h('p', { class: 'muted', text: 'Nothing logged yet.' }), h('button', { type: 'button', class: 'btn', text: 'Log product change', onclick: () => openProductForm() }));
+
+  root.append(h('div', { class: 'grid two' }, card('Period status', stat), card('Bleeding on this day', bl), card('Pain', pn), card('Mood and energy', md), card('Most recent product', pr)));
+  const tc = h('section', { class: 'card', id: 'timerCard' }); fillTimer(tc); if (settings.tamponTimer) root.append(tc);
+  const est = estimateCard(); if (est) root.append(est);
+  root.append(card('Add to ' + fmtShort(logDate()), quickRow()), card('Activity for ' + fmtShort(sel), activityList(sel)), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'See cycle summaries', onclick: () => go('cycles') })));
+}
+function introCard() {
+  const c = card('Welcome to Petal', [
+    h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
+    h('p', { text: "You can skip anything you don't want to track. Optional boxes live under \"Add details\"." }),
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Got it', onclick: () => { settings.introDismissed = true; const r = persist(); if (!r.ok) state.saveError = r.reason; render('logBtn'); } }), h('button', { type: 'button', class: 'btn', text: 'Try demo data', onclick: enterDemo }))], 'soft');
+  return c;
+}
+
+/* ---- Tampon timer ---- */
+function fmtElapsed(ms) { const m = Math.max(0, Math.floor(ms / 60000)); return Math.floor(m / 60) + ' h ' + pad2(m % 60) + ' min'; }
+function fillTimer(box) {
+  box.replaceChildren(); if (!settings.tamponTimer) return;
+  box.append(h('h2', { text: 'Tampon timer' }));
+  const ts = tamponState(data.products), a = ts.active;
+  if (!a) box.append(h('p', { class: 'muted', text: 'No tampon is marked as in. The timer starts only when you log "Inserted" or "Changed" for a tampon. Petal never starts it on its own.' }), h('button', { type: 'button', class: 'btn', text: 'Log a tampon', onclick: () => openProductForm(null, { product: 'tampon', action: 'on' }) }));
+  else {
+    const ms = Date.now() - new Date(a.ts).getTime(), hrs = ms / 3600000, level = hrs >= 8 ? 2 : hrs >= settings.reminderHours ? 1 : 0;
+    const prev = state.timerLevels[a.id]; if (prev !== undefined && level > prev) toast('Tampon timer: it has been ' + fmtElapsed(ms) + ' since the tampon you logged.'); state.timerLevels[a.id] = level;
+    box.append(h('p', { text: 'Logged as in since ' + fmtWhen(a.ts) + '.' }), h('p', { class: 'big', text: fmtElapsed(ms) + ' so far' }),
+      h('p', { class: 'small', text: level === 0 ? 'Under your ' + settings.reminderHours + '-hour reminder.' : level === 1 ? 'Past your ' + settings.reminderHours + '-hour reminder.' : 'Past 8 hours.' }));
+    if (level > 0 && state.timerDismissed[a.id] !== level) box.append(h('div', { class: 'notice', role: 'status' }, h('strong', { text: 'Reminder. ' }),
+      level === 2 ? 'It has been over 8 hours since the tampon you logged. The FDA says never wear a tampon longer than 8 hours. Petal cannot tell if it is still in, so the timer keeps running until you log a change or removal.' : 'It has been ' + settings.reminderHours + ' hours or more since the tampon you logged. Petal cannot tell if it is still in, so the timer keeps running until you log a change or removal.',
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Dismiss for now', onclick: () => { state.timerDismissed[a.id] = level; fillTimer(box); } }))));
+    box.append(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Log a change', onclick: () => openProductForm(null, { product: 'tampon', action: 'changed' }) }), h('button', { type: 'button', class: 'btn', text: 'Log removal', onclick: () => openProductForm(null, { product: 'tampon', action: 'off' }) })));
+  }
+  if (ts.conflicts.length) box.append(h('p', { class: 'notice' }, 'Your product log shows two tampon insertions with no removal between them. Petal treats the later one as a change. Check your tampon entries.'));
+  box.append(h('p', { class: 'small muted', text: 'This reminder only works while this page is open and active. Your browser may pause it. Do not rely on it as your only reminder.' }),
+    h('p', { class: 'small' }, 'FDA guidance: change each tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet).'));
+}
+
+/* ---- Estimate ---- */
+function estimateCard() {
+  const e = computeEstimate(); if (e.state === 'off') return null;
+  const kids = [];
+  if (e.state === 'insufficient') kids.push(h('p', { text: 'Not enough history yet. An estimate needs at least 3 completed start-to-start cycles. You have ' + e.have + '.' }));
+  else if (e.state === 'stale') kids.push(h('p', { text: 'The window from your most recent start has passed. Petal will not guess further. Log your next period when it starts. This is only a simple estimate, so a different timing does not mean anything is wrong.' }));
+  else kids.push(h('p', { class: 'big', text: 'About ' + fmtShort(e.lo) + ' to ' + fmtShort(e.hi) }), h('p', { class: 'muted small', text: 'A simple estimate, not a medically checked prediction. It can be wrong.' }));
+  if (e.state !== 'insufficient') kids.push(h('p', { class: 'small' }, rich(h('span'), 'How it is worked out: the {{median}} of your latest ' + e.n + ' cycle lengths is ' + e.m + ' days, counted from your latest start on ' + fmtShort(e.last) + '. The window stretches to cover your shortest (' + e.mn + ') and longest (' + e.mx + ') recent cycles, and at least 2 days either side.')));
+  kids.push(h('button', { type: 'button', class: 'btn', text: 'Turn estimates off', onclick: () => { settings.estimates = false; saved('Estimates are off.'); } }));
+  return card('Estimated window', kids);
+}
+
+/* ================= 9. Calendar ================= */
+function dayInfo(date, est) {
+  const f = flowOn(date), e = entriesOn(date), n = e.products.length + e.pain.length + e.moods.length + e.relief.length, p = periodOn(date), today = todayStr();
+  const inEst = est.state === 'ok' && date >= today && date >= est.lo && date <= est.hi;
+  return { f, n, p, inEst };
+}
+function dayLabel(date, d, today) {
+  const bits = [fmtLong(date)]; if (date === today) bits.push('Today'); if (date === state.sel) bits.push('Selected');
+  if (d.f) bits.push(d.f.level === 'none' ? 'No bleeding logged' : 'Bleeding logged: ' + labelOf(FLOW, d.f.level).toLowerCase()); else if (d.p) bits.push('Inside a logged period, no flow entry');
+  if (d.n) bits.push(d.n + (d.n === 1 ? ' other entry' : ' other entries')); if (d.inEst) bits.push('Inside the estimated window, not logged');
+  return bits.join('. ');
+}
+function symFor(d) { return (d.f ? (d.f.level === 'none' ? '◇' : '●') : d.p ? '○' : '') + (d.n ? '▪' : '') + (d.inEst ? '✦' : ''); }
+function viewCalendar(root) {
+  const today = todayStr(), [y, m] = state.calMonth.split('-').map(Number), est = computeEstimate();
+  root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Calendar' }));
+  const monthName = new Date(y, m - 1, 1).toLocaleDateString(undefined, { month: 'long', year: 'numeric' });
+  const shift = (n) => { const d = new Date(y, m - 1 + n, 1); state.calMonth = d.getFullYear() + '-' + pad2(d.getMonth() + 1); render(n < 0 ? 'calPrev' : 'calNext'); };
+  root.append(h('div', { class: 'datebar' }, h('button', { type: 'button', class: 'btn icon', id: 'calPrev', 'aria-label': 'Previous month', onclick: () => shift(-1) }, icon('prev')),
+    h('h2', { 'aria-live': 'polite', style: 'margin:0 6px', text: monthName }), h('button', { type: 'button', class: 'btn icon', id: 'calNext', 'aria-label': 'Next month', onclick: () => shift(1) }, icon('next')),
+    h('button', { type: 'button', class: 'btn', text: 'Today', onclick: () => { state.calMonth = today.slice(0, 7); state.sel = today; render('calToday'); }, id: 'calToday' }),
+    h('span', { class: 'seg' }, h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.calMode === 'grid'), text: 'Grid', onclick: () => { state.calMode = 'grid'; render(); } }), h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.calMode === 'list'), text: 'List', onclick: () => { state.calMode = 'list'; render(); } }))));
+  const dim = new Date(y, m, 0).getDate(), pre = new Date(y, m - 1, 1).getDay(), dates = [];
+  for (let i = 1; i <= dim; i++) dates.push(state.calMonth + '-' + pad2(i));
+  const choose = (date) => { state.sel = date; render('day-' + date); };
+  if (state.calMode === 'grid') {
+    const cells = Array(pre).fill(null).concat(dates); while (cells.length % 7) cells.push(null);
+    const head = h('tr', null, [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = new Date(2023, 0, 1 + i); return h('th', { scope: 'col' }, h('abbr', { title: dt.toLocaleDateString(undefined, { weekday: 'long' }), text: dt.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 3) })); }));
+    const rows = []; for (let i = 0; i < cells.length; i += 7) rows.push(h('tr', null, cells.slice(i, i + 7).map((date) => {
+      if (!date) return h('td'); const d = dayInfo(date, est);
+      return h('td', null, h('button', { type: 'button', id: 'day-' + date, class: 'day' + (d.f && d.f.level !== 'none' ? ' bleed' : '') + (d.p ? ' inperiod' : '') + (date === today ? ' today' : '') + (d.inEst ? ' est' : '') + (date === state.sel ? ' sel' : ''), 'aria-label': dayLabel(date, d, today), 'aria-current': date === today ? 'date' : null, onclick: () => choose(date) },
+        h('span', { class: 'n', 'aria-hidden': 'true', text: String(Number(date.slice(8))) }), h('span', { class: 'sym', 'aria-hidden': 'true', text: symFor(d) })));
+    })));
+    root.append(h('div', { class: 'card' }, h('table', { class: 'cal' }, h('caption', { class: 'sr-only', text: monthName }), h('thead', null, head), h('tbody', null, rows))));
+  } else {
+    root.append(h('div', { class: 'card' }, h('ul', { class: 'daylist' }, dates.map((date) => { const d = dayInfo(date, est);
+      return h('li', null, h('button', { type: 'button', id: 'day-' + date, class: 'btn' + (date === state.sel ? ' sel' : ''), 'aria-label': dayLabel(date, d, today), 'aria-current': date === today ? 'date' : null, onclick: () => choose(date) }, h('span', { 'aria-hidden': 'true', text: localDate(date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + (date === today ? ' (today)' : '') + '  ' + symFor(d) })));
+    }))));
+  }
+  const L = [['●', 'Bleeding logged'], ['○', 'Inside a logged period, no flow entry'], ['◇', 'No bleeding logged'], ['▪', 'Other entries'], ['✦', 'Estimated window (not logged)'], ['Underlined number', 'Today'], ['Filled day', 'Selected day']];
+  root.append(h('section', { 'aria-label': 'Legend', class: 'card soft' }, h('h2', { text: 'Legend' }), h('ul', { class: 'legend' }, L.map((l) => h('li', null, h('strong', { 'aria-hidden': 'true', text: l[0] + ' ' }), l[1]))), h('p', { class: 'small muted', text: 'Estimated days only appear if you turn estimates on in Settings. They are guesses, not records.' })));
+  const sd = state.sel;
+  root.append(card(fmtLong(sd), [(periodOn(sd) ? h('p', { class: 'info', text: 'This day is inside a period you logged' + (periodOn(sd).end ? '.' : ' (still going, counted through today).') }) : null), quickRow(), activityList(sd), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Open on Today screen', onclick: () => go('today') }))]));
+}
+
+/* ================= 10. Cycle summaries ================= */
+function countBy(arr) { const o = {}; arr.forEach((x) => { o[x] = (o[x] || 0) + 1; }); return Object.keys(o).map((k) => [k, o[k]]).sort((a, b) => b[1] - a[1]); }
+function viewCycles(root) {
+  const today = todayStr(), ps = periodsSorted().reverse(), iv = intervals();
+  root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Cycle summaries' }), h('button', { type: 'button', class: 'btn', text: 'Back to Today', onclick: () => go('today') }),
+    h('p', { class: 'info', text: 'Based on your recorded entries. Days with no entry are not recorded, which is different from having no symptoms.' }));
+  root.append(card('How these numbers work', h('ul', null,
+    h('li', null, 'Period length counts both the first and last day.'), h('li', null, rich(h('span'), 'Cycle length is the number of calendar days from one period\'s first day to the next period\'s first day. See {{cycle}}.')),
+    h('li', null, 'A period that is still ongoing is not counted as complete.'), h('li', null, 'Petal does not judge whether a length is normal.'))));
+  root.append(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Add a past period', onclick: () => openPeriodForm({ mode: 'start', past: true }) }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })));
+  if (!ps.length) { root.append(h('p', { class: 'muted', text: "Nothing logged yet. Add an entry whenever you're ready." })); return; }
+  if (iv.length) {
+    const max = Math.max.apply(null, iv.map((x) => x.days)), box = h('div');
+    iv.slice().reverse().forEach((x) => box.append(h('p', { class: 'small', text: fmtShort(x.from) + ' to ' + fmtShort(x.to) + ': ' + x.days + ' days' }), h('div', { class: 'bar', 'aria-hidden': 'true' }, h('span', { style: 'width:' + Math.round(x.days / max * 100) + '%' }))));
+    if (iv.length >= 2) box.append(h('p', {}, rich(h('span'), 'The {{median}} of your recorded cycle lengths is ' + median(iv.map((x) => x.days)) + ' days (from ' + iv.length + ' cycles).')));
+    root.append(card('Start-to-start cycle lengths', box));
+  }
+  ps.forEach((p) => {
+    const end = p.end || today, inR = (d) => d >= p.start && d <= end, flows = data.flow.filter((f) => inR(f.date)), pains = data.pain.filter((x) => inR(dateOfIso(x.ts))), moods = data.moods.filter((x) => inR(x.date)), prods = data.products.filter((x) => inR(dateOfIso(x.ts)));
+    const dl = h('dl', { class: 'kv' }); const row = (k, v) => { dl.append(h('dt', { text: k }), h('dd', { text: v })); };
+    row('Length', p.end ? (dayDiff(p.start, p.end) + 1) + ' days' : 'Ongoing: day ' + (dayDiff(p.start, today) + 1) + ' so far (not counted as complete)');
+    const prevIdx = iv.find((x) => x.to === p.start); row('Days since the previous period started', prevIdx ? prevIdx.days + ' days' : 'Not available');
+    row('Bleeding days logged', flows.filter((f) => f.level !== 'none').length + ''); row('No-bleeding days logged', flows.filter((f) => f.level === 'none').length + '');
+    row('Highest pain logged', pains.length ? Math.max.apply(null, pains.map((x) => x.intensity)) + ' of 10' : 'No pain entries recorded');
+    const pc = countBy(prods.map((x) => productName(x.product))); row('Product entries', pc.length ? pc.map((x) => x[0] + ': ' + x[1]).join(', ') : 'None recorded');
+    const sc = countBy([].concat.apply([], moods.map((x) => x.symptoms.map((s) => s.name)))).slice(0, 5); row('Symptoms logged most', sc.length ? sc.map((x) => x[0] + ' (' + x[1] + ')').join(', ') : 'None recorded');
+    const ic = countBy(pains.filter((x) => x.impact).map((x) => labelOf(IMPACT, x.impact))); row('Daily-life impact recorded', ic.length ? ic.map((x) => x[0] + ' (' + x[1] + ')').join(', ') : 'None recorded');
+    root.append(card(fmtShort(p.start) + (p.end ? ' to ' + fmtShort(p.end) : ' (ongoing)'), [dl, p.note ? h('p', { class: 'muted small', text: 'Note: ' + p.note }) : null, h('button', { type: 'button', class: 'btn', text: 'Edit this period', onclick: () => openPeriodForm({ mode: 'edit', id: p.id }) })]));
+  });
+}
+
+/* ================= 11. Help panel ================= */
+function helpNodes() {
+  return [
+    h('section', { class: 'urgent' }, h('p', null, h('span', { class: 'tag urgent-tag', text: 'Urgent' }), h('strong', { text: 'Get emergency care' })),
+      h('p', { text: 'ACOG guidance: seek emergency medical care if you are changing pads or tampons every hour for more than two hours in a row and also have chest pain, shortness of breath, or lightheadedness or dizziness.' }),
+      h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.acog), '. ' + SOURCES.acog.status),
+      h('p', { text: 'The FDA lists warning signs of toxic shock syndrome: a sudden fever (usually 102°F or higher), vomiting, diarrhea, fainting or near-fainting when standing, dizziness, or a sunburn-like rash. If you notice these during or soon after your period, stop using tampons and get medical care right away.' }),
+      h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.fda), '. ' + SOURCES.fda.status), h('p', { text: 'If you think it is an emergency, call your local emergency number (911 in the US).' })),
+    h('section', { class: 'info', style: 'margin-top:12px' }, h('p', null, h('span', { class: 'tag', text: 'Talk to someone' }), h('strong', { text: 'You can ask for help any time' })),
+      h('p', { text: 'That emergency example is not the only reason to reach out. Talk with a doctor, nurse, parent, or another adult you trust if something about your period worries you or gets in the way of school, sleep, or things you enjoy. You do not need to be sure something is wrong.' }),
+      h('p', { text: 'Pain that bothers you, bleeding that worries you, or anything that feels off to you are all fine reasons to ask. You can bring Petal\'s printed summary to an appointment.' }),
+      h('p', { class: 'small' }, 'You can also read ', extLink(SOURCES.diary), '. ' + SOURCES.diary.status)),
+    h('p', { class: 'small muted', text: 'Petal is a journal and a learning tool. It cannot monitor your health or tell you whether something is wrong.' })
+  ];
+}
+function openHelp() { openInfoDialog('When to get help', helpNodes()); }
+
+/* ================= 12. Learn ================= */
+const CATS = ['All', 'Basics', 'Products', 'Pain and feelings', 'Your journal', 'Getting help'];
+const ARTICLES = [
+  { id: 'started', cat: 'Basics', title: 'I think my period started: now what?', summary: 'A calm first look at what you might see and what you can do.', sources: ['kids'], sections: [
+    { tag: 'Health info', h: 'What you might see', items: ['Period blood can be red or brown. Brown blood is normal.', 'A first period can be light and last only 2 or 3 days.', 'Periods can change during the first couple of years. Food, exercise, and some medicines can change them too.'] },
+    { tag: 'Practical', h: 'What you can do right now', items: ['Use a pad, period underwear, or another product you have. If you have nothing, folded toilet paper can work for a short time.', 'Ask a trusted adult, the school nurse, or a friend for supplies.', 'Add today in Petal with "Start or end period". You can skip every optional box.'] },
+    { tag: 'Health info', h: 'If you are not sure', items: ['If you are not sure it is a period, or something worries you, you can ask a {{healthpro}} or a trusted adult. You do not have to be certain something is wrong to ask.'] }] },
+  { id: 'bag', cat: 'Basics', title: 'What should I keep in my school bag?', summary: 'A short list of things that make a surprise period easier.', sources: [], sections: [
+    { tag: 'Practical', h: 'Good things to carry', items: ['A few of the products you use, in a small zip pouch.', 'A spare pair of underwear and a small bag for used clothes.', 'A small bag or wrapper for used products. Do not flush pads or wrappers.', 'Hand wipes or sanitizer.', 'A sweater or jacket you could tie around your waist.'] },
+    { tag: 'Practical', h: 'If you run out', items: ['Ask the school nurse, a teacher, or a friend. Many schools keep supplies, and you can ask the front office where they are.'] }] },
+  { id: 'products', cat: 'Products', title: 'Pads, tampons, and period underwear', summary: 'What each product is, in plain words.', sources: ['fda'], sections: [
+    { tag: 'Practical', h: 'The basics', items: ['Pads stick inside your underwear and soak up blood.', 'Tampons go inside the body and soak up blood. They have a string for taking them out.', 'A {{cup|menstrual cup}} or {{disc|menstrual disc}} collects blood. Follow the package for how to use and clean it.', 'Period underwear has a built-in soaking layer. Check the label for washing steps.', 'You can try different products and switch whenever you like.'] },
+    { tag: 'Practical', h: 'Reading the package', items: ['{{absorbency}} tells you how much a product is made to hold. The package explains its labels.'] },
+    { tag: 'Health info', h: 'Tampon safety', items: ['FDA guidance: change each tampon every 4 to 8 hours and never wear one longer than 8 hours.', 'The FDA lists warning signs of {{tss}}: a sudden fever (usually 102°F or higher), vomiting, diarrhea, fainting or near-fainting when standing, dizziness, or a sunburn-like rash. If you notice these during or soon after your period, stop using tampons and get medical care right away.'] }] },
+  { id: 'logchange', cat: 'Products', title: 'How do I log a product change?', summary: 'Two taps and a time. Everything else is optional.', sources: [], sections: [
+    { tag: 'About Petal', h: 'The quick way', items: ['Tap "Log something", then "Log product change".', 'Pick the product and what happened. The time starts as now. You can change it to log something from earlier.', 'Tap "Add details" if you want to note how full it was or why you changed it.'] },
+    { tag: 'About Petal', h: 'Good to know', items: ['Changing for comfort is different from a fully soaked product. Log whichever is true.', 'Petal never turns your entries into an amount of blood.', 'If you did not log a product, Petal does not assume you used none.'] }] },
+  { id: 'cramps', cat: 'Pain and feelings', title: 'Understanding cramps', summary: 'Pain deserves to be taken seriously, and writing it down helps.', sources: [], note: 'This is general information and practical tips. No outside source was checked for this article, and it is not medical advice.', sections: [
+    { tag: 'General info', h: 'What {{cramps}} can be like', items: ['Many people have pain around their period, often in the lower belly, {{pelvis}}, or back.', 'Having pain around a period is common, but you do not have to just put up with it. Strong pain is worth talking about.'] },
+    { tag: 'Practical', h: 'Things some people try', items: ['A warm heating pad or a warm bath.', 'Resting, or gentle movement like a slow walk or stretching.', 'Ask a pharmacist, a doctor, or a trusted adult about medicine. They can tell you what is right for you and how much. Petal does not give doses.'] },
+    { tag: 'About Petal', h: 'Why log pain', items: ['Writing down how strong it was, where it hurt, and how much it got in the way gives you something clear to share with a {{healthpro}}.'] }] },
+  { id: 'mood', cat: 'Pain and feelings', title: 'Why track mood and energy?', summary: 'A look back can help you notice what your days were like.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
+    { tag: 'About Petal', h: 'What it is for', items: ['Mood, energy, sleep, and body {{symptom|symptoms}} can be logged on any day, not only on period days.', 'Later, you can look back at what you wrote down. Petal shows what you recorded. It does not say why something happened.', 'You can hide symptom choices you do not use, and add your own, in Settings.'] },
+    { tag: 'About Petal', h: 'Skipping is fine', items: ['Log only when it feels useful. There are no streaks and no pressure to fill anything in.'] }] },
+  { id: 'help', cat: 'Getting help', title: 'When should I ask for help?', summary: 'Urgent signs, and the many everyday reasons to ask for support.', sources: ['acog', 'fda', 'diary'], help: true, sections: [] },
+  { id: 'history', cat: 'Your journal', title: 'Understanding your cycle history', summary: 'How Petal turns your entries into summaries.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
+    { tag: 'About Petal', h: 'How the numbers work', items: ['Your {{cycle}} length is the number of days from the first day of one period to the first day of the next.', 'Period length counts the first and last day. A period that is still going is not counted as complete.', 'Everything is based on what you recorded. A day with no entry is not a day with no symptoms.'] },
+    { tag: 'About Petal', h: 'The optional estimate', items: ['It is off unless you turn it on. It needs at least 3 completed cycles.', 'Petal takes the {{median}} of up to your last 6 cycle lengths and shows a window of days. This is a simple {{estimate}} and it can be wrong. It never says a day is safe or unsafe, and it never says a period is late.'] }] },
+  { id: 'privacy', cat: 'Your journal', title: 'Keeping your journal private', summary: 'Where your entries live, and what that means.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
+    { tag: 'About Petal', h: 'Where your entries are', items: ['Your entries are stored in this browser using {{storage}}. They are not automatically sent to a server.', 'Browser data can be cleared or lost. Private browsing may not keep entries. Opening or moving this file in a different way can change which browser storage it can reach.', 'Export a backup if you want a separate copy. Exported files contain private information, so keep them somewhere safe.'] },
+    { tag: 'About Petal', h: 'What Petal cannot do', items: ['People who can use your browser profile may be able to open this journal.', 'Petal cannot clear your browser history or secure a shared device.', 'Petal has no account, ads, analytics, or tracking.'] }] }
+];
+function viewLearn(root) {
+  root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Learn' }));
+  if (state.article) return learnArticle(root, ARTICLES.find((a) => a.id === state.article));
+  root.append(h('div', { class: 'btn-row' }, h('span', { class: 'seg' }, h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.learnTab === 'articles'), text: 'Articles', onclick: () => { state.learnTab = 'articles'; render(); } }), h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.learnTab === 'words'), text: 'Words explained', onclick: () => { state.learnTab = 'words'; render(); } }))));
+  if (state.learnTab === 'words') return learnWords(root);
+  root.append(h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'learnQ', text: 'Search articles' }), h('input', { type: 'search', id: 'learnQ', value: state.learnQ, oninput: (e) => { state.learnQ = e.target.value; fillList(); } })),
+    chips({ id: 'learnCat', name: 'lcat', type: 'radio', legend: 'Category', options: CATS.map((c) => [c, c]), values: [state.learnCat] }));
+  root.querySelector('#learnCat').addEventListener('change', (e) => { state.learnCat = e.target.value; fillList(); });
+  const live = h('p', { class: 'muted small', role: 'status', id: 'learnCount' }), list = h('div', { class: 'grid' });
+  root.append(live, list, h('section', { class: 'card soft' }, h('h2', { text: 'Where the health information comes from' }), h('p', { class: 'small', text: 'Health claims link to a source. Each article shows whether that source was checked. Links need internet. Everything else in Learn works offline. Petal is not a medical review.' })));
+  function fillList() {
+    const q = state.learnQ.trim().toLowerCase();
+    const hits = ARTICLES.filter((a) => (state.learnCat === 'All' || a.cat === state.learnCat) && (!q || (a.title + ' ' + a.summary + ' ' + a.sections.map((s) => s.h + ' ' + s.items.join(' ')).join(' ')).toLowerCase().includes(q) || (plain(a.title + a.sections.map((s) => s.items.join(' ')).join(' '))).toLowerCase().includes(q)));
+    live.textContent = hits.length + (hits.length === 1 ? ' article' : ' articles') + ' found.';
+    list.replaceChildren(...hits.map((a) => h('article', { class: 'card' }, h('span', { class: 'tag', text: a.cat }), h('h2', null, a.title), h('p', { class: 'muted', text: a.summary }), h('button', { type: 'button', class: 'btn', id: 'art-' + a.id, 'aria-label': 'Read: ' + a.title, text: 'Read', onclick: () => { state.article = a.id; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); } }))));
+    if (!hits.length) list.replaceChildren(h('p', { class: 'muted', text: 'Nothing matches that search. Try fewer words.' }));
+  }
+  fillList();
+}
+function learnArticle(root, a) {
+  root.append(h('button', { type: 'button', class: 'btn', text: 'Back to all articles', onclick: () => { const id = 'art-' + a.id; state.article = null; render(id); } }), h('h2', { style: 'margin-top:14px;font-size:1.4rem', text: a.title }), h('p', { class: 'muted', text: a.summary }));
+  if (a.help) root.append(h('div', { class: 'grid' }, helpNodes()));
+  a.sections.forEach((s) => root.append(h('section', { class: 'card', style: 'margin-top:12px' }, h('p', null, h('span', { class: 'tag', text: s.tag })), h('h3', { style: 'margin-top:0' }, rich(h('span'), s.h)), h('ul', null, s.items.map((i) => h('li', null, rich(h('span'), i)))))));
+  const chk = h('section', { class: 'card soft', style: 'margin-top:12px' }, h('h2', { text: 'Sources and checking' }));
+  if (a.sources.length) chk.append(h('ul', null, a.sources.map((k) => h('li', null, extLink(SOURCES[k]), ' (opens in a new tab, needs internet)', h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })))));
+  else chk.append(h('p', { class: 'small', text: a.note || 'No outside source was checked for this article.' }));
+  root.append(chk);
+}
+function learnWords(root) {
+  root.append(h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'glossQ', text: 'Search words' }), h('input', { type: 'search', id: 'glossQ', value: state.glossQ, oninput: (e) => { state.glossQ = e.target.value; fill(); } })));
+  const live = h('p', { class: 'muted small', role: 'status' }), dl = h('dl', { class: 'card' }); root.append(live, dl);
+  function fill() { const q = state.glossQ.trim().toLowerCase(), keys = Object.keys(GLOSSARY).filter((k) => !q || (GLOSSARY[k][0] + ' ' + GLOSSARY[k][1]).toLowerCase().includes(q)).sort((a, b) => GLOSSARY[a][0].localeCompare(GLOSSARY[b][0]));
+    live.textContent = keys.length + (keys.length === 1 ? ' word' : ' words') + ' found.'; dl.replaceChildren(...[].concat.apply([], keys.map((k) => [h('dt', { style: 'font-weight:700;margin-top:10px', text: GLOSSARY[k][0] }), h('dd', { style: 'margin:0 0 6px', text: GLOSSARY[k][1] })]))); }
+  fill();
+}
+
+/* ================= 13. Settings ================= */
+function setSetting(patch, msg, focusId) { Object.assign(settings, patch); applyTheme(); const r = persist(); if (r.ok) { state.saveError = ''; toast(r.demo ? 'Changed for this demo only.' : msg || 'Your setting is saved.'); } else state.saveError = r.reason; render(focusId); }
+function demoGuard() { if (state.demo) { toast('Leave demo mode first. Demo entries are kept out of exports, backups, and deletion.'); return true; } return false; }
+function viewSettings(root) {
+  root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Settings' }));
+  // Theme
+  root.append(card('Theme', chipsTheme()));
+  // Estimates
+  root.append(card('Period estimate', [h('p', { class: 'muted', text: 'Off by default. When on, Petal needs 3 completed start-to-start cycles, then shows a window of days based on the median of your latest 6. It is a simple estimate, not a medically checked prediction.' }), toggle('est', 'Show period estimates', settings.estimates, (v) => setSetting({ estimates: v }, v ? 'Estimates are on.' : 'Estimates are off.', 'set-est'))]));
+  // Timer
+  const tm = [h('p', { class: 'muted', text: 'Off by default. When on, Petal shows how long ago you logged a tampon going in. It starts only from a tampon "Inserted" or "Changed" entry that you log.' }), toggle('timer', 'Turn on the tampon timer', settings.tamponTimer, (v) => setSetting({ tamponTimer: v }, v ? 'The tampon timer is on.' : 'The tampon timer is off.', 'set-timer'))];
+  if (settings.tamponTimer) { const ch = chips({ id: 'rem', name: 'rem', type: 'radio', legend: 'In-app reminder after', options: [['4', '4 hours'], ['6', '6 hours'], ['8', '8 hours']], values: [String(settings.reminderHours)] }); ch.addEventListener('change', (e) => setSetting({ reminderHours: Number(e.target.value) }, 'Your reminder choice is saved.')); tm.push(ch); }
+  tm.push(h('p', { class: 'small' }, 'This reminder only works while this page is open and active. Your browser may pause it. Do not rely on it as your only reminder. FDA guidance: change a tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet).'));
+  root.append(card('Tampon timer', tm));
+  // Symptoms
+  const sy = h('fieldset', { class: 'field' }, h('legend', { text: 'Symptom choices to show in forms' })); const wrap = h('div', { class: 'chips' });
+  SYMPTOMS.concat(settings.customSymptoms).forEach((n) => wrap.append(h('label', { class: 'chip' }, h('input', { type: 'checkbox', checked: !settings.hiddenSymptoms.includes(n), onchange: (e) => { const hid = settings.hiddenSymptoms.filter((x) => x !== n); if (!e.target.checked) hid.push(n); setSetting({ hiddenSymptoms: hid }, 'Your symptom choices are saved.'); } }), h('span', { text: n }))));
+  sy.append(wrap);
+  const cust = h('div'); settings.customSymptoms.forEach((n, i) => cust.append(h('p', null, n + ' ', h('button', { type: 'button', class: 'btn', 'aria-label': 'Remove custom symptom ' + n, text: 'Remove', onclick: () => setSetting({ customSymptoms: settings.customSymptoms.filter((x) => x !== n), hiddenSymptoms: settings.hiddenSymptoms.filter((x) => x !== n) }, 'The custom symptom is removed. Old entries keep their text.') }))));
+  const addIn = h('input', { type: 'text', id: 'newSym', maxlength: 40, autocomplete: 'off' }), addErr = h('p', { class: 'field-err', id: 'newSym-err', hidden: true });
+  root.append(card('Symptoms', [sy, h('h3', { text: 'Your own symptoms' }), cust, h('div', { class: 'field' }, h('label', { for: 'newSym', text: 'Add a symptom name' }), addIn, addErr, h('button', { type: 'button', class: 'btn', style: 'margin-top:8px', text: 'Add', onclick: () => {
+    const n = addIn.value.trim(); const all = SYMPTOMS.concat(settings.customSymptoms).map((x) => x.toLowerCase());
+    if (!n) { addErr.hidden = false; addErr.textContent = 'Type a name first.'; addIn.setAttribute('aria-invalid', 'true'); addIn.setAttribute('aria-describedby', 'newSym-err'); addIn.focus(); return; }
+    if (all.includes(n.toLowerCase())) { addErr.hidden = false; addErr.textContent = 'That symptom is already in the list.'; addIn.setAttribute('aria-invalid', 'true'); addIn.setAttribute('aria-describedby', 'newSym-err'); addIn.focus(); return; }
+    if (settings.customSymptoms.length >= 30) { addErr.hidden = false; addErr.textContent = 'You can add up to 30 of your own.'; return; }
+    setSetting({ customSymptoms: settings.customSymptoms.concat([n]) }, 'Your symptom is added.', 'newSym'); } }))]));
+  // Privacy & storage
+  const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
+  root.append(card('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
+    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup.', 'No account, ads, analytics, or tracking. Petal makes no network requests with your data.'].map((x) => h('li', { text: x })))]));
+  // Export/import
+  root.append(card('Export, import, and print', [
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download JSON backup', onclick: exportJSON }), h('button', { type: 'button', class: 'btn', text: 'Download CSV', onclick: exportCSV }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })),
+    h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { for: 'impFile', text: 'Restore from a Petal JSON backup' }), h('p', { class: 'hint', text: 'You will see a preview first. Nothing changes until you confirm. Importing replaces your current journal.' }), h('input', { type: 'file', id: 'impFile', accept: '.json,application/json', onchange: onImportFile })),
+    h('details', { class: 'more' }, h('summary', { text: 'CSV layout' }), h('p', { class: 'small', text: 'One row per entry. Columns: ' + CSV_COLS.join(', ') + '. record_type is period, flow, product, pain, mood, or relief. Unused columns are empty. Lists are joined with "; ". Text that starts with = + - or @ gets a \' in front so spreadsheets do not run it. The JSON backup keeps your original text.' }))]));
+  // Demo
+  root.append(card('Demo data', [h('p', { class: 'muted', text: 'Try Petal with sample entries. Demo data is kept completely separate. It is never saved, exported, or mixed into your real journal.' }), state.demo ? h('button', { type: 'button', class: 'btn primary', text: 'Leave demo mode', onclick: leaveDemo }) : h('button', { type: 'button', class: 'btn', id: 'demoBtn', text: 'Try demo data', onclick: enterDemo })]));
+  // Delete
+  root.append(card('Delete all data', [h('p', { text: 'This removes your journal and settings from this browser. Files you exported earlier and your browser history are not affected.' }), h('button', { type: 'button', class: 'btn danger', id: 'delAll', text: 'Delete all data…', onclick: openDeleteAll })], 'soft'));
+  // About
+  const src = Object.keys(SOURCES).map((k) => h('li', null, extLink(SOURCES[k]), h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })));
+  root.append(card('About Petal and sources', [h('p', { text: 'Petal (version 1) is a private period journal and learning tool. It is not a medical service and cannot diagnose, treat, or monitor anything. It works without internet. Only the source links below need internet.' }), h('p', { class: 'small', text: 'Article text was written for this app in plain language. It was not medically reviewed. Source checks below say exactly what was and was not opened.' }), h('ul', null, src)]));
+}
+function toggle(id, label, on, fn) { return h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: 'set-' + id, checked: on, onchange: (e) => fn(e.target.checked) }), h('span', { text: label })))); }
+function chipsTheme() {
+  const fs = h('fieldset', { class: 'field' }, h('legend', { text: 'Choose a look' })), wrap = h('div', { class: 'chips' });
+  THEMES.forEach((t) => wrap.append(h('label', { class: 'chip theme-opt' }, h('input', { type: 'radio', name: 'theme', value: t.id, checked: settings.theme === t.id, onchange: () => setSetting({ theme: t.id }, 'Your theme is saved.') }), h('span', null, h('span', { class: 'sw', 'aria-hidden': 'true' }, t.sw.map((c) => h('i', { style: 'background:' + c }))), ' ' + t.name))));
+  fs.append(wrap); return fs;
+}
+
+/* ================= 14. Export, import, print, delete, demo ================= */
+const CSV_COLS = ['record_type', 'date', 'time', 'start_date', 'end_date', 'flow_level', 'leaks', 'bleeding_between_periods', 'overnight_issue', 'product', 'action', 'absorbency_or_description', 'fullness', 'reason', 'overnight_change', 'double_protection', 'pain_intensity', 'pain_locations', 'pain_types', 'pain_start_time', 'pain_duration_minutes', 'daily_impact', 'relief_tried', 'moods', 'energy', 'sleep_hours', 'sleep_quality', 'symptoms', 'no_symptoms_selected', 'medication', 'dose', 'non_medication_relief', 'pain_before', 'pain_after', 'did_it_help', 'note'];
+function csvCell(v) { let s = v === null || v === undefined ? '' : String(v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; }
+function buildCSV() {
+  const rows = [], yes = (b) => (b ? 'yes' : ''), tm = (iso) => pad2(new Date(iso).getHours()) + ':' + pad2(new Date(iso).getMinutes()), lab = (l, v) => labelOf(l, v);
+  data.periods.forEach((p) => rows.push({ k: p.start + ' 00:00', r: { record_type: 'period', date: p.start, start_date: p.start, end_date: p.end || '', note: p.note } }));
+  data.flow.forEach((f) => rows.push({ k: f.date + ' 00:01', r: { record_type: 'flow', date: f.date, flow_level: f.level, leaks: yes(f.leaks), bleeding_between_periods: yes(f.between), overnight_issue: yes(f.overnight), note: f.note } }));
+  data.products.forEach((x) => rows.push({ k: dateOfIso(x.ts) + ' ' + tm(x.ts), r: { record_type: 'product', date: dateOfIso(x.ts), time: tm(x.ts), product: x.product, action: x.action, absorbency_or_description: x.absorbency, fullness: x.fullness, reason: x.reason, overnight_change: yes(x.overnight), double_protection: yes(x.double), note: x.note } }));
+  data.pain.forEach((x) => rows.push({ k: dateOfIso(x.ts) + ' ' + tm(x.ts), r: { record_type: 'pain', date: dateOfIso(x.ts), time: tm(x.ts), pain_intensity: x.intensity, pain_locations: x.locations.join('; '), pain_types: x.types.join('; '), pain_start_time: x.startTime, pain_duration_minutes: x.duration === null ? '' : x.duration, daily_impact: x.impact, relief_tried: x.relief.join('; '), note: x.note } }));
+  data.moods.forEach((x) => rows.push({ k: x.date + ' 12:00', r: { record_type: 'mood', date: x.date, moods: x.moods.join('; '), energy: x.energy, sleep_hours: x.sleepHours === null ? '' : x.sleepHours, sleep_quality: x.sleepQuality, symptoms: x.symptoms.map((s) => s.name + (s.severity ? ' (' + s.severity + ')' : '')).join('; '), no_symptoms_selected: yes(x.noSymptoms), note: x.note } }));
+  data.relief.forEach((x) => rows.push({ k: dateOfIso(x.ts) + ' ' + tm(x.ts), r: { record_type: 'relief', date: dateOfIso(x.ts), time: tm(x.ts), medication: x.medication, dose: x.dose, non_medication_relief: x.nonMed.join('; '), pain_before: x.before === null ? '' : x.before, pain_after: x.after === null ? '' : x.after, did_it_help: x.helped, note: x.note } }));
+  rows.sort((a, b) => (a.k < b.k ? -1 : a.k > b.k ? 1 : 0));
+  return '﻿' + [CSV_COLS.join(',')].concat(rows.map((x) => CSV_COLS.map((c) => csvCell(x.r[c])).join(','))).join('\r\n') + '\r\n';
+}
+function download(name, mime, text) {
+  try { const url = URL.createObjectURL(new Blob([text], { type: mime + ';charset=utf-8' })); const a = h('a', { href: url, download: name }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000); toast('Your file was created. Check your downloads. It contains private information, so keep it somewhere safe.'); }
+  catch (e) { openInfoDialog('Copy your data', [h('p', { text: 'This browser did not allow a download. Select all the text below, copy it, and paste it into a file named ' + name + '.' }), h('textarea', { readonly: '', rows: 10, 'aria-label': 'Exported data', value: text, onfocus: (ev) => ev.target.select() })]); }
+}
+function backupPayload() { return JSON.stringify({ app: 'petal', type: 'journal-backup', version: VERSION, exportedAt: new Date().toISOString(), settings: settings, journal: data }, null, 2); }
+function exportJSON() { if (demoGuard()) return; download('petal-backup-' + todayStr() + '.json', 'application/json', backupPayload()); }
+function exportCSV() { if (demoGuard()) return; download('petal-entries-' + todayStr() + '.csv', 'text/csv', buildCSV()); }
+const counts = (j) => ({ periods: j.periods.length, flow: j.flow.length, products: j.products.length, pain: j.pain.length, moods: j.moods.length, relief: j.relief.length });
+function dateRange(j) { const d = [].concat(j.periods.map((p) => p.start), j.flow.map((x) => x.date), j.moods.map((x) => x.date), j.products.map((x) => dateOfIso(x.ts)), j.pain.map((x) => dateOfIso(x.ts)), j.relief.map((x) => dateOfIso(x.ts))).sort(); return d.length ? fmtShort(d[0]) + ' to ' + fmtShort(d[d.length - 1]) : 'No dates'; }
+function onImportFile(ev) {
+  if (demoGuard()) { ev.target.value = ''; return; }
+  const file = ev.target.files && ev.target.files[0]; if (!file) return;
+  const fail = (msg) => { ev.target.value = ''; openInfoDialog('This file cannot be imported', [h('p', { text: msg }), h('p', { class: 'muted', text: 'Nothing was changed.' })]); };
+  if (file.size > 8 * 1024 * 1024) return fail('The file is larger than 8 MB, which is more than a Petal backup should be.');
+  const reader = new FileReader();
+  reader.onerror = () => fail('The file could not be read.');
+  reader.onload = () => {
+    let p; try { p = JSON.parse(String(reader.result)); } catch (e) { return fail('The file is not valid JSON.'); }
+    if (!isObj(p) || p.app !== 'petal') return fail('This does not look like a Petal backup.');
+    if (p.version !== VERSION) return fail('This backup is version ' + String(p.version) + '. This copy of Petal only understands version ' + VERSION + '.');
+    const cj = cleanJournal(p.journal); const cs = p.settings === undefined ? { errors: [], settings: null } : cleanSettings(p.settings);
+    const errs = cj.errors.concat(cs.errors);
+    if (errs.length) return fail('The backup has problems: ' + errs.slice(0, 6).join(' '));
+    ev.target.value = ''; openImportPreview(cj.journal, cs.settings);
+  };
+  reader.readAsText(file);
+}
+function openImportPreview(j, s) {
+  const c = counts(j), box = h('input', { type: 'checkbox', id: 'impOk' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Replace my journal', disabled: true });
+  box.addEventListener('change', () => { go.disabled = !box.checked; });
+  go.addEventListener('click', () => { data = j; if (s) { settings = s; applyTheme(); } if (state.storage.mode === 'blocked') { state.storage.mode = 'ok'; state.storage.raw = null; } $('#dlg').close(); saved('Your journal was replaced with the backup.'); });
+  openInfoDialog('Import preview', [h('p', { text: 'This backup contains:' }), h('ul', null, h('li', { text: c.periods + ' period records' }), h('li', { text: c.flow + ' flow entries' }), h('li', { text: c.products + ' product entries' }), h('li', { text: c.pain + ' pain entries' }), h('li', { text: c.moods + ' mood and symptom entries' }), h('li', { text: c.relief + ' medication or relief entries' })),
+    h('p', { text: 'Dates: ' + dateRange(j) + (s ? '. Settings are included.' : '. No settings included.') }), h('p', { class: 'notice', text: 'Replacing overwrites your current journal. Notes in the file are treated as plain text.' }),
+    h('button', { type: 'button', class: 'btn', text: 'Download a backup of my current journal first', onclick: () => download('petal-backup-before-import-' + todayStr() + '.json', 'application/json', backupPayload()) }),
+    h('div', { class: 'field', style: 'margin-top:12px' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, box, h('span', { text: 'I understand this replaces my current journal' })))), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+}
+function openDeleteAll() {
+  if (demoGuard()) return; const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
+  inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
+  go.addEventListener('click', () => {
+    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); } } catch (e) { ok = false; }
+    data = emptyData(); settings = defaultSettings(); applyTheme(); state.sel = todayStr(); state.saveError = ''; if (ok && state.storage.mode === 'blocked') { state.storage.mode = 'ok'; state.storage.raw = null; }
+    $('#dlg').close(); state.view = 'today'; render(); toast(ok ? 'Petal data in this browser is deleted. Files you exported earlier and your browser history are not affected.' : 'Your journal was cleared on this page, but the browser would not remove the stored copy.');
+  });
+  openInfoDialog('Delete all data?', [h('p', { text: 'This will permanently delete:' }), h('ul', null, h('li', { text: c.periods + ' period records, ' + c.flow + ' flow entries, ' + c.products + ' product entries' }), h('li', { text: c.pain + ' pain entries, ' + c.moods + ' mood and symptom entries, ' + c.relief + ' medication or relief entries' }), h('li', { text: 'Your settings, including theme and custom symptoms' }), h('li', { text: 'Only Petal\'s own storage in this browser. Nothing else in your browser is touched.' })),
+    h('p', { class: 'muted small', text: 'This does not delete files you exported earlier, and it does not clear your browser history.' }), h('button', { type: 'button', class: 'btn', text: 'Download a backup first', onclick: exportJSON }),
+    h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'delWord', text: 'Type DELETE to confirm' }), inp), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Keep my data', onclick: () => $('#dlg').close() }))]);
+}
+function openPrintDialog() {
+  if (demoGuard()) return; const t = todayStr();
+  openForm({ title: 'Print summary', saveLabel: 'Open print dialog', build: () => { const fr = document.createDocumentFragment();
+    fr.append(h('p', { class: 'hint', text: 'Choose a date range. Your browser\'s print window lets you print or save as PDF.' }), textField({ id: 'pr-from', type: 'date', label: 'From', value: addDays(t, -90), max: t }), textField({ id: 'pr-to', type: 'date', label: 'To', value: t, max: t }),
+      h('fieldset', { class: 'field' }, h('legend', { text: 'Include' }), h('div', { class: 'chips' }, [['periods', 'Periods and cycle lengths'], ['flow', 'Flow'], ['products', 'Products'], ['pain', 'Pain'], ['moods', 'Mood and symptoms'], ['relief', 'Medication and relief']].map(([v, l]) => h('label', { class: 'chip' }, h('input', { type: 'checkbox', name: 'inc', value: v, checked: true }), h('span', { text: l }))))),
+      h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: 'pr-notes' }), h('span', { text: 'Include my written notes' }))), h('p', { class: 'hint', text: 'Off by default so private notes are not printed by accident.' }))); return fr; },
+    submit: (f) => { const from = val(f, 'pr-from'), to = val(f, 'pr-to'), errs = []; if (!isDateStr(from)) errs.push({ id: 'pr-from', msg: 'Choose a start date.' }); if (!isDateStr(to)) errs.push({ id: 'pr-to', msg: 'Choose an end date.' }); if (!errs.length && to < from) errs.push({ id: 'pr-to', msg: 'The end date is before the start date.' }); if (errs.length) return errs;
+      const inc = getVals(f, 'inc'), notes = f.querySelector('#pr-notes').checked; setTimeout(() => { buildPrint(from, to, inc, notes); window.print(); }, 250); return null; } });
+}
+function buildPrint(from, to, inc, notes) {
+  const root = $('#printArea'), inR = (d) => d >= from && d <= to; root.replaceChildren();
+  const table = (head, rows) => rows.length ? h('table', null, h('thead', null, h('tr', null, head.map((x) => h('th', { text: x })))), h('tbody', null, rows.map((r) => h('tr', null, r.map((c) => h('td', { text: c === null || c === undefined ? '' : String(c) })))))) : h('p', { text: 'No entries recorded in this range.' });
+  const nt = (x) => (notes ? x : ''), when = (iso) => fmtShort(dateOfIso(iso)) + ' ' + fmtTime(iso);
+  root.append(h('h1', { text: 'Period journal summary' }), h('p', { text: fmtShort(from) + ' to ' + fmtShort(to) + '. Prepared in Petal on ' + fmtShort(todayStr()) + '.' }), h('p', { text: 'Based on recorded entries only. A day with no entry is not recorded, and it does not mean no symptoms. Notes are ' + (notes ? 'included.' : 'not included.') }));
+  if (inc.includes('periods')) { root.append(h('h2', { text: 'Periods' }), table(['Start', 'End', 'Length', 'Days since previous start'], periodsSorted().filter((p) => inR(p.start) || (p.end && inR(p.end))).map((p) => { const iv = intervals().find((x) => x.to === p.start); return [fmtShort(p.start), p.end ? fmtShort(p.end) : 'Ongoing', p.end ? (dayDiff(p.start, p.end) + 1) + ' days' : 'Ongoing', iv ? iv.days : '']; })), h('p', { text: 'Length counts both the first and last day. Cycle length is days from one start to the next.' })); }
+  if (inc.includes('flow')) root.append(h('h2', { text: 'Flow' }), table(['Date', 'Flow', 'Details', nt('Note')].filter(Boolean), data.flow.filter((x) => inR(x.date)).sort((a, b) => (a.date < b.date ? -1 : 1)).map((x) => [fmtShort(x.date), flowText(x), [x.leaks && 'leaks', x.between && 'between periods', x.overnight && 'overnight issues'].filter(Boolean).join(', ')].concat(notes ? [x.note] : []))));
+  if (inc.includes('products')) root.append(h('h2', { text: 'Products' }), table(['When', 'Product', 'Action', 'Details'].concat(notes ? ['Note'] : []), data.products.filter((x) => inR(dateOfIso(x.ts))).sort(byTs).map((x) => [when(x.ts), productName(x.product), actionShort(x.product, x.action), [x.absorbency, x.fullness && labelOf(FULLNESS, x.fullness), x.reason && labelOf(REASONS, x.reason), x.overnight && 'overnight', x.double && 'double protection'].filter(Boolean).join(', ')].concat(notes ? [x.note] : []))));
+  if (inc.includes('pain')) root.append(h('h2', { text: 'Pain' }), table(['When', 'Pain (0 to 10)', 'Where', 'Type', 'Impact', 'Tried'].concat(notes ? ['Note'] : []), data.pain.filter((x) => inR(dateOfIso(x.ts))).sort(byTs).map((x) => [when(x.ts), x.intensity, joinLabels(PAIN_LOC, x.locations), joinLabels(PAIN_TYPE, x.types), labelOf(IMPACT, x.impact), joinLabels(PAIN_RELIEF, x.relief)].concat(notes ? [x.note] : []))));
+  if (inc.includes('moods')) root.append(h('h2', { text: 'Mood and symptoms' }), table(['Date', 'Mood', 'Energy', 'Sleep', 'Symptoms'].concat(notes ? ['Note'] : []), data.moods.filter((x) => inR(x.date)).sort((a, b) => (a.date < b.date ? -1 : 1)).map((x) => [fmtShort(x.date), joinLabels(MOODS, x.moods), labelOf(ENERGY, x.energy), x.sleepHours !== null ? x.sleepHours + ' h' : '', x.noSymptoms ? 'None selected' : x.symptoms.map((s) => s.name + (s.severity ? ' (' + s.severity + ')' : '')).join(', ')].concat(notes ? [x.note] : []))));
+  if (inc.includes('relief')) root.append(h('h2', { text: 'Medication and relief' }), table(['When', 'Medication', 'Dose noted', 'Other', 'Pain before to after', 'Did it help'].concat(notes ? ['Note'] : []), data.relief.filter((x) => inR(dateOfIso(x.ts))).sort(byTs).map((x) => [when(x.ts), x.medication, x.dose, joinLabels(NONMED, x.nonMed), (x.before === null ? '' : x.before) + (x.after === null ? '' : ' to ' + x.after), labelOf(HELPED, x.helped)].concat(notes ? [x.note] : [])), h('p', { text: 'This is a personal record, not medication guidance.' })));
+  window.addEventListener('afterprint', () => root.replaceChildren(), { once: true });
+}
+
+/* ---- Demo mode (kept apart from real data and storage) ---- */
+function makeDemo() {
+  const t = todayStr(), d = emptyData(), starts = [-113, -85, -55, -26], lens = [5, 4, 5, 5], lv = ['moderate', 'heavy', 'moderate', 'light', 'spotting'];
+  starts.forEach((off, i) => {
+    const s = addDays(t, off), e = addDays(s, lens[i] - 1);
+    d.periods.push({ id: 'demo-p' + i, start: s, end: e, note: '' });
+    for (let k = 0; k < lens[i]; k++) d.flow.push({ id: 'demo-f' + i + k, date: addDays(s, k), level: lv[k], leaks: false, between: false, overnight: k === 1, note: '' });
+    d.pain.push({ id: 'demo-pn' + i, ts: atTime(s, 15, 30), intensity: [5, 6, 4, 5][i], locations: ['lower_abdomen'], types: ['cramping'], startTime: '', duration: null, impact: i === 1 ? 'slowed' : 'none', relief: ['heat'], note: '' });
+    d.moods.push({ id: 'demo-m' + i, date: addDays(s, 1), created: atTime(addDays(s, 1), 20, 0), moods: ['sensitive', 'calm'], energy: 'low', sleepHours: null, sleepQuality: '', symptoms: [{ name: 'Bloating', severity: 'mild' }], noSymptoms: false, note: '' });
+    d.products.push({ id: 'demo-pr' + i, ts: atTime(s, 8, 0), product: 'pad', action: 'changed', absorbency: 'regular', fullness: 'partly', reason: 'comfort', overnight: false, double: false, note: '' });
+  });
+  return d;
+}
+function enterDemo() { if (state.demo) return; state.stash = { data, settings, sel: state.sel }; data = makeDemo(); settings = Object.assign(defaultSettings(), settings, { estimates: true, introDismissed: true }); state.demo = true; state.sel = todayStr(); go('today'); toast('Demo mode is on. These are sample entries and are not saved.'); }
+function leaveDemo() { if (!state.demo) return; data = state.stash.data; settings = state.stash.settings; state.sel = state.stash.sel; state.stash = null; state.demo = false; applyTheme(); go('today'); toast('You left demo mode. Your real journal is back.'); }
+
+/* ================= 15. Banners, navigation, render, startup ================= */
+function renderBanners() {
+  const b = $('#banners'); b.replaceChildren();
+  if (state.demo) b.append(h('div', { class: 'notice' }, h('strong', { text: 'Demo mode. ' }), 'These are sample entries. They are not saved and are not part of your journal. ', h('button', { type: 'button', class: 'btn', text: 'Leave demo mode', onclick: leaveDemo })));
+  if (state.storage.mode === 'blocked') b.append(h('div', { class: 'urgent', role: 'alert' }, h('strong', { text: 'Saved data could not be read. ' }), state.storage.reason + ' Petal will not overwrite it silently, and nothing new is being saved yet.',
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download the unreadable data', onclick: () => download('petal-unreadable-data.txt', 'text/plain', state.storage.raw || '') }),
+      h('button', { type: 'button', class: 'btn', text: 'Start a new journal…', onclick: async () => { if (await confirmBox({ title: 'Replace the unreadable data?', body: 'This permanently removes the saved data Petal could not read. Download it first if you want a copy.', okText: 'Replace it', danger: true, cancelText: 'Keep it' })) { try { const s = ls(); s.removeItem(KEY_J); s.removeItem(KEY_S); } catch (e) { /* ignore */ } state.storage.mode = 'ok'; state.storage.raw = null; data = emptyData(); settings = defaultSettings(); applyTheme(); render(); toast('Started a new journal.'); } } }))));
+  if (state.storage.mode === 'memory') b.append(h('div', { class: 'urgent', role: 'alert' }, h('strong', { text: 'Your entries are not being saved. ' }), 'This browser or mode does not allow storage (private browsing can cause this). Entries disappear when you close this page.', h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download what is here', onclick: exportJSON }))));
+  if (state.saveError && state.storage.mode !== 'memory') b.append(h('div', { class: 'urgent', role: 'alert' }, h('strong', { text: 'Your last change was not saved. ' }), state.saveError + ' It is still shown here, but may be lost when you close this page.', h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download a backup now', onclick: exportJSON }))));
+}
+const NAV = [['today', 'Today', 'today'], ['calendar', 'Calendar', 'calendar'], ['learn', 'Learn', 'learn'], ['settings', 'Settings', 'settings']];
+function renderNav() { const n = $('#nav'), cur = state.view === 'cycles' ? 'today' : state.view; n.replaceChildren(...NAV.map(([k, l, i]) => h('button', { type: 'button', id: 'nav-' + k, 'aria-current': cur === k ? 'page' : null, onclick: () => { if (k === 'learn' && state.view !== 'learn') state.article = null; go(k); } }, icon(i), h('span', { text: l })))); }
+const VIEWS = { today: viewToday, calendar: viewCalendar, cycles: viewCycles, learn: viewLearn, settings: viewSettings };
+function render(focusId) {
+  renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m);
+  if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
+}
+function go(view) { state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
+
+function init() {
+  initStorage(); applyTheme();
+  $('#brand').append(flowerIcon(28), h('span', { text: 'Petal' }));
+  $('#helpBtn').addEventListener('click', openHelp);
+  ['dlg', 'confirm', 'gloss'].forEach((id) => wireDialog($('#' + id)));
+  render();
+  setInterval(() => { const box = $('#timerCard'); if (box && $('#dlg').open === false) fillTimer(box); }, 30000);
+  document.addEventListener('visibilitychange', () => { const box = $('#timerCard'); if (!document.hidden && box) fillTimer(box); });
+}
+init();
+})();
+</script>
+</body>
+  </html>
