@@ -281,13 +281,16 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 /* month grid */
 .cal{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:1px;background:var(--line);border:1px solid var(--line)}
 .dow{background:var(--accent);color:var(--on-accent);padding:9px 6px;text-align:center;font:700 12px/1 var(--label);letter-spacing:.14em;text-transform:uppercase}
-.day{background:var(--field);min-height:122px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0}
+.day{background:var(--field);aspect-ratio:1/1;min-height:120px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--caramel) transparent}   /* every day stays a square; scroll inside it to see more tasks */
+.day::-webkit-scrollbar{width:6px}.day::-webkit-scrollbar-thumb{background:var(--caramel);border-radius:3px}
+.day>.chip{flex:none}
 .day{position:relative}
 .day>:not(.xmark){position:relative;z-index:1}
 .day:nth-child(7n+1),.day:nth-child(7n){background:var(--wknd)}
 /* fridge-calendar marks: an X through days that have passed, a hand-drawn circle around special occasions */
-.xmark{position:absolute;left:4px;top:4px;width:calc(100% - 8px);height:calc(100% - 8px);pointer-events:none;z-index:0}
-.xmark path{fill:none;stroke:var(--ink);stroke-opacity:.3;stroke-width:2.4;stroke-linecap:round;vector-effect:non-scaling-stroke}
+.xmark{position:absolute;left:7px;top:8px;width:30px;height:30px;pointer-events:none;z-index:0}
+.mday .xmark{left:50%;top:5px;width:26px;height:26px;margin-left:-13px}
+.xmark path{fill:none;stroke:var(--ink);stroke-opacity:.35;stroke-width:2;stroke-linecap:round;vector-effect:non-scaling-stroke}
 .dn{position:relative;display:inline-grid;place-items:center;min-width:30px;height:30px}
 .circ{position:absolute;left:-5px;top:-5px;width:calc(100% + 10px);height:calc(100% + 10px);pointer-events:none;overflow:visible}
 .circ path{fill:none;stroke:var(--mark);stroke-width:2.6;stroke-linecap:round;stroke-linejoin:round;vector-effect:non-scaling-stroke}
@@ -442,7 +445,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.4';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.0.5';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
