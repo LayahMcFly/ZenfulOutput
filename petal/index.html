@@ -214,6 +214,32 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 .pday .field{margin:0}
 .quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
 .quick .btn{flex-direction:column;gap:4px;min-height:68px;font-size:11px;text-align:center;padding:8px 4px}
+/* ===== Article reader ===== */
+.essay{max-width:41rem;margin:0 auto}
+.essay .meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 0;font:700 12px/1.4 var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
+.essay #artTitle{font-size:clamp(30px,6.5vw,42px);margin:.4rem 0 .5rem}
+.essay .lede{font-size:21px;line-height:1.55;color:var(--ink-soft);margin:0 0 1rem}
+.essay p,.essay li{font-size:19px;line-height:1.75}
+.essay p{margin:0 0 1.05em}
+.essay ul,.essay ol{margin:0 0 1.2em;padding-left:1.4rem}
+.essay li{margin-bottom:.45em}
+.esec{margin-top:34px}
+.esec h3{font:400 26px/1.2 var(--display);margin:.1rem 0 .7rem}
+.sectag{margin:0 0 4px!important;font-size:inherit}
+.example{border-left:3px solid var(--accent);padding:.15rem 0 .15rem 14px;margin:1.2em 0!important}
+.exlabel{display:block;font:700 12px/1.6 var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong)}
+.essay p.info{font-size:18px}
+.srcmark{display:inline-flex;align-items:center;justify-content:center;min-width:30px;min-height:30px;margin-left:1px;padding:0 3px;border:0;background:none;font:700 13px/1 var(--label);color:var(--accent-strong);cursor:pointer;text-decoration:underline;text-underline-offset:3px;vertical-align:baseline}
+.alink{font:inherit;color:var(--accent-strong);background:none;border:0;padding:2px 0;cursor:pointer;text-decoration:underline;text-underline-offset:4px;text-align:left}
+.toc{margin:0 0 1.4rem;border:1.5px dashed var(--caramel);border-radius:3px;padding:2px 14px;background:var(--card)}
+.toc summary{min-height:44px;display:flex;align-items:center;cursor:pointer;font:700 13px/1.2 var(--label);letter-spacing:.08em;text-transform:uppercase;color:var(--accent-strong)}
+.toc ol{margin:0 0 .8rem;padding-left:1.3rem}
+.toc li{font-size:17px;line-height:1.5;margin-bottom:.25em}
+.toc a{color:var(--ink);text-underline-offset:3px;display:inline-block;padding:3px 0}
+.essay .esrc{margin-top:38px}
+.essay .esrc li{font-size:17px;line-height:1.55}
+.essay .urgent p{font-size:18px}
+.essay .urgent{margin:0 0 1.2em}
 .ver{margin:26px 0 0;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
 .theme-opt .sw{display:inline-flex;gap:2px}
 .theme-opt .sw i{width:14px;height:14px;border-radius:50%;border:1px solid #6b4e3b;display:inline-block}
@@ -260,8 +286,7 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const CHECKED_ON = '2026-11-01';
-const APP_VERSION = '1.0.0'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '1.0.1'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -316,25 +341,54 @@ const GLOSSARY = {
   pelvis: ['Pelvis', 'The lower part of your body between your belly and the tops of your legs.'],
   symptom: ['Symptom', 'A change in how your body feels or works.'],
   median: ['Median', 'The middle value after numbers are put in order. If there are two middle numbers, it is halfway between them.'],
-  cramps: ['Cramps', 'Pain, often in the lower belly or back, that can come and go around a period.'],
+  cramps: ['Cramps', 'Pain in the lower belly, sometimes spreading to the back or thighs, that can come and go around a period.'],
   tss: ['Toxic shock syndrome (TSS)', 'A serious illness that can come on quickly. The FDA connects it with tampon use and lists warning signs. Get medical care right away if you have them.'],
   cup: ['Menstrual cup', 'A small, soft cup worn inside the body to collect period blood instead of soaking it up.'],
   disc: ['Menstrual disc', 'A flexible disc worn inside the body to collect period blood.'],
   healthpro: ['Healthcare professional', 'A doctor, nurse, or other trained health worker.'],
   severity: ['Severity', 'How strong or bothersome something is.'],
   estimate: ['Estimate', 'A careful guess based on your past entries. It can be wrong.'],
-  storage: ['Browser storage', 'Space inside your web browser where this page keeps your entries on your own device.']
+  storage: ['Browser storage', 'Space inside your web browser where this page keeps your entries on your own device.'],
+  hormones: ['Hormones', 'Chemicals your body makes that send messages between different parts of the body. Some of them help control your cycle.'],
+  uterus: ['Uterus', 'A muscular organ in your lower belly. During a period, its soft lining comes away and leaves your body through the vagina.'],
+  vagina: ['Vagina', 'The soft passage from the uterus to the outside of the body. Period blood leaves through it. Tampons and cups are placed in it.'],
+  prostaglandins: ['Prostaglandins', 'Chemicals your body makes. Around a period, they help the muscle of the uterus tighten, which can cause cramps.'],
+  pms: ['PMS (premenstrual syndrome)', 'Mood and body changes some people notice in the days before a period, and sometimes during it. Not everyone has them.'],
+  backup: ['Backup', 'A separate copy of your entries, kept somewhere other than this browser.'],
+  profile: ['Browser profile', 'The set of saved information a browser keeps for one user, such as history, saved logins, and data from sites. Anyone who can open that profile can see what is in it.']
 };
 
+// Each source says honestly whether its page was read. "checked" is the date the page was read, or null if it could not be opened.
+function mkSource(short, label, url, checked, note) {
+  return { short, label, url, checked, note,
+    status: checked ? 'Read on ' + checked + ' while this app was written. ' + note + ' This is not a medical review.' : 'Suggested source. Check for current guidance. ' + note };
+}
+const READ_NOW = '2026-11-05';
 const SOURCES = {
-  fda: { label: 'FDA: The Facts on Tampons and Tampon Safety', url: 'https://www.fda.gov/consumers/consumer-updates/facts-tampons-and-tampon-safety',
-    status: 'Checked on ' + CHECKED_ON + ' while this app was written. The 4 to 8 hour guidance, the 8-hour limit, and the toxic shock warning signs were read on this page. This is not a medical review.' },
-  acog: { label: 'ACOG: Abnormal Uterine Bleeding', url: 'https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding',
-    status: 'Suggested source. Check for current guidance. This page could not be opened when this app was written, so its content was not checked.' },
-  diary: { label: 'ACOG: Abnormal Bleeding Diary', url: 'https://www.acog.org/womens-health/health-tools/abnormal-bleeding-diary',
-    status: 'Suggested source. Check for current guidance. This page could not be opened when this app was written, so its content was not checked.' },
-  kids: { label: 'Nemours KidsHealth: I Think I Had My First Period. How Can I Be Sure?', url: 'https://kidshealth.org/en/teens/expert-period.html',
-    status: 'Checked on ' + CHECKED_ON + ' while this app was written. The notes about brown blood, short and light first periods, and periods changing in the first couple of years were read on this page. The page does not give a step-by-step checklist, so this app does not present one as sourced. This is not a medical review.' }
+  fda: mkSource('FDA', 'FDA: The Facts on Tampons and Tampon Safety', 'https://www.fda.gov/consumers/consumer-updates/facts-tampons-and-tampon-safety', READ_NOW,
+    'The 4 to 8 hour advice, the 8-hour limit, the lowest-absorbency advice, and the toxic shock warning signs were read on this page.'),
+  acogfirst: mkSource('ACOG, first period', 'ACOG: Your First Period', 'https://www.acog.org/womens-health/faqs/your-first-period', READ_NOW,
+    'Typical start age, light early periods, cycle length ranges, tracking, supplies, and when to see a doctor were read on this page.'),
+  acogheavy: mkSource('ACOG, heavy bleeding', 'ACOG: Heavy Menstrual Bleeding', 'https://www.acog.org/womens-health/faqs/heavy-menstrual-bleeding', READ_NOW,
+    'The description of heavy bleeding and the advice to track start dates, length, and flow were read on this page.'),
+  acog: mkSource('ACOG, abnormal bleeding', 'ACOG: Abnormal Uterine Bleeding', 'https://www.acog.org/womens-health/faqs/abnormal-uterine-bleeding', null,
+    'This page could not be opened when it was tried on 2026-11-01 and again on 2026-11-05, so the exact wording of the emergency guidance in this app has not been checked against it.'),
+  diary: mkSource('ACOG, bleeding diary', 'ACOG: Abnormal Bleeding Diary', 'https://www.acog.org/womens-health/health-tools/abnormal-bleeding-diary', null,
+    'This page could not be opened when it was tried on 2026-11-01, so its content has not been checked.'),
+  nhsperiods: mkSource('NHS, periods', 'NHS: Periods', 'https://www.nhs.uk/conditions/periods/', READ_NOW,
+    'Typical start age, usual period and cycle length, and the colour of period blood were read on this page.'),
+  nhsprob: mkSource('NHS, period problems', 'NHS: Period problems', 'https://www.nhs.uk/conditions/periods/period-problems/', READ_NOW,
+    'The signs worth discussing with a doctor and the advice to keep a symptom diary were read on this page.'),
+  nhspain: mkSource('NHS, period pain', 'NHS: Period pain', 'https://www.nhs.uk/conditions/period-pain/', READ_NOW,
+    'What period pain can feel like, ways to ease it at home, and when to get help were read on this page.'),
+  kids: mkSource('KidsHealth, first period', 'Nemours KidsHealth: I Think I Had My First Period. How Can I Be Sure?', 'https://kidshealth.org/en/teens/expert-period.html', '2026-11-01',
+    'The notes about brown blood, short and light first periods, and periods changing in the first couple of years were read on this page.'),
+  kidscramps: mkSource('KidsHealth, cramps', 'KidsHealth: Period Cramps (teen page, copy hosted by Akron Children\'s)', 'https://www.akronchildrens.org/kidshealth/en/teens/cramps.html', READ_NOW,
+    'What causes cramps, what can help, and when to see a doctor were read on this page. The address on kidshealth.org could not be opened here, so this link goes to the copy Akron Children\'s hosts.'),
+  kidssupplies: mkSource('KidsHealth, supplies', 'KidsHealth: Period supplies (teen page)', 'https://kidshealth.org/CHOC/en/teens/supplies.html', READ_NOW,
+    'What pads, tampons, and cups are, the advice on unscented pads and not flushing products, and its change-timing numbers were read on this page.'),
+  kidsprob: mkSource('KidsHealth, menstrual problems', 'KidsHealth: Menstrual problems (teen page, copy hosted by Akron Children\'s)', 'https://akronchildrens.org/kidshealth/en/teens/menstrual-problems.html', READ_NOW,
+    'The sections on PMS, irregular periods, and when to call a doctor were read on this page.')
 };
 
 /* ================= 2. Small helpers ================= */
@@ -432,7 +486,6 @@ let settings = defaultSettings();
 const state = {
   view: 'today', sel: todayStr(), calMonth: todayStr().slice(0, 7), calMode: 'grid',
   learnTab: 'articles', learnQ: '', learnCat: 'All', article: null, glossQ: '',
-  demo: false, stash: null,
   storage: { mode: 'ok', raw: null, reason: '' }, // mode: ok | memory | blocked
   saveError: '', timerLevels: {}, timerDismissed: {}
 };
@@ -548,7 +601,6 @@ function initStorage() {
   }
 }
 function persist() {
-  if (state.demo) return { ok: true, demo: true };
   if (state.storage.mode === 'blocked') return { ok: false, reason: 'Saved data that could not be read is still in this browser. Petal will not overwrite it until you choose what to do.' };
   const s = ls();
   try {
@@ -561,7 +613,7 @@ function persist() {
 // Called after any change. Only says "saved" once storage has succeeded.
 function saved(okMsg) {
   const r = persist();
-  if (r.ok) { state.saveError = ''; toast(r.demo ? 'Done. Demo entries are not saved anywhere.' : okMsg || 'Your entry is saved.'); }
+  if (r.ok) { state.saveError = ''; toast(okMsg || 'Your entry is saved.'); }
   else { state.saveError = r.reason; }
   render();
   return r;
@@ -605,14 +657,19 @@ function glossBtn(key, label) {
   if (!GLOSSARY[key]) return document.createTextNode(label || key);
   return h('button', { type: 'button', class: 'gloss', 'aria-haspopup': 'dialog', onclick: (e) => openGloss(key, e.currentTarget) }, label || GLOSSARY[key][0], h('span', { class: 'sr-only', text: ' (tap for meaning)' }));
 }
-// Text with {{key}} or {{key|shown words}} becomes plain text plus glossary buttons.
+// Text tokens: {{term|shown words}} opens a glossary definition, [[s:key]] is a numbered source marker, [[a:id|words]] links to another article.
+const TOKEN = '\\{\\{([a-z0-9-]+)(?:\\|([^}]+))?\\}\\}|\\[\\[s:([a-z0-9-]+)\\]\\]|\\[\\[a:([a-z0-9-]+)\\|([^\\]]+)\\]\\]';
 function rich(el, text) {
-  const re = /\{\{([a-z0-9-]+)(?:\|([^}]+))?\}\}/g; let last = 0, m;
-  while ((m = re.exec(text))) { if (m.index > last) el.append(text.slice(last, m.index)); el.append(glossBtn(m[1], m[2])); last = re.lastIndex; }
+  const re = new RegExp(TOKEN, 'g'); let last = 0, m;
+  while ((m = re.exec(text))) {
+    if (m.index > last) el.append(text.slice(last, m.index));
+    if (m[1]) el.append(glossBtn(m[1], m[2])); else if (m[3]) el.append(srcMark(m[3])); else el.append(articleLink(m[4], m[5]));
+    last = re.lastIndex;
+  }
   if (last < text.length) el.append(text.slice(last));
   return el;
 }
-const plain = (t) => t.replace(/\{\{([a-z0-9-]+)(?:\|([^}]+))?\}\}/g, (m, k, l) => l || (GLOSSARY[k] ? GLOSSARY[k][0] : k));
+const plain = (t) => t.replace(new RegExp(TOKEN, 'g'), (m, k, l, s, a, w) => (k ? (l || (GLOSSARY[k] ? GLOSSARY[k][0] : k)) : s ? '' : w));
 const hintEl = (id, text) => rich(h('p', { class: 'hint', id: id }), text);
 
 function chips(o) {
@@ -982,6 +1039,7 @@ function quickRow() {
   const q = [['drop', 'Start or end period', () => { const o = getOngoing(); const inP = periodOn(logDate()); if (o && !inP) openPeriodForm({ mode: 'end', id: o.id }); else if (inP) openPeriodForm({ mode: 'edit', id: inP.id }); else openPeriodForm({ mode: 'start' }); }], ['flow', 'How much (flow)', () => openFlowForm()], ['product', 'Product', () => openProductForm()], ['pain', 'Pain', () => openPainForm()], ['mood', 'Mood and symptoms', () => openMoodForm()], ['relief', 'Medication or relief', () => openReliefForm()]];
   return h('div', { class: 'quick', role: 'group', 'aria-label': 'Add to ' + fmtShort(logDate()) }, q.map((x) => h('button', { type: 'button', class: 'btn', onclick: x[2] }, icon(x[0], 20), x[1])));
 }
+const hasAnyData = () => data.periods.length + data.flow.length + data.products.length + data.pain.length + data.moods.length + data.relief.length > 0;
 function activityList(date) {
   const items = dayItems(date);
   if (!items.length) return h('p', { class: 'muted', text: "Nothing logged yet. Add an entry whenever you're ready." });
@@ -994,7 +1052,7 @@ function activityList(date) {
 function viewToday(root) {
   const today = todayStr(), sel = state.sel, ongoing = getOngoing(), e = entriesOn(sel);
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: sel === today ? 'Today' : 'Journal' }), h('p', { class: 'muted', text: fmtLong(sel) }));
-  if (!settings.introDismissed && !state.demo) root.append(introCard());
+  if (!settings.introDismissed) root.append(introCard());
   root.append(h('div', { class: 'datebar' },
     h('button', { type: 'button', class: 'btn icon', id: 'prevDay', 'aria-label': 'Previous day', onclick: () => { state.sel = addDays(sel, -1); render('prevDay'); } }, icon('prev')),
     h('label', { class: 'sr-only', for: 'selDate', text: 'Choose a date' }), h('input', { type: 'date', id: 'selDate', value: sel, onchange: (ev) => { if (isDateStr(ev.target.value)) { state.sel = ev.target.value; render('selDate'); } } }),
@@ -1039,7 +1097,9 @@ function introCard() {
   const c = card('Welcome to Petal', [
     h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
     h('p', { text: "You can skip anything you don't want to track. Optional boxes live under \"Add details\"." }),
-    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Got it', onclick: () => { settings.introDismissed = true; const r = persist(); if (!r.ok) state.saveError = r.reason; render('logBtn'); } }), h('button', { type: 'button', class: 'btn', text: 'Try demo data', onclick: enterDemo }))], 'soft');
+    h('p', { text: 'Here is where things will show up as you log them:' }),
+    h('ul', null, h('li', { text: 'Today: log a period, flow, a product change, pain, mood, or relief in a few taps. You can pick a past date too.' }), h('li', { text: 'Calendar: days you logged appear here, with a list view if you prefer it.' }), h('li', { text: 'Cycle summaries: period lengths and patterns, worked out only from what you record.' }), h('li', { text: 'Learn: short articles and a "Words explained" list.' })),
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Got it', onclick: () => { settings.introDismissed = true; const r = persist(); if (!r.ok) state.saveError = r.reason; render('logBtn'); } }))], 'soft');
   return c;
 }
 
@@ -1116,6 +1176,7 @@ function viewCalendar(root) {
       return h('li', null, h('button', { type: 'button', id: 'day-' + date, class: 'btn' + (date === state.sel ? ' sel' : ''), 'aria-label': dayLabel(date, d, today), 'aria-current': date === today ? 'date' : null, onclick: () => choose(date) }, h('span', { 'aria-hidden': 'true', text: localDate(date).toLocaleDateString(undefined, { weekday: 'short', month: 'short', day: 'numeric' }) + (date === today ? ' (today)' : '') + '  ' + symFor(d) })));
     }))));
   }
+  if (!hasAnyData()) root.append(h('p', { class: 'info' }, 'Nothing logged yet. Add an entry whenever you\'re ready. Days with bleeding, pain, products, or mood entries get a mark here, and tapping any day lets you log for it. If you turn on estimates in Settings, a dashed outline will show an estimated window once there is enough history.'));
   const L = [['●', 'Bleeding logged'], ['○', 'Inside a logged period, no flow entry'], ['◇', 'No bleeding logged'], ['▪', 'Other entries'], ['✦', 'Estimated window (not logged)'], ['Underlined number', 'Today'], ['Filled day', 'Selected day']];
   root.append(h('section', { 'aria-label': 'Legend', class: 'card soft' }, h('h2', { text: 'Legend' }), h('ul', { class: 'legend' }, L.map((l) => h('li', null, h('strong', { 'aria-hidden': 'true', text: l[0] + ' ' }), l[1]))), h('p', { class: 'small muted', text: 'Estimated days only appear if you turn estimates on in Settings. They are guesses, not records.' })));
   const sd = state.sel;
@@ -1132,7 +1193,13 @@ function viewCycles(root) {
     h('li', null, 'Period length counts both the first and last day.'), h('li', null, rich(h('span'), 'Cycle length is the number of calendar days from one period\'s first day to the next period\'s first day. See {{cycle}}.')),
     h('li', null, 'A period that is still ongoing is not counted as complete.'), h('li', null, 'Petal does not judge whether a length is normal.'))));
   root.append(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Add a past period', onclick: () => openPeriodForm({ mode: 'start', past: true }) }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })));
-  if (!ps.length) { root.append(h('p', { class: 'muted', text: "Nothing logged yet. Add an entry whenever you're ready." })); return; }
+  if (!ps.length) {
+    root.append(card('Nothing logged yet', [h('p', { text: "Add an entry whenever you're ready. Once you log a period, this page shows:" }),
+      h('ul', null, h('li', { text: 'How long each period lasted, counting the first and last day.' }), h('li', { text: 'Days from one period start to the next, after you have logged two or more.' }), h('li', { text: 'Bleeding days and no-bleeding days you logged, your highest pain score, product entries, common symptoms, and daily-life impact.' })),
+      h('p', { class: 'muted', text: 'The optional period estimate in Settings needs at least 3 completed cycles before it shows anything.' })], 'soft'));
+    return;
+  }
+  if (iv.length === 0) root.append(card('Cycle lengths', h('p', { text: 'A cycle length needs two period start dates. After you log your next period, the days between the two starts will show here.' }), 'soft'));
   if (iv.length) {
     const max = Math.max.apply(null, iv.map((x) => x.days)), box = h('div');
     iv.slice().reverse().forEach((x) => box.append(h('p', { class: 'small', text: fmtShort(x.from) + ' to ' + fmtShort(x.to) + ': ' + x.days + ' days' }), h('div', { class: 'bar', 'aria-hidden': 'true' }, h('span', { style: 'width:' + Math.round(x.days / max * 100) + '%' }))));
@@ -1154,81 +1221,513 @@ function viewCycles(root) {
 }
 
 /* ================= 11. Help panel ================= */
+// The urgent panel is shared by the "When to get help" window and the help article.
+function urgentNode() {
+  return h('section', { class: 'urgent' }, h('p', null, h('span', { class: 'tag urgent-tag', text: 'Urgent' }), h('strong', { text: 'Get emergency care' })),
+    h('p', { text: 'ACOG guidance: seek emergency medical care if you are changing pads or tampons every hour for more than two hours in a row and also have chest pain, shortness of breath, or lightheadedness or dizziness.' }),
+    h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.acog), '. ' + SOURCES.acog.status),
+    h('p', { text: 'A related ACOG page that was read says that needing to change a pad or tampon every 1 to 2 hours is a reason to see a doctor, and that dizziness, light-headedness, or a racing pulse needs prompt care.' }),
+    h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.acogfirst), '. Read on ' + SOURCES.acogfirst.checked + '.'),
+    h('p', { text: 'The FDA lists warning signs of toxic shock syndrome: a sudden fever (usually 102°F or higher), vomiting, diarrhea, fainting or near-fainting when standing, dizziness, or a sunburn-like rash. If you notice these during or soon after your period, stop using tampons and get medical care right away.' }),
+    h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.fda), '. ' + SOURCES.fda.status), h('p', { text: 'If you think it is an emergency, call your local emergency number (911 in the US).' }));
+}
 function helpNodes() {
   return [
-    h('section', { class: 'urgent' }, h('p', null, h('span', { class: 'tag urgent-tag', text: 'Urgent' }), h('strong', { text: 'Get emergency care' })),
-      h('p', { text: 'ACOG guidance: seek emergency medical care if you are changing pads or tampons every hour for more than two hours in a row and also have chest pain, shortness of breath, or lightheadedness or dizziness.' }),
-      h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.acog), '. ' + SOURCES.acog.status),
-      h('p', { text: 'The FDA lists warning signs of toxic shock syndrome: a sudden fever (usually 102°F or higher), vomiting, diarrhea, fainting or near-fainting when standing, dizziness, or a sunburn-like rash. If you notice these during or soon after your period, stop using tampons and get medical care right away.' }),
-      h('p', { class: 'small' }, 'Source: ', extLink(SOURCES.fda), '. ' + SOURCES.fda.status), h('p', { text: 'If you think it is an emergency, call your local emergency number (911 in the US).' })),
+    urgentNode(),
     h('section', { class: 'info', style: 'margin-top:12px' }, h('p', null, h('span', { class: 'tag', text: 'Talk to someone' }), h('strong', { text: 'You can ask for help any time' })),
       h('p', { text: 'That emergency example is not the only reason to reach out. Talk with a doctor, nurse, parent, or another adult you trust if something about your period worries you or gets in the way of school, sleep, or things you enjoy. You do not need to be sure something is wrong.' }),
       h('p', { text: 'Pain that bothers you, bleeding that worries you, or anything that feels off to you are all fine reasons to ask. You can bring Petal\'s printed summary to an appointment.' }),
-      h('p', { class: 'small' }, 'You can also read ', extLink(SOURCES.diary), '. ' + SOURCES.diary.status)),
+      h('p', { class: 'small' }, 'You can also read ', extLink(SOURCES.diary), '. ' + SOURCES.diary.status),
+      h('button', { type: 'button', class: 'btn', text: 'Read the full article', onclick: () => openArticle('help') })),
     h('p', { class: 'small muted', text: 'Petal is a journal and a learning tool. It cannot monitor your health or tell you whether something is wrong.' })
   ];
 }
 function openHelp() { openInfoDialog('When to get help', helpNodes()); }
 
+/* ================= 12a. Article text =================
+   Markup inside text: {{term|shown words}} = glossary button, [[s:key]] = numbered source marker, [[a:id|words]] = link to another article.
+   Block types: a string is a paragraph; {ex} an example; {ul} / {ol} lists; {note} a callout; {urgentPanel:true} the urgent-help panel. */
+const ARTICLES = [
+  {
+    id: 'started', cat: 'Basics', title: 'I think my period started: now what?',
+    summary: 'What a first period can look like, what to do in the first hour, and when it makes sense to ask someone.',
+    sources: ['nhsperiods', 'acogfirst', 'kids', 'kidssupplies'], related: ['bag', 'products', 'help'],
+    intro: [
+      `You notice a spot in your underwear, or a stain you can't explain, or a damp feeling that wasn't there a minute ago. You check, and the color is red, pink, or brown, and now you're trying to work out whether this is a period and what you're supposed to do about it. That moment can feel urgent and a little unreal at the same time.`,
+      `This article covers what a first period can look like, what to do in the first hour, why the next few periods may not match the first one, and when it makes sense to ask someone about it. It also shows where Petal fits in, if you decide you want to write it down.`
+    ],
+    sections: [
+      { tag: 'Health information', h: 'What a first period can look like', blocks: [
+        `A period is the part of the monthly {{cycle}} when you bleed from the {{vagina}} for a few days. The NHS says periods usually begin around age 12, and that some people start earlier or later. It adds that a later start is usually not a concern.[[s:nhsperiods]]`,
+        `A first period often looks different from what people expect, and the color is part of that. Blood can be red, but it can also be pink or brown, especially on lighter days.[[s:nhsperiods]] Nemours KidsHealth says it is completely normal for the blood to look brownish, and that a first period can be light and last only two or three days.[[s:kids]] ACOG describes early periods as often very light, sometimes only a few reddish-brown spots.[[s:acogfirst]]`,
+        { ex: `Say you wipe and see a rusty brown mark on the tissue, and then nothing else for the rest of the day. That can be a first period. Someone else might see steady red bleeding that lasts most of a week. Both are ways a period can begin.` },
+        `The NHS puts a typical period at 2 to 7 days, around 5 on average, with the heaviest bleeding usually in the first couple of days.[[s:nhsperiods]]`
+      ] },
+      { tag: 'Practical tips', h: 'What to do in the first hour', blocks: [
+        `Start by catching the blood, then decide who to tell. A pad is the easiest place to begin, because it sticks to the inside of your underwear and soaks up the blood. KidsHealth suggests choosing unscented ones, since scented pads can irritate.[[s:kidssupplies]] If you don't have a pad, folded toilet paper can get you through a short stretch until you can find one.`,
+        { ex: `Imagine you notice it at school, partway through the day. You can ask the school nurse, a teacher you trust, or a friend for a pad. Some schools keep supplies in the nurse's office or a restroom, so it's worth asking. At home, you can look in a family bathroom or tell a parent or another adult you trust, and ask them to help you pick out supplies.` },
+        `Needing supplies you don't have is an ordinary problem with an ordinary fix, and a quiet question is all it takes.`
+      ] },
+      { tag: 'Health information', h: 'Why your next period may look different', blocks: [
+        `One period tells you very little about the next one. KidsHealth explains that periods can change during the first couple of years because {{hormones}} vary from cycle to cycle, and that food, exercise, and medicines can also affect them.[[s:kids]]`,
+        `ACOG gives the average cycle as about 28 days and says anywhere from 21 to 45 days is considered normal for teens. It also says it can take 6 years or more after a first period for cycles to become regular.[[s:acogfirst]] Sources vary on the details, which is a good reminder that there is no single schedule everyone follows.`,
+        { ex: `So you might have a period in March, none in April, and another in May, and the gap alone does not tell you something is wrong.` },
+        `That does not make every change harmless. ACOG lists a period that lasts longer than 7 days, needing to change a pad or tampon every 1 to 2 hours, and regular periods that turn irregular for several months as reasons to see a doctor.[[s:acogfirst]]`
+      ] },
+      { tag: 'How Petal works', h: 'Writing it down, if you want to', blocks: [
+        `You don't have to track anything. If you'd like a record, tap Log something, then Start or end period, and choose the first day of bleeding. ACOG suggests marking that first day as day 1 and then marking each day of bleeding after it.[[s:acogfirst]] Petal does the counting once you've entered the dates.`,
+        `If you aren't sure the bleeding is a period, you can log it under Log flow as Light or {{spotting}} and add a note. Petal never starts a period on its own, so you can decide later whether it deserves a period record. Every optional box can stay empty. The article [[a:flow|Getting to know your flow]] explains what each choice records.`
+      ] },
+      { h: 'Starting small', blocks: [
+        `A first period can be small, brown, and over in a day or two, or it can be red and last most of a week. The useful steps are the same either way: catch the blood, tell someone if you want help, and write it down only if that sounds useful to you.`,
+        `If anything about it worries you, you can ask a {{healthpro}} or an adult you trust, and you don't have to be sure something is wrong first. [[a:bag|What should I keep in my school bag?]] and [[a:products|Pads, tampons, and period underwear]] cover supplies in more detail, and [[a:help|When should I ask for help?]] lists the situations where it's especially worth asking.`
+      ] }
+    ]
+  },
+  {
+    id: 'bag', cat: 'Basics', title: 'What should I keep in my school bag?',
+    summary: 'A small period kit makes a surprise easier to handle. This covers what goes in it and how to ask for help.',
+    sources: ['kidssupplies', 'fda'], related: ['products', 'started'],
+    intro: [
+      `Periods rarely check your schedule first. One can start during second period, show up a few days early, or arrive heavier than you expected right when the bus pulls away. A small kit in your bag can't prevent any of that, but it changes what the moment costs you. Instead of a scramble, it becomes a quick trip to the bathroom.`,
+      `This article is mostly practical advice, so most of it comes from common sense. The few health details in it point to a source.`
+    ],
+    sections: [
+      { tag: 'Practical tips', h: 'What a kit is for', blocks: [
+        `The kit's job is to cover the first few hours of a surprise, until you can get home or find more supplies. That includes the obvious problem of having nothing to use. It also covers the less obvious ones: a leak that shows on your clothes, a pad that fills sooner than you planned, or a friend who needs one and doesn't want to ask the whole hallway.`,
+        { ex: `Say your period starts at lunch. With a kit, you go to the bathroom, change, put the used product in a wrapper, and get back to class. Without one, you might spend the afternoon folding toilet paper and checking your clothes. The difference is mostly about attention, and a kit gives some of it back.` }
+      ] },
+      { tag: 'Practical tips', h: 'What goes in it', blocks: [
+        `Most kits are small enough to fit in a pencil case or a zip pouch, and you can build one from things you already use. Start with this list and change it to fit you:`,
+        { ul: [
+          `A few of the products you actually use, such as pads or tampons`,
+          `A spare pair of underwear, or period underwear`,
+          `A small plastic or zip bag for used clothes`,
+          `A bag or wrapper for used products, because they go in the trash and not the toilet`,
+          `Hand sanitizer or wipes, for when a sink isn't nearby`,
+          `A sweater or jacket you could tie around your waist`
+        ] },
+        `Anything that makes the day easier can go in, such as a small heat pack, and anything you never use can come out.`
+      ] },
+      { tag: 'Health information', h: 'Choosing supplies that suit you', blocks: [
+        `Pick products you would really use, in sizes that match your flow. If you carry pads, KidsHealth suggests unscented ones, since scented pads can irritate.[[s:kidssupplies]] If you carry tampons, the FDA advises using the lowest {{absorbency}} that works for you, and lists absorbency levels as light, regular, and super.[[s:fda]] Carrying one lighter and one heavier option helps if your flow changes from day to day.`,
+        `The same FDA page says to change each tampon every 4 to 8 hours and never wear one longer than 8 hours.[[s:fda]] A tampon in your kit is a reminder to plan for the change as well as the start.`
+      ] },
+      { tag: 'Practical tips', h: 'Where used products go', blocks: [
+        `Disposable pads and wrappers go in the trash. KidsHealth says not to flush pads, and that tampons shouldn't be flushed even if the box says they are flushable.[[s:kidssupplies]] Many restroom stalls have a small bin. If yours doesn't, wrap the product in toilet paper or its own wrapper and put it in the trash on your way out.`
+      ] },
+      { tag: 'Practical tips', h: 'Asking for help without making it a big thing', blocks: [
+        `Asking for a pad is a short request, and you can keep it as short as you like. You don't have to explain more than you want to. A few ways to say it:`,
+        { ul: [
+          `To a friend: "Do you have a pad I could borrow?"`,
+          `To a teacher: "Can I go to the nurse? I started my period."`,
+          `To a parent or another adult at home: "I'm almost out of supplies. Can we get more this week?"`
+        ] },
+        `If you're not sure who to ask at school, the nurse's office is a good first stop, and you can ask whether the school keeps supplies there. Asking early in the day, before you need something, also takes the pressure off.`
+      ] },
+      { h: 'Making it yours', blocks: [
+        `A good kit is the one you actually carry. Check it after each period, restock what you used, and take out anything that no longer fits. [[a:products|Pads, tampons, and period underwear]] can help you decide what belongs in it, and [[a:started|I think my period started: now what?]] covers the first-day questions.`
+      ] }
+    ]
+  },
+  {
+    id: 'products', cat: 'Products', title: 'Pads, tampons, and period underwear',
+    summary: 'What each product does, why there is no single schedule for changing them, and what the FDA says about tampon safety.',
+    sources: ['kidssupplies', 'acogfirst', 'fda', 'nhsperiods'], related: ['logchange', 'bag'],
+    intro: [
+      `Walk down the period aisle of a drugstore and the choices multiply quickly: pads with wings, tampons with applicators, cups, discs, underwear that soaks up blood. It's easy to wonder which one you're supposed to pick. The honest answer is that none of them is the right one for everyone, and many people use different products on different days.`,
+      `This article explains what each product is and how it works, why there is no single schedule for changing them, and what the FDA says about tampon safety. It doesn't rank the products, because comfort, flow, and the kind of day you're having all matter.`
+    ],
+    sections: [
+      { tag: 'Practical tips', h: 'What each product does', blocks: [
+        `Pads stick to the inside of your underwear and soak up blood. Some have flaps called wings that fold around the sides of your underwear to hold the pad in place.[[s:kidssupplies]] Because a pad sits outside the body, many people find it the simplest place to start.`,
+        `Tampons are small rolls of absorbent material that go inside the {{vagina}} and soak up blood there. Each has a string for taking it out, and some come with an applicator that helps you put it in. KidsHealth notes that some people find slender applicator tampons easiest to start with, and suggests trying a first tampon on a heavier day.[[s:kidssupplies]]`,
+        `A {{cup|menstrual cup}} or a {{disc|menstrual disc}} works differently. It collects blood instead of absorbing it.[[s:kidssupplies]] Brands differ, so follow the instructions in the box for putting it in, taking it out, and cleaning it.`,
+        `Period underwear looks like regular underwear with a soaking layer built in. The NHS describes it as designed to be washed and reused, and ACOG says it can be worn for a full day, depending on your flow.[[s:nhsperiods]][[s:acogfirst]]`
+      ] },
+      { tag: 'Health information', h: 'Changing products: why the answer is "it depends"', blocks: [
+        `No single schedule works for every product or every person, and the sources reflect that. For pads, KidsHealth says to change every 3 to 4 hours even on a light day, while ACOG says every 4 to 8 hours, or sooner when the pad is full or wet.[[s:kidssupplies]][[s:acogfirst]] Cups and period underwear come with their own instructions, which vary by brand.`,
+        `The overlap is easy to use in practice. Change a pad when it feels full, wet, or uncomfortable, and before it leaks, because those cues matter more than the clock.`,
+        { ex: `Say you have a light day and your pad still feels fine at lunch. On another day your flow is heavy, and you change before every class. Neither is wrong. What differs is how much the product had to hold.` }
+      ] },
+      { tag: 'Health information', h: 'Tampon safety, in plain words', blocks: [
+        `Tampons are the one product with a firm time limit from the FDA: change each tampon every 4 to 8 hours, and never wear a single tampon for more than 8 hours at a time.[[s:fda]] The FDA also advises using the lowest {{absorbency}} that does the job. If a tampon lasts the whole 8 hours without needing a change, the absorbency may be higher than you need.[[s:fda]]`,
+        `The reason for the limits is {{tss}}, a serious illness. The FDA says that using the lowest absorbency, changing within 8 hours, and using tampons only during your period all lower the risk.[[s:fda]]`,
+        `The 8-hour limit does not pause overnight. A tampon put in at bedtime still has to come out within 8 hours, so if you sleep longer than that, a different product for the night is one way to stay inside the limit.`,
+        `The FDA lists these warning signs of TSS, which matter during your period or soon after it:`,
+        { ul: [
+          `A sudden fever, usually 102°F or higher`,
+          `Vomiting or diarrhea`,
+          `Fainting, or nearly fainting when you stand up`,
+          `Dizziness`,
+          `A rash that looks like a sunburn`
+        ] },
+        `If you notice them, the FDA's instruction is to stop using tampons and get medical attention right away.[[s:fda]]`
+      ] },
+      { tag: 'Practical tips', h: 'Choosing, and changing your mind', blocks: [
+        `Comfort is a good guide. A product should not hurt when you use it, and it's fine to stop and try something else if it does. Pain that keeps happening with a particular product is worth mentioning to a {{healthpro}}.`,
+        `KidsHealth points out that many people switch between products depending on the situation, where they are, how heavy their flow is, and whether they need coverage for the day or the night.[[s:kidssupplies]] That could mean a pad at school, a tampon for swim practice, and period underwear for sleep, or something entirely different. The mix is yours to decide, and it can change from month to month.`,
+        `Whatever you use, disposable products go in the trash, not the toilet.[[s:kidssupplies]]`
+      ] },
+      { tag: 'How Petal works', h: 'Writing down what you use', blocks: [
+        `If you want to track products, Petal has a place for it. You choose the product, say what happened, and add details like how full it was and why you changed it. Petal never turns those entries into an amount of blood, and an empty product log is never read as "used none." The steps are in [[a:logchange|How do I log a product change?]], and [[a:flow|Getting to know your flow]] explains why the reason for a change matters.`
+      ] },
+      { h: 'Choosing what works', blocks: [
+        `The best product is the one that lets you get through your day comfortably and follows the safety guidance on its package. If you have questions about using any of them, a nurse, a doctor, or an adult you trust can help.`
+      ] }
+    ]
+  },
+
+  {
+    id: 'logchange', cat: 'Products', title: 'How do I log a product change?',
+    summary: 'A step-by-step guide to the product log, including what each question records and what Petal checks for.',
+    sources: [], related: ['products', 'flow'],
+    intro: [
+      `Logging a product takes about as long as changing one. You say which product it was, what you did with it, and when. Everything else is optional, so you can stop after the first questions and come back to add detail later, or never.`
+    ],
+    sections: [
+      { tag: 'How Petal works', h: 'The steps', blocks: [
+        { ol: [
+          `On Today, tap Log something, then Log product change. If the entry belongs to an earlier day, pick that date first.`,
+          `Choose the product: pad, tampon, cup, disc, period underwear, or other. Petal starts with the one you used last.`,
+          `Choose what happened. The choices adapt to the product, so a tampon offers Inserted and Removed, while period underwear offers Put on and Took off.`,
+          `Check the time. It starts as now, and you can change it for something that already happened.`,
+          `Tap Save. Anything below the time is optional.`
+        ] }
+      ] },
+      { tag: 'How Petal works', h: 'The optional questions', blocks: [
+        `If you want more detail, Petal can also record the absorbency you used, how full the product was (light, partly full, full, or overflowing), and the reason you changed it. The reasons are that it was full, that you wanted to change for comfort, that you were going to the bathroom, that it was bedtime, or something else. There are also boxes for overnight use, for wearing two products at once, and for a short note.`,
+        `Fullness and reason are the details that help most when you look back. A pattern of "full" and "overflow" on the same days can be worth showing to a {{healthpro}}, while a pattern of changes "for comfort" tells a different story. [[a:flow|Getting to know your flow]] covers how to read them.`
+      ] },
+      { tag: 'How Petal works', h: 'What Petal checks for you', blocks: [
+        `Petal won't let you log a second tampon as Inserted when the last one hasn't been marked as removed. It asks you to record the removal first, so your history doesn't show two tampons at once. If you did wear two products on purpose, like a pad with a tampon, tick the double protection box and log each product separately.`,
+        `You can edit or delete an entry afterward, and a product entry can't be dated in the future. If you forgot to log a change, add it later with the right time and a note.`,
+        `The tampon timer is off unless you turn it on in Settings. It reminds you after 4, 6, or 8 hours, but only while Petal is open in your browser. It can't send a notification when the page is closed, so treat it as a nudge, not an alarm.`
+      ] }
+    ]
+  },
+  {
+    id: 'flow', cat: 'Your journal', title: 'Getting to know your flow',
+    summary: 'How to describe bleeding in your own terms, what Petal records when you log flow, and which patterns are worth mentioning to someone.',
+    sources: ['acogheavy', 'nhsprob', 'acogfirst'], related: ['history', 'help'],
+    intro: [
+      `Someone asks how heavy your period is, and you realize you have nothing to compare it to. Heavy compared with what? A friend's? Last month's? The pad you saw in a commercial? Most people have never seen anyone else's flow, so the question is harder than it sounds.`,
+      `This article explains how Petal lets you describe flow, why the words are relative to you, and which patterns are worth writing down. The goal is to build a picture of your own normal over a few periods, so that a change stands out when it happens.`
+    ],
+    sections: [
+      { tag: 'How Petal works', h: 'Describing flow in five words', blocks: [
+        `For each day, Petal offers None, Spotting, Light, Moderate, and Heavy. None means no bleeding that day. {{spotting}} is a small amount of blood, such as a few drops or a smear on the tissue. The other three describe how much you are bleeding compared with the rest of your period, and compared with what is usual for you.`,
+        { ex: `A person who mostly needs a pantyliner might call the first day Moderate. Another person who fills a pad every few hours might call the same day Light compared with their heaviest day. Both entries are right, because each one describes that person's own scale.` },
+        `Petal doesn't turn these words into milliliters or "normal" ranges. It also never reads a blank day as None. "Not logged" means you didn't record anything, and "None" means you checked and saw no bleeding. Those are different facts, so the app keeps them separate.`
+      ] },
+      { tag: 'How Petal works', h: 'The extra boxes that help later', blocks: [
+        `Below the flow level there are three yes-or-no questions: did it leak, was this bleeding between periods, and was it heavier overnight. There is also a note field. These are the details people usually forget by the time they see a doctor.`,
+        `Leaks are worth noting for the practical reason that they show when a product isn't keeping up. Writing "leaked on the bus before I could change" is more useful than writing "heavy", because it tells you what happened and when.`,
+        `The between-periods box is for any bleeding that happens when you didn't expect your period. It doesn't say anything is wrong by itself. It simply gives you a record, and a single occasion is different from a pattern across several months.`
+      ] },
+      { tag: 'Practical tips', h: 'Using products to see your flow', blocks: [
+        `Your product log gives you a second way to understand flow. If you log the reason for each change, you can see how often a product was full when you changed it compared with how often you changed it for comfort or because you were going to the bathroom anyway.`,
+        { ex: `Over a period you might see that Day 1 had two changes for comfort, Day 2 had five changes because the pad was full, and Days 4 and 5 had one change a day. That is a picture of your flow with no numbers involved.` },
+        `Petal doesn't count products as "amount of blood". A pad changed early for comfort holds less than a pad changed when it was full, and a tampon is not measured the same way as a cup. Treat product counts as clues, not as measurements.`
+      ] },
+      { tag: 'Health information', h: 'Patterns worth mentioning to someone', blocks: [
+        `Your flow is yours, and it is usual for it to change from one period to the next. Some patterns are still worth bringing up with a {{healthpro}}, and it helps to have dates and notes when you do.`,
+        `ACOG lists a period that lasts more than 7 days and needing to change a pad or tampon every 1 to 2 hours among the reasons to see a doctor.[[s:acogfirst]] Its page on heavy menstrual bleeding covers the same ground in more detail.[[s:acogheavy]] The NHS says to talk to a doctor about heavy bleeding, and to see one if period pain is severe enough to affect daily life.[[s:nhsprob]]`,
+        { ex: `If you log flow every day for three periods and your notes say you leaked at school, missed practice, and changed overnight each time, you have specific information to share. "My periods have been hard to manage for three months" is a much easier sentence to say with the notes in front of you.` },
+        `This list is a starting point, not a full one. A feeling that something is off is a good enough reason to ask, and [[a:help|When should I ask for help?]] has the situations where asking matters most.`
+      ] },
+      { tag: 'How Petal works', h: 'How much to track', blocks: [
+        `Writing down flow every day of every period is one way to do it. Some people only log the days that stand out, and others log just the start and end dates. All of these give Petal something to work with, and none is a worse way to use the app. [[a:light|Using Petal without tracking everything]] describes what the app can still do with only a little information.`
+      ] }
+    ]
+  },
+  {
+    id: 'cramps', cat: 'Pain and feelings', title: 'Understanding cramps',
+    summary: 'Why cramps happen, what often helps, how to describe pain in Petal, and when pain is a reason to talk to someone.',
+    sources: ['kidscramps', 'nhspain', 'nhsprob'], related: ['mood', 'help'],
+    intro: [
+      `It starts as a dull ache low in your belly, maybe on the first morning of your period or the evening before. By lunch it is a steady pulling that makes it hard to sit still in class. Someone tells you it's normal, and that may be true, but it does not make it feel any better in the moment.`,
+      `This article explains why cramps happen, what people commonly do to feel better, how to describe the pain in Petal, and when pain is a reason to ask for help. Common and manageable are good things to be, and they do not mean your pain doesn't count.`
+    ],
+    sections: [
+      { tag: 'Health information', h: 'Why cramps happen', blocks: [
+        `Cramps are pain in the lower belly that can spread to the back or thighs, and they usually show up around the time a period starts.[[s:kidscramps]] KidsHealth explains the cause this way: during a period, the {{uterus}} squeezes to push out its lining, and substances called {{prostaglandins}} help trigger those squeezes.[[s:kidscramps]]`,
+        `The NHS describes period pain as a sharp pain or a dull ache in the tummy that usually starts just before or at the start of a period and lasts up to 3 days.[[s:nhspain]] Its self-care list includes a warm bath or shower, a heat pad, massage, and gentle exercise such as walking or yoga.[[s:nhspain]]`
+      ] },
+      { tag: 'Practical tips', h: 'What people often try', blocks: [
+        `There is no single fix, and what helps one person can do nothing for another. The sources suggest several things you can try on your own, and you can mix them:`,
+        { ul: [
+          `Heat, such as a heating pad or a warm bath`,
+          `Gentle movement, like a walk or stretching`,
+          `Rest, when your body is telling you to slow down`,
+          `A pain reliever from the pharmacy, if an adult or {{healthpro}} says it is right for you`
+        ] },
+        `The last item needs a clear answer from someone who knows you. Which medicine, and how much of it, depends on your age, your weight, and your health history, so Petal doesn't give doses. KidsHealth says to talk to a doctor or pharmacist about the right medicine, and cautions against aspirin for teens.[[s:kidscramps]] If you take something, you can write it down in Petal under Medication or relief, so you can see later whether it seemed to help.`,
+        { ex: `Imagine you try a heating pad on Day 1 and notice little change, then take a walk on Day 2 and feel looser. Writing both down turns "nothing works" into "heat didn't help me, but movement did", which is useful to know.` }
+      ] },
+      { tag: 'How Petal works', h: 'Describing pain so it means something later', blocks: [
+        `Pain is hard to describe in words, so Petal asks for a number from 0 to 10 and then offers a few optional details: where it hurts, what kind of pain it is, when it started, how long it lasted, and how it affected your day. The number is yours to define. A 5 for you might be a 3 for a friend.`,
+        `The question about impact is often the most helpful. "Pain 6, missed gym class" or "pain 4, couldn't focus on the test" says more about what the pain is doing than the number does. Notes about what you tried, and whether it helped, round out the picture.`,
+        `Across a few periods, Petal's cycle summaries show the highest pain level you recorded for each one. That gives you a quick answer to "has this been getting worse?" without trying to remember.`
+      ] },
+      { tag: 'Health information', h: 'When pain deserves a conversation', blocks: [
+        `Most period pain is manageable, and it can still be worth a conversation. The NHS says to see a doctor if period pain is stopping you doing your usual daily activities, or if your periods become more painful, heavier, or irregular.[[s:nhspain]] Its page on period problems puts it this way: see a doctor if the pain is so severe that it affects your daily life.[[s:nhsprob]]`,
+        `You don't need to wait until pain is unbearable. If you are missing school, skipping things you enjoy, or planning your month around your pain, you have enough reason to ask. A record of your pain scores, impacts, and what you tried gives a doctor something concrete to work from, and it makes the appointment shorter and more useful.`,
+        `Some pain is more urgent. The NHS says to get an urgent appointment or call its 111 service if pelvic or period pain is severe or worse than usual and painkillers have not helped.[[s:nhspain]] If that happens to you, tell an adult and contact a doctor or urgent care the same day. [[a:help|When should I ask for help?]] separates out the other urgent situations.`
+      ] },
+      { h: 'Taking your pain seriously', blocks: [
+        `Cramps are common, which makes them easy to brush off, including by yourself. Taking the pain seriously can be as simple as noting it, trying something that might help, and telling someone when it keeps interfering with your life. [[a:mood|Mood, energy, and your period]] covers the other side of how a period can feel.`
+      ] }
+    ]
+  },
+
+  {
+    id: 'mood', cat: 'Pain and feelings', title: 'Mood, energy, and your period',
+    summary: 'How hormones can change mood, energy, and sleep around a period, how to notice your own pattern, and when feelings need more support.',
+    sources: ['kidsprob'], related: ['cramps', 'help'],
+    intro: [
+      `A small thing goes wrong on a Tuesday afternoon, and you are closer to tears than the situation deserves. Or you slept eight hours and still feel like you are moving through water. You might wonder whether it is stress, school, friends, or your period, and the honest answer is that it could be any of them, or several together.`,
+      `This article covers what the sources say about mood and energy around a period, how to notice a pattern in your own life without guessing, and when feelings are a reason to reach out. It makes no promises about how you will feel, because people differ a lot here.`
+    ],
+    sections: [
+      { tag: 'Health information', h: 'What changes, and why it is hard to pin down', blocks: [
+        `Your {{hormones}} rise and fall during the {{cycle}}, and those changes can affect how you feel. KidsHealth describes {{pms}} as mood and body changes before or during a period, including sadness, mood swings, crankiness, anxiety, tiredness, bloating, and sore breasts. It says PMS is usually worst in the 4 days before a period and eases 2 to 3 days after bleeding starts.[[s:kidsprob]] Not everyone gets these changes, and the ones that show up can differ from one period to the next.`,
+        `A shift in mood or energy around your period can also come from something else entirely. Sleep, food, a hard week, and a stressful conversation all change how you feel. Because so many things overlap, a single bad day tells you very little. A pattern across several cycles tells you more.`,
+        { ex: `Say you feel irritable on the third Monday of one month. That alone could be anything. If your notes show irritability in the two or three days before your period in four months out of five, that is worth knowing, and it gives you a chance to plan around it.` }
+      ] },
+      { tag: 'How Petal works', h: 'Noticing your own pattern', blocks: [
+        `Petal's mood and symptom form lets you pick as many moods as apply, rate your energy on five levels, note how many hours you slept and how well, and tick any symptoms. You can also record "No symptoms today" explicitly, which is different from leaving the form empty. That distinction matters because a pattern needs the good days as well as the hard ones.`,
+        `Nothing in the form is required. If you only want to log on days that feel off, that works. Over time, the cycle summaries list your most common symptoms for each period, so you can see them without searching through old entries.`,
+        { ex: `Suppose your summaries show low energy and poor sleep in the two days before three periods in a row. You could try an earlier bedtime that week, or schedule a big task for another time. If nothing changes, you still have a clear note to take to a doctor.` }
+      ] },
+      { tag: 'Practical tips', h: 'Small things that can help', blocks: [
+        `KidsHealth suggests a balanced diet, plenty of exercise, and relaxing activities such as yoga or meditation, and it suggests avoiding caffeine if you feel cranky or anxious.[[s:kidsprob]] These are general habits that most people benefit from, and they are no substitute for care if symptoms are strong. Sleep isn't on KidsHealth's list, but it affects how anyone feels, so it is worth noticing.`,
+        `Planning can matter as much as habits. If you know the days before your period are harder, you can leave extra time before a presentation, or tell a friend you might need a quieter weekend. Treat your feelings as information, not as something to be embarrassed about.`
+      ] },
+      { tag: 'Health information', h: 'When feelings need more support', blocks: [
+        `Feeling a bit low or on edge before a period is one thing, and feeling very sad, hopeless, or unable to cope for days is another. KidsHealth says to call a doctor if home treatments don't help, if you feel very sad or hopeless, if PMS keeps you from your usual activities, or if symptoms continue after the first few days of your period.[[s:kidsprob]] You can tell a parent, a school counselor, or a {{healthpro}}, and it is a reason to ask whether or not you think it has anything to do with your cycle.`,
+        `If you ever have thoughts of hurting yourself or ending your life, tell a trusted adult right away, or contact a crisis line. In the United States you can call or text 988 at any time. If you are in danger now, call your local emergency number.`,
+        `Writing down moods in Petal can help you explain what you have been feeling, since it is easier to say "I've had low energy and low mood for three weeks" with dates in front of you.`
+      ] },
+      { h: 'Feelings count too', blocks: [
+        `A period affects more than the body, and your mood and energy are part of the picture. You don't need a reason to take your feelings seriously, and you don't need to wait for a crisis to talk to someone. [[a:cramps|Understanding cramps]] covers the physical side, and [[a:help|When should I ask for help?]] lists more situations where asking makes sense.`
+      ] }
+    ]
+  },
+  {
+    id: 'help', cat: 'Getting help', title: 'When should I ask for help?',
+    summary: 'Situations that need urgent care, and a wider list of reasons to talk to a doctor, nurse, or trusted adult.',
+    sources: ['acog', 'fda', 'acogfirst', 'acogheavy', 'nhsprob'], related: ['flow', 'cramps', 'products'],
+    intro: [
+      `Many people wait to ask about their period because they aren't sure it is a big enough problem. They worry about bothering someone, or they assume what they are feeling is normal because nobody has told them otherwise. This article tries to lower that bar. It starts with the few situations that need quick medical care, and then lists the many reasons to ask that are not emergencies.`,
+      `Urgent situations are not the only reason to ask for help. If something worries you, that is enough.`
+    ],
+    sections: [
+      { tag: 'Urgent', h: 'Get medical help right away', blocks: [
+        { urgentPanel: true }
+      ] },
+      { tag: 'Health information', h: 'Reasons to see a doctor or nurse soon', blocks: [
+        `These situations are not emergencies, but they are worth a visit, and the sooner you ask the easier the answer tends to be. ACOG lists several for teens: a period that lasts longer than 7 days, needing to change a pad or tampon every 1 to 2 hours, and periods that were regular and then become irregular for several months.[[s:acogfirst]] The ACOG page on heavy menstrual bleeding goes into more detail.[[s:acogheavy]]`,
+        `ACOG also lists periods that come more often than every 21 days or less often than every 45 days, and a period that stops for more than 3 months after you have started having them.[[s:acogfirst]] The NHS says to see a doctor if your periods stop and you're concerned, and if period pain is severe enough to affect daily life.[[s:nhsprob]]`,
+        { ex: `Imagine you have logged four periods in Petal, and each one lasted eight or nine days. You never felt unwell during them, so it was easy to ignore. Eight days is above ACOG's 7-day mark, and four periods in a row is a pattern, so it is a good time to show your notes to a doctor.` }
+      ] },
+      { tag: 'Practical tips', h: 'Who to talk to', blocks: [
+        `You can start with whoever feels easiest. A parent or another adult at home can help you book an appointment. The school nurse can talk through a question and tell you if it is worth a doctor's visit. A doctor or nurse who sees teens is used to these questions and doesn't expect you to know the vocabulary.`,
+        `You can also call a clinic and ask whether they can talk to you about your period. You don't need an emergency to make that call, and a visit with a question and nothing wrong is a normal reason to see a doctor.`
+      ] },
+      { tag: 'Practical tips', h: 'Questions you can bring', blocks: [
+        `An appointment goes better when you arrive with a few questions. You can use these, change them, or add your own:`,
+        { ul: [
+          `Is my period length and pattern typical for someone my age?`,
+          `Is the amount of bleeding I have a reason for concern?`,
+          `What can I do about my pain, and what is safe for me to take?`,
+          `Which symptoms would mean I should come back sooner?`,
+          `Is there anything about my products or routine I should change?`
+        ] },
+        `Bringing Petal along helps. The print summary lets you choose a date range, and notes are left out unless you turn them on. A short list of dates, flow levels, and pain scores can say more than trying to remember.`
+      ] },
+      { tag: 'Practical tips', h: 'If you are nervous about asking', blocks: [
+        `It is common to feel awkward bringing this up. You don't need the right words, and you can start with something like "I'd like to ask about my period" or "I'm not sure whether this is normal." You also don't need to be certain that something is wrong, because being unsure is the reason to ask. If one adult brushes it off, ask another one.`
+      ] }
+    ]
+  },
+  {
+    id: 'history', cat: 'Your journal', title: 'Understanding your cycle history',
+    summary: 'How Petal counts cycle length and period length, what the summaries show, and how the optional estimate is worked out.',
+    sources: ['acogfirst', 'nhsprob'], related: ['flow', 'light'],
+    intro: [
+      `After a few months of logging, Petal starts showing numbers: a period of five days, a cycle of twenty-nine, a pain score of six. It helps to know how those numbers are produced, so you can tell what they say and what they leave out.`,
+      `This article walks through the cycle summaries, explains how the optional estimate works, and offers a few ways to read a history without drawing conclusions the numbers can't support.`
+    ],
+    sections: [
+      { tag: 'How Petal works', h: 'How the counts work', blocks: [
+        `A {{cycle}} is counted from the first day of one period to the first day of the next. ACOG uses the same method, with the first day of bleeding as day 1.[[s:acogfirst]] Petal shows this as "days since previous start". A period's length counts both the first and last day, so a period that starts on a Monday and ends on Friday is five days.`,
+        `For each period, the summary also lists how many days of bleeding and how many days without bleeding you logged, your highest pain score, product entries by type, your most common symptoms, and any impacts you recorded. All of it comes from what you entered. A day you didn't log is not counted as a day with no bleeding.`
+      ] },
+      { tag: 'How Petal works', h: 'What the median is', blocks: [
+        `Once you have at least two recorded cycle lengths, Petal shows the {{median}}, which is the middle value when the lengths are put in order. The median is steadier than an average, because one unusually long or short cycle doesn't move it much.`,
+        { ex: `If your last three cycle lengths are 28, 30, and 27 days, in order they are 27, 28, 30, and the median is 28. An average would give 28.3, which is close, but if one of them were 45 the average would jump while the median would stay put.` }
+      ] },
+      { tag: 'How Petal works', h: 'The optional estimate', blocks: [
+        `The period estimate is off unless you turn it on in Settings, and it needs at least three completed cycles before it shows anything. It takes the median of your most recent cycles, up to six, and adds that to the start of your last period to give a window of dates, not a single day. The window is wider when your cycles have varied more.`,
+        { ex: `Say your last three cycles were 28, 30, and 27 days. The median is 28. The shortest and longest differ from it by 1 and 2 days, and Petal never narrows the window below 2 days either side. If your last period started on November 1, the window runs from November 27 to December 1.` },
+        `The estimate is a rough guess based only on your own past, and it can be wrong. Petal never says a period is late, and it never uses the estimate to say anything about your health. If a period doesn't arrive in the window, the estimate hasn't failed you, because the window is simply an estimate.`
+      ] },
+      { tag: 'Health information', h: 'Reading your history without over-reading it', blocks: [
+        `Cycle lengths vary, especially in the first years. ACOG says the average cycle is about 28 days, that cycles of 21 to 45 days are also normal, and that it may take 6 years or more after a first period for cycles to become regular.[[s:acogfirst]] So a history that jumps around does not necessarily mean something is wrong.`,
+        `A few patterns are worth asking about, though. ACOG lists cycles shorter than 21 days or longer than 45 days, and periods that stop for more than 3 months, as reasons to see a doctor.[[s:acogfirst]] The NHS says to talk to a doctor about heavy bleeding and to see one if your periods stop and you're concerned.[[s:nhsprob]] If Petal's summaries show any of these across several cycles, you now have the dates to show.`,
+        `Try looking at the history as a whole before zooming in on a single row. A pattern across six months is more informative than one cycle that looks odd.`
+      ] }
+    ]
+  },
+
+  {
+    id: 'light', cat: 'Your journal', title: 'Using Petal without tracking everything',
+    summary: 'Petal works with very little information. Here is what you get from logging only a start date, a few days, or just the days that stand out.',
+    sources: [], related: ['history', 'flow'],
+    intro: [
+      `Tracking apps can make logging feel like homework, with every missed day a small failure. Petal is built the other way around. It has no streaks, no reminders to log, and no score, so whatever you record is enough.`,
+      `This article describes a few light ways to use the app and what each one gives you, so you can pick the one that fits your life and change it whenever you like.`
+    ],
+    sections: [
+      { tag: 'How Petal works', h: 'Just the dates', blocks: [
+        `The smallest useful record is the first day of each period. Tap Log something, then Start or end period, and enter the date. If you also add the last day, Petal can show how long each period lasted. With only start dates, you still get the number of days between periods and the median once you have a few of them.`,
+        { ex: `Suppose you log only the first day of each period for four months and never open the app between them. You will see four start dates, three cycle lengths, and the middle value of those lengths. That is enough to answer "about how long are my cycles?" when someone asks.` },
+        `Because Petal only counts what you record, a blank day is never read as a day without bleeding. A sparse record gives sparse summaries, and nothing in it is wrong.`
+      ] },
+      { tag: 'How Petal works', h: 'Only the days that stand out', blocks: [
+        `You can also log only when something is unusual: a day of heavy flow, a bad cramp, a leak at school, a mood that surprised you. The entries still carry the details that are hardest to remember later, and they cost you almost nothing on the days when nothing happens.`,
+        `If you have a long gap in your records, a note on the next entry can explain it, such as "was traveling, didn't log". The note is for you or for a {{healthpro}}, and Petal doesn't need it.`
+      ] },
+      { tag: 'How Petal works', h: 'Turning off what you do not use', blocks: [
+        `Petal has more questions than most people will answer, and every one of them is optional. The "Add details" sections are optional, so you can skip them. In Settings you can hide symptoms you never use and add your own. The tampon timer and the period estimate are both off until you turn them on.`,
+        { ex: `Someone who only wants to track pain could leave flow, products, and mood alone entirely. Their summaries would show pain scores and period dates, and nothing else, which is a perfectly good journal.` }
+      ] },
+      { tag: 'Practical tips', h: 'Backfilling and taking breaks', blocks: [
+        `You can log any past date, so a missed week is easy to fill in when you remember it. If you stop using Petal for a while, your older entries stay where they are, and you can start again without any catching up. A break isn't something the app notices or counts against you.`,
+        `If you would like to look back with a doctor in the room, a few start dates and one or two notes are a fine thing to bring. [[a:history|Understanding your cycle history]] explains how the summaries work, and [[a:flow|Getting to know your flow]] covers the details that help most when you want them.`
+      ] }
+    ]
+  },
+  {
+    id: 'privacy', cat: 'Your journal', title: 'Keeping your journal private',
+    summary: 'Where Petal keeps your entries, who can see them, what a backup contains, and the steps that help you protect what you write.',
+    sources: [], related: ['light', 'history'],
+    intro: [
+      `A period journal holds personal information, and it is reasonable to ask who can see it. The short answer for Petal is that your entries stay in your browser on the device you are using, and the app doesn't send them anywhere. The longer answer includes a few things Petal doesn't do, and a few steps that are up to you.`,
+      `This article describes what the app actually does with your data, what it doesn't protect against, and how to keep or remove your records.`
+    ],
+    sections: [
+      { tag: 'How Petal works', h: 'Where your entries live', blocks: [
+        `Petal saves your journal and settings in your browser's local storage, which is a small area your browser keeps on your device. The page is built so that it can't connect to other websites or servers, and it has no accounts, ads, or analytics. Nothing you write is uploaded.`,
+        `Because the entries live in one browser on one device, they do not follow you. If you open Petal on a different phone or computer, or in a different browser, you will see an empty journal. The same is true if you use a private browsing window, which may not keep your entries once it closes.`,
+        `If your browser blocks storage, Petal shows a banner saying so, and it won't tell you something is saved when it isn't. If the stored data can't be read, Petal leaves it alone instead of overwriting it.`
+      ] },
+      { tag: 'How Petal works', h: 'What Petal does not do', blocks: [
+        `Petal has no PIN, password, or encryption. Anyone who can open your browser on your device, or who uses the same browser profile, may be able to open your journal. Petal also doesn't back up your data automatically. If you clear your browser's site data or switch devices, the entries are gone unless you saved a copy.`,
+        { ex: `If you share a family tablet and the same browser profile, someone else could open Petal there and see your entries. A phone with a screen lock and your own browser profile is a more private place for a journal.` },
+        `A few habits help. Lock your device, use your own profile, and clear the data from any device you borrow. If you need extra protection, a device lock is stronger than anything a web page can offer.`
+      ] },
+      { tag: 'How Petal works', h: 'Backups, exports, and printing', blocks: [
+        `In Settings, Download JSON backup saves everything Petal knows about you into one file, which you can restore later through Restore from a Petal JSON backup. Petal shows a preview before it replaces anything. Download CSV saves a table of entries you can open in a spreadsheet. Print summary builds a page for a date range of your choosing, and notes are left out unless you turn them on.`,
+        `Those files are not protected by Petal. Once you save a backup, it sits on your device like any other file, and anyone with access to the folder can open it. Treat it the way you would treat a private photo, and delete copies you no longer need.`
+      ] },
+      { tag: 'How Petal works', h: 'Deleting your data', blocks: [
+        `Delete all data removes your journal and settings from this browser, after you type DELETE to confirm. It affects only what Petal stored. Files you exported earlier and your browser history are not touched, so you may want to delete those separately.`,
+        `If you share a device, deleting data when you finish, or exporting a backup to somewhere private first, are both ways to keep the journal under your control.`
+      ] }
+    ]
+  }
+];
+
 /* ================= 12. Learn ================= */
 const CATS = ['All', 'Basics', 'Products', 'Pain and feelings', 'Your journal', 'Getting help'];
-const ARTICLES = [
-  { id: 'started', cat: 'Basics', title: 'I think my period started: now what?', summary: 'A calm first look at what you might see and what you can do.', sources: ['kids'], sections: [
-    { tag: 'Health info', h: 'What you might see', items: ['Period blood can be red or brown. Brown blood is normal.', 'A first period can be light and last only 2 or 3 days.', 'Periods can change during the first couple of years. Food, exercise, and some medicines can change them too.'] },
-    { tag: 'Practical', h: 'What you can do right now', items: ['Use a pad, period underwear, or another product you have. If you have nothing, folded toilet paper can work for a short time.', 'Ask a trusted adult, the school nurse, or a friend for supplies.', 'Add today in Petal with "Start or end period". You can skip every optional box.'] },
-    { tag: 'Health info', h: 'If you are not sure', items: ['If you are not sure it is a period, or something worries you, you can ask a {{healthpro}} or a trusted adult. You do not have to be certain something is wrong to ask.'] }] },
-  { id: 'bag', cat: 'Basics', title: 'What should I keep in my school bag?', summary: 'A short list of things that make a surprise period easier.', sources: [], sections: [
-    { tag: 'Practical', h: 'Good things to carry', items: ['A few of the products you use, in a small zip pouch.', 'A spare pair of underwear and a small bag for used clothes.', 'A small bag or wrapper for used products. Do not flush pads or wrappers.', 'Hand wipes or sanitizer.', 'A sweater or jacket you could tie around your waist.'] },
-    { tag: 'Practical', h: 'If you run out', items: ['Ask the school nurse, a teacher, or a friend. Many schools keep supplies, and you can ask the front office where they are.'] }] },
-  { id: 'products', cat: 'Products', title: 'Pads, tampons, and period underwear', summary: 'What each product is, in plain words.', sources: ['fda'], sections: [
-    { tag: 'Practical', h: 'The basics', items: ['Pads stick inside your underwear and soak up blood.', 'Tampons go inside the body and soak up blood. They have a string for taking them out.', 'A {{cup|menstrual cup}} or {{disc|menstrual disc}} collects blood. Follow the package for how to use and clean it.', 'Period underwear has a built-in soaking layer. Check the label for washing steps.', 'You can try different products and switch whenever you like.'] },
-    { tag: 'Practical', h: 'Reading the package', items: ['{{absorbency}} tells you how much a product is made to hold. The package explains its labels.'] },
-    { tag: 'Health info', h: 'Tampon safety', items: ['FDA guidance: change each tampon every 4 to 8 hours and never wear one longer than 8 hours.', 'The FDA lists warning signs of {{tss}}: a sudden fever (usually 102°F or higher), vomiting, diarrhea, fainting or near-fainting when standing, dizziness, or a sunburn-like rash. If you notice these during or soon after your period, stop using tampons and get medical care right away.'] }] },
-  { id: 'logchange', cat: 'Products', title: 'How do I log a product change?', summary: 'Two taps and a time. Everything else is optional.', sources: [], sections: [
-    { tag: 'About Petal', h: 'The quick way', items: ['Tap "Log something", then "Log product change".', 'Pick the product and what happened. The time starts as now. You can change it to log something from earlier.', 'Tap "Add details" if you want to note how full it was or why you changed it.'] },
-    { tag: 'About Petal', h: 'Good to know', items: ['Changing for comfort is different from a fully soaked product. Log whichever is true.', 'Petal never turns your entries into an amount of blood.', 'If you did not log a product, Petal does not assume you used none.'] }] },
-  { id: 'cramps', cat: 'Pain and feelings', title: 'Understanding cramps', summary: 'Pain deserves to be taken seriously, and writing it down helps.', sources: [], note: 'This is general information and practical tips. No outside source was checked for this article, and it is not medical advice.', sections: [
-    { tag: 'General info', h: 'What {{cramps}} can be like', items: ['Many people have pain around their period, often in the lower belly, {{pelvis}}, or back.', 'Having pain around a period is common, but you do not have to just put up with it. Strong pain is worth talking about.'] },
-    { tag: 'Practical', h: 'Things some people try', items: ['A warm heating pad or a warm bath.', 'Resting, or gentle movement like a slow walk or stretching.', 'Ask a pharmacist, a doctor, or a trusted adult about medicine. They can tell you what is right for you and how much. Petal does not give doses.'] },
-    { tag: 'About Petal', h: 'Why log pain', items: ['Writing down how strong it was, where it hurt, and how much it got in the way gives you something clear to share with a {{healthpro}}.'] }] },
-  { id: 'mood', cat: 'Pain and feelings', title: 'Why track mood and energy?', summary: 'A look back can help you notice what your days were like.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
-    { tag: 'About Petal', h: 'What it is for', items: ['Mood, energy, sleep, and body {{symptom|symptoms}} can be logged on any day, not only on period days.', 'Later, you can look back at what you wrote down. Petal shows what you recorded. It does not say why something happened.', 'You can hide symptom choices you do not use, and add your own, in Settings.'] },
-    { tag: 'About Petal', h: 'Skipping is fine', items: ['Log only when it feels useful. There are no streaks and no pressure to fill anything in.'] }] },
-  { id: 'help', cat: 'Getting help', title: 'When should I ask for help?', summary: 'Urgent signs, and the many everyday reasons to ask for support.', sources: ['acog', 'fda', 'diary'], help: true, sections: [] },
-  { id: 'history', cat: 'Your journal', title: 'Understanding your cycle history', summary: 'How Petal turns your entries into summaries.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
-    { tag: 'About Petal', h: 'How the numbers work', items: ['Your {{cycle}} length is the number of days from the first day of one period to the first day of the next.', 'Period length counts the first and last day. A period that is still going is not counted as complete.', 'Everything is based on what you recorded. A day with no entry is not a day with no symptoms.'] },
-    { tag: 'About Petal', h: 'The optional estimate', items: ['It is off unless you turn it on. It needs at least 3 completed cycles.', 'Petal takes the {{median}} of up to your last 6 cycle lengths and shows a window of days. This is a simple {{estimate}} and it can be wrong. It never says a day is safe or unsafe, and it never says a period is late.'] }] },
-  { id: 'privacy', cat: 'Your journal', title: 'Keeping your journal private', summary: 'Where your entries live, and what that means.', sources: [], note: 'This article describes how the app works. No outside source was checked.', sections: [
-    { tag: 'About Petal', h: 'Where your entries are', items: ['Your entries are stored in this browser using {{storage}}. They are not automatically sent to a server.', 'Browser data can be cleared or lost. Private browsing may not keep entries. Opening or moving this file in a different way can change which browser storage it can reach.', 'Export a backup if you want a separate copy. Exported files contain private information, so keep them somewhere safe.'] },
-    { tag: 'About Petal', h: 'What Petal cannot do', items: ['People who can use your browser profile may be able to open this journal.', 'Petal cannot clear your browser history or secure a shared device.', 'Petal has no account, ads, analytics, or tracking.'] }] }
-];
+let curArticle = null; // the article being drawn, so source markers can be numbered
+// ARTICLES (the article text) lives in the article data blocks above this section.
+
+/* ---- Reading helpers ---- */
+// All the reading text of an article as plain words. Used for search and for the reading-time estimate.
+function articleBody(a) {
+  const parts = [].concat(a.intro || []);
+  (a.sections || []).forEach((s) => { parts.push(s.h); (s.blocks || []).forEach((b) => {
+    if (typeof b === 'string') parts.push(b); else if (b.ex) parts.push(b.ex); else if (b.ul || b.ol) parts.push((b.ul || b.ol).join(' ')); else if (b.note) parts.push(b.note); else if (b.urgentPanel) parts.push(urgentNode().textContent);
+  }); });
+  return plain(parts.join(' '));
+}
+const wordCount = (t) => t.split(/\s+/).filter(Boolean).length;
+// About 200 words a minute, rounded. Worked out from the real article text, never typed in by hand.
+function readMins(a) { if (a._mins === undefined) a._mins = Math.max(1, Math.round(wordCount(articleBody(a)) / 200)); return a._mins; }
+function searchText(a) { if (a._text === undefined) a._text = (a.title + ' ' + a.summary + ' ' + articleBody(a)).toLowerCase(); return a._text; }
+
+function srcMark(key) {
+  const a = curArticle, i = a ? a.sources.indexOf(key) : -1; if (i < 0) return document.createTextNode('');
+  return h('button', { type: 'button', class: 'srcmark', 'aria-label': 'Source ' + (i + 1) + ': ' + SOURCES[key].short + '. Go to the sources list.',
+    onclick: () => { const t = document.getElementById('src-' + a.id + '-' + key); if (t) { t.scrollIntoView({ block: 'center' }); t.focus(); } } }, '[' + (i + 1) + ']');
+}
+function articleLink(id, words) {
+  const t = ARTICLES.find((x) => x.id === id); if (!t) return document.createTextNode(words);
+  return h('button', { type: 'button', class: 'alink', 'aria-label': 'Open article: ' + t.title, onclick: () => openArticle(id) }, words);
+}
+function openArticle(id) {
+  const d = $('#dlg'); if (d.open) { d._opener = null; d._openerId = null; d.close(); }
+  state.article = id; state.learnTab = 'articles'; state.view = 'learn'; render(); window.scrollTo(0, 0);
+  const t = $('#artTitle') || $('#viewTitle'); if (t) t.focus();
+}
+
 function viewLearn(root) {
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Learn' }));
-  if (state.article) return learnArticle(root, ARTICLES.find((a) => a.id === state.article));
+  if (state.article && ARTICLES.some((a) => a.id === state.article)) return learnArticle(root, ARTICLES.find((a) => a.id === state.article));
+  state.article = null; curArticle = null;
   root.append(h('div', { class: 'btn-row' }, h('span', { class: 'seg' }, h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.learnTab === 'articles'), text: 'Articles', onclick: () => { state.learnTab = 'articles'; render(); } }), h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.learnTab === 'words'), text: 'Words explained', onclick: () => { state.learnTab = 'words'; render(); } }))));
   if (state.learnTab === 'words') return learnWords(root);
-  root.append(h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'learnQ', text: 'Search articles' }), h('input', { type: 'search', id: 'learnQ', value: state.learnQ, oninput: (e) => { state.learnQ = e.target.value; fillList(); } })),
+  root.append(h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'learnQ', text: 'Search articles' }), h('p', { class: 'hint', id: 'learnQ-hint', text: 'Searches the full text of every article.' }), h('input', { type: 'search', id: 'learnQ', 'aria-describedby': 'learnQ-hint', value: state.learnQ, oninput: (e) => { state.learnQ = e.target.value; fillList(); } })),
     chips({ id: 'learnCat', name: 'lcat', type: 'radio', legend: 'Category', options: CATS.map((c) => [c, c]), values: [state.learnCat] }));
   root.querySelector('#learnCat').addEventListener('change', (e) => { state.learnCat = e.target.value; fillList(); });
   const live = h('p', { class: 'muted small', role: 'status', id: 'learnCount' }), list = h('div', { class: 'grid' });
-  root.append(live, list, h('section', { class: 'card soft' }, h('h2', { text: 'Where the health information comes from' }), h('p', { class: 'small', text: 'Health claims link to a source. Each article shows whether that source was checked. Links need internet. Everything else in Learn works offline. Petal is not a medical review.' })));
+  root.append(live, list, h('section', { class: 'card soft' }, h('h2', { text: 'Where the health information comes from' }), h('p', { class: 'small', text: 'Every article ends with its sources, and numbered markers in the text point to them. Each source says the date its page was read, or that it could not be checked. Links need internet. Everything else in Learn works offline. Petal is not a medical review.' })));
   function fillList() {
     const q = state.learnQ.trim().toLowerCase();
-    const hits = ARTICLES.filter((a) => (state.learnCat === 'All' || a.cat === state.learnCat) && (!q || (a.title + ' ' + a.summary + ' ' + a.sections.map((s) => s.h + ' ' + s.items.join(' ')).join(' ')).toLowerCase().includes(q) || (plain(a.title + a.sections.map((s) => s.items.join(' ')).join(' '))).toLowerCase().includes(q)));
+    const hits = ARTICLES.filter((a) => (state.learnCat === 'All' || a.cat === state.learnCat) && (!q || searchText(a).includes(q)));
     live.textContent = hits.length + (hits.length === 1 ? ' article' : ' articles') + ' found.';
-    list.replaceChildren(...hits.map((a) => h('article', { class: 'card' }, h('span', { class: 'tag', text: a.cat }), h('h2', null, a.title), h('p', { class: 'muted', text: a.summary }), h('button', { type: 'button', class: 'btn', id: 'art-' + a.id, 'aria-label': 'Read: ' + a.title, text: 'Read', onclick: () => { state.article = a.id; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); } }))));
+    list.replaceChildren(...hits.map((a) => h('article', { class: 'card' }, h('span', { class: 'tag', text: a.cat }), h('h2', null, a.title), h('p', { class: 'muted', text: a.summary }), h('p', { class: 'small muted', text: 'About ' + readMins(a) + ' min read' }),
+      h('button', { type: 'button', class: 'btn', id: 'art-' + a.id, 'aria-label': 'Read: ' + a.title, text: 'Read', onclick: () => openArticle(a.id) }))));
     if (!hits.length) list.replaceChildren(h('p', { class: 'muted', text: 'Nothing matches that search. Try fewer words.' }));
   }
   fillList();
 }
 function learnArticle(root, a) {
-  root.append(h('button', { type: 'button', class: 'btn', text: 'Back to all articles', onclick: () => { const id = 'art-' + a.id; state.article = null; render(id); } }), h('h2', { style: 'margin-top:14px;font-size:1.4rem', text: a.title }), h('p', { class: 'muted', text: a.summary }));
-  if (a.help) root.append(h('div', { class: 'grid' }, helpNodes()));
-  a.sections.forEach((s) => root.append(h('section', { class: 'card', style: 'margin-top:12px' }, h('p', null, h('span', { class: 'tag', text: s.tag })), h('h3', { style: 'margin-top:0' }, rich(h('span'), s.h)), h('ul', null, s.items.map((i) => h('li', null, rich(h('span'), i)))))));
-  const chk = h('section', { class: 'card soft', style: 'margin-top:12px' }, h('h2', { text: 'Sources and checking' }));
-  if (a.sources.length) chk.append(h('ul', null, a.sources.map((k) => h('li', null, extLink(SOURCES[k]), ' (opens in a new tab, needs internet)', h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })))));
-  else chk.append(h('p', { class: 'small', text: a.note || 'No outside source was checked for this article.' }));
-  root.append(chk);
+  curArticle = a; const secId = (i) => 'sec-' + a.id + '-' + i;
+  const back = () => h('button', { type: 'button', class: 'btn', text: 'Back to all articles', onclick: () => { const id = 'art-' + a.id; state.article = null; render(id); window.scrollTo(0, 0); } });
+  const goTo = (id) => { const t = document.getElementById(id); if (t) { t.scrollIntoView({ block: 'start' }); t.focus(); } };
+  root.append(h('div', { class: 'btn-row' }, back()));
+  const art = h('article', { class: 'essay', 'aria-labelledby': 'artTitle' });
+  art.append(h('p', { class: 'meta' }, h('span', { class: 'tag', text: a.cat }), 'About ' + readMins(a) + ' min read'), h('h2', { id: 'artTitle', tabindex: '-1', text: a.title }), h('p', { class: 'lede', text: a.summary }));
+  if (a.sections.length >= 4) {
+    const wide = window.matchMedia && window.matchMedia('(min-width: 700px)').matches;
+    art.append(h('details', { class: 'toc', open: wide ? '' : null }, h('summary', { text: 'In this article' }), h('nav', { 'aria-label': 'In this article' }, h('ol', null, a.sections.map((s, i) => h('li', null, h('a', { href: '#' + secId(i), onclick: (ev) => { ev.preventDefault(); goTo(secId(i)); } }, plain(s.h))))))));
+  }
+  a.intro.forEach((t) => art.append(rich(h('p'), t)));
+  a.sections.forEach((s, i) => {
+    const sec = h('section', { class: 'esec', 'aria-labelledby': secId(i) });
+    if (s.tag) sec.append(h('p', { class: 'sectag' }, h('span', { class: s.tag === 'Urgent' ? 'tag urgent-tag' : 'tag', text: s.tag })));
+    sec.append(h('h3', { id: secId(i), tabindex: '-1' }, rich(h('span'), s.h)));
+    s.blocks.forEach((b) => {
+      if (typeof b === 'string') sec.append(rich(h('p'), b));
+      else if (b.ex) sec.append(h('p', { class: 'example' }, h('strong', { class: 'exlabel', text: 'For example' }), rich(h('span'), b.ex)));
+      else if (b.ul) sec.append(h('ul', null, b.ul.map((x) => rich(h('li'), x))));
+      else if (b.ol) sec.append(h('ol', null, b.ol.map((x) => rich(h('li'), x))));
+      else if (b.note) sec.append(rich(h('p', { class: 'info' }), b.note));
+      else if (b.urgentPanel) sec.append(urgentNode());
+    });
+    art.append(sec);
+  });
+  if (a.related && a.related.length) art.append(h('section', { class: 'esec' }, h('h3', { text: 'Keep reading' }), h('ul', null, a.related.map((id) => { const t = ARTICLES.find((x) => x.id === id); return t ? h('li', null, articleLink(id, t.title), ' ', h('span', { class: 'muted', text: '(about ' + readMins(t) + ' min)' })) : null; }))));
+  const src = h('section', { class: 'card soft esrc', 'aria-labelledby': 'srcHead' }, h('h2', { id: 'srcHead', text: 'Sources and further reading' }));
+  if (a.sources.length) src.append(h('ol', null, a.sources.map((k) => { const s = SOURCES[k]; return h('li', { id: 'src-' + a.id + '-' + k, tabindex: '-1' }, extLink(s), h('br'), h('span', { class: 'small muted', text: s.checked ? 'Read on ' + s.checked + '. ' + s.note : s.status })); })));
+  else src.append(h('p', { class: 'small', text: a.note || 'This article gives practical suggestions and describes how Petal works. It makes no health claims that need an outside source.' }));
+  src.append(h('p', { class: 'small muted', text: 'Written for Petal in plain language. This is general information, not medical advice, and it has not been medically reviewed. Source links need internet. Sources can disagree with each other, and the text says so where they do.' }));
+  art.append(src, h('div', { class: 'btn-row' }, back()));
+  root.append(art);
 }
 function learnWords(root) {
   root.append(h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'glossQ', text: 'Search words' }), h('input', { type: 'search', id: 'glossQ', value: state.glossQ, oninput: (e) => { state.glossQ = e.target.value; fill(); } })));
@@ -1239,8 +1738,7 @@ function learnWords(root) {
 }
 
 /* ================= 13. Settings ================= */
-function setSetting(patch, msg, focusId) { Object.assign(settings, patch); applyTheme(); const r = persist(); if (r.ok) { state.saveError = ''; toast(r.demo ? 'Changed for this demo only.' : msg || 'Your setting is saved.'); } else state.saveError = r.reason; render(focusId); }
-function demoGuard() { if (state.demo) { toast('Leave demo mode first. Demo entries are kept out of exports, backups, and deletion.'); return true; } return false; }
+function setSetting(patch, msg, focusId) { Object.assign(settings, patch); applyTheme(); const r = persist(); if (r.ok) { state.saveError = ''; toast(msg || 'Your setting is saved.'); } else state.saveError = r.reason; render(focusId); }
 function viewSettings(root) {
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Settings' }));
   // Theme
@@ -1273,8 +1771,6 @@ function viewSettings(root) {
     h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download JSON backup', onclick: exportJSON }), h('button', { type: 'button', class: 'btn', text: 'Download CSV', onclick: exportCSV }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })),
     h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { for: 'impFile', text: 'Restore from a Petal JSON backup' }), h('p', { class: 'hint', text: 'You will see a preview first. Nothing changes until you confirm. Importing replaces your current journal.' }), h('input', { type: 'file', id: 'impFile', accept: '.json,application/json', onchange: onImportFile })),
     h('details', { class: 'more' }, h('summary', { text: 'CSV layout' }), h('p', { class: 'small', text: 'One row per entry. Columns: ' + CSV_COLS.join(', ') + '. record_type is period, flow, product, pain, mood, or relief. Unused columns are empty. Lists are joined with "; ". Text that starts with = + - or @ gets a \' in front so spreadsheets do not run it. The JSON backup keeps your original text.' }))]));
-  // Demo
-  root.append(card('Demo data', [h('p', { class: 'muted', text: 'Try Petal with sample entries. Demo data is kept completely separate. It is never saved, exported, or mixed into your real journal.' }), state.demo ? h('button', { type: 'button', class: 'btn primary', text: 'Leave demo mode', onclick: leaveDemo }) : h('button', { type: 'button', class: 'btn', id: 'demoBtn', text: 'Try demo data', onclick: enterDemo })]));
   // Delete
   root.append(card('Delete all data', [h('p', { text: 'This removes your journal and settings from this browser. Files you exported earlier and your browser history are not affected.' }), h('button', { type: 'button', class: 'btn danger', id: 'delAll', text: 'Delete all data…', onclick: openDeleteAll })], 'soft'));
   // About
@@ -1288,7 +1784,7 @@ function chipsTheme() {
   fs.append(wrap); return fs;
 }
 
-/* ================= 14. Export, import, print, delete, demo ================= */
+/* ================= 14. Export, import, print, delete ================= */
 const CSV_COLS = ['record_type', 'date', 'time', 'start_date', 'end_date', 'flow_level', 'leaks', 'bleeding_between_periods', 'overnight_issue', 'product', 'action', 'absorbency_or_description', 'fullness', 'reason', 'overnight_change', 'double_protection', 'pain_intensity', 'pain_locations', 'pain_types', 'pain_start_time', 'pain_duration_minutes', 'daily_impact', 'relief_tried', 'moods', 'energy', 'sleep_hours', 'sleep_quality', 'symptoms', 'no_symptoms_selected', 'medication', 'dose', 'non_medication_relief', 'pain_before', 'pain_after', 'did_it_help', 'note'];
 function csvCell(v) { let s = v === null || v === undefined ? '' : String(v); if (/^[=+\-@\t\r]/.test(s)) s = "'" + s; if (/[",\r\n]/.test(s)) s = '"' + s.replace(/"/g, '""') + '"'; return s; }
 function buildCSV() {
@@ -1307,12 +1803,11 @@ function download(name, mime, text) {
   catch (e) { openInfoDialog('Copy your data', [h('p', { text: 'This browser did not allow a download. Select all the text below, copy it, and paste it into a file named ' + name + '.' }), h('textarea', { readonly: '', rows: 10, 'aria-label': 'Exported data', value: text, onfocus: (ev) => ev.target.select() })]); }
 }
 function backupPayload() { return JSON.stringify({ app: 'petal', type: 'journal-backup', version: VERSION, appVersion: APP_VERSION, exportedAt: new Date().toISOString(), settings: settings, journal: data }, null, 2); }
-function exportJSON() { if (demoGuard()) return; download('petal-backup-' + todayStr() + '.json', 'application/json', backupPayload()); }
-function exportCSV() { if (demoGuard()) return; download('petal-entries-' + todayStr() + '.csv', 'text/csv', buildCSV()); }
+function exportJSON() { download('petal-backup-' + todayStr() + '.json', 'application/json', backupPayload()); }
+function exportCSV() { download('petal-entries-' + todayStr() + '.csv', 'text/csv', buildCSV()); }
 const counts = (j) => ({ periods: j.periods.length, flow: j.flow.length, products: j.products.length, pain: j.pain.length, moods: j.moods.length, relief: j.relief.length });
 function dateRange(j) { const d = [].concat(j.periods.map((p) => p.start), j.flow.map((x) => x.date), j.moods.map((x) => x.date), j.products.map((x) => dateOfIso(x.ts)), j.pain.map((x) => dateOfIso(x.ts)), j.relief.map((x) => dateOfIso(x.ts))).sort(); return d.length ? fmtShort(d[0]) + ' to ' + fmtShort(d[d.length - 1]) : 'No dates'; }
 function onImportFile(ev) {
-  if (demoGuard()) { ev.target.value = ''; return; }
   const file = ev.target.files && ev.target.files[0]; if (!file) return;
   const fail = (msg) => { ev.target.value = ''; openInfoDialog('This file cannot be imported', [h('p', { text: msg }), h('p', { class: 'muted', text: 'Nothing was changed.' })]); };
   if (file.size > 8 * 1024 * 1024) return fail('The file is larger than 8 MB, which is more than a Petal backup should be.');
@@ -1339,7 +1834,7 @@ function openImportPreview(j, s) {
     h('div', { class: 'field', style: 'margin-top:12px' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, box, h('span', { text: 'I understand this replaces my current journal' })))), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
 }
 function openDeleteAll() {
-  if (demoGuard()) return; const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
+  const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
   inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
   go.addEventListener('click', () => {
     const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); } } catch (e) { ok = false; }
@@ -1351,7 +1846,7 @@ function openDeleteAll() {
     h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'delWord', text: 'Type DELETE to confirm' }), inp), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Keep my data', onclick: () => $('#dlg').close() }))]);
 }
 function openPrintDialog() {
-  if (demoGuard()) return; const t = todayStr();
+  const t = todayStr();
   openForm({ title: 'Print summary', saveLabel: 'Open print dialog', build: () => { const fr = document.createDocumentFragment();
     fr.append(h('p', { class: 'hint', text: 'Choose a date range. Your browser\'s print window lets you print or save as PDF.' }), textField({ id: 'pr-from', type: 'date', label: 'From', value: addDays(t, -90), max: t }), textField({ id: 'pr-to', type: 'date', label: 'To', value: t, max: t }),
       h('fieldset', { class: 'field' }, h('legend', { text: 'Include' }), h('div', { class: 'chips' }, [['periods', 'Periods and cycle lengths'], ['flow', 'Flow'], ['products', 'Products'], ['pain', 'Pain'], ['moods', 'Mood and symptoms'], ['relief', 'Medication and relief']].map(([v, l]) => h('label', { class: 'chip' }, h('input', { type: 'checkbox', name: 'inc', value: v, checked: true }), h('span', { text: l }))))),
@@ -1373,26 +1868,9 @@ function buildPrint(from, to, inc, notes) {
   window.addEventListener('afterprint', () => root.replaceChildren(), { once: true });
 }
 
-/* ---- Demo mode (kept apart from real data and storage) ---- */
-function makeDemo() {
-  const t = todayStr(), d = emptyData(), starts = [-113, -85, -55, -26], lens = [5, 4, 5, 5], lv = ['moderate', 'heavy', 'moderate', 'light', 'spotting'];
-  starts.forEach((off, i) => {
-    const s = addDays(t, off), e = addDays(s, lens[i] - 1);
-    d.periods.push({ id: 'demo-p' + i, start: s, end: e, note: '' });
-    for (let k = 0; k < lens[i]; k++) d.flow.push({ id: 'demo-f' + i + k, date: addDays(s, k), level: lv[k], leaks: false, between: false, overnight: k === 1, note: '' });
-    d.pain.push({ id: 'demo-pn' + i, ts: atTime(s, 15, 30), intensity: [5, 6, 4, 5][i], locations: ['lower_abdomen'], types: ['cramping'], startTime: '', duration: null, impact: i === 1 ? 'slowed' : 'none', relief: ['heat'], note: '' });
-    d.moods.push({ id: 'demo-m' + i, date: addDays(s, 1), created: atTime(addDays(s, 1), 20, 0), moods: ['sensitive', 'calm'], energy: 'low', sleepHours: null, sleepQuality: '', symptoms: [{ name: 'Bloating', severity: 'mild' }], noSymptoms: false, note: '' });
-    d.products.push({ id: 'demo-pr' + i, ts: atTime(s, 8, 0), product: 'pad', action: 'changed', absorbency: 'regular', fullness: 'partly', reason: 'comfort', overnight: false, double: false, note: '' });
-  });
-  return d;
-}
-function enterDemo() { if (state.demo) return; state.stash = { data, settings, sel: state.sel }; data = makeDemo(); settings = Object.assign(defaultSettings(), settings, { estimates: true, introDismissed: true }); state.demo = true; state.sel = todayStr(); go('today'); toast('Demo mode is on. These are sample entries and are not saved.'); }
-function leaveDemo() { if (!state.demo) return; data = state.stash.data; settings = state.stash.settings; state.sel = state.stash.sel; state.stash = null; state.demo = false; applyTheme(); go('today'); toast('You left demo mode. Your real journal is back.'); }
-
 /* ================= 15. Banners, navigation, render, startup ================= */
 function renderBanners() {
   const b = $('#banners'); b.replaceChildren();
-  if (state.demo) b.append(h('div', { class: 'notice' }, h('strong', { text: 'Demo mode. ' }), 'These are sample entries. They are not saved and are not part of your journal. ', h('button', { type: 'button', class: 'btn', text: 'Leave demo mode', onclick: leaveDemo })));
   if (state.storage.mode === 'blocked') b.append(h('div', { class: 'urgent', role: 'alert' }, h('strong', { text: 'Saved data could not be read. ' }), state.storage.reason + ' Petal will not overwrite it silently, and nothing new is being saved yet.',
     h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download the unreadable data', onclick: () => download('petal-unreadable-data.txt', 'text/plain', state.storage.raw || '') }),
       h('button', { type: 'button', class: 'btn', text: 'Start a new journal…', onclick: async () => { if (await confirmBox({ title: 'Replace the unreadable data?', body: 'This permanently removes the saved data Petal could not read. Download it first if you want a copy.', okText: 'Replace it', danger: true, cancelText: 'Keep it' })) { try { const s = ls(); s.removeItem(KEY_J); s.removeItem(KEY_S); } catch (e) { /* ignore */ } state.storage.mode = 'ok'; state.storage.raw = null; data = emptyData(); settings = defaultSettings(); applyTheme(); render(); toast('Started a new journal.'); } } }))));
