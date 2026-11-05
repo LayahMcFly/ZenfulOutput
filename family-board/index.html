@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light">
+<html lang="en" data-theme="light" data-style="neutral">
 <!--
   Family Board
   Copyright (C) 2026 Leia
@@ -61,6 +61,21 @@ html[data-theme=dark]{
   --hole:#17100b; --coil:#8d9aa4; --grid:rgba(199,154,107,.07);
   --ok:#9bbd7e; --warn:#f0907c; --mark:#ff9a86; color-scheme:dark;
 }
+
+/* Style modes (Settings > Appearance). Each one has a light and a dark set; the original warm-paper values above stay as the base. */
+html[data-style=neutral]:not([data-theme=dark]){--paper:#eceff1;--paper-lo:#dfe3e6;--linen:#f4f6f7;--card:#ffffff;--field:#fbfcfc;--ink:#1f2a30;--ink-soft:#55646c;--walnut:#455a64;--caramel:#7a8c96;--rust:#2a6a6e;--line:#cfd6da;--shadow:rgba(20,30,40,.25);--accent:#2f6f73;--on-accent:#ffffff;--wash:rgba(47,111,115,.10);--wknd:#f1f3f4;--today:#dcebec;--hole:#c3ccd1;--coil:#90a4ae;--grid:transparent;--ok:#3f7a4a;--warn:#a33a2a;--mark:#c0392b;--display:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+html[data-style=neutral][data-theme=dark]{--paper:#14191c;--paper-lo:#1b2227;--linen:#1e262b;--card:#222b31;--field:#1a2126;--ink:#e8eef1;--ink-soft:#a8b6bd;--walnut:#8fb0bd;--caramel:#6f8793;--rust:#6fc3c7;--line:#36444c;--shadow:rgba(0,0,0,.6);--accent:#6fc3c7;--on-accent:#0c1a1c;--wash:rgba(111,195,199,.14);--wknd:#1d252a;--today:#1f3a3d;--hole:#0e1316;--coil:#8da0a8;--grid:transparent;--ok:#8fcf9a;--warn:#f0907c;--mark:#ff9a86;--display:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+html[data-style=girly]:not([data-theme=dark]){--paper:#f7e6ee;--paper-lo:#efd3e0;--linen:#fbeef3;--card:#fffafc;--field:#ffffff;--ink:#4a2540;--ink-soft:#7d5473;--walnut:#8e3f77;--caramel:#c97fae;--rust:#b02a78;--line:#ecc6da;--shadow:rgba(120,40,90,.3);--accent:#c2468f;--on-accent:#ffffff;--wash:rgba(194,70,143,.10);--wknd:#fbeaf2;--today:#f3e0f5;--hole:#e5b9d0;--coil:#c97fae;--grid:rgba(194,70,143,.07);--ok:#4d7a3a;--warn:#a32a2a;--mark:#c0305e}
+html[data-style=girly][data-theme=dark]{--paper:#261522;--paper-lo:#301b2b;--linen:#35202f;--card:#3d2536;--field:#2f1b29;--ink:#fbe8f2;--ink-soft:#d9b3c9;--walnut:#e79bc8;--caramel:#c97fae;--rust:#f08cc0;--line:#5c3750;--shadow:rgba(0,0,0,.55);--accent:#f08cc0;--on-accent:#2a0f20;--wash:rgba(240,140,192,.14);--wknd:#35202f;--today:#3a2540;--hole:#170c14;--coil:#c98fb2;--grid:rgba(240,140,192,.07);--ok:#a8d58b;--warn:#ffa08f;--mark:#ff9fb0}
+html[data-style=boyish]:not([data-theme=dark]){--paper:#dde3ea;--paper-lo:#cbd3dd;--linen:#e8edf2;--card:#f7f9fb;--field:#ffffff;--ink:#0f1b2d;--ink-soft:#44546a;--walnut:#1b3a5c;--caramel:#5d7fa3;--rust:#0b5cb8;--line:#b8c3d1;--shadow:rgba(10,25,50,.35);--accent:#14365f;--on-accent:#ffffff;--wash:rgba(11,99,197,.10);--wknd:#e6ebf1;--today:#d3e6f9;--hole:#b3bfcd;--coil:#6f8299;--grid:transparent;--ok:#2a7a3b;--warn:#b3261e;--mark:#d9480f;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+html[data-style=boyish][data-theme=dark]{--paper:#0d1117;--paper-lo:#131a22;--linen:#161e28;--card:#1a232e;--field:#121921;--ink:#e6edf3;--ink-soft:#9fb0c3;--walnut:#79a8e0;--caramel:#5d7fa3;--rust:#4aa3ff;--line:#2c3a4a;--shadow:rgba(0,0,0,.65);--accent:#4aa3ff;--on-accent:#07131f;--wash:rgba(74,163,255,.14);--wknd:#151d27;--today:#14304d;--hole:#080b10;--coil:#6f8299;--grid:transparent;--ok:#6fd08c;--warn:#ff8f84;--mark:#ff9a6b;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+html[data-style=neutral] .sheet::before,html[data-style=boyish] .sheet::before{display:none}
+html[data-style=neutral] .sheet,html[data-style=boyish] .sheet{padding-top:28px}
+html[data-style=boyish] h1,html[data-style=boyish] h2,html[data-style=boyish] h3,html[data-style=boyish] h4{font-weight:700;letter-spacing:-.01em}
+html[data-style=neutral] h1,html[data-style=neutral] h2,html[data-style=neutral] h3,html[data-style=neutral] h4{font-weight:600}
+html[data-style=girly] .btn,html[data-style=girly] .panel,html[data-style=girly] .sheet,html[data-style=girly] input,html[data-style=girly] select,html[data-style=girly] textarea,html[data-style=girly] .mem{border-radius:12px}
+html[data-style=neutral] .btn,html[data-style=neutral] .panel,html[data-style=neutral] input,html[data-style=neutral] select,html[data-style=neutral] textarea{border-radius:6px}
+html[data-style=boyish] .btn,html[data-style=boyish] .panel,html[data-style=boyish] .sheet,html[data-style=boyish] input,html[data-style=boyish] select,html[data-style=boyish] textarea{border-radius:2px}
 *{box-sizing:border-box}
 html{background:var(--paper);font-size:100%}
 html.large{font-size:115%}
@@ -423,7 +438,7 @@ const CL={notes:[],noNotes:false,noAvatar:false,on:false,cfg:null,stage:'loading
    2. Data model, validation, storage
    ===================================================================== */
 let D=null;                 // workspace data
-let ST={theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
+let ST={style:'neutral',theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
 let storageOK=true, loadNote='';
 const UI={view:'calendar',month:new Date(new Date().getFullYear(),new Date().getMonth(),1),f:{person:'all',group:'all',status:'all'},gid:'',popId:''};
 
@@ -673,6 +688,9 @@ const DARKQ=matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){
   const dark=ST.theme==='dark'||(ST.theme==='system'&&DARKQ.matches);
   document.documentElement.dataset.theme=dark?'dark':'light';
+  if(!['girly','neutral','boyish'].includes(ST.style))ST.style='neutral';
+  document.documentElement.dataset.style=ST.style;
+  {const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||m.content}
   document.documentElement.classList.toggle('large',!!ST.large);
 }
 DARKQ.addEventListener&&DARKQ.addEventListener('change',applyTheme);
@@ -888,6 +906,7 @@ function settingsView(){
       <p class="muted small" style="margin-top:8px">The workspace lives only in this browser. It is private to this device, not protected by a password.</p></section>
     ${privatePanel()}
     <section class="panel"><h3>Appearance</h3><div class="two">
+      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
@@ -1187,6 +1206,7 @@ document.addEventListener('change',async e=>{
   const a=t.dataset.act;if(!a)return;
   if(a==='filter'){UI.f[t.dataset.k]=t.value;render();return}
   if(a==='theme'){ST.theme=t.value;saveSettings();applyTheme();render();return}
+  if(a==='style'){ST.style=t.value;saveSettings();applyTheme();render();return}
   if(a==='crossoff'){ST.crossOff=t.checked;saveSettings();render();return}
   if(a==='large'){ST.large=t.checked;saveSettings();applyTheme();render();return}
   if(a==='cursor'){ST.cursor=t.checked;saveSettings();setupCursor();render();return}
@@ -2738,6 +2758,7 @@ function cloudMembersView(){
 }
 const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
+      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
