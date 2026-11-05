@@ -1,5 +1,5 @@
 <!doctype html>
-<html lang="en" data-theme="light" data-style="neutral" data-breadbtn="on">
+<html lang="en" data-theme="light" data-style="bread" data-breadbtn="off">
 <!--
   Family Board
   Copyright (C) 2026 Leia
@@ -442,7 +442,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.3';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.0.4';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -458,7 +458,7 @@ const CL={notes:[],noNotes:false,noAvatar:false,on:false,cfg:null,stage:'loading
    2. Data model, validation, storage
    ===================================================================== */
 let D=null;                 // workspace data
-let ST={breadBtns:true,style:'neutral',theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
+let ST={breadBtns:false,style:'bread',theme:'system',cursor:true,effects:true,large:false,calMode:'month',crossOff:true};
 let storageOK=true, loadNote='';
 const UI={view:'calendar',month:new Date(new Date().getFullYear(),new Date().getMonth(),1),f:{person:'all',group:'all',status:'all'},gid:'',popId:''};
 
@@ -708,9 +708,9 @@ const DARKQ=matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){
   const dark=ST.theme==='dark'||(ST.theme==='system'&&DARKQ.matches);
   document.documentElement.dataset.theme=dark?'dark':'light';
-  if(!['girly','neutral','boyish','bread'].includes(ST.style))ST.style='neutral';
+  if(!['girly','neutral','boyish','bread'].includes(ST.style))ST.style='bread';
   document.documentElement.dataset.style=ST.style;
-  document.documentElement.dataset.breadbtn=ST.breadBtns===false?'off':'on';
+  document.documentElement.dataset.breadbtn=ST.breadBtns===true?'on':'off';
   {const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||m.content}
   document.documentElement.classList.toggle('large',!!ST.large);
 }
@@ -929,7 +929,7 @@ function settingsView(){
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
-      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns!==false?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
+      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns===true?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
@@ -2794,7 +2794,7 @@ const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
       ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
-      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns!==false?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
+      ${ST.style==='bread'?`<label class="chk" style="margin-top:12px"><input type="checkbox" data-act="breadbtn" ${ST.breadBtns===true?'checked':''} data-fk="s-breadbtn"> Toasty bread buttons (turn off for plain buttons)</label>`:''}
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
     <section class="panel"><h3>Effects</h3>
@@ -2878,4 +2878,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-  </html>
+</html>
