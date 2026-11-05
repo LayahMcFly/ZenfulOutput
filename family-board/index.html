@@ -69,6 +69,24 @@ html[data-style=girly]:not([data-theme=dark]){--paper:#f7e6ee;--paper-lo:#efd3e0
 html[data-style=girly][data-theme=dark]{--paper:#261522;--paper-lo:#301b2b;--linen:#35202f;--card:#3d2536;--field:#2f1b29;--ink:#fbe8f2;--ink-soft:#d9b3c9;--walnut:#e79bc8;--caramel:#c97fae;--rust:#f08cc0;--line:#5c3750;--shadow:rgba(0,0,0,.55);--accent:#f08cc0;--on-accent:#2a0f20;--wash:rgba(240,140,192,.14);--wknd:#35202f;--today:#3a2540;--hole:#170c14;--coil:#c98fb2;--grid:rgba(240,140,192,.07);--ok:#a8d58b;--warn:#ffa08f;--mark:#ff9fb0}
 html[data-style=boyish]:not([data-theme=dark]){--paper:#dde3ea;--paper-lo:#cbd3dd;--linen:#e8edf2;--card:#f7f9fb;--field:#ffffff;--ink:#0f1b2d;--ink-soft:#44546a;--walnut:#1b3a5c;--caramel:#5d7fa3;--rust:#0b5cb8;--line:#b8c3d1;--shadow:rgba(10,25,50,.35);--accent:#14365f;--on-accent:#ffffff;--wash:rgba(11,99,197,.10);--wknd:#e6ebf1;--today:#d3e6f9;--hole:#b3bfcd;--coil:#6f8299;--grid:transparent;--ok:#2a7a3b;--warn:#b3261e;--mark:#d9480f;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
 html[data-style=boyish][data-theme=dark]{--paper:#0d1117;--paper-lo:#131a22;--linen:#161e28;--card:#1a232e;--field:#121921;--ink:#e6edf3;--ink-soft:#9fb0c3;--walnut:#79a8e0;--caramel:#5d7fa3;--rust:#4aa3ff;--line:#2c3a4a;--shadow:rgba(0,0,0,.65);--accent:#4aa3ff;--on-accent:#07131f;--wash:rgba(74,163,255,.14);--wknd:#151d27;--today:#14304d;--hole:#080b10;--coil:#6f8299;--grid:transparent;--ok:#6fd08c;--warn:#ff8f84;--mark:#ff9a6b;--display:'Segoe UI',system-ui,-apple-system,Roboto,Helvetica,Arial,sans-serif;--body:system-ui,-apple-system,'Segoe UI',Roboto,Helvetica,Arial,sans-serif}
+
+/* Bread mode: the original warm-paper look, with toasted loaf buttons (crust border, crumb dots, two bumps on top). */
+html[data-style=bread] .btn:not(.quiet):not(.bare){position:relative;isolation:isolate;margin-top:6px;--crust:#7a4318;--toast1:#e6b068;--toast2:#c9843a;--toast3:#a9622a;--bt:#3a1f0d;
+  background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),radial-gradient(circle at 47% 70%,rgba(90,45,15,.28) 0 1.4px,transparent 2.2px),radial-gradient(circle at 78% 30%,rgba(255,240,200,.5) 0 1.6px,transparent 2.4px),radial-gradient(circle at 90% 72%,rgba(90,45,15,.25) 0 1.3px,transparent 2.1px),linear-gradient(var(--toast1),var(--toast2) 62%,var(--toast3));
+  color:var(--bt);border:2px solid var(--crust);border-radius:20px 20px 12px 12px;text-shadow:0 1px 0 rgba(255,235,190,.55);
+  box-shadow:inset 0 3px 0 rgba(255,240,200,.6),inset 0 -3px 0 rgba(90,45,15,.3),0 3px 0 var(--crust),0 6px 8px -4px var(--shadow)}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::before,html[data-style=bread] .btn:not(.quiet):not(.bare)::after{content:"";position:absolute;top:-7px;height:13px;width:30%;z-index:-1;background:linear-gradient(var(--toast1),var(--toast2));border:2px solid var(--crust);border-bottom:0;border-radius:14px 14px 0 0}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::before{left:12%}
+html[data-style=bread] .btn:not(.quiet):not(.bare)::after{right:12%}
+html[data-style=bread] .btn:not(.quiet):not(.bare).soft{--toast1:#f6e2b4;--toast2:#ecc98a;--toast3:#dfae66;color:#5a3216}
+html[data-style=bread] .btn.soft:not(.quiet):not(.bare):hover{background:radial-gradient(circle at 18% 34%,rgba(255,240,200,.55) 0 1.6px,transparent 2.4px),linear-gradient(#fbeec9,#f0d296 62%,#e4b872)}
+html[data-style=bread] .btn:not(.quiet):not(.bare).danger{--toast1:#b5562c;--toast2:#933e1c;--toast3:#762f14;--bt:#fff1dc;--crust:#4d1f0a;text-shadow:0 1px 0 rgba(0,0,0,.35)}
+html[data-style=bread] .btn:not(.quiet):not(.bare)[aria-pressed=true],html[data-style=bread] .btn.soft:not(.quiet):not(.bare)[aria-pressed=true]{--toast1:#c98a3e;--toast2:#a9692a;--toast3:#8a5120;--bt:#fff1dc;text-shadow:0 1px 0 rgba(0,0,0,.3)}
+html[data-style=bread] .btn:hover{filter:brightness(1.06)}
+html[data-style=bread] .btn:active{transform:translateY(2px);box-shadow:inset 0 3px 0 rgba(255,240,200,.5),inset 0 -2px 0 rgba(90,45,15,.3),0 1px 0 var(--crust)}
+html[data-style=bread] .btn.sm::before,html[data-style=bread] .btn.sm::after{top:-6px;height:11px}
+html[data-style=bread] .seg .btn,html[data-style=bread] .seg .btn::before,html[data-style=bread] .seg .btn::after{border-radius:12px}
+@media print{html[data-style=bread] .btn{display:none}}
 html[data-style=neutral] .sheet::before,html[data-style=boyish] .sheet::before{display:none}
 html[data-style=neutral] .sheet,html[data-style=boyish] .sheet{padding-top:28px}
 html[data-style=boyish] h1,html[data-style=boyish] h2,html[data-style=boyish] h3,html[data-style=boyish] h4{font-weight:700;letter-spacing:-.01em}
@@ -688,7 +706,7 @@ const DARKQ=matchMedia('(prefers-color-scheme: dark)');
 function applyTheme(){
   const dark=ST.theme==='dark'||(ST.theme==='system'&&DARKQ.matches);
   document.documentElement.dataset.theme=dark?'dark':'light';
-  if(!['girly','neutral','boyish'].includes(ST.style))ST.style='neutral';
+  if(!['girly','neutral','boyish','bread'].includes(ST.style))ST.style='neutral';
   document.documentElement.dataset.style=ST.style;
   {const m=document.querySelector('meta[name=theme-color]');if(m)m.content=getComputedStyle(document.documentElement).getPropertyValue('--accent').trim()||m.content}
   document.documentElement.classList.toggle('large',!!ST.large);
@@ -906,7 +924,7 @@ function settingsView(){
       <p class="muted small" style="margin-top:8px">The workspace lives only in this browser. It is private to this device, not protected by a password.</p></section>
     ${privatePanel()}
     <section class="panel"><h3>Appearance</h3><div class="two">
-      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish']],ST.style,'data-act="style" data-fk="s-style"')}
+      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
@@ -1787,7 +1805,7 @@ function drawCrop(cv,size){
   ctx.imageSmoothingQuality='high';
   ctx.drawImage(im,Math.max(0,sx),Math.max(0,sy),sz,sz,0,0,size,size);
 }
-const PK={kind:'familyBoard.pfpKind.v1',src:'familyBoard.photoSrc.v1',out:'familyBoard.photoOut.v1',adj:'familyBoard.photoAdj.v1',aout:'familyBoard.avatarOut.v1'};
+const PK={kind:'familyBoard.pfpKind.v1',src:'familyBoard.photoSrc.v1',out:'familyBoard.photoOut.v1',adj:'familyBoard.photoAdj.v1',aout:'familyBoard.avatarOut.v1',dm:'familyBoard.dmKey.v1'};
 const lsGet=k=>{try{return localStorage.getItem(k)||''}catch{return''}};
 const lsSet=(k,v)=>{try{if(v)localStorage.setItem(k,v);else localStorage.removeItem(k)}catch{}};
 const AV={skin:['#f9d9c3','#f1c27d','#e0a370','#c68642','#8d5524','#5b3a24'],
@@ -1861,7 +1879,7 @@ function openAvatarBuilder(){
       while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
       if(!okAvatar(data))return bad('That avatar could not be prepared. Try again.');
       try{localStorage.setItem('familyBoard.avatar.v1',JSON.stringify(c))}catch{}
-      cloudDo(()=>rpc('set_avatar',{p_data:data}),'Avatar saved.').then(ok=>{if(ok){lsSet(PK.aout,data);lsSet(PK.kind,'avatar');closeDlg()}});
+      cloudDo(()=>rpc('set_avatar',{p_data:data}),'Avatar saved.').then(ok=>{if(ok){lsSet(PK.aout,data);lsSet(PK.kind,'avatar');closeDlg();dmAsk('avatar')}});
     };
     img.onerror=()=>bad('Your browser could not draw the avatar. Try the photo option instead.');
     img.src='data:image/svg+xml;charset=utf-8,'+encodeURIComponent(avatarSVG(c));
@@ -1893,7 +1911,8 @@ function openPfpMenu(){
       ${hasAv&&cur!=='avatar'?b('pfpuseavatar','Use my saved avatar',false):''}
       ${b('avatar',hasAv?'Customize my avatar':'Build an avatar')}
       ${b('pfpdoppel',m.dm?'Change my DoppelMe key':'Use a DoppelMe avatar when online')}
-      ${m.dm?b('pfpdoppeloff','Stop using DoppelMe'):''}
+      ${!m.dm&&DMRE.test(lsGet(PK.dm))?b('pfpusedm','Use my saved DoppelMe avatar',false):''}
+      ${m.dm?b('pfpdoppeloff','Show my photo or avatar instead of DoppelMe'):''}
       ${hasPhoto||hasSrc?b('pfpforget','Remove my photo'):''}
     </div></div>`);
 }
@@ -1920,6 +1939,11 @@ function openDoppelDialog(){
   if(cur)check();
   $('#dmform').addEventListener('submit',ev=>{ev.preventDefault();if(!key||save.disabled)return;
     cloudDo(()=>rpc('set_doppelme',{p_key:key}),'DoppelMe avatar saved.').then(ok=>{if(ok)closeDlg()})});
+}
+async function dmAsk(what){
+  const m=me();if(!m||!m.dm)return;
+  const ok=await confirmBox('Show your '+what+' instead?','Your DoppelMe avatar is still showing on top while you are online, so your '+what+' stays hidden. Show your '+what+' instead? You can switch DoppelMe back on any time in Profile picture, without pasting the key again.','Show my '+what,false);
+  if(ok){lsSet(PK.dm,m.dm);await cloudDo(()=>rpc('set_doppelme',{p_key:null}),'DoppelMe is off. Your '+what+' is showing.')}
 }
 async function pfpSet(data,msg,kind){
   const ok=await cloudDo(()=>rpc('set_avatar',{p_data:data}),msg);
@@ -1961,7 +1985,7 @@ function openPhotoDialog(pre){
     let q=.85,data=out.toDataURL('image/jpeg',q);
     while(data.length>45000&&q>.4){q-=.15;data=out.toDataURL('image/jpeg',q)}
     if(!okAvatar(data))return bad('That picture could not be prepared. Try a different one.');
-    cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok){if(PH.src)lsSet(PK.src,PH.src);lsSet(PK.out,data);lsSet(PK.adj,JSON.stringify({z:+$('#ph-zoom').value,x:+$('#ph-x').value,y:+$('#ph-y').value}));lsSet(PK.kind,'photo');closeDlg()}});
+    cloudDo(()=>rpc('set_avatar',{p_data:data}),'Photo updated.').then(ok=>{if(ok){if(PH.src)lsSet(PK.src,PH.src);lsSet(PK.out,data);lsSet(PK.adj,JSON.stringify({z:+$('#ph-zoom').value,x:+$('#ph-x').value,y:+$('#ph-y').value}));lsSet(PK.kind,'photo');closeDlg();dmAsk('photo')}});
   });
 }
 function openDeleteWs(w){
@@ -2098,6 +2122,9 @@ function cycleView(){
       <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="hsw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="hsw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
       <p class="muted small" style="margin-top:4px">The small white circle in a day’s corner is that day’s pain, from 0 to 10.</p></section>
     ${open?card(open):''}
+    <section class="panel" aria-labelledby="petalh"><h3 id="petalh">Want more than this?</h3>
+      <p>Petal is a full period tracker made for this, with articles and more detailed tracking. It keeps its own entries, so nothing from this page is sent or copied there.</p>
+      <div class="row" style="margin-top:10px"><a class="btn" href="../petal/index.html" data-fk="petal">Open Petal</a></div></section>
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
       <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}
     ${cyDanger()}`;
@@ -2300,7 +2327,8 @@ async function cloudClick(a,b,id){
     case'avatar':openAvatarBuilder();return true;
     case'pfp':openPfpMenu();return true;
     case'pfpdoppel':openDoppelDialog();return true;
-    case'pfpdoppeloff':{const ok=await cloudDo(()=>rpc('set_doppelme',{p_key:null}),'DoppelMe avatar turned off.');if(ok)closeDlg();return true}
+    case'pfpusedm':{const k=lsGet(PK.dm);if(!DMRE.test(k))return true;const ok=await cloudDo(()=>rpc('set_doppelme',{p_key:k}),'DoppelMe avatar is on.');if(ok)closeDlg();return true}
+    case'pfpdoppeloff':{lsSet(PK.dm,me().dm||lsGet(PK.dm));const ok=await cloudDo(()=>rpc('set_doppelme',{p_key:null}),'DoppelMe avatar turned off.');if(ok)closeDlg();return true}
     case'pfpletter':pfpSet(null,'Back to your letter.','letter');return true;
     case'pfpusephoto':pfpSet(lsGet(PK.out),'Using your saved photo.','photo');return true;
     case'pfpuseavatar':pfpSet(lsGet(PK.aout),'Using your saved avatar.','avatar');return true;
@@ -2758,7 +2786,7 @@ function cloudMembersView(){
 }
 const appearancePanels=()=>`
     <section class="panel"><h3>Appearance</h3><div class="two">
-      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish']],ST.style,'data-act="style" data-fk="s-style"')}
+      ${sel('s-style','Style',[['girly','Girly'],['neutral','Gender neutral'],['boyish','Boyish'],['bread','Bread']],ST.style,'data-act="style" data-fk="s-style"')}
       ${sel('s-theme','Color theme',[['system','Match my device'],['light','Light'],['dark','Dark']],ST.theme,'data-act="theme" data-fk="s-theme"')}</div>
       <label class="chk" style="margin-top:12px"><input type="checkbox" data-act="large" ${ST.large?'checked':''} data-fk="s-large"> Larger text</label>
       <label class="chk" style="margin-top:10px"><input type="checkbox" data-act="crossoff" ${ST.crossOff?'checked':''} data-fk="s-cross"> Cross off days that have passed, like a fridge calendar</label></section>
@@ -2843,4 +2871,4 @@ function settingsViewCloud(){
 })();
 </script>
 </body>
-</html>
+  </html>
