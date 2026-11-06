@@ -1,22 +1,5 @@
 <!doctype html>
 <html lang="en">
-<!--
-  The Family Recipe Book
-  Copyright (C) 2026 Leia
-
-  This program is free software: you can redistribute it and/or modify
-  it under the terms of the GNU General Public License as published by
-  the Free Software Foundation, either version 3 of the License, or
-  (at your option) any later version.
-
-  This program is distributed in the hope that it will be useful,
-  but WITHOUT ANY WARRANTY; without even the implied warranty of
-  MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-  GNU General Public License for more details.
-
-  You should have received a copy of the GNU General Public License
-  along with this program.  If not, see <https://www.gnu.org/licenses/>.
--->
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
@@ -26,8 +9,8 @@
 <meta property="og:site_name" content="The Family Recipe Book">
 <meta property="og:title" content="The Family Recipe Book">
 <meta property="og:description" content="From our kitchen to yours. Recipes, meals, cook mode and timers.">
-<meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/recipe-book.html">
-<meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/preview.png">
+<meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/recipe-book/">
+<meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/recipe-book/preview.png">
 <meta property="og:image:type" content="image/png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -35,7 +18,7 @@
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="The Family Recipe Book">
 <meta name="twitter:description" content="From our kitchen to yours. Recipes, meals, cook mode and timers.">
-<meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/preview.png">
+<meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/recipe-book/preview.png">
 <meta name="theme-color" content="#ecdfc8">
 
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='3' width='24' height='26' rx='3' fill='%236f4a33'/%3E%3Crect x='7' y='3' width='21' height='26' rx='2' fill='%23f7efdf'/%3E%3Cpath d='M17.5 23C11.5 18.5 11.5 14.5 14.8 13.8c1.3-.3 2.3.6 2.7 1.5.4-.9 1.4-1.8 2.7-1.5 3.3.7 3.3 4.7-2.7 9.2z' fill='%2393573a'/%3E%3C/svg%3E">
@@ -418,21 +401,14 @@ dialog p{font-size:20px}
 <div id="toast" role="status" aria-live="polite"></div>
 <dialog id="sdlg"><form autocomplete="off" method="dialog">
   <h2 style="font-size:26px">Settings</h2>
-  <section class="sgroup"><h3>Saving</h3><div class="sbar" id="sbar"></div></section>
+  <section class="sgroup"><h3>Saving</h3><div class="sbar" id="sbar"></div><p class="hint">When you sign in, a copy of your recipes and photos is stored online with your account. It is not end-to-end encrypted, so the person who runs this site could technically read it. Do not put private information in recipes.</p></section>
   <section class="sgroup"><h3>Backup</h3><p class="hint">A backup is a file with all your recipes and photos. Keep one somewhere safe.</p><div class="row"><button type="button" class="btn soft" data-act="backup">Save a backup</button><button type="button" class="btn soft" data-act="restore">Restore a backup</button></div><input type="file" id="restore" accept=".json,application/json" hidden></section>
   <section class="sgroup"><h3>Method writer</h3><p class="hint">Lets an AI write the method from your ingredients. Choose a service and add your key.</p><div class="row"><button type="button" class="btn soft" data-act="groqset">Method writer settings</button></div></section>
   <p class="hint" id="sver"></p>
   <div class="row"><button type="button" class="btn" data-close="close">Done</button></div>
 </form></dialog>
 <dialog id="dlg"><form autocomplete="off" method="dialog"><p id="dlgmsg"></p><div class="row"><button type="button" class="btn soft" data-close="no" id="dlgno">Keep it</button><button class="btn" value="yes" id="dlgyes">Remove it</button></div></form></dialog>
-<dialog id="gdlg"><form autocomplete="off" method="dialog">
-  <h2 style="font-size:26px">Save to Google Drive</h2>
-  <p class="hint" id="gnote"></p>
-  <div class="qs" id="gsteps" aria-live="polite"></div>
-  <div class="field"><label for="gcid">Google client ID</label><input id="gcid" type="text" autocapitalize="off" spellcheck="false" placeholder="1234567890-abc.apps.googleusercontent.com"></div>
-  <p class="hint">Your recipes go in a folder called "Family Recipe Book" in your Drive. This page can only see that folder, nothing else.</p>
-  <div class="row"><button class="btn" value="go">Save and connect</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div>
-</form></dialog>
+<dialog id="adlg"><form autocomplete="on" id="aform" novalidate></form></dialog>
 <dialog id="qdlg"><form autocomplete="off" method="dialog">
   <h2 style="font-size:26px">Method writer settings</h2>
   <div class="field"><label for="qprov">Which service</label><select id="qprov"><option value="gemini">Google Gemini (free tier)</option><option value="openrouter">OpenRouter (free models)</option><option value="groq">Groq</option></select></div>
@@ -470,7 +446,6 @@ const store={
 const uuid=()=>(window.crypto&&crypto.randomUUID)?crypto.randomUUID():'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g,c=>{const r=Math.random()*16|0;return(c==='x'?r:(r&3|8)).toString(16)});
 const slugify=s=>String(s).toLowerCase().normalize('NFKD').replace(/[^\w\s-]/g,'').trim().replace(/[\s_-]+/g,'-')||'recipe';
 const app=$('#app');
-/* Optional: paste your Google client ID between the quotes so every device works without typing it in. */
 const S={type:'',mode:null,base:'',token:'',user:null,favs:new Set(),cats:[],org:{categories:null,tags:null},query:'',cat:'',onlyFavs:false,page:1,totalPages:1,demo:[],deleted:{},cur:null,checked:new Set(),f:1,base:0,target:0,label:''};
 const API=()=>Book;
 const isFav=r=>!!r.fav;
@@ -605,64 +580,78 @@ const cleanRecipe=(r,stamp)=>{
     image:/^data:image\//.test(r.image||'')||/^https:\/\/(www\.)?themealdb\.com\//.test(r.image||'')?r.image:'',fav:!!r.fav,updated:Number(r.updated)||stamp};
 };
 
-/* ---------- Google Drive (optional cloud save) ---------- */
-const G={token:'',exp:0,client:null,folderId:'',fileId:'',lastMod:'',lastSync:0,busy:false,again:false,timer:0};
-const cid=()=>store.get('rb_gcid')||'';
-const canGoogle=()=>location.protocol==='https:'||location.hostname==='localhost';
-const VERSION='3.0';
+/* ---------- Online account (Supabase email + password) ---------- */
+const VERSION='v2.0.0';
+const SB_URL='https://rkbsivxrlsflhfrlgwuk.supabase.co';
+const SB_KEY='sb_publishable_MBLZA6K7i44e8OFmO9eFFA_YzyskoAR';
+const sbKey=()=>(SB_KEY||store.get('rb_sbkey')||'').trim();
+const G={sess:null,lastSync:0,busy:false,again:false,timer:0,pending:''};
+(function(){try{const j=JSON.parse(store.get('rb_sess')||'null');if(j&&j.refresh_token)G.sess=j}catch{}})();
+const saveSess=()=>{if(G.sess)store.set('rb_sess',JSON.stringify(G.sess));else store.del('rb_sess')};
+function takeSession(j){
+  if(!j||!j.access_token)return false;
+  const u=j.user||{};
+  G.sess={access_token:j.access_token,refresh_token:j.refresh_token||(G.sess&&G.sess.refresh_token)||'',exp:Date.now()+((Number(j.expires_in)||3600)-60)*1000,email:u.email||(G.sess&&G.sess.email)||'',uid:u.id||(G.sess&&G.sess.uid)||''};
+  saveSess();return true;
+}
 function driveBar(){
-  if(G.token){
-    const t=G.busy?'Saving to Google Drive…':G.lastSync?'Saved to Google Drive at '+new Date(G.lastSync).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'Connected to Google Drive';
-    return `<span>${t}</span><button class="btn quiet" data-act="gsync">Sync now</button><button class="btn quiet" data-act="goff">Disconnect</button>`;
+  if(!sbKey())return `<span>Saved on this device</span><button class="btn quiet" data-act="signin">Sign in</button>`;
+  if(G.sess){
+    const t=G.busy?'Saving online…':G.lastSync?'Saved online at '+new Date(G.lastSync).toLocaleTimeString([],{hour:'numeric',minute:'2-digit'}):'Signed in';
+    return `<span>${esc(G.sess.email||'Signed in')}</span><span>${t}</span><button class="btn quiet" data-act="gsync">Sync now</button><button class="btn quiet" data-act="chpw">Change password</button><button class="btn quiet" data-act="goff">Sign out</button>`;
   }
-  return `<span>Saved on this device</span><button class="btn quiet" data-act="gdrive">${store.get('rb_gd')==='1'?'Reconnect Google Drive':'Connect Google Drive'}</button>${store.get('rb_gcid')?'<button class="btn quiet" data-act="gcfg">Change client ID</button>':''}`;
+  return `<span>Saved on this device</span><button class="btn quiet" data-act="signin">Sign in</button>`;
 }
 function updateBar(){const t=$('#sbar');if(t)t.innerHTML=driveBar()}
-function loadGIS(){
-  if(window.google&&google.accounts&&google.accounts.oauth2)return Promise.resolve();
-  return new Promise((res,rej)=>{const sc=document.createElement('script');sc.src='https://accounts.google.com/gsi/client';sc.async=true;sc.onload=()=>res();sc.onerror=()=>rej(new Error('GIS'));document.head.appendChild(sc)});
-}
 function driveError(e){
   const m=e&&e.message;
-  if(m==='GAUTH')toast('Google Drive needs you to sign in again to keep saving. Tap Reconnect Google Drive.');
-  else if(m==='NETWORK')toast('I could not reach Google Drive. Your recipes are still saved on this device.');
-  else toast(m||'Google Drive could not save.');
+  if(m==='AUTH')toast('Your online session ended. Tap Sign in to keep saving online.');
+  else if(m==='NETWORK')toast('I could not reach the online account. Your recipes are still saved on this device.');
+  else toast(m||'Saving online did not work.');
   updateBar();
 }
-async function gfetch(url,opt={}){
-  if(!G.token||Date.now()>G.exp){G.token='';throw new Error('GAUTH')}
+function sbMsg(j,st){
+  const m=String((j&&(j.msg||j.error_description||j.message||j.error))||'').toLowerCase(),c=String((j&&(j.error_code||j.code))||'').toLowerCase();
+  if(c==='invalid_credentials'||m.includes('invalid login'))return 'That email and password do not match. Check them and try again.';
+  if(c==='email_not_confirmed'||m.includes('not confirmed'))return 'Please confirm your email first. Open the message we sent you and tap the link in it.';
+  if(c==='user_already_exists'||m.includes('already registered'))return 'That email already has an account. Try Sign in, or Forgot password.';
+  if(c==='weak_password'||m.includes('password should'))return 'That password is too weak. Use at least 8 characters.';
+  if(c==='same_password'||m.includes('different from the old'))return 'Choose a password that is different from your old one.';
+  if(c==='over_email_send_rate_limit'||c==='over_request_rate_limit'||st===429||m.includes('rate limit')||m.includes('seconds'))return 'Too many tries. Wait a minute and try again.';
+  if(m.includes('valid email')||c==='validation_failed')return 'That does not look like a valid email address.';
+  if(m.includes('signups not allowed'))return 'New accounts are turned off for this project.';
+  return(j&&(j.msg||j.error_description||j.message))||'Something went wrong ('+st+').';
+}
+async function authCall(path,body,method='POST',tok){
   let r;
-  try{r=await fetch(url,{...opt,headers:{Authorization:'Bearer '+G.token,...(opt.headers||{})}})}catch{throw new Error('NETWORK')}
-  if(r.status===401){G.token='';throw new Error('GAUTH')}
-  if(!r.ok){const e=new Error(r.status===403?'Google Drive refused the request. Check that the Google Drive API is turned on for your project and that your account is a test user.':'Google Drive answered with an error ('+r.status+').');e.status=r.status;throw e}
+  try{r=await fetch(SB_URL+path,{method,headers:{apikey:sbKey(),'Content-Type':'application/json',...(tok?{Authorization:'Bearer '+tok}:{})},body:body?JSON.stringify(body):undefined})}catch{throw new Error('NETWORK')}
+  let j={};try{j=await r.json()}catch{}
+  if(!r.ok){const e=new Error(sbMsg(j,r.status));e.status=r.status;throw e}
+  return j;
+}
+async function freshToken(){
+  if(!G.sess)throw new Error('AUTH');
+  if(Date.now()<G.sess.exp)return G.sess.access_token;
+  try{
+    const j=await authCall('/auth/v1/token?grant_type=refresh_token',{refresh_token:G.sess.refresh_token});
+    takeSession(j);return G.sess.access_token;
+  }catch(e){
+    if(e.message==='NETWORK')throw e;
+    G.sess=null;saveSess();updateBar();throw new Error('AUTH');
+  }
+}
+async function sbRest(path,opt={}){
+  const tok=await freshToken();
+  let r;
+  try{r=await fetch(SB_URL+'/rest/v1/'+path,{...opt,headers:{apikey:sbKey(),Authorization:'Bearer '+tok,'Content-Type':'application/json',...(opt.headers||{})}})}catch{throw new Error('NETWORK')}
+  if(r.status===401){G.sess.exp=0;throw new Error('AUTH')}
+  if(!r.ok){
+    let j={};try{j=await r.json()}catch{}
+    const m=String(j.message||'');
+    if(r.status===404||j.code==='PGRST205'||m.includes('recipe_books'))throw new Error('The online table is not set up yet. Run the setup SQL in Supabase first.');
+    throw new Error(m||'The online account answered with an error ('+r.status+').');
+  }
   return r;
-}
-async function ensureFolder(){
-  if(G.folderId)return G.folderId;
-  const q=encodeURIComponent("name='Family Recipe Book' and mimeType='application/vnd.google-apps.folder' and trashed=false");
-  let j=await(await gfetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id)&pageSize=1`)).json();
-  if(j.files&&j.files.length)G.folderId=j.files[0].id;
-  else{
-    j=await(await gfetch('https://www.googleapis.com/drive/v3/files?fields=id',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({name:'Family Recipe Book',mimeType:'application/vnd.google-apps.folder'})})).json();
-    G.folderId=j.id;
-  }
-  return G.folderId;
-}
-async function findFile(){
-  const q=encodeURIComponent(`name='recipes.json' and '${G.folderId}' in parents and trashed=false`);
-  const j=await(await gfetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,modifiedTime)&pageSize=1`)).json();
-  return(j.files&&j.files[0])||null;
-}
-async function uploadData(json){
-  if(G.fileId){
-    try{return await(await gfetch(`https://www.googleapis.com/upload/drive/v3/files/${G.fileId}?uploadType=media&fields=id,modifiedTime`,{method:'PATCH',headers:{'Content-Type':'application/json'},body:json})).json()}
-    catch(e){if(e.status!==404)throw e;G.fileId=''}
-  }
-  const b='rb'+Math.random().toString(36).slice(2);
-  const meta=JSON.stringify({name:'recipes.json',parents:[G.folderId],mimeType:'application/json'});
-  const body=`--${b}\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n${meta}\r\n--${b}\r\nContent-Type: application/json\r\n\r\n${json}\r\n--${b}--`;
-  const j=await(await gfetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,modifiedTime',{method:'POST',headers:{'Content-Type':'multipart/related; boundary='+b},body})).json();
-  G.fileId=j.id;return j;
 }
 function mergeBooks(a,ad,b,bd){
   const del={...ad};for(const k in bd)del[k]=Math.max(del[k]||0,bd[k]);
@@ -671,25 +660,23 @@ function mergeBooks(a,ad,b,bd){
   return{recipes:[...map.values()].filter(r=>!(del[r.slug]&&del[r.slug]>=(r.updated||0))),deleted:del};
 }
 async function syncNow(){
+  if(!G.sess)return;
   if(G.busy){G.again=true;return}
   G.busy=true;updateBar();
   let merged=false;
   try{
-    await ensureFolder();
-    const f=await findFile();
-    if(f){
-      G.fileId=f.id;
-      if(f.modifiedTime!==G.lastMod){
-        const remote=await(await gfetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`)).json();
-        const rl=(Array.isArray(remote)?remote:remote.recipes||[]).filter(r=>r&&typeof r.name==='string').map(r=>cleanRecipe(r,0));
-        const rd=(remote&&remote.deleted&&typeof remote.deleted==='object')?remote.deleted:{};
-        const m=mergeBooks(S.demo,S.deleted,rl,rd);
-        merged=JSON.stringify(m.recipes)!==JSON.stringify(S.demo);
-        S.demo=m.recipes;S.deleted=m.deleted;Book.persist(true);
-      }
+    const uid=G.sess.uid;
+    const rows=await(await sbRest('recipe_books?select=data&user_id=eq.'+encodeURIComponent(uid))).json();
+    const remote=rows&&rows[0]&&rows[0].data;
+    if(remote){
+      const rl=(Array.isArray(remote)?remote:remote.recipes||[]).filter(r=>r&&typeof r.name==='string').map(r=>cleanRecipe(r,0));
+      const rd=(remote&&remote.deleted&&typeof remote.deleted==='object')?remote.deleted:{};
+      const m=mergeBooks(S.demo,S.deleted,rl,rd);
+      merged=JSON.stringify(m.recipes)!==JSON.stringify(S.demo);
+      S.demo=m.recipes;S.deleted=m.deleted;Book.persist(true);
     }
-    const out=await uploadData(JSON.stringify({app:'family-recipe-book',version:2,saved:new Date().toISOString(),recipes:S.demo,deleted:S.deleted}));
-    G.lastMod=out.modifiedTime;G.lastSync=Date.now();
+    await sbRest('recipe_books?on_conflict=user_id',{method:'POST',headers:{Prefer:'resolution=merge-duplicates,return=minimal'},body:JSON.stringify({user_id:uid,data:{app:'family-recipe-book',version:2,saved:new Date().toISOString(),recipes:S.demo,deleted:S.deleted},updated_at:new Date().toISOString()})});
+    G.lastSync=Date.now();
   }finally{
     G.busy=false;updateBar();
     if(G.again){G.again=false;Drive.schedule()}
@@ -698,45 +685,141 @@ async function syncNow(){
 }
 const Drive={
   schedule(){
-    if(!G.token)return;
-    if(Date.now()>G.exp){G.token='';updateBar();return}
+    if(!G.sess)return;
     clearTimeout(G.timer);G.timer=setTimeout(()=>syncNow().catch(driveError),1500);
   }
 };
-async function connectDrive(){
-  if(!canGoogle()){toast('Google sign-in only works from the published web address of this page, not from a downloaded file.');return}
-  if(!cid()){openGSetup();return}
-  try{await loadGIS()}catch{toast("I couldn't load Google's sign-in. Check your connection and try again.");return}
-  if(!G.client){
-    G.client=google.accounts.oauth2.initTokenClient({
-      client_id:cid(),scope:'https://www.googleapis.com/auth/drive.file',
-      callback:async r=>{
-        if(!r||r.error||!r.access_token){toast(r&&r.error==='access_denied'?'Google Drive was not connected.':'Google sign-in did not finish. Please try again.');return}
-        G.token=r.access_token;G.exp=Date.now()+((Number(r.expires_in)||3600)-60)*1000;
-        store.set('rb_gd','1');updateBar();
-        try{await syncNow();toast('Connected. Your recipes are saved to Google Drive.')}catch(e){driveError(e)}
-      },
-      error_callback:e=>{if(e&&e.type!=='popup_closed')toast('Google sign-in was blocked. Allow pop-ups for this page and try again.')}
-    });
+async function signOut(){
+  const t=G.sess&&G.sess.access_token;
+  G.sess=null;saveSess();G.lastSync=0;updateBar();
+  if(t){try{fetch(SB_URL+'/auth/v1/logout',{method:'POST',headers:{apikey:sbKey(),Authorization:'Bearer '+t}})}catch{}}
+  toast('Signed out. Your recipes stay on this device.');
+}
+
+/* ---- the sign-in screen ---- */
+const KS={i:0};
+let AMODE='signin';
+const KSTEPS=()=>[
+  ['Open your Supabase project','Sign in to supabase.com and open the project for this recipe book.',{href:'https://supabase.com/dashboard/project/rkbsivxrlsflhfrlgwuk/settings/api-keys',label:'Open the API keys page'}],
+  ['Find the public key','Look for the "anon" key, or the one named "Publishable key". It starts with eyJ or sb_publishable_. Do not use the secret or service_role key.'],
+  ['Copy it','Tap the copy icon next to that key.'],
+  ['Paste it below','Come back here, paste it into the box, and tap Save key. It stays in this browser only.']
+];
+const SETUP_SQL=`create table public.recipe_books (
+  user_id uuid primary key default auth.uid() references auth.users(id) on delete cascade,
+  data jsonb not null,
+  updated_at timestamptz not null default now()
+);
+alter table public.recipe_books enable row level security;
+create policy "own book select" on public.recipe_books for select to authenticated using (auth.uid() = user_id);
+create policy "own book insert" on public.recipe_books for insert to authenticated with check (auth.uid() = user_id);
+create policy "own book update" on public.recipe_books for update to authenticated using (auth.uid() = user_id) with check (auth.uid() = user_id);
+create policy "own book delete" on public.recipe_books for delete to authenticated using (auth.uid() = user_id);`;
+function authNote(msg,kind){const n=$('#anote');if(!n)return authRender(msg,kind);n.textContent=msg;n.className='gnote'+(kind==='err'?' err':'');n.hidden=!msg;aBusy(false)}
+function authRender(msg,kind){
+  const f=$('#aform'),m=AMODE;
+  const note=`<p class="gnote${kind==='err'?' err':''}" id="anote" role="status" aria-live="polite"${msg?'':' hidden'}>${esc(msg||'')}</p>`;
+  const em=`<div class="field"><label for="aem">Email</label><input id="aem" name="email" type="email" inputmode="email" autocomplete="username email" autocapitalize="off" spellcheck="false" required></div>`;
+  const pw=(id,label,ac)=>`<div class="field"><label for="${id}">${label}</label><input id="${id}" name="password" type="password" autocomplete="${ac}" minlength="8" required></div>`;
+  let h='';
+  if(m==='key'){
+    const L=KSTEPS();KS.i=Math.min(KS.i,L.length-1);
+    h=`<h2 style="font-size:26px">Connect your online account</h2><p class="hint">This page needs your project's public key once on this device.</p><div class="qs" aria-live="polite">${stepBox('How to find your key',L,KS.i,'kstep')}</div><div class="field"><label for="akey">Public key</label><input id="akey" type="text" autocapitalize="off" spellcheck="false" autocomplete="off" placeholder="eyJ… or sb_publishable_…"></div>${note}<div class="row"><button class="btn" type="submit">Save key</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div>`;
+  }else if(m==='signin'){
+    h=`<h2 style="font-size:26px">Sign in</h2><p class="hint">Sign in to save your recipes online and open them on any device.</p>${em}${pw('apw','Password','current-password')}${note}<div class="row"><button class="btn" type="submit">Sign in</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div><div class="row"><button type="button" class="btn quiet" data-act="amode" data-m="forgot">Forgot password?</button><button type="button" class="btn quiet" data-act="amode" data-m="signup">Create an account</button></div>`;
+  }else if(m==='signup'){
+    h=`<h2 style="font-size:26px">Create an account</h2><p class="hint">Use an email you can open. Your password needs at least 8 characters.</p>${em}${pw('apw','Password','new-password')}${pw('apw2','Type the password again','new-password')}${note}<div class="row"><button class="btn" type="submit">Create account</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div><div class="row"><button type="button" class="btn quiet" data-act="amode" data-m="signin">I already have an account</button></div>`;
+  }else if(m==='forgot'){
+    h=`<h2 style="font-size:26px">Forgot your password?</h2><p class="hint">Type your email and we will send you a link to choose a new one.</p>${em}${note}<div class="row"><button class="btn" type="submit">Send the link</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div><div class="row"><button type="button" class="btn quiet" data-act="amode" data-m="signin">Back to sign in</button></div>`;
+  }else if(m==='newpw'){
+    h=`<h2 style="font-size:26px">Choose a new password</h2><p class="hint">At least 8 characters.</p>${pw('apw','New password','new-password')}${pw('apw2','Type it again','new-password')}${note}<div class="row"><button class="btn" type="submit">Save new password</button><button type="button" class="btn soft" data-close="cancel">Cancel</button></div>`;
   }
-  G.client.requestAccessToken({prompt:store.get('rb_gd')==='1'?'':'consent'});
+  f.innerHTML=h;
+  const e0=$('#aem');if(e0&&AMODE_EMAIL)e0.value=AMODE_EMAIL;
 }
-function disconnectDrive(){
-  const t=G.token;
-  if(t&&window.google&&google.accounts&&google.accounts.oauth2)google.accounts.oauth2.revoke(t,()=>{});
-  G.token='';G.fileId='';G.folderId='';G.lastMod='';store.del('rb_gd');updateBar();
-  toast('Disconnected. Your recipes stay in the Drive folder and on this device.');
+let AMODE_EMAIL='';
+function openAuth(mode){
+  const em=$('#aem');if(em&&em.value)AMODE_EMAIL=em.value.trim();
+  AMODE=(!sbKey()&&mode!=='key')?'key':mode;
+  if(AMODE==='key')KS.i=0;
+  authRender();
+  const d=$('#adlg');if(!d.open)d.showModal();
+  const first=$('#aem')||$('#apw')||$('#akey');if(first&&!(first.value))setTimeout(()=>{try{first.focus()}catch{}},50);
 }
-function openGSetup(){
-  const d=$('#gdlg');
-  $('#gnote').textContent=canGoogle()?'Paste the client ID from your Google Cloud project. You only need to do this once on this device.':'Google sign-in only works once this page is published at a web address, such as GitHub Pages. Open the published page to connect.';
-  $('#gcid').value=cid();GS.i=0;gRender();
-  d.addEventListener('close',()=>{
-    const v=$('#gcid').value.trim();
-    if(d.returnValue==='go'&&v){store.set('rb_gcid',v);G.client=null;connectDrive()}
-  },{once:true});
-  d.showModal();
+function aBusy(on){const b=$('#aform button[type=submit]');if(b){b.disabled=on;b.dataset.t=b.dataset.t||b.textContent;b.textContent=on?'One moment…':b.dataset.t}}
+async function authSubmit(){
+  const v=id=>($(id)?$(id).value:'');
+  try{
+    if(AMODE==='key'){
+      const k=v('#akey').trim();
+      if(k.length<20||/service_role/i.test(k)){authNote('That does not look like the public key. Check the steps above.','err');return}
+      try{const p=JSON.parse(atob(k.split('.')[1]||''));if(p.role==='service_role'){authNote('That is the secret key. Please use the public (anon or publishable) key instead.','err');return}}catch{}
+      store.set('rb_sbkey',k);AMODE='signin';authRender('Saved. Now sign in.');return;
+    }
+    const email=v('#aem').trim();AMODE_EMAIL=email;
+    if(AMODE==='forgot'){
+      if(!email){authNote('Type your email first.','err');return}
+      aBusy(true);
+      await authCall('/auth/v1/recover?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email});
+      authNote('If that email has an account, a link is on its way. Open it on this device to choose a new password. Check your spam folder too.');return;
+    }
+    const pw=v('#apw');
+    if(AMODE==='newpw'){
+      if(pw.length<8){authNote('Use at least 8 characters.','err');return}
+      if(pw!==v('#apw2')){authNote('The two passwords do not match.','err');return}
+      aBusy(true);
+      const t=await freshToken();
+      await authCall('/auth/v1/user',{password:pw},'PUT',t);
+      $('#adlg').close('done');toast('Your password was changed.');return;
+    }
+    if(!email||!pw){authNote('Type your email and password.','err');return}
+    if(AMODE==='signup'){
+      if(pw.length<8){authNote('Use at least 8 characters.','err');return}
+      if(pw!==v('#apw2')){authNote('The two passwords do not match.','err');return}
+      aBusy(true);
+      const j=await authCall('/auth/v1/signup?redirect_to='+encodeURIComponent(location.origin+location.pathname),{email,password:pw});
+      if(j.access_token){takeSession(j);$('#adlg').close('done');await afterLogin('Account created.');return}
+      if(j.user&&Array.isArray(j.user.identities)&&!j.user.identities.length||(j.identities&&!j.identities.length)){authNote('That email already has an account. Try Sign in, or Forgot password.','err');return}
+      AMODE='signin';authRender('Almost done. We sent a message to '+email+'. Tap the link in it to confirm, then sign in here.');return;
+    }
+    aBusy(true);
+    const j=await authCall('/auth/v1/token?grant_type=password',{email,password:pw});
+    takeSession(j);$('#adlg').close('done');await afterLogin('Signed in.');
+  }catch(e){
+    if(e.message==='NETWORK')authNote('I could not reach the online account. Check your connection and try again.','err');
+    else if(e.message==='AUTH')authNote('Your session ended. Open the link in your email again.','err');
+    else authNote(e.message,'err');
+  }
 }
+async function afterLogin(first){
+  updateBar();
+  try{await syncNow();toast(first+' Your recipes are saved online.')}catch(e){driveError(e)}
+}
+function authBoot(){
+  const f=$('#aform');
+  f.addEventListener('submit',e=>{e.preventDefault();authSubmit()});
+  const ap=G.pending;G.pending='';
+  if(ap==='recovery')openAuth('newpw');
+  else if(ap==='signup')afterLogin('Email confirmed.');
+  else if(ap&&ap.startsWith('error:'))toast(ap.slice(6));
+  if(G.sess&&sbKey())syncNow().catch(driveError);
+}
+/* A link from a Supabase email lands here with the answer in the address after the #. */
+(function(){
+  const h=location.hash;
+  if(!/^#(access_token|error|error_code|error_description)=/.test(h)&&!/[#&](access_token|error_code)=/.test(h))return;
+  const q=new URLSearchParams(h.slice(1));
+  history.replaceState(null,'',location.pathname+location.search+'#/');
+  if(q.get('access_token')){
+    takeSession({access_token:q.get('access_token'),refresh_token:q.get('refresh_token'),expires_in:q.get('expires_in')});
+    try{const p=JSON.parse(atob(q.get('access_token').split('.')[1].replace(/-/g,'+').replace(/_/g,'/')));G.sess.uid=p.sub||G.sess.uid;G.sess.email=p.email||G.sess.email;saveSess()}catch{}
+    G.pending=q.get('type')==='recovery'?'recovery':'signup';
+  }else{
+    const c=q.get('error_code');
+    G.pending='error:'+(c==='otp_expired'?'That email link has expired or was already used. Tap Sign in, then Forgot password to get a new one.':(q.get('error_description')||'That link did not work.').replace(/\+/g,' '));
+  }
+})();
+
 
 /* ---------- Groq: write the method ---------- */
 const PROV={
@@ -780,24 +863,11 @@ function qRender(){
   const k=Object.keys(PROV).find(x=>x===$('#qprov').value)||'gemini',L=QSTEPS[k];
   QS.i=Math.min(QS.i,L.length-1);$('#qsteps').innerHTML=stepBox('How to get your key',L,QS.i,'qstep');
 }
-const GS={i:0};
-function gSteps(){
-  const o=location.origin&&location.origin!=='null'?location.origin:'the web address of this page';
-  return [
-    ['Open Google Cloud','Sign in with the Google account you want your recipes saved in. Accept the terms if it asks. Then create a new project and name it "Recipe book".',{href:'https://console.cloud.google.com/projectcreate',label:'Open Google Cloud'}],
-    ['Turn on Google Drive','Search for "Google Drive API" in the search bar at the top, open it, and tap Enable.',{href:'https://console.cloud.google.com/apis/library/drive.googleapis.com',label:'Open the Drive API page'}],
-    ['Set up the consent screen','Open "Google Auth Platform" (or "OAuth consent screen"). Name the app "Recipe book", add your email, and choose External. Under Audience, add your own email as a Test user. Without this, Google blocks your sign-in.',{href:'https://console.cloud.google.com/auth/overview',label:'Open Google Auth Platform'}],
-    ['Create the client','Go to Clients, then Create client. Choose "Web application". Under "Authorized JavaScript origins" add exactly this address, with nothing after it: '+o,{href:'https://console.cloud.google.com/auth/clients',label:'Open Clients'}],
-    ['Copy the client ID','After creating it, copy the Client ID. It ends in .apps.googleusercontent.com. You do not need the client secret.'],
-    ['Paste it below','Paste the client ID into the box below and tap Save and connect. If Google says access is blocked, wait a few minutes and try again.']
-  ];
-}
-function gRender(){const L=gSteps();GS.i=Math.min(GS.i,L.length-1);$('#gsteps').innerHTML=stepBox('How to connect Google Drive',L,GS.i,'gstep')}
 function gqFill(){
   QS.i=0;
   const p=PROV[$('#qprov').value]||PROV.openrouter;
   $('#qkey').value=(store.get(p.keyk)||'');$('#qmodel').value=store.get(p.modk)||'';$('#qmodel').placeholder=p.model;
-  $('#qhelp').textContent='Your key stays in this browser only. It is not saved to Google Drive, backups or this web page, so do not use it on a shared computer.';
+  $('#qhelp').textContent='Your key stays in this browser only. It is not saved to your online account, backups or this web page, so do not use it on a shared computer.';
   qRender();
   $('#qmhelp').textContent='If '+p.name+' says the model is gone, paste a newer name from '+p.models+'.';
 }
@@ -1423,10 +1493,10 @@ document.addEventListener('click',async e=>{
   if(chip){S.cat=chip.dataset.cat;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===chip));loadGrid(false);return}
   const b=e.target.closest('[data-act]');if(!b)return;
   const a=b.dataset.act;
-  if(a==='gstep'){GS.i=Math.max(0,GS.i+(+b.dataset.d));gRender();return}
+  if(a==='kstep'){KS.i=Math.max(0,KS.i+(+b.dataset.d));authRender();return}
   if(a==='qstep'){QS.i=Math.max(0,QS.i+(+b.dataset.d));qRender();return}
-  if(a==='settings'){$('#sbar').innerHTML=driveBar();$('#sver').textContent='The Family Recipe Book, version '+VERSION;$('#sdlg').showModal();return}
-  if(['gdrive','gcfg','groqset'].includes(a)&&b.closest('#sdlg'))$('#sdlg').close();
+  if(a==='settings'){$('#sbar').innerHTML=driveBar();$('#sver').textContent='The Family Recipe Book '+VERSION;$('#sdlg').showModal();return}
+  if(['signin','chpw','groqset'].includes(a)&&b.closest('#sdlg'))$('#sdlg').close();
   if(a==='groq')return groqMethod();
   if(a==='groqset')return openGroqSettings(null,!!b.closest('#sdlg'));
   if(a==='restore')return $('#restore').click();
@@ -1461,10 +1531,11 @@ document.addEventListener('click',async e=>{
   if(a==='feedopen')return feedOpen(+b.dataset.i);
   if(a==='ndsave')return ndSave().catch(()=>toast('I could not save that recipe.'));
   if(a==='ndclose'){$('#ndlg').close();return}
-  if(a==='gdrive')return connectDrive();
-  if(a==='gcfg')return openGSetup();
-  if(a==='gsync')return syncNow().then(()=>toast('Synced with Google Drive.')).catch(driveError);
-  if(a==='goff')return disconnectDrive();
+  if(a==='signin')return openAuth('signin');
+  if(a==='amode')return openAuth(b.dataset.m);
+  if(a==='gsync')return syncNow().then(()=>toast('Your book is up to date online.')).catch(driveError);
+  if(a==='goff')return signOut();
+  if(a==='chpw')return openAuth('newpw');
   if(a==='more'){S.page++;return loadGrid(true)}
   if(a==='onlyfav'){S.onlyFavs=!S.onlyFavs;b.setAttribute('aria-pressed',S.onlyFavs);return loadGrid(false)}
   if(a==='print')return window.print();
@@ -1536,10 +1607,10 @@ document.addEventListener('change',async e=>{
 
 /* ---------- start ---------- */
 decorate();
-$('#ver').textContent='Version '+VERSION;
+$('#ver').textContent=VERSION;
 Book.boot();
 route();
-if(cid()&&canGoogle())loadGIS().catch(()=>{});
+authBoot();
 tmLoad();
 })();
 </script>
