@@ -151,9 +151,21 @@ main{padding-top:10px;padding-bottom:calc(var(--nav-h) + var(--fw) + 36px + env(
 fieldset{border:0;margin:0 0 16px;padding:0;min-width:0}
 legend{padding:0;margin-bottom:6px}
 .hint{color:var(--ink-soft);font-size:16px;margin:2px 0 6px;font-weight:400;font-family:var(--body);text-transform:none;letter-spacing:0}
-input[type=text],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=search],select,textarea{width:100%;min-height:44px;font:inherit;color:var(--ink);background:var(--linen);border:1.5px solid var(--input-border);border-radius:3px;padding:8px 12px}
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=search],select,textarea{width:100%;min-height:44px;font:inherit;color:var(--ink);background:var(--linen);border:1.5px solid var(--input-border);border-radius:3px;padding:8px 12px}
 textarea{min-height:120px;resize:vertical;line-height:29px;padding:6px 12px;background-image:repeating-linear-gradient(transparent 0 28px,rgba(176,132,91,.28) 28px 29px);background-attachment:local;background-position:0 6px}
 select{width:auto;max-width:100%}
+/* Paper-style fields */
+input[type=text],input[type=email],input[type=password],input[type=tel],input[type=number],input[type=date],input[type=time],input[type=datetime-local],input[type=search],select,textarea{border-radius:8px;background-color:var(--card);box-shadow:inset 0 2px 3px rgba(64,41,29,.10);transition:border-color .15s,box-shadow .15s;-webkit-appearance:none;appearance:none}
+input[type=email],input[type=password],input[type=text],input[type=search]{min-height:48px;font-size:18px}
+input::placeholder,textarea::placeholder{color:var(--ink-soft);opacity:.7}
+input[type=text]:hover,input[type=email]:hover,input[type=password]:hover,input[type=search]:hover,select:hover,textarea:hover{border-color:var(--accent)}
+input[type=text]:focus,input[type=email]:focus,input[type=password]:focus,input[type=search]:focus,input[type=number]:focus,input[type=date]:focus,input[type=time]:focus,input[type=datetime-local]:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:inset 0 2px 3px rgba(64,41,29,.08),0 0 0 4px var(--soft)}
+input[type=search]{padding-left:44px;background-repeat:no-repeat;background-position:14px 50%;background-size:20px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f4a33' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E")}
+:root[data-mode="dark"] input[type=search]{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9bf94' stroke-width='2' stroke-linecap='round'%3E%3Ccircle cx='11' cy='11' r='6.5'/%3E%3Cpath d='M16 16l4.5 4.5'/%3E%3C/svg%3E")}
+input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:20px;width:20px;margin-right:2px;cursor:pointer;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f4a33' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E") center/14px no-repeat}
+:root[data-mode="dark"] input[type=search]::-webkit-search-cancel-button{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9bf94' stroke-width='2.4' stroke-linecap='round'%3E%3Cpath d='M6 6l12 12M18 6L6 18'/%3E%3C/svg%3E")}
+select{padding-right:38px;background-repeat:no-repeat;background-position:right 12px center;background-size:14px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%236f4a33' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
+:root[data-mode="dark"] select{background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23d9bf94' stroke-width='2.6' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpath d='M5 9l7 7 7-7'/%3E%3C/svg%3E")}
 [aria-invalid="true"]{border-color:var(--err);border-width:3px}
 .field-err{color:var(--err);font-weight:700;margin:4px 0 0}
 .field-err::before{content:"\26A0  "}
@@ -306,7 +318,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.0.1'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.0.2'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
