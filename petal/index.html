@@ -256,7 +256,9 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 .essay .esrc li{font-size:17px;line-height:1.55}
 .essay .urgent p{font-size:18px}
 .essay .urgent{margin:0 0 1.2em}
-.ver{margin:26px 0 0;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
+.verno{flex:0 0 100%}
+.footlink{background:none;border:0;padding:6px 4px;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:32px}
+.ver{display:flex;flex-wrap:wrap;justify-content:center;gap:0 18px;margin:26px 0 0;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
 .theme-opt .sw{display:inline-flex;gap:2px}
 .theme-opt .sw i{width:14px;height:14px;border-radius:50%;border:1px solid #6b4e3b;display:inline-block}
 #printArea{display:none}
@@ -304,7 +306,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '1.0.5'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '1.0.9'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -443,6 +445,7 @@ const ICONS = {
   calendar: '<rect x="3.5" y="5" width="17" height="15" rx="3"/><path d="M8 3v4M16 3v4M3.5 10h17"/>',
   learn: '<path d="M4 5.5C4 4.7 4.7 4 5.5 4H11v15H5.5C4.7 19 4 18.3 4 17.5z"/><path d="M20 5.5c0-.8-.7-1.5-1.5-1.5H13v15h5.5c.8 0 1.5-.7 1.5-1.5z"/>',
   settings: '<circle cx="12" cy="12" r="3"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.3 5.3l2.1 2.1M16.6 16.6l2.1 2.1M18.7 5.3l-2.1 2.1M7.4 16.6l-2.1 2.1"/>',
+  edit: '<path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>', download: '<path d="M12 4v11M7.5 10.5L12 15l4.5-4.5M5 20h14"/>',
   plus: '<path d="M12 5v14M5 12h14"/>', close: '<path d="M6 6l12 12M18 6L6 18"/>',
   prev: '<path d="M15 5l-7 7 7 7"/>', next: '<path d="M9 5l7 7-7 7"/>',
   drop: '<path d="M12 3s6 6.2 6 10.5A6 6 0 0 1 6 13.5C6 9.2 12 3 12 3z"/>',
@@ -498,7 +501,7 @@ function median(a) { const s = a.slice().sort((x, y) => x - y), n = s.length; re
 
 /* ================= 3. State, data model, validation ================= */
 const emptyData = () => ({ periods: [], flow: [], products: [], pain: [], moods: [], relief: [] });
-const defaultSettings = () => ({ theme: 'lavender', estimates: false, tamponTimer: false, reminderHours: 6, hiddenSymptoms: [], customSymptoms: [], introDismissed: false });
+const defaultSettings = () => ({ theme: 'lavender', estimates: false, tamponTimer: false, reminderHours: 6, padTimer: false, padReminderHours: 4, heavyStart: true, hiddenSymptoms: [], customSymptoms: [], introDismissed: false });
 let data = emptyData();
 let settings = defaultSettings();
 const state = {
@@ -569,7 +572,9 @@ function cleanSettings(raw) {
   if (!isObj(raw)) return { errors: ['Settings are missing or invalid.'], settings: d };
   if (inList(THEMES.map((t) => [t.id]), raw.theme)) d.theme = raw.theme; else if (raw.theme !== undefined) errors.push('Unknown theme.');
   d.estimates = raw.estimates === true; d.tamponTimer = raw.tamponTimer === true; d.introDismissed = raw.introDismissed === true;
-  if ([4, 6, 8].includes(raw.reminderHours)) d.reminderHours = raw.reminderHours; else if (raw.reminderHours !== undefined) errors.push('Reminder hours must be 4, 6, or 8.');
+  if ([2, 4, 6, 8].includes(raw.reminderHours)) d.reminderHours = raw.reminderHours; else if (raw.reminderHours !== undefined) errors.push('Tampon reminder hours must be 2, 4, 6, or 8.');
+  d.padTimer = raw.padTimer === true; d.heavyStart = raw.heavyStart !== false;
+  if ([3, 4, 6, 8].includes(raw.padReminderHours)) d.padReminderHours = raw.padReminderHours; else if (raw.padReminderHours !== undefined) errors.push('Pad reminder hours must be 3, 4, 6, or 8.');
   const names = (v, what) => { if (v === undefined) return []; if (!Array.isArray(v) || v.length > 60 || v.some((x) => typeof x !== 'string' || !x.trim() || x.length > 40)) { errors.push(what + ' is not valid.'); return []; } return v.map((x) => x.trim()); };
   d.hiddenSymptoms = names(raw.hiddenSymptoms, 'Hidden symptoms'); d.customSymptoms = names(raw.customSymptoms, 'Custom symptoms');
   return { errors, settings: d };
@@ -596,8 +601,21 @@ function computeEstimate() {
   return { state: hi < todayStr() ? 'stale' : 'ok', lo, hi, m, n: recent.length, last, mn, mx };
 }
 // Tampon sequence: 'on' while one is in is a conflict; 'changed' swaps; 'off' clears.
-function tamponState(products) {
-  const now = new Date().toISOString(), list = products.filter((e) => e.product === 'tampon' && e.ts <= now).sort(byTs);
+// Sooner reminders: at the start of a period (first two days, unless today's flow is logged as light, spotting or none) or whenever today's flow is Heavy.
+const HEAVY_HOURS = { pad: 4, tampon: 2 };
+function heavyContext() {
+  const t = todayStr(), f = data.flow.find((x) => x.date === t), per = periodOn(t), day = per ? dayDiff(per.start, t) + 1 : 0;
+  const heavy = !!f && f.level === 'heavy', early = !!per && day <= 2 && !(f && ['none', 'spotting', 'light'].includes(f.level));
+  return { on: heavy || early, heavy, early, day };
+}
+function reminderHoursFor(kind) {
+  const base = kind === 'pad' ? settings.padReminderHours : settings.reminderHours, ctx = heavyContext();
+  const sooner = settings.heavyStart && ctx.on && HEAVY_HOURS[kind] < base;
+  return { hours: sooner ? HEAVY_HOURS[kind] : base, sooner, ctx };
+}
+function tamponState(products) { return productState(products, 'tampon'); }
+function productState(products, kind) {
+  const now = new Date().toISOString(), list = products.filter((e) => e.product === kind && e.ts <= now).sort(byTs);
   let active = null; const conflicts = [];
   list.forEach((e) => { if (e.action === 'on') { if (active) conflicts.push(e.id); active = e; } else if (e.action === 'changed') active = e; else active = null; });
   return { active, conflicts };
@@ -1107,7 +1125,7 @@ function viewToday(root) {
   else pr.append(h('p', { class: 'muted', text: 'Nothing logged yet.' }), h('button', { type: 'button', class: 'btn', text: 'Log product change', onclick: () => openProductForm() }));
 
   root.append(h('div', { class: 'grid two' }, card('Period status', stat), card('Bleeding on this day', bl), card('Pain', pn), card('Mood and energy', md), card('Most recent product', pr)));
-  const tc = h('section', { class: 'card', id: 'timerCard' }); fillTimer(tc); if (settings.tamponTimer) root.append(tc);
+  const tc = h('section', { class: 'card', id: 'timerCard' }); fillTimer(tc); if (settings.tamponTimer || settings.padTimer) root.append(tc);
   const est = estimateCard(); if (est) root.append(est);
   root.append(card('Add to ' + fmtShort(logDate()), quickRow()), card('Activity for ' + fmtShort(sel), activityList(sel)), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'See cycle summaries', onclick: () => go('cycles') })));
 }
@@ -1123,24 +1141,32 @@ function introCard() {
 
 /* ---- Tampon timer ---- */
 function fmtElapsed(ms) { const m = Math.max(0, Math.floor(ms / 60000)); return Math.floor(m / 60) + ' h ' + pad2(m % 60) + ' min'; }
-function fillTimer(box) {
-  box.replaceChildren(); if (!settings.tamponTimer) return;
-  box.append(h('h2', { text: 'Tampon timer' }));
-  const ts = tamponState(data.products), a = ts.active;
-  if (!a) box.append(h('p', { class: 'muted', text: 'No tampon is marked as in. The timer starts only when you log "Inserted" or "Changed" for a tampon. Petal never starts it on its own.' }), h('button', { type: 'button', class: 'btn', text: 'Log a tampon', onclick: () => openProductForm(null, { product: 'tampon', action: 'on' }) }));
+function timerBlock(kind) {
+  const isPad = kind === 'pad', name = isPad ? 'Pad' : 'Tampon', low = name.toLowerCase();
+  const sec = h('div', { class: 'timer-block' }, h('h2', { text: name + ' timer' }));
+  const ts = productState(data.products, kind), a = ts.active, r = reminderHoursFor(kind);
+  if (!a) sec.append(h('p', { class: 'muted', text: 'No ' + low + ' is marked as on. The timer starts only when you log "' + (isPad ? 'Put on' : 'Inserted') + '" or "Changed" for a ' + low + '. Petal never starts it on its own.' }), h('button', { type: 'button', class: 'btn', text: 'Log a ' + low, onclick: () => openProductForm(null, { product: kind, action: 'on' }) }));
   else {
-    const ms = Date.now() - new Date(a.ts).getTime(), hrs = ms / 3600000, level = hrs >= 8 ? 2 : hrs >= settings.reminderHours ? 1 : 0;
-    const prev = state.timerLevels[a.id]; if (prev !== undefined && level > prev) toast('Tampon timer: it has been ' + fmtElapsed(ms) + ' since the tampon you logged.'); state.timerLevels[a.id] = level;
-    box.append(h('p', { text: 'Logged as in since ' + fmtWhen(a.ts) + '.' }), h('p', { class: 'big', text: fmtElapsed(ms) + ' so far' }),
-      h('p', { class: 'small', text: level === 0 ? 'Under your ' + settings.reminderHours + '-hour reminder.' : level === 1 ? 'Past your ' + settings.reminderHours + '-hour reminder.' : 'Past 8 hours.' }));
-    if (level > 0 && state.timerDismissed[a.id] !== level) box.append(h('div', { class: 'notice', role: 'status' }, h('strong', { text: 'Reminder. ' }),
-      level === 2 ? 'It has been over 8 hours since the tampon you logged. The FDA says never wear a tampon longer than 8 hours. Petal cannot tell if it is still in, so the timer keeps running until you log a change or removal.' : 'It has been ' + settings.reminderHours + ' hours or more since the tampon you logged. Petal cannot tell if it is still in, so the timer keeps running until you log a change or removal.',
-      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Dismiss for now', onclick: () => { state.timerDismissed[a.id] = level; fillTimer(box); } }))));
-    box.append(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Log a change', onclick: () => openProductForm(null, { product: 'tampon', action: 'changed' }) }), h('button', { type: 'button', class: 'btn', text: 'Log removal', onclick: () => openProductForm(null, { product: 'tampon', action: 'off' }) })));
+    const ms = Date.now() - new Date(a.ts).getTime(), hrs = ms / 3600000, level = !isPad && hrs >= 8 ? 2 : hrs >= r.hours ? 1 : 0;
+    const prev = state.timerLevels[a.id]; if (prev !== undefined && level > prev) toast(name + ' timer: it has been ' + fmtElapsed(ms) + ' since the ' + low + ' you logged.'); state.timerLevels[a.id] = level;
+    sec.append(h('p', { text: 'Logged as ' + (isPad ? 'on' : 'in') + ' since ' + fmtWhen(a.ts) + '.' }), h('p', { class: 'big', text: fmtElapsed(ms) + ' so far' }),
+      h('p', { class: 'small', text: level === 0 ? 'Under your ' + r.hours + '-hour reminder.' : level === 1 ? 'Past your ' + r.hours + '-hour reminder.' : 'Past 8 hours.' }));
+    if (r.sooner) sec.append(h('p', { class: 'small', text: (r.ctx.heavy ? 'Your flow is logged as heavy today' : 'It is the first days of your period') + ', so Petal is reminding you sooner: every ' + r.hours + ' hours for ' + low + 's.' }));
+    if (level > 0 && state.timerDismissed[a.id] !== level) sec.append(h('div', { class: 'notice', role: 'status' }, h('strong', { text: 'Reminder. ' }),
+      level === 2 ? 'It has been over 8 hours since the tampon you logged. The FDA says never wear a tampon longer than 8 hours. Petal cannot tell if it is still in, so the timer keeps running until you log a change or removal.' : 'It has been ' + r.hours + ' hours or more since the ' + low + ' you logged. ' + (isPad ? 'It may be time to change it. ' : '') + 'Petal cannot tell if it is still ' + (isPad ? 'on' : 'in') + ', so the timer keeps running until you log a change or removal.',
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Dismiss for now', onclick: () => { state.timerDismissed[a.id] = level; fillTimer($('#timerCard')); } }))));
+    sec.append(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', text: 'Log a change', onclick: () => openProductForm(null, { product: kind, action: 'changed' }) }), h('button', { type: 'button', class: 'btn', text: 'Log removal', onclick: () => openProductForm(null, { product: kind, action: 'off' }) })));
   }
-  if (ts.conflicts.length) box.append(h('p', { class: 'notice' }, 'Your product log shows two tampon insertions with no removal between them. Petal treats the later one as a change. Check your tampon entries.'));
-  box.append(h('p', { class: 'small muted', text: 'This reminder only works while this page is open and active. Your browser may pause it. Do not rely on it as your only reminder.' }),
-    h('p', { class: 'small' }, 'FDA guidance: change each tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet).'));
+  if (!isPad && ts.conflicts.length) sec.append(h('p', { class: 'notice' }, 'Your product log shows two tampon insertions with no removal between them. Petal treats the later one as a change. Check your tampon entries.'));
+  return sec;
+}
+function fillTimer(box) {
+  if (!box) return; box.replaceChildren(); if (!settings.tamponTimer && !settings.padTimer) return;
+  if (settings.tamponTimer) box.append(timerBlock('tampon'));
+  if (settings.padTimer) box.append(timerBlock('pad'));
+  box.append(h('p', { class: 'small muted', text: 'These reminders only work while this page is open and active. Your browser may pause them. Do not rely on them as your only reminder.' }));
+  if (settings.tamponTimer) box.append(h('p', { class: 'small' }, 'FDA guidance: change each tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet).'));
+  if (settings.padTimer) box.append(h('p', { class: 'small' }, 'Pad change times vary. KidsHealth suggests every 3 to 4 hours and ACOG says every 4 to 8 hours, or sooner when a pad is full or wet. ACOG also says to see a doctor if you need to change a pad or tampon every 1 to 2 hours. ', extLink(SOURCES.acogfirst), ' (opens in a new tab, needs internet).'));
 }
 
 /* ---- Estimate ---- */
@@ -1420,7 +1446,7 @@ const ARTICLES = [
       { tag: 'How Petal works', h: 'What Petal checks for you', blocks: [
         `Petal won't let you log a second tampon as Inserted when the last one hasn't been marked as removed. It asks you to record the removal first, so your history doesn't show two tampons at once. If you did wear two products on purpose, like a pad with a tampon, tick the double protection box and log each product separately.`,
         `You can edit or delete an entry afterward, and a product entry can't be dated in the future. If you forgot to log a change, add it later with the right time and a note.`,
-        `The tampon timer is off unless you turn it on in Settings. It reminds you after 4, 6, or 8 hours, but only while Petal is open in your browser. It can't send a notification when the page is closed, so treat it as a nudge, not an alarm.`
+        `The tampon and pad timers are off unless you turn them on in Settings. You choose how long to wait before a reminder, and Petal can remind you sooner at the start of a period or on days you log heavy flow: every 2 hours for tampons and every 4 for pads. The reminders only work while Petal is open in your browser. It can't send a notification when the page is closed, so treat it as a nudge, not an alarm.`
       ] }
     ]
   },
@@ -1618,7 +1644,7 @@ const ARTICLES = [
         `If you have a long gap in your records, a note on the next entry can explain it, such as "was traveling, didn't log". The note is for you or for a {{healthpro}}, and Petal doesn't need it.`
       ] },
       { tag: 'How Petal works', h: 'Turning off what you do not use', blocks: [
-        `Petal has more questions than most people will answer, and every one of them is optional. The "Add details" sections are optional, so you can skip them. In Settings you can hide symptoms you never use and add your own. The tampon timer and the period estimate are both off until you turn them on.`,
+        `Petal has more questions than most people will answer, and every one of them is optional. The "Add details" sections are optional, so you can skip them. In Settings you can hide symptoms you never use and add your own. The tampon and pad timers and the period estimate are all off until you turn them on.`,
         { ex: `Someone who only wants to track pain could leave flow, products, and mood alone entirely. Their summaries would show pain scores and period dates, and nothing else, which is a perfectly good journal.` }
       ] },
       { tag: 'Practical tips', h: 'Backfilling and taking breaks', blocks: [
@@ -1763,11 +1789,16 @@ function viewSettings(root) {
   root.append(card('Theme', chipsTheme()));
   // Estimates
   root.append(card('Period estimate', [h('p', { class: 'muted', text: 'Off by default. When on, Petal needs 3 completed start-to-start cycles, then shows a window of days based on the median of your latest 6. It is a simple estimate, not a medically checked prediction.' }), toggle('est', 'Show period estimates', settings.estimates, (v) => setSetting({ estimates: v }, v ? 'Estimates are on.' : 'Estimates are off.', 'set-est'))]));
-  // Timer
-  const tm = [h('p', { class: 'muted', text: 'Off by default. When on, Petal shows how long ago you logged a tampon going in. It starts only from a tampon "Inserted" or "Changed" entry that you log.' }), toggle('timer', 'Turn on the tampon timer', settings.tamponTimer, (v) => setSetting({ tamponTimer: v }, v ? 'The tampon timer is on.' : 'The tampon timer is off.', 'set-timer'))];
-  if (settings.tamponTimer) { const ch = chips({ id: 'rem', name: 'rem', type: 'radio', legend: 'In-app reminder after', options: [['4', '4 hours'], ['6', '6 hours'], ['8', '8 hours']], values: [String(settings.reminderHours)] }); ch.addEventListener('change', (e) => setSetting({ reminderHours: Number(e.target.value) }, 'Your reminder choice is saved.')); tm.push(ch); }
-  tm.push(h('p', { class: 'small' }, 'This reminder only works while this page is open and active. Your browser may pause it. Do not rely on it as your only reminder. FDA guidance: change a tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet).'));
-  root.append(card('Tampon timer', tm));
+  // Change reminders
+  const tm = [h('p', { class: 'muted', text: 'Both are off by default. When on, Petal shows how long ago you logged a tampon or pad going on. It starts only from an entry that you log.' }),
+    toggle('timer', 'Turn on the tampon timer', settings.tamponTimer, (v) => setSetting({ tamponTimer: v }, v ? 'The tampon timer is on.' : 'The tampon timer is off.', 'set-timer'))];
+  if (settings.tamponTimer) { const ch = chips({ id: 'rem', name: 'rem', type: 'radio', legend: 'Tampon reminder after', options: [['2', '2 hours'], ['4', '4 hours'], ['6', '6 hours'], ['8', '8 hours']], values: [String(settings.reminderHours)] }); ch.addEventListener('change', (e) => setSetting({ reminderHours: Number(e.target.value) }, 'Your tampon reminder is saved.')); tm.push(ch); }
+  tm.push(toggle('padtimer', 'Turn on the pad timer', settings.padTimer, (v) => setSetting({ padTimer: v }, v ? 'The pad timer is on.' : 'The pad timer is off.', 'set-padtimer')));
+  if (settings.padTimer) { const ch = chips({ id: 'padrem', name: 'padrem', type: 'radio', legend: 'Pad reminder after', options: [['3', '3 hours'], ['4', '4 hours'], ['6', '6 hours'], ['8', '8 hours']], values: [String(settings.padReminderHours)] }); ch.addEventListener('change', (e) => setSetting({ padReminderHours: Number(e.target.value) }, 'Your pad reminder is saved.')); tm.push(ch); }
+  if (settings.tamponTimer || settings.padTimer) tm.push(toggle('heavy', 'Remind me sooner at the start of a period or when flow is heavy', settings.heavyStart, (v) => setSetting({ heavyStart: v }, v ? 'Sooner reminders are on.' : 'Sooner reminders are off.', 'set-heavy')),
+    h('p', { class: 'small', text: 'When this is on, Petal suggests changing a pad every 4 hours and a tampon every 2 hours during the first two days of a period, and on any day you log heavy flow. It skips this on days you log flow as light, spotting, or none. Your own reminder time is used if it is already shorter.' }));
+  tm.push(h('p', { class: 'small' }, 'These reminders only work while this page is open and active. Your browser may pause them. Do not rely on them as your only reminder. FDA guidance: change a tampon every 4 to 8 hours and never wear one longer than 8 hours. ', extLink(SOURCES.fda), ' (opens in a new tab, needs internet). Sources differ on pads: KidsHealth suggests every 3 to 4 hours and ACOG says every 4 to 8 hours, or sooner when a pad is full or wet.'));
+  root.append(card('Change reminders', tm));
   // Symptoms
   const sy = h('fieldset', { class: 'field' }, h('legend', { text: 'Symptom choices to show in forms' })); const wrap = h('div', { class: 'chips' });
   SYMPTOMS.concat(settings.customSymptoms).forEach((n) => wrap.append(h('label', { class: 'chip' }, h('input', { type: 'checkbox', checked: !settings.hiddenSymptoms.includes(n), onchange: (e) => { const hid = settings.hiddenSymptoms.filter((x) => x !== n); if (!e.target.checked) hid.push(n); setSetting({ hiddenSymptoms: hid }, 'Your symptom choices are saved.'); } }), h('span', { text: n }))));
@@ -1780,14 +1811,6 @@ function viewSettings(root) {
     if (all.includes(n.toLowerCase())) { addErr.hidden = false; addErr.textContent = 'That symptom is already in the list.'; addIn.setAttribute('aria-invalid', 'true'); addIn.setAttribute('aria-describedby', 'newSym-err'); addIn.focus(); return; }
     if (settings.customSymptoms.length >= 30) { addErr.hidden = false; addErr.textContent = 'You can add up to 30 of your own.'; return; }
     setSetting({ customSymptoms: settings.customSymptoms.concat([n]) }, 'Your symptom is added.', 'newSym'); } }))]));
-  // Privacy & storage
-  const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
-  root.append(card('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
-    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup.', 'No account, ads, analytics, or tracking. Petal makes no network requests with your data.'].map((x) => h('li', { text: x })))]));
-  // Safe copy
-  root.append(card('Download a safe copy (zip)', [h('p', { text: 'Get one zip with the Petal app, a backup of your journal, and a README that explains how to set it up and where to keep the files. Use it if Petal ever fails to load or your entries seem to be missing.' }),
-    h('button', { type: 'button', class: 'btn', id: 'zipBtn', text: 'Download zip', onclick: exportZip }),
-    h('p', { class: 'small muted', text: 'The zip contains your private entries and is not password protected. If nothing downloads, open Petal directly in your browser instead of a preview pane.' })]));
   // Export/import
   root.append(card('Export, import, and print', [
     h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download JSON backup', onclick: exportJSON }), h('button', { type: 'button', class: 'btn', text: 'Download CSV', onclick: exportCSV }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })),
@@ -1795,9 +1818,6 @@ function viewSettings(root) {
     h('details', { class: 'more' }, h('summary', { text: 'CSV layout' }), h('p', { class: 'small', text: 'One row per entry. Columns: ' + CSV_COLS.join(', ') + '. record_type is period, flow, product, pain, mood, or relief. Unused columns are empty. Lists are joined with "; ". Text that starts with = + - or @ gets a \' in front so spreadsheets do not run it. The JSON backup keeps your original text.' }))]));
   // Delete
   root.append(card('Delete all data', [h('p', { text: 'This removes your journal and settings from this browser. Files you exported earlier and your browser history are not affected.' }), h('button', { type: 'button', class: 'btn danger', id: 'delAll', text: 'Delete all data…', onclick: openDeleteAll })], 'soft'));
-  // About
-  const src = Object.keys(SOURCES).map((k) => h('li', null, extLink(SOURCES[k]), h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })));
-  root.append(card('About Petal and sources', [h('p', { text: 'Petal v' + APP_VERSION + ' is a private period journal and learning tool. It is not a medical service and cannot diagnose, treat, or monitor anything. It works without internet. Only the source links below need internet.' }), h('p', { class: 'small', text: 'Article text was written for this app in plain language. It was not medically reviewed. Source checks below say exactly what was and was not opened.' }), h('ul', null, src)]));
 }
 function toggle(id, label, on, fn) { return h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: 'set-' + id, checked: on, onchange: (e) => fn(e.target.checked) }), h('span', { text: label })))); }
 function chipsTheme() {
@@ -1875,7 +1895,7 @@ function readmeText(stamp) {
     '',
     'GOOD HABITS',
     '  - Open petal.html the same way each time, from the same folder, in the same browser. Browsers may keep data separately for each place a file is opened from, so a moved or renamed copy can look empty until you restore.',
-    '  - Make a fresh backup now and then. In Petal, open Settings and tap "Download JSON backup", or download this zip again. Replace the old backup so you always know which one is newest.',
+    '  - Make a fresh backup now and then. In Petal, open Settings and tap "Download JSON backup", or tap "Download" at the bottom of any screen to get this zip again. Replace the old backup so you always know which one is newest.',
     '  - Name backups with the date, as Petal does.',
     '',
     'KEEP IT PRIVATE',
@@ -1970,9 +1990,25 @@ function renderBanners() {
 const NAV = [['today', 'Today', 'today'], ['calendar', 'Calendar', 'calendar'], ['learn', 'Learn', 'learn'], ['settings', 'Settings', 'settings']];
 function renderNav() { const n = $('#nav'), cur = state.view === 'cycles' ? 'today' : state.view; n.replaceChildren(...NAV.map(([k, l, i]) => h('button', { type: 'button', id: 'nav-' + k, 'aria-current': cur === k ? 'page' : null, onclick: () => { if (k === 'learn' && state.view !== 'learn') state.article = null; go(k); } }, icon(i), h('span', { text: l })))); }
 const VIEWS = { today: viewToday, calendar: viewCalendar, cycles: viewCycles, learn: viewLearn, settings: viewSettings };
+function openDownload() {
+  const stamp = todayStr();
+  openInfoDialog('Download Petal', [h('p', { text: 'This makes one zip file called petal-safe-copy-' + stamp + '.zip. Use it if Petal ever fails to load or your entries seem to be missing. It contains:' }),
+    h('ul', null, h('li', { text: 'petal.html: the Petal app itself, so you can always open it again.' }), h('li', { text: 'petal-backup-' + stamp + '.json: a backup of all your entries and settings as of today. You can restore it in Settings.' }), h('li', { text: 'README.txt: simple steps for setting it up and where to keep the files.' })),
+    h('p', { class: 'small muted', text: 'The zip contains your private entries and is not password protected. Store it somewhere only you can reach. If nothing downloads, open Petal directly in your browser instead of a preview pane.' }),
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', id: 'zipBtn', onclick: exportZip }, icon('download', 18), 'Download zip'))]);
+}
+function openSources() {
+  const src = Object.keys(SOURCES).map((k) => h('li', null, extLink(SOURCES[k]), h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })));
+  openInfoDialog('About Petal and sources', [h('p', { text: 'Petal v' + APP_VERSION + ' is a private period journal and learning tool. It is not a medical service and cannot diagnose, treat, or monitor anything. It works without internet. Only the source links below need internet.' }), h('p', { class: 'small', text: 'Article text was written for this app in plain language. It was not medically reviewed. Source checks below say exactly what was and was not opened.' }), h('ul', null, src)]);
+}
+function openPrivacy() {
+  const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
+  openInfoDialog('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
+    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup.', 'No account, ads, analytics, or tracking. Petal makes no network requests with your data.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Backups, the zip download, and Delete all data are in Settings.' })]);
+}
 function render(focusId) {
   renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m);
-  m.append(h('p', { class: 'ver', text: 'Petal v' + APP_VERSION }));
+  m.append(h('p', { class: 'ver' }, h('span', { class: 'verno', text: 'Petal v' + APP_VERSION }), h('button', { type: 'button', class: 'footlink', id: 'privacyLink', text: 'Data and privacy', onclick: openPrivacy }), h('button', { type: 'button', class: 'footlink', id: 'sourcesLink', text: 'Sources', onclick: openSources }), h('button', { type: 'button', class: 'footlink', id: 'downloadLink', text: 'Download', onclick: openDownload })));
   if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
 }
 function go(view) { state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
