@@ -7,6 +7,239 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ecdfc8">
 <title>My Journal</title>
+<!-- Pattern lock: nothing in Petal is shown until the secret pattern is drawn. 3 wrong tries = 30 second lockout. -->
+<script>
+(function () {
+  var PATTERN_CODE = '1skjwfubocd';   // code for the secret pattern
+  var MAX_TRIES = 3, LOCK_MS = 30000, MIN_DOTS = 4;
+  var STATE_KEY = 'petalLockState';
+
+  var maker = /[?&]makepattern(&|=|$)/.test(location.search);
+
+  /* simple string hash, so the pattern is not written out in plain numbers */
+  function hash(str) {
+    var h1 = 0xdeadbeef, h2 = 0x41c6ce57, ch, i;
+    for (i = 0; i < str.length; i++) {
+      ch = str.charCodeAt(i);
+      h1 = Math.imul(h1 ^ ch, 2654435761);
+      h2 = Math.imul(h2 ^ ch, 1597334677);
+    }
+    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
+    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
+    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
+    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
+    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
+  }
+  function codeFor(sel) { return hash('petal-lock:' + sel.join('-')); }
+
+  /* Tries and lockout are kept in three places (site storage, tab storage, tab name),
+     and the strictest value wins, so reloading the page cannot clear them. */
+  function readOne(raw) { try { return JSON.parse(raw) || {}; } catch (e) { return {}; } }
+  function load() {
+    var parts = [], raw;
+    try { parts.push(readOne(localStorage.getItem(STATE_KEY))); } catch (e) {}
+    try { parts.push(readOne(sessionStorage.getItem(STATE_KEY))); } catch (e) {}
+    try { if (window.name.indexOf(STATE_KEY + '=') === 0) parts.push(readOne(window.name.slice(STATE_KEY.length + 1))); } catch (e) {}
+    var out = { fails: 0, until: 0 };
+    parts.forEach(function (p) {
+      out.fails = Math.max(out.fails, p.fails || 0);
+      out.until = Math.max(out.until, p.until || 0);
+    });
+    return out;
+  }
+  function save(s) {
+    var raw = JSON.stringify(s);
+    try { localStorage.setItem(STATE_KEY, raw); } catch (e) {}
+    try { sessionStorage.setItem(STATE_KEY, raw); } catch (e) {}
+    try { window.name = STATE_KEY + '=' + raw; } catch (e) {}
+  }
+
+  /* hide everything else right away so nothing flashes before the lock appears */
+  var css = document.getElementById('petal-lock-style');
+  if (!css) { css = document.createElement('style'); css.id = 'petal-lock-style';  css.textContent =
+    'html.pl-locked body>*:not(#petal-lock){visibility:hidden!important}' +
+    'html[data-locked] body>#petal-lock[id]{visibility:visible!important}' +
+    'html.pl-locked,html.pl-locked body{overflow:hidden}' +
+    '#petal-lock{--bg:#ecdfc8;--card:#fbf5e8;--ink:#40291d;--soft:#6d523f;--accent:#9b5565;--line:#d9c6a6;' +
+    'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;' +
+    'background:var(--bg);color:var(--ink);font:400 18px/1.5 Georgia,"Times New Roman",serif}' +
+    '@media (prefers-color-scheme:dark){#petal-lock{--bg:#241a14;--card:#3a2c22;--ink:#f1e6d2;--soft:#c9b79e;--accent:#e08aa0;--line:#57432f}}' +
+    '#petal-lock .box{width:min(340px,100%);text-align:center;background:var(--card);border:1px solid var(--line);' +
+    'border-top:8px solid var(--accent);padding:26px 22px 22px;box-shadow:0 14px 24px -16px rgba(0,0,0,.45)}' +
+    '#petal-lock h1{font:400 30px/1.1 Georgia,serif;margin:8px 0 4px}' +
+    '#petal-lock .sub{margin:0 0 14px;color:var(--soft);font-size:16px}' +
+    '#petal-lock .pad{position:relative;width:min(260px,72vw);aspect-ratio:1;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;border-radius:12px}' +
+    '#petal-lock .pad svg{width:100%;height:100%;display:block}' +
+    '#petal-lock .ring{fill:none;stroke:var(--line);stroke-width:3}' +
+    '#petal-lock .core{fill:var(--soft);opacity:.55}' +
+    '#petal-lock .on .ring{stroke:var(--accent);stroke-width:4}' +
+    '#petal-lock .on .core{fill:var(--accent);opacity:1}' +
+    '#petal-lock .cur .ring{stroke:var(--ink);stroke-dasharray:6 5}' +
+    '#petal-lock .trail{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:.75}' +
+    '#petal-lock .pad:focus-visible{box-shadow:0 0 0 3px var(--accent)}' +
+    '#petal-lock .msg{min-height:3em;margin:12px 0 0;font-size:16px;color:var(--soft)}' +
+    '#petal-lock .msg.bad{color:var(--accent);font-weight:700}' +
+    '#petal-lock .pad.shake{animation:pl-shake .4s}' +
+    '#petal-lock .pad.off{opacity:.35;pointer-events:none}' +
+    '#petal-lock code{display:block;margin:8px 0;padding:10px;background:var(--bg);border:1px solid var(--line);word-break:break-all;font:700 15px ui-monospace,Courier,monospace;color:var(--ink)}' +
+    '#petal-lock button{font:700 13px ui-monospace,Courier,monospace;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#fff;border:0;border-radius:3px;padding:12px 16px;min-height:44px;cursor:pointer}' +
+    '@keyframes pl-shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}' +
+    '@media (prefers-reduced-motion:reduce){#petal-lock .pad.shake{animation:none}}';
+  (document.head || document.documentElement).appendChild(css); }
+  document.documentElement.classList.add('pl-locked');
+
+  function build() {
+    var NS = 'http://www.w3.org/2000/svg';
+    var wrap = document.createElement('div');
+    wrap.id = 'petal-lock';
+    wrap.setAttribute('role', 'dialog');
+    wrap.setAttribute('aria-label', 'Petal pattern lock');
+    wrap.innerHTML =
+      '<div class="box">' +
+      '<svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4c5.6 4.9 8.2 9.2 8.2 13.1a8.2 8.2 0 0 1-16.4 0C7.8 13.2 10.4 8.9 16 4z" fill="#9b5565"/><path d="M16 12c2.8 2.4 3.9 4.4 3.9 6.1a3.9 3.9 0 0 1-7.8 0c0-1.7 1.1-3.7 3.9-6.1z" fill="#fbf5e8"/></svg>' +
+      '<h1>Petal</h1>' +
+      '<p class="sub">' + (maker ? 'Draw a new pattern to get its code.' : 'Draw your pattern to open.') + '</p>' +
+      '<div class="pad" tabindex="0" role="application" aria-label="Pattern pad. Use arrow keys to move, space to add a dot, enter to finish, escape to clear."></div>' +
+      '<p class="msg" aria-live="polite"></p>' +
+      '</div>';
+    document.body.appendChild(wrap);
+
+    var pad = wrap.querySelector('.pad'), msg = wrap.querySelector('.msg');
+    var svg = document.createElementNS(NS, 'svg');
+    svg.setAttribute('viewBox', '0 0 300 300');
+    var trail = document.createElementNS(NS, 'polyline');
+    trail.setAttribute('class', 'trail');
+    svg.appendChild(trail);
+    var dots = [];
+    for (var i = 0; i < 9; i++) {
+      var g = document.createElementNS(NS, 'g');
+      var cx = 50 + (i % 3) * 100, cy = 50 + Math.floor(i / 3) * 100;
+      var ring = document.createElementNS(NS, 'circle');
+      ring.setAttribute('class', 'ring'); ring.setAttribute('cx', cx); ring.setAttribute('cy', cy); ring.setAttribute('r', 26);
+      var core = document.createElementNS(NS, 'circle');
+      core.setAttribute('class', 'core'); core.setAttribute('cx', cx); core.setAttribute('cy', cy); core.setAttribute('r', 8);
+      g.appendChild(ring); g.appendChild(core); svg.appendChild(g);
+      dots.push({ g: g, x: cx, y: cy });
+    }
+    pad.appendChild(svg);
+
+    var sel = [], drawing = false, cursor = 4, keyMode = false, tick = null;
+
+    function render(px, py) {
+      var pts = sel.map(function (d) { return dots[d].x + ',' + dots[d].y; });
+      if (px != null && sel.length) pts.push(px + ',' + py);
+      trail.setAttribute('points', pts.join(' '));
+      dots.forEach(function (d, i) {
+        d.g.setAttribute('class', (sel.indexOf(i) > -1 ? 'on' : '') + (keyMode && i === cursor ? ' cur' : ''));
+      });
+    }
+    function say(text, bad) { msg.textContent = text; msg.className = 'msg' + (bad ? ' bad' : ''); }
+    function clear() { sel = []; drawing = false; render(); }
+    function hit(x, y) {
+      for (var i = 0; i < 9; i++) {
+        var dx = x - dots[i].x, dy = y - dots[i].y;
+        if (dx * dx + dy * dy < 46 * 46) return i;
+      }
+      return -1;
+    }
+    function coords(e) {
+      var r = pad.getBoundingClientRect();
+      return [(e.clientX - r.left) / r.width * 300, (e.clientY - r.top) / r.height * 300];
+    }
+
+    function lockedFor() { var s = load(); return s.until && s.until > Date.now() ? Math.ceil((s.until - Date.now()) / 1000) : 0; }
+    function showLock() {
+      var left = lockedFor();
+      if (left > 0) {
+        pad.classList.add('off'); say('Too many tries. Try again in ' + left + 's.', true);
+        if (!tick) tick = setInterval(showLock, 250);
+      } else {
+        pad.classList.remove('off');
+        if (tick) { clearInterval(tick); tick = null; say('Draw your pattern to open.'); }
+      }
+    }
+
+    function finish() {
+      drawing = false; render();
+      if (sel.length < MIN_DOTS) {
+        if (sel.length) say('Connect at least ' + MIN_DOTS + ' dots.', true);
+        setTimeout(clear, 500); return;
+      }
+      var code = codeFor(sel);
+      if (maker) {
+        msg.innerHTML = 'Replace <b>PATTERN_CODE</b> in the lock with:<code>' + code + '</code><button type="button">Draw again</button>';
+        msg.querySelector('button').onclick = function () { clear(); say(''); };
+        return;
+      }
+      if (code === PATTERN_CODE) {
+        save({});
+        document.documentElement.classList.remove('pl-locked');
+        wrap.remove();
+        armRelock();
+        return;
+      }
+      var s = load(); s.fails = (s.fails || 0) + 1;
+      pad.classList.remove('shake'); void pad.offsetWidth; pad.classList.add('shake');
+      if (s.fails >= MAX_TRIES) { s.fails = 0; s.until = Date.now() + LOCK_MS; save(s); setTimeout(clear, 400); showLock(); return; }
+      save(s);
+      say('Wrong pattern. ' + (MAX_TRIES - s.fails) + (MAX_TRIES - s.fails === 1 ? ' try left.' : ' tries left.'), true);
+      setTimeout(clear, 500);
+    }
+
+    pad.addEventListener('pointerdown', function (e) {
+      if (lockedFor()) return;
+      keyMode = false; clear(); say('');
+      drawing = true; pad.setPointerCapture(e.pointerId);
+      var c = coords(e), h = hit(c[0], c[1]);
+      if (h > -1) sel.push(h);
+      render(c[0], c[1]);
+      e.preventDefault();
+    });
+    pad.addEventListener('pointermove', function (e) {
+      if (!drawing) return;
+      var c = coords(e), h = hit(c[0], c[1]);
+      if (h > -1 && sel.indexOf(h) === -1) sel.push(h);
+      render(c[0], c[1]);
+    });
+    pad.addEventListener('pointerup', function () { if (drawing) finish(); });
+    pad.addEventListener('pointercancel', function () { if (drawing) clear(); });
+
+    pad.addEventListener('keydown', function (e) {
+      if (lockedFor()) return;
+      var k = e.key, moved = true;
+      if (k === 'ArrowRight' && cursor % 3 < 2) cursor++;
+      else if (k === 'ArrowLeft' && cursor % 3 > 0) cursor--;
+      else if (k === 'ArrowDown' && cursor < 6) cursor += 3;
+      else if (k === 'ArrowUp' && cursor > 2) cursor -= 3;
+      else if (k === ' ') { if (sel.indexOf(cursor) === -1) sel.push(cursor); }
+      else if (k === 'Enter') { finish(); }
+      else if (k === 'Escape' || k === 'Backspace') { clear(); }
+      else moved = false;
+      if (moved) { keyMode = true; render(); e.preventDefault(); }
+    });
+
+    showLock();
+    if (!maker) pad.focus({ preventScroll: true });
+  }
+
+  /* Lock again whenever the page is left or brought back: switching tabs or apps,
+     the screen turning off, or the browser restoring the tab without a reload. */
+  var armed = false;
+  function lockNow() {
+    document.documentElement.classList.add('pl-locked');
+    if (!document.getElementById('petal-lock')) build();
+  }
+  function armRelock() {
+    if (armed) return;
+    armed = true;
+    document.addEventListener('visibilitychange', function () { if (document.hidden) lockNow(); });
+    window.addEventListener('pagehide', lockNow);
+    window.addEventListener('pageshow', function (e) { if (e.persisted) lockNow(); });
+  }
+
+  if (document.body) build(); else document.addEventListener('DOMContentLoaded', build);
+})();
+</script>
 <script id="prelock">try{if(localStorage.getItem('petal.v2.lock'))document.documentElement.setAttribute('data-locked','')}catch(e){}</script>
 <meta name="description" content="Petal is a private journal for tracking your period. It works offline, and an account is optional.">
 <meta property="og:type" content="website">
@@ -333,12 +566,12 @@ html[data-locked] body{background:var(--paper)}
 (function () {
 'use strict';
 // A copy of this page's own source, taken before anything is drawn, so the zip download can include a working app file.
-const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(' data-locked=""', '');
+const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(' data-locked=""', '').replace(/<style id="petal-lock-style">[\s\S]*?<\/style>/, '').replace(' class="pl-locked"', '');
 
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.1.1'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.1.2'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
