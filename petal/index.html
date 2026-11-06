@@ -7,6 +7,18 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ecdfc8">
 <title>My Journal</title>
+<meta name="description" content="Petal is a private, offline journal for tracking your period, with no account needed.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/petal/">
+<meta property="og:title" content="Petal: a private period journal">
+<meta property="og:description" content="A calm, private journal for your period. Works offline, no account needed.">
+<meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/petal/petal-preview.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Petal, with a purple flower on a cream paper background">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/petal/petal-preview.png">
+
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='3' y='3' width='26' height='26' rx='3' fill='%236f4a33'/%3E%3Crect x='6' y='3' width='23' height='26' rx='2' fill='%23f7efdf'/%3E%3Cg fill='%23a77ee0'%3E%3Ccircle cx='19.5' cy='10.5' r='4.2'/%3E%3Ccircle cx='24' cy='15' r='4.2'/%3E%3Ccircle cx='21.6' cy='20.6' r='4.2'/%3E%3Ccircle cx='15.8' cy='20.4' r='4.2'/%3E%3Ccircle cx='14.8' cy='14.4' r='4.2'/%3E%3C/g%3E%3Ccircle cx='19.3' cy='16.2' r='2.6' fill='%23e0a93a'/%3E%3C/svg%3E">
 <style>
 /* Look: an inside-cover page of a handed-down journal, in a stitched, scalloped pillowcase border.
@@ -88,6 +100,8 @@ main{padding-top:10px;padding-bottom:calc(var(--nav-h) + var(--fw) + 36px + env(
 .nav{position:fixed;left:var(--fw);right:var(--fw);bottom:calc(var(--fw) + env(safe-area-inset-bottom));z-index:20;display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--linen);border:1px solid var(--line);border-top:1.5px dashed var(--caramel);border-radius:3px;padding:3px;box-shadow:0 -6px 14px -10px var(--shadow)}
 .nav button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;min-height:54px;border:0;border-top:3px solid transparent;background:transparent;color:var(--ink-soft);font:700 11px/1.2 var(--label);letter-spacing:.04em;text-transform:uppercase;border-radius:2px;cursor:pointer}
 .nav button[aria-current="page"]{color:var(--ink);background:var(--soft);border-top-color:var(--accent)}
+@media (max-width:340px){.quick .btn{font-size:10px!important;padding:8px 4px!important;gap:4px!important}}
+@media (max-width:370px){.nav button{font-size:9.5px;letter-spacing:0;padding:0 1px}.quick .btn{font-size:11px;letter-spacing:0;padding:8px 6px;gap:6px}}
 @media (min-width:860px){
   :root{--gutter:28px}
   .shell{padding-left:calc(var(--fw) + 190px);padding-right:var(--fw)}
@@ -178,8 +192,9 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 
 /* ===== Activity, calendar, bars ===== */
 .activity{list-style:none;margin:0;padding:0;display:grid;gap:10px}
-.activity li{display:grid;grid-template-columns:70px 1fr auto;gap:10px;align-items:start;border:1px solid var(--line);border-radius:2px;padding:10px 12px;background:var(--linen)}
-.activity .time{font:700 12px/1.4 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.activity li{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:6px 10px;align-items:start;border:1px solid var(--line);border-radius:2px;padding:10px 12px;background:var(--linen)}
+.activity .time{grid-column:1/-1;font:700 12px/1.4 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink-soft)}
+.activity li>div{min-width:0;overflow-wrap:break-word}
 .activity .t{font:400 20px/1.25 var(--display)}
 .seg{display:inline-flex}
 .seg button{margin-left:-2px}
@@ -212,8 +227,9 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 .pday{display:flex;flex-wrap:wrap;gap:4px 14px;align-items:end;border-top:1px dashed var(--caramel);padding:8px 0}
 .pday-t{flex:1 0 100%;margin:0;font:700 13px/1.3 var(--label);letter-spacing:.04em;text-transform:uppercase;color:var(--ink)}
 .pday .field{margin:0}
-.quick{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
-.quick .btn{flex-direction:column;gap:4px;min-height:68px;font-size:11px;text-align:center;padding:8px 4px}
+.quick{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin:10px 0}
+.quick .btn{flex-direction:row;justify-content:flex-start;gap:8px;min-height:52px;font-size:12px;text-align:left;padding:8px 10px;overflow-wrap:normal;word-break:normal;hyphens:none;white-space:normal;line-height:1.25}
+.quick .btn svg{flex:0 0 auto}
 /* ===== Article reader ===== */
 .essay{max-width:41rem;margin:0 auto}
 .essay .meta{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin:14px 0 0;font:700 12px/1.4 var(--label);letter-spacing:.06em;text-transform:uppercase;color:var(--ink-soft)}
@@ -282,11 +298,13 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 <script>
 (function () {
 'use strict';
+// A copy of this page's own source, taken before anything is drawn, so the zip download can include a working app file.
+const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '1.0.1'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '1.0.5'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -1766,6 +1784,10 @@ function viewSettings(root) {
   const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
   root.append(card('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
     h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup.', 'No account, ads, analytics, or tracking. Petal makes no network requests with your data.'].map((x) => h('li', { text: x })))]));
+  // Safe copy
+  root.append(card('Download a safe copy (zip)', [h('p', { text: 'Get one zip with the Petal app, a backup of your journal, and a README that explains how to set it up and where to keep the files. Use it if Petal ever fails to load or your entries seem to be missing.' }),
+    h('button', { type: 'button', class: 'btn', id: 'zipBtn', text: 'Download zip', onclick: exportZip }),
+    h('p', { class: 'small muted', text: 'The zip contains your private entries and is not password protected. If nothing downloads, open Petal directly in your browser instead of a preview pane.' })]));
   // Export/import
   root.append(card('Export, import, and print', [
     h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Download JSON backup', onclick: exportJSON }), h('button', { type: 'button', class: 'btn', text: 'Download CSV', onclick: exportCSV }), h('button', { type: 'button', class: 'btn', text: 'Print summary', onclick: openPrintDialog })),
@@ -1804,6 +1826,74 @@ function download(name, mime, text) {
 }
 function backupPayload() { return JSON.stringify({ app: 'petal', type: 'journal-backup', version: VERSION, appVersion: APP_VERSION, exportedAt: new Date().toISOString(), settings: settings, journal: data }, null, 2); }
 function exportJSON() { download('petal-backup-' + todayStr() + '.json', 'application/json', backupPayload()); }
+
+/* Zip download: the app file, a backup of the journal, and a README. Stored without compression, so no libraries are needed. */
+const CRC_T = (() => { const t = []; for (let n = 0; n < 256; n++) { let c = n; for (let k = 0; k < 8; k++) c = c & 1 ? 0xEDB88320 ^ (c >>> 1) : c >>> 1; t[n] = c >>> 0; } return t; })();
+function crc32(b) { let c = 0xFFFFFFFF; for (let i = 0; i < b.length; i++) c = CRC_T[(c ^ b[i]) & 255] ^ (c >>> 8); return (c ^ 0xFFFFFFFF) >>> 0; }
+function makeZip(files) {
+  const enc = new TextEncoder(), now = new Date();
+  const dt = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF, dd = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+  const parts = [], central = []; let off = 0;
+  const u16 = (v) => [v & 255, (v >> 8) & 255], u32 = (v) => [v & 255, (v >>> 8) & 255, (v >>> 16) & 255, (v >>> 24) & 255];
+  files.forEach((f) => {
+    const name = enc.encode(f.name), body = enc.encode(f.text), crc = crc32(body);
+    const common = [].concat(u16(20), u16(0x0800), u16(0), u16(dt), u16(dd), u32(crc), u32(body.length), u32(body.length), u16(name.length), u16(0));
+    parts.push(Uint8Array.from([0x50, 0x4B, 3, 4].concat(common)), name, body);
+    central.push(Uint8Array.from([0x50, 0x4B, 1, 2].concat(u16(20), common, u16(0), u16(0), u16(0), u32(0), u32(off))), name);
+    off += 30 + name.length + body.length;
+  });
+  let cl = 0; central.forEach((c) => { cl += c.length; });
+  const end = Uint8Array.from([0x50, 0x4B, 5, 6, 0, 0, 0, 0].concat(u16(files.length), u16(files.length), u32(cl), u32(off), u16(0)));
+  return new Blob(parts.concat(central, [end]), { type: 'application/zip' });
+}
+function readmeText(stamp) {
+  return [
+    'PETAL: SAFE COPY',
+    'Saved on ' + stamp + ' from Petal v' + APP_VERSION,
+    '',
+    'WHAT IS IN THIS ZIP',
+    '  petal.html            The Petal app itself. Open it in a web browser.',
+    '  petal-backup-' + stamp + '.json   A backup of your journal and settings as of ' + stamp + '.',
+    '  README.txt            This file.',
+    '',
+    'WHY THIS EXISTS',
+    'Petal keeps your entries in your web browser, not on a server. Browsers can lose that data if you clear site data, switch browsers or devices, or use a private window. This zip gives you two things to keep elsewhere: the app, so you can always open it, and a backup of your entries, so you can always put them back.',
+    '',
+    'SET IT UP (about 5 minutes)',
+    '  1. Unzip the file. On Windows, right-click it and choose Extract All. On a Mac, double-click it. On a phone, use your Files app and tap the zip.',
+    '  2. Make a folder called Petal somewhere you will remember, for example Documents.',
+    '  3. Move petal.html and the .json backup into that folder.',
+    '  4. Make a second copy of the folder somewhere else, such as a USB drive, a cloud drive you trust, or another device. One copy on one device is not a backup.',
+    '  5. Open petal.html by double-clicking it. It opens in your default browser.',
+    '',
+    'IF YOUR JOURNAL LOOKS EMPTY OR PETAL WILL NOT LOAD',
+    '  1. Do not panic and do not delete anything. Your backup file still has your entries.',
+    '  2. Open petal.html in a different browser, or try again after restarting your device.',
+    '  3. In Petal, go to Settings. Under "Restore from a Petal JSON backup", choose the .json file from this folder.',
+    '  4. Petal shows a preview of what is inside. Check it, confirm, and your entries come back.',
+    'Restoring replaces whatever is in Petal at that moment with what is in the backup, so restore the newest backup you have.',
+    '',
+    'GOOD HABITS',
+    '  - Open petal.html the same way each time, from the same folder, in the same browser. Browsers may keep data separately for each place a file is opened from, so a moved or renamed copy can look empty until you restore.',
+    '  - Make a fresh backup now and then. In Petal, open Settings and tap "Download JSON backup", or download this zip again. Replace the old backup so you always know which one is newest.',
+    '  - Name backups with the date, as Petal does.',
+    '',
+    'KEEP IT PRIVATE',
+    'The backup file is plain text and is not locked with a password. Anyone who has the file can read what is in it. Store it where only you can get to it. Avoid shared family folders, shared computers, and email attachments you do not need. Delete old copies you no longer want.',
+    '',
+    'ABOUT PETAL',
+    'Petal is a journal and a learning tool. It cannot diagnose anything or replace a doctor, nurse, or other health professional.',
+    ''
+  ].join('\r\n');
+}
+function exportZip() {
+  const stamp = todayStr();
+  try {
+    const blob = makeZip([{ name: 'petal.html', text: SELF_HTML }, { name: 'petal-backup-' + stamp + '.json', text: backupPayload() }, { name: 'README.txt', text: readmeText(stamp) }]);
+    const url = URL.createObjectURL(blob), a = h('a', { href: url, download: 'petal-safe-copy-' + stamp + '.zip' }); document.body.append(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 5000);
+    toast('Your zip was created. Check your downloads. It contains private information, so keep it somewhere safe.');
+  } catch (e) { openInfoDialog('Could not make the zip', [h('p', { text: 'This browser did not allow the download. You can still use "Download JSON backup" below, or try opening Petal directly in your browser instead of a preview.' })]); }
+}
 function exportCSV() { download('petal-entries-' + todayStr() + '.csv', 'text/csv', buildCSV()); }
 const counts = (j) => ({ periods: j.periods.length, flow: j.flow.length, products: j.products.length, pain: j.pain.length, moods: j.moods.length, relief: j.relief.length });
 function dateRange(j) { const d = [].concat(j.periods.map((p) => p.start), j.flow.map((x) => x.date), j.moods.map((x) => x.date), j.products.map((x) => dateOfIso(x.ts)), j.pain.map((x) => dateOfIso(x.ts)), j.relief.map((x) => dateOfIso(x.ts))).sort(); return d.length ? fmtShort(d[0]) + ' to ' + fmtShort(d[d.length - 1]) : 'No dates'; }
