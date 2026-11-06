@@ -455,7 +455,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.7';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.0.8';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -2141,9 +2141,6 @@ function cycleView(){
       <p class="muted small" style="margin-top:10px">Flow, light to dark: ${HEAVY.map((x,i)=>`<span class="hsw" style="background:${x[0]};margin-left:8px"></span>${i+1} ${x[1]}`).join(' ')} <span class="hsw" style="margin-left:8px;background:repeating-linear-gradient(45deg,#f6e3e0,#f6e3e0 3px,#fff 3px,#fff 6px)"></span>Period day, flow not logged</p>
       <p class="muted small" style="margin-top:4px">The small white circle in a day’s corner is that day’s pain, from 0 to 10.</p></section>
     ${open?card(open):''}
-    <section class="panel" aria-labelledby="petalh"><h3 id="petalh">Want more than this?</h3>
-      <p>Petal is a full period tracker made for this, with articles and more detailed tracking. It keeps its own entries, so nothing from this page is sent or copied there.</p>
-      <div class="row" style="margin-top:10px"><a class="btn" href="../petal/index.html" data-fk="petal">Open Petal</a></div></section>
     ${avg?`<section class="panel"><h3>Patterns</h3><p>Your cycles have been about <strong>${avg} days</strong> apart${plen?` and periods last about <strong>${plen} ${plen===1?'day':'days'}</strong>`:''}. Based on that, your next period may start around <strong>${esc(fmtDate(next,{month:'long',day:'numeric'}))}</strong>.</p>
       <p class="muted small">This is an estimate from your own entries, not medical advice. If your periods are very painful, very heavy or change a lot, mention it to a doctor.</p></section>`:''}
     ${cyDanger()}`;
