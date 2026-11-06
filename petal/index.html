@@ -306,7 +306,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.0.0'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.0.1'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -1695,7 +1695,7 @@ const ARTICLES = [
    Optional. Petal keeps working from this browser first. When signed in, a copy of the journal is saved to Supabase.
    Only the project's public (publishable) key belongs in this file. Never put a service_role or secret key here. */
 const SB_URL = 'https://rkbsivxrlsflhfrlgwuk.supabase.co';
-const SB_KEY = ''; // paste the project's publishable (or anon) key here, from Supabase > Project Settings > API Keys
+const SB_KEY = 'sb_publishable_MBLZA6K7i44e8OFmO9eFFA_YzyskoAR'; // public (publishable) key only, from Supabase > Project Settings > API Keys
 const KEY_A = 'petal.v2.account';
 const cloud = { acct: null, status: 'off', note: '', rev: 0, busy: false, again: false, seq: 0, applying: false, paused: false, timer: null, lastOk: '' };
 const cloudReady = () => SB_KEY.length > 20;
@@ -2294,4 +2294,4 @@ init();
 })();
 </script>
 </body>
-   </html>
+</html>
