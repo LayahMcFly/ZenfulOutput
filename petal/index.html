@@ -7,6 +7,7 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ecdfc8">
 <title>My Journal</title>
+<script id="prelock">try{if(localStorage.getItem('petal.v2.lock'))document.documentElement.setAttribute('data-locked','')}catch(e){}</script>
 <meta name="description" content="Petal is a private journal for tracking your period. It works offline, and an account is optional.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/petal/">
@@ -269,6 +270,25 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 .essay .urgent p{font-size:18px}
 .essay .urgent{margin:0 0 1.2em}
 .verno{flex:0 0 100%}
+/* Pattern lock */
+html[data-locked] body>*:not(#lock){visibility:hidden!important}
+html[data-locked] body{background:var(--paper)}
+.lock{position:fixed;inset:0;z-index:9999;background:var(--paper);display:flex;align-items:center;justify-content:center;padding:16px;overflow:auto}
+.lockcard{width:100%;max-width:380px;background:var(--card);border:2px dashed var(--caramel);border-radius:10px;padding:22px 20px 24px;text-align:center;box-shadow:0 6px 24px rgba(40,25,15,.25)}
+.locktitle{font-size:24px;margin:8px 0 6px}
+.padsvg{width:min(78vw,300px);height:auto;margin:6px auto;display:block;user-select:none;-webkit-user-select:none}
+.padsvg:focus-visible{outline:3px solid var(--focus);outline-offset:4px;border-radius:8px}
+.paddot{fill:var(--linen);stroke:var(--accent);stroke-width:3}
+.paddot.on{fill:var(--accent)}
+.padnum{font:13px var(--mono,monospace);fill:var(--ink-soft);text-anchor:middle;pointer-events:none}
+.padline{fill:none;stroke:var(--accent);stroke-width:7;stroke-linecap:round;stroke-linejoin:round;opacity:.75}
+.padsvg.bad .padline{stroke:var(--err)}.padsvg.bad .paddot.on{fill:var(--err);stroke:var(--err)}
+.padsvg.bad{animation:padshake .4s}
+.padsvg.padoff{opacity:.45}
+@keyframes padshake{0%,100%{transform:translateX(0)}25%{transform:translateX(-8px)}75%{transform:translateX(8px)}}
+@media (prefers-reduced-motion:reduce){.padsvg.bad{animation:none}}
+.lockmsg{min-height:1.6em;margin:6px 0 10px;font-weight:700}
+.lockcard details{text-align:left;margin-top:10px}
 .footlink{background:none;border:0;padding:6px 4px;margin:0;font:inherit;letter-spacing:inherit;text-transform:inherit;color:var(--ink);text-decoration:underline;text-underline-offset:3px;cursor:pointer;min-height:32px}
 .ver{display:flex;flex-wrap:wrap;justify-content:center;gap:0 18px;margin:26px 0 0;text-align:center;font:400 12px/1.4 var(--label);letter-spacing:.14em;text-transform:uppercase;color:var(--ink-soft)}
 .theme-opt .sw{display:inline-flex;gap:2px}
@@ -313,12 +333,12 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 (function () {
 'use strict';
 // A copy of this page's own source, taken before anything is drawn, so the zip download can include a working app file.
-const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
+const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(' data-locked=""', '');
 
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.0.2'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.1.1'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -1687,7 +1707,7 @@ const ARTICLES = [
         `In Settings you can log out, change your password, delete the cloud copy, or delete the whole account. Deleting the account removes the account and the saved copy. It does not delete the journal on your device.`
       ] },
       { tag: 'How Petal works', h: 'What Petal does not do', blocks: [
-        `Petal has no PIN or lock screen. Anyone who can open your browser on your device, or who uses the same browser profile, may be able to open your journal, and an account password does not change that. Petal also doesn't make local backups on its own. If you clear your browser's site data and you have no account or backup file, the entries are gone.`,
+        `Petal has an optional pattern lock in Settings that shows every time the page opens, which keeps casual viewers out. It is a screen lock and not encryption, so someone with access to your browser's stored data could still reach your journal, and an account password does not change that. Petal also doesn't make local backups on its own. If you clear your browser's site data and you have no account or backup file, the entries are gone.`,
         { ex: `If you share a family tablet and the same browser profile, someone else could open Petal there and see your entries. A phone with a screen lock and your own browser profile is a more private place for a journal.` },
         `A few habits help. Lock your device, use your own profile, and log out and clear the data on any device you borrow. If you need extra protection, a device lock is stronger than anything a web page can offer.`
       ] },
@@ -1962,6 +1982,107 @@ async function cloudInit() {
   if (signedIn() && cloudReady()) { setStatus('checking'); render(); syncNow(); }
 }
 
+/* ================= 11b. Pattern lock =================
+   An optional screen lock. It shows every time Petal is opened or reloaded. It hides the screen from casual viewers and
+   does not encrypt anything: the journal is still stored in the browser. */
+const KEY_L = 'petal.v2.lock', KEY_LF = 'petal.v2.lockfails';
+const LOCK_TRIES = 3, LOCK_SECONDS = 30, LOCK_MIN_DOTS = 4;
+const lockState = { cfg: null, fails: 0, until: 0, tick: null, open: false };
+
+function lhash(salt, pat) { // small synchronous hash, repeated; fine for a screen lock
+  let a = 0xdeadbeef, b = 0x41c6ce57; const s = salt + ':' + pat;
+  for (let r = 0; r < 3000; r++) for (let i = 0; i < s.length; i++) { const c = s.charCodeAt(i) + r; a = Math.imul(a ^ c, 2654435761); b = Math.imul(b ^ c, 1597334677); }
+  a = Math.imul(a ^ (a >>> 16), 2246822507) ^ Math.imul(b ^ (b >>> 13), 3266489909); b = Math.imul(b ^ (b >>> 16), 2246822507) ^ Math.imul(a ^ (a >>> 13), 3266489909);
+  return (4294967296 * (2097151 & b) + (a >>> 0)).toString(36);
+}
+function loadLock() { try { const s = ls(); const r = s && s.getItem(KEY_L); const c = r ? JSON.parse(r) : null; lockState.cfg = isObj(c) && typeof c.salt === 'string' && typeof c.hash === 'string' ? c : null; const f = s && s.getItem(KEY_LF); const fo = f ? JSON.parse(f) : null; if (isObj(fo)) { lockState.fails = Math.max(0, Math.min(LOCK_TRIES, Number(fo.fails) || 0)); lockState.until = Number(fo.until) || 0; } } catch (e) { lockState.cfg = null; } }
+function saveFails() { try { const s = ls(); if (s) s.setItem(KEY_LF, JSON.stringify({ fails: lockState.fails, until: lockState.until })); } catch (e) { /* the count just resets on reload */ } }
+function setPattern(pat) { const salt = Math.random().toString(36).slice(2) + Date.now().toString(36); lockState.cfg = { salt: salt, hash: lhash(salt, pat), n: pat.length }; try { const s = ls(); if (!s) return false; s.setItem(KEY_L, JSON.stringify(lockState.cfg)); s.removeItem(KEY_LF); } catch (e) { lockState.cfg = null; return false; } lockState.fails = 0; lockState.until = 0; return true; }
+function clearPattern() { lockState.cfg = null; lockState.fails = 0; lockState.until = 0; try { const s = ls(); if (s) { s.removeItem(KEY_L); s.removeItem(KEY_LF); } } catch (e) { /* nothing to clear */ } }
+const patternOk = (pat) => !!lockState.cfg && lhash(lockState.cfg.salt, pat) === lockState.cfg.hash;
+
+/* Pattern pad: drag across the dots. Also fine to tap dots one at a time. */
+function patternPad(onDone, label) {
+  const NS = 'http://www.w3.org/2000/svg', pts = []; for (let i = 0; i < 9; i++) pts.push({ n: i + 1, x: 55 + (i % 3) * 95, y: 55 + Math.floor(i / 3) * 95 });
+  const svg = document.createElementNS(NS, 'svg'); svg.setAttribute('viewBox', '0 0 300 300'); svg.setAttribute('class', 'padsvg'); svg.setAttribute('role', 'img'); svg.setAttribute('aria-label', label || 'Pattern pad with nine dots. You can also type the dot numbers below.');
+  const line = document.createElementNS(NS, 'polyline'); line.setAttribute('class', 'padline'); svg.appendChild(line);
+  const els = pts.map((p) => { const g = document.createElementNS(NS, 'g'); const c = document.createElementNS(NS, 'circle'); c.setAttribute('cx', p.x); c.setAttribute('cy', p.y); c.setAttribute('r', 15); c.setAttribute('class', 'paddot'); const t = document.createElementNS(NS, 'text'); t.setAttribute('x', p.x); t.setAttribute('y', p.y + 5); t.setAttribute('class', 'padnum'); t.textContent = String(p.n); g.appendChild(c); g.appendChild(t); svg.appendChild(g); return c; });
+  let seq = [], down = false, cur = null, disabled = false;
+  const draw = () => { const coords = seq.map((n) => pts[n - 1].x + ',' + pts[n - 1].y); if (cur && down) coords.push(cur.x + ',' + cur.y); line.setAttribute('points', coords.join(' ')); els.forEach((c, i) => c.setAttribute('class', 'paddot' + (seq.indexOf(i + 1) >= 0 ? ' on' : ''))); };
+  const loc = (e) => { const r = svg.getBoundingClientRect(); return { x: (e.clientX - r.left) * 300 / r.width, y: (e.clientY - r.top) * 300 / r.height }; };
+  const hit = (q) => { for (const p of pts) if ((p.x - q.x) * (p.x - q.x) + (p.y - q.y) * (p.y - q.y) < 38 * 38) return p.n; return 0; };
+  const add = (q) => { const n = hit(q); if (n && seq.indexOf(n) < 0) { seq.push(n); } };
+  svg.addEventListener('pointerdown', (e) => { if (disabled) return; e.preventDefault(); try { svg.setPointerCapture(e.pointerId); } catch (x) { /* fine */ } down = true; seq = []; cur = loc(e); add(cur); draw(); });
+  svg.addEventListener('pointermove', (e) => { if (!down) return; cur = loc(e); add(cur); draw(); });
+  const end = () => { if (!down) return; down = false; cur = null; const out = seq.join(''); draw(); if (out) onDone(out); };
+  svg.addEventListener('pointerup', end); svg.addEventListener('pointercancel', end);
+  svg.style.touchAction = 'none';
+  svg.padApi = { reset: () => { seq = []; down = false; cur = null; draw(); }, disable: (v) => { disabled = v; svg.classList.toggle('padoff', v); }, flash: (cls) => { svg.classList.add(cls); setTimeout(() => svg.classList.remove(cls), 500); } };
+  return svg;
+}
+const cleanDigits = (v) => String(v).replace(/[^1-9]/g, '').split('').filter((d, i, a) => a.indexOf(d) === i).join('');
+
+/* Lock screen */
+function showLock() {
+  if (!lockState.cfg || lockState.open) return; lockState.open = true; document.documentElement.setAttribute('data-locked', '');
+  let box = document.getElementById('lock'); if (box) box.remove();
+  box = h('div', { id: 'lock', class: 'lock', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'lockTitle' }); document.body.append(box);
+  document.querySelectorAll('#app, .skip').forEach((n) => n.setAttribute('inert', ''));
+  const msg = h('p', { class: 'lockmsg', role: 'status', 'aria-live': 'polite', id: 'lockMsg' }), txt = h('input', { type: 'text', inputmode: 'numeric', id: 'lockTxt', autocomplete: 'off', placeholder: 'For example 1 4 7 8 9' });
+  const pad = patternPad((p) => attempt(p));
+  const unlock = () => { lockState.open = false; box.remove(); document.documentElement.removeAttribute('data-locked'); if (lockState.after) { const f = lockState.after; lockState.after = null; f(); } document.querySelectorAll('#app, .skip').forEach((n) => n.removeAttribute('inert')); const m = $('#main'); if (m) { m.setAttribute('tabindex', '-1'); m.focus({ preventScroll: true }); } };
+  const remaining = () => Math.max(0, Math.ceil((lockState.until - Date.now()) / 1000));
+  const paintLocked = () => { const s = remaining(); if (s <= 0) { clearInterval(lockState.tick); lockState.fails = 0; lockState.until = 0; saveFails(); pad.padApi.disable(false); txt.disabled = false; goBtn.disabled = false; msg.textContent = 'You can try again.'; return; } pad.padApi.disable(true); txt.disabled = true; goBtn.disabled = true; msg.textContent = 'Too many tries. Try again in ' + s + ' second' + (s === 1 ? '' : 's') + '.'; };
+  const attempt = (pat) => {
+    if (remaining() > 0) return;
+    if (pat.length < LOCK_MIN_DOTS) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
+    if (patternOk(pat)) { lockState.fails = 0; lockState.until = 0; saveFails(); unlock(); return; }
+    lockState.fails++; pad.padApi.flash('bad'); setTimeout(() => pad.padApi.reset(), 450); txt.value = '';
+    if (lockState.fails >= LOCK_TRIES) { lockState.until = Date.now() + LOCK_SECONDS * 1000; saveFails(); clearInterval(lockState.tick); paintLocked(); lockState.tick = setInterval(paintLocked, 500); }
+    else { saveFails(); const left = LOCK_TRIES - lockState.fails; msg.textContent = 'That is not the right pattern. ' + left + ' ' + (left === 1 ? 'try' : 'tries') + ' left.'; }
+  };
+  const goBtn = h('button', { type: 'button', class: 'btn', id: 'lockGo', text: 'Unlock', onclick: () => attempt(cleanDigits(txt.value)) });
+  txt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); attempt(cleanDigits(txt.value)); } });
+  box.append(h('div', { class: 'lockcard' }, h('div', { class: 'book-title' }, flowerIcon(28), h('span', { text: 'Petal' })), h('h1', { id: 'lockTitle', class: 'locktitle', text: 'Draw your pattern to open Petal' }), pad, msg,
+    h('details', { class: 'more' }, h('summary', { text: 'Type the dot numbers instead' }), h('p', { class: 'small', text: 'The dots are numbered 1 to 9 from left to right, top to bottom. Type the numbers in the order you would draw them.' }), h('div', { class: 'field' }, h('label', { for: 'lockTxt', text: 'Dot numbers' }), txt), goBtn),
+    h('details', { class: 'more' }, h('summary', { text: 'Forgot your pattern?' }), h('p', { class: 'small', text: 'Petal cannot reset it for you, because that would let anyone get in. To remove the lock, clear this site\'s data in your browser settings. That also clears the journal saved in this browser, so restore it afterwards from a backup file or by logging in to your account.' }))));
+  if (remaining() > 0) { paintLocked(); lockState.tick = setInterval(paintLocked, 500); } else if (lockState.fails > 0) { msg.textContent = (LOCK_TRIES - lockState.fails) + ' ' + (LOCK_TRIES - lockState.fails === 1 ? 'try' : 'tries') + ' left.'; }
+  setTimeout(() => { const s = box.querySelector('svg'); s && s.focus && s.focus(); }, 50);
+}
+function lockInit() {
+  loadLock(); if (!lockState.cfg) document.documentElement.removeAttribute('data-locked');
+  if (lockState.cfg) showLock();
+  return !!lockState.cfg;
+  window.addEventListener('pageshow', (e) => { if (e.persisted && lockState.cfg) { loadLock(); showLock(); } });
+}
+
+/* Settings: turn the lock on, change it, or turn it off */
+function openPatternSetup(mode) { // mode: 'set' | 'change'
+  let first = null; const msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: 'Draw a pattern that connects at least ' + LOCK_MIN_DOTS + ' dots.' });
+  const done = (pat) => {
+    if (pat.length < LOCK_MIN_DOTS) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
+    if (!first) { first = pat; pad.padApi.reset(); msg.textContent = 'Now draw it again to confirm.'; return; }
+    if (first !== pat) { first = null; pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Those did not match. Draw your new pattern again from the start.'; return; }
+    if (!setPattern(pat)) { msg.textContent = 'This browser would not let Petal save the lock, so it was not turned on.'; return; }
+    $('#dlg').close(); toast('Pattern lock is on. Petal will ask for it every time it opens.'); render();
+  };
+  const pad = patternPad(done);
+  openInfoDialog(mode === 'change' ? 'Change your pattern' : 'Set a pattern lock', [h('p', { text: 'Petal will ask for this pattern every time the page is opened or reloaded. You can also type it as numbers, so keep the order in mind.' }), msg, pad,
+    h('p', { class: 'small muted', text: 'This is a screen lock. It keeps casual viewers out but does not encrypt your journal. If you forget the pattern, the only way back in is clearing this site\'s data, which also clears the journal in this browser. Download a backup first.' }),
+    h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+}
+function openPatternOff() {
+  const msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: 'Draw your current pattern to turn the lock off.' });
+  const pad = patternPad((pat) => { if (patternOk(pat)) { clearPattern(); $('#dlg').close(); toast('Pattern lock is off.'); render(); } else { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'That is not the right pattern.'; } });
+  openInfoDialog('Turn off the pattern lock', [msg, pad, h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+}
+function lockCard() {
+  const on = !!lockState.cfg;
+  return card('Pattern lock', [h('p', { text: on ? 'On. Petal asks for your pattern every time it opens or reloads.' : 'Optional. Add a pattern like a phone lock screen, so Petal asks for it every time it opens or reloads. After 3 wrong tries it waits 30 seconds.' }),
+    h('p', { class: 'small muted', text: 'It is a screen lock, not encryption. It does not stop someone with access to your browser\'s stored data.' }),
+    h('div', { class: 'btn-row' }, on ? [h('button', { type: 'button', class: 'btn', id: 'lockChange', text: 'Change pattern', onclick: () => openPatternSetup('change') }), h('button', { type: 'button', class: 'btn', id: 'lockOff', text: 'Turn off', onclick: openPatternOff }), h('button', { type: 'button', class: 'btn', text: 'Lock now', onclick: () => { lockState.open = false; showLock(); } })] : h('button', { type: 'button', class: 'btn primary', id: 'lockOn', text: 'Set a pattern', onclick: () => openPatternSetup('set') }))]);
+}
+
 /* ================= 12. Learn ================= */
 const CATS = ['All', 'Basics', 'Products', 'Pain and feelings', 'Your journal', 'Getting help'];
 let curArticle = null; // the article being drawn, so source markers can be numbered
@@ -2065,6 +2186,8 @@ function viewSettings(root) {
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Settings' }));
   // Account
   root.append(accountCard());
+  // Pattern lock
+  root.append(lockCard());
   // Theme
   root.append(card('Theme', chipsTheme()));
   // Estimates
@@ -2227,7 +2350,7 @@ function openDeleteAll() {
   const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
   inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
   go.addEventListener('click', () => {
-    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); s.removeItem(KEY_A); } } catch (e) { ok = false; } cloud.acct = null; cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus('off');
+    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); s.removeItem(KEY_A); s.removeItem(KEY_L); s.removeItem(KEY_LF); } } catch (e) { ok = false; } lockState.cfg = null; cloud.acct = null; cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus('off');
     data = emptyData(); settings = defaultSettings(); applyTheme(); state.sel = todayStr(); state.saveError = ''; if (ok && state.storage.mode === 'blocked') { state.storage.mode = 'ok'; state.storage.raw = null; }
     $('#dlg').close(); state.view = 'today'; render(); toast(ok ? 'Petal data in this browser is deleted. Files you exported earlier and your browser history are not affected.' : 'Your journal was cleared on this page, but the browser would not remove the stored copy.');
   });
@@ -2284,7 +2407,7 @@ function openSources() {
 function openPrivacy() {
   const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
   openInfoDialog('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are only sent to a server if you choose to create an account, which is optional. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups, or use an account, if you want to keep a separate copy.' }),
-    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup. An account password protects the cloud copy, not this device.', 'Petal has no ads, analytics, or tracking. Without an account, it sends nothing anywhere. With an account, your journal is sent to the cloud, where it is not end-to-end encrypted.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Accounts, backups, and Delete all data are in Settings. The zip download is in the footer.' })]);
+    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, permanent, or a backup. The optional pattern lock hides the screen but does not encrypt anything. An account password protects the cloud copy, not this device.', 'Petal has no ads, analytics, or tracking. Without an account, it sends nothing anywhere. With an account, your journal is sent to the cloud, where it is not end-to-end encrypted.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Accounts, backups, and Delete all data are in Settings. The zip download is in the footer.' })]);
 }
 function render(focusId) {
   renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m);
@@ -2294,11 +2417,12 @@ function render(focusId) {
 function go(view) { state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
 
 function init() {
-  initStorage(); applyTheme();
+  initStorage(); applyTheme(); const locked = lockInit();
   $('#brand').append(flowerIcon(28), h('span', { text: 'Petal' }));
   $('#helpBtn').addEventListener('click', openHelp);
   ['dlg', 'confirm', 'gloss'].forEach((id) => wireDialog($('#' + id)));
-  render(); cloudInit();
+  const start = () => { render(); cloudInit(); };
+  if (locked) lockState.after = start; else start();
   setInterval(() => { const box = $('#timerCard'); if (box && $('#dlg').open === false) fillTimer(box); }, 30000);
   document.addEventListener('visibilitychange', () => { const box = $('#timerCard'); if (!document.hidden && box) fillTimer(box); });
 }
@@ -2306,4 +2430,4 @@ init();
 })();
 </script>
 </body>
-</html>
+   </html>
