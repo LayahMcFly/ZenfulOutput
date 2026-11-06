@@ -97,6 +97,36 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
 .foot .legal strong{font-weight:700}
 .foot .base{grid-column:1/-1;border-top:1px solid rgba(247,239,223,.3);padding-top:16px;font:400 12px/1.5 var(--label);letter-spacing:.08em;text-transform:uppercase;display:flex;flex-wrap:wrap;gap:6px 24px;justify-content:space-between}
 @media (prefers-color-scheme:dark){.foot .base{border-color:rgba(36,26,20,.35)}}
+/* Party Pocket card: borrows the app's cosmic purple, pink glow and twinkling stars so it stands out */
+.card.party{position:relative;overflow:hidden;isolation:isolate;color:#f8fafc;
+  border:1.5px solid rgba(236,72,153,.65);border-top:8px solid #ec4899;
+  background:linear-gradient(135deg,#0f172a 0%,#1e1b4b 50%,#311042 100%);
+  box-shadow:0 0 0 1px rgba(236,72,153,.25),0 0 26px -2px rgba(236,72,153,.5),0 14px 26px -14px rgba(15,23,42,.8);
+  animation:pp-glow 3.2s ease-in-out infinite}
+.card.party>*{position:relative;z-index:1}
+.card.party::before{content:"";position:absolute;inset:0;z-index:0;pointer-events:none;
+  background-image:radial-gradient(1.6px 1.6px at 12% 22%,#fff,transparent),radial-gradient(1.2px 1.2px at 78% 14%,#fff,transparent),
+  radial-gradient(1.8px 1.8px at 90% 48%,#f9a8d4,transparent),radial-gradient(1.2px 1.2px at 34% 72%,#fff,transparent),
+  radial-gradient(1.6px 1.6px at 64% 84%,#f9a8d4,transparent),radial-gradient(1.2px 1.2px at 8% 88%,#fff,transparent),
+  radial-gradient(1.4px 1.4px at 52% 36%,#fff,transparent),radial-gradient(1.2px 1.2px at 94% 90%,#fff,transparent);
+  animation:pp-twinkle 2.6s ease-in-out infinite alternate}
+.card.party::after{content:"";position:absolute;top:0;bottom:0;left:-60%;width:45%;z-index:0;pointer-events:none;
+  background:linear-gradient(100deg,transparent,rgba(255,255,255,.16),transparent);transform:skewX(-18deg);
+  animation:pp-shine 5.5s ease-in-out infinite}
+.card.party svg{width:58px;height:58px;filter:drop-shadow(0 0 12px rgba(236,72,153,.75));animation:pp-bob 4s ease-in-out infinite}
+.card.party h2,.card.party p,.card.party .go{font-family:Inter,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.card.party h2{color:#f8fafc;font-weight:800;letter-spacing:-.5px}
+.card.party h2 span{color:#ec4899;text-shadow:0 0 18px rgba(236,72,153,.65)}
+.card.party p{color:#cbd5e1;font-size:17px}
+.card.party .go{background:#db2777;color:#fff;outline:1.5px dashed rgba(255,255,255,.7);box-shadow:0 0 22px rgba(236,72,153,.65);animation:pp-pulse 2.4s ease-in-out infinite}
+.card.party:hover{box-shadow:0 0 0 1px rgba(236,72,153,.55),0 0 42px 2px rgba(236,72,153,.75),0 18px 28px -14px rgba(15,23,42,.9)}
+.card.party:focus-visible{outline-color:#f9a8d4}
+@keyframes pp-glow{50%{box-shadow:0 0 0 1px rgba(236,72,153,.5),0 0 40px 2px rgba(236,72,153,.7),0 14px 26px -14px rgba(15,23,42,.8)}}
+@keyframes pp-twinkle{from{opacity:.4}to{opacity:1}}
+@keyframes pp-shine{0%,55%{left:-60%}100%{left:130%}}
+@keyframes pp-bob{50%{transform:translateY(-4px)}}
+@keyframes pp-pulse{50%{box-shadow:0 0 36px rgba(236,72,153,.95)}}
+@media (prefers-reduced-motion:reduce){.card.party,.card.party::before,.card.party::after,.card.party svg,.card.party .go{animation:none}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
 </head>
@@ -135,9 +165,9 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
       </a>
     </li>
     <li>
-      <a class="card" href="party-pocket/" style="--c:#b8862b">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="4" fill="#6f4a33"/><rect x="7" y="7" width="18" height="18" rx="3.5" fill="#f7efdf"/><circle cx="12" cy="12" r="1.9" fill="#93573a"/><circle cx="20" cy="12" r="1.9" fill="#93573a"/><circle cx="16" cy="16" r="1.9" fill="#93573a"/><circle cx="12" cy="20" r="1.9" fill="#93573a"/><circle cx="20" cy="20" r="1.9" fill="#93573a"/></svg>
-        <h2>Party Pocket</h2>
+      <a class="card party" href="party-pocket/">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><rect x="8" y="10" width="48" height="44" rx="14" fill="rgba(255,255,255,.08)" stroke="#ec4899" stroke-width="3"/><path d="M32 16l3.2 7.6 8.3.7-6.3 5.5 1.9 8.1L32 33.2l-7.1 4.7 1.9-8.1-6.3-5.5 8.3-.7z" fill="#ec4899"/><path d="M18 40l1.5 3.5 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="#f8fafc" opacity=".85"/><path d="M46 40l1.5 3.5 3.7.3-2.8 2.4.9 3.6-3.3-2-3.3 2 .9-3.6-2.8-2.4 3.7-.3z" fill="#f8fafc" opacity=".85"/></svg>
+        <h2>Party <span>Pocket</span></h2>
         <p>Party games and a quiz scoreboard for game night, all offline.</p>
         <span class="go">Open Party Pocket</span>
       </a>
