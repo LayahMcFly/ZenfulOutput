@@ -3,15 +3,15 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; base-uri 'none'; form-action 'none'">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src 'unsafe-inline'; script-src 'unsafe-inline'; img-src data:; connect-src https://rkbsivxrlsflhfrlgwuk.supabase.co; base-uri 'none'; form-action 'none'">
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ecdfc8">
 <title>My Journal</title>
-<meta name="description" content="Petal is a private, offline journal for tracking your period, with no account needed.">
+<meta name="description" content="Petal is a private journal for tracking your period. It works offline, and an account is optional.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/petal/">
 <meta property="og:title" content="Petal: a private period journal">
-<meta property="og:description" content="A calm, private journal for your period. Works offline, no account needed.">
+<meta property="og:description" content="A calm, private journal for your period. Works offline, and an account is optional.">
 <meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/petal/petal-preview.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
@@ -306,7 +306,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML;
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '1.0.9'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.0.0'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -638,6 +638,7 @@ function initStorage() {
 }
 function persist() {
   if (state.storage.mode === 'blocked') return { ok: false, reason: 'Saved data that could not be read is still in this browser. Petal will not overwrite it until you choose what to do.' };
+  cloudNotify();
   const s = ls();
   try {
     if (!s) throw new Error('none');
@@ -1131,7 +1132,7 @@ function viewToday(root) {
 }
 function introCard() {
   const c = card('Welcome to Petal', [
-    h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
+    h('p', { text: 'Your entries are stored in this browser. They are only sent to a server if you choose to create an account, which is optional. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups, or use an account, if you want to keep a separate copy.' }),
     h('p', { text: "You can skip anything you don't want to track. Optional boxes live under \"Add details\"." }),
     h('p', { text: 'Here is where things will show up as you log them:' }),
     h('ul', null, h('li', { text: 'Today: log a period, flow, a product change, pain, mood, or relief in a few taps. You can pick a past date too.' }), h('li', { text: 'Calendar: days you logged appear here, with a list view if you prefer it.' }), h('li', { text: 'Cycle summaries: period lengths and patterns, worked out only from what you record.' }), h('li', { text: 'Learn: short articles and a "Words explained" list.' })),
@@ -1655,34 +1656,299 @@ const ARTICLES = [
   },
   {
     id: 'privacy', cat: 'Your journal', title: 'Keeping your journal private',
-    summary: 'Where Petal keeps your entries, who can see them, what a backup contains, and the steps that help you protect what you write.',
+    summary: 'Where Petal keeps your entries, what changes if you create an optional account, who can see them, and the steps that help you protect what you write.',
     sources: [], related: ['light', 'history'],
     intro: [
-      `A period journal holds personal information, and it is reasonable to ask who can see it. The short answer for Petal is that your entries stay in your browser on the device you are using, and the app doesn't send them anywhere. The longer answer includes a few things Petal doesn't do, and a few steps that are up to you.`,
+      `A period journal holds personal information, and it is reasonable to ask who can see it. The short answer is that your entries stay in your browser on the device you are using, and Petal sends them nowhere unless you create an account. The longer answer covers what an account changes, what Petal doesn't do, and a few steps that are up to you.`,
       `This article describes what the app actually does with your data, what it doesn't protect against, and how to keep or remove your records.`
     ],
     sections: [
       { tag: 'How Petal works', h: 'Where your entries live', blocks: [
-        `Petal saves your journal and settings in your browser's local storage, which is a small area your browser keeps on your device. The page is built so that it can't connect to other websites or servers, and it has no accounts, ads, or analytics. Nothing you write is uploaded.`,
-        `Because the entries live in one browser on one device, they do not follow you. If you open Petal on a different phone or computer, or in a different browser, you will see an empty journal. The same is true if you use a private browsing window, which may not keep your entries once it closes.`,
+        `Petal always saves your journal and settings in your browser's local storage, which is a small area your browser keeps on your device. It has no ads or analytics. If you never create an account, nothing you write leaves your device, and the page only contacts the internet if you open a source link.`,
+        `Because local entries live in one browser on one device, they do not follow you. If you open Petal on a different phone or computer, or in a different browser, you will see an empty journal until you restore a backup or log in to an account. A private browsing window may not keep your entries once it closes.`,
         `If your browser blocks storage, Petal shows a banner saying so, and it won't tell you something is saved when it isn't. If the stored data can't be read, Petal leaves it alone instead of overwriting it.`
       ] },
+      { tag: 'How Petal works', h: 'What an account changes', blocks: [
+        `An account is optional. When you create one with an email and password, Petal saves a copy of your whole journal, including notes and settings, to a cloud database after each change. That copy lets you open the journal on another device and get it back if you clear this browser. Your journal is still saved on your device first.`,
+        `The cloud copy is protected by your login and travels over a secure connection, but it is not end-to-end encrypted. That means the service that hosts the database, and the person who runs this copy of Petal, can technically access what is stored. If you would rather keep notes private from everyone, you can leave the account off and use backups instead.`,
+        { ex: `Say you log in on a school laptop to check a past period. Your journal loads from the cloud into that browser and stays there until you log out or delete the data. Logging out in Petal stops syncing, but the entries already loaded remain in that browser unless you use Delete all data.` },
+        `In Settings you can log out, change your password, delete the cloud copy, or delete the whole account. Deleting the account removes the account and the saved copy. It does not delete the journal on your device.`
+      ] },
       { tag: 'How Petal works', h: 'What Petal does not do', blocks: [
-        `Petal has no PIN, password, or encryption. Anyone who can open your browser on your device, or who uses the same browser profile, may be able to open your journal. Petal also doesn't back up your data automatically. If you clear your browser's site data or switch devices, the entries are gone unless you saved a copy.`,
+        `Petal has no PIN or lock screen. Anyone who can open your browser on your device, or who uses the same browser profile, may be able to open your journal, and an account password does not change that. Petal also doesn't make local backups on its own. If you clear your browser's site data and you have no account or backup file, the entries are gone.`,
         { ex: `If you share a family tablet and the same browser profile, someone else could open Petal there and see your entries. A phone with a screen lock and your own browser profile is a more private place for a journal.` },
-        `A few habits help. Lock your device, use your own profile, and clear the data from any device you borrow. If you need extra protection, a device lock is stronger than anything a web page can offer.`
+        `A few habits help. Lock your device, use your own profile, and log out and clear the data on any device you borrow. If you need extra protection, a device lock is stronger than anything a web page can offer.`
       ] },
       { tag: 'How Petal works', h: 'Backups, exports, and printing', blocks: [
-        `In Settings, Download JSON backup saves everything Petal knows about you into one file, which you can restore later through Restore from a Petal JSON backup. Petal shows a preview before it replaces anything. Download CSV saves a table of entries you can open in a spreadsheet. Print summary builds a page for a date range of your choosing, and notes are left out unless you turn them on.`,
+        `In Settings, Download JSON backup saves everything Petal knows about you into one file, which you can restore later through Restore from a Petal JSON backup. Petal shows a preview before it replaces anything. The Download link in the footer makes a zip with the app, a backup, and a README. Download CSV saves a table of entries, and Print summary builds a page for a date range of your choosing with notes left out unless you turn them on.`,
         `Those files are not protected by Petal. Once you save a backup, it sits on your device like any other file, and anyone with access to the folder can open it. Treat it the way you would treat a private photo, and delete copies you no longer need.`
       ] },
       { tag: 'How Petal works', h: 'Deleting your data', blocks: [
-        `Delete all data removes your journal and settings from this browser, after you type DELETE to confirm. It affects only what Petal stored. Files you exported earlier and your browser history are not touched, so you may want to delete those separately.`,
+        `Delete all data removes your journal and settings from this browser and logs you out, after you type DELETE to confirm. It does not delete a cloud copy, files you exported earlier, or your browser history. If you have an account and want the cloud copy gone, delete it from the Account card in Settings first.`,
         `If you share a device, deleting data when you finish, or exporting a backup to somewhere private first, are both ways to keep the journal under your control.`
       ] }
     ]
   }
 ];
+
+/* ================= 11. Account and cloud copy (Version 2) =================
+   Optional. Petal keeps working from this browser first. When signed in, a copy of the journal is saved to Supabase.
+   Only the project's public (publishable) key belongs in this file. Never put a service_role or secret key here. */
+const SB_URL = 'https://rkbsivxrlsflhfrlgwuk.supabase.co';
+const SB_KEY = ''; // paste the project's publishable (or anon) key here, from Supabase > Project Settings > API Keys
+const KEY_A = 'petal.v2.account';
+const cloud = { acct: null, status: 'off', note: '', rev: 0, busy: false, again: false, seq: 0, applying: false, paused: false, timer: null, lastOk: '' };
+const cloudReady = () => SB_KEY.length > 20;
+const signedIn = () => !!(cloud.acct && cloud.acct.refresh_token);
+
+function loadAcct() { try { const s = ls(); const r = s && s.getItem(KEY_A); const a = r ? JSON.parse(r) : null; if (isObj(a) && typeof a.refresh_token === 'string' && typeof a.uid === 'string') cloud.acct = a; } catch (e) { cloud.acct = null; } }
+function saveAcct() { try { const s = ls(); if (!s) return; if (cloud.acct) s.setItem(KEY_A, JSON.stringify(cloud.acct)); else s.removeItem(KEY_A); } catch (e) { /* the session just will not be remembered */ } }
+
+async function sb(path, o) {
+  o = o || {}; const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 15000);
+  try {
+    const headers = { apikey: SB_KEY, 'Content-Type': 'application/json' };
+    if (o.token) headers.Authorization = 'Bearer ' + o.token;
+    if (o.prefer) headers.Prefer = o.prefer;
+    let r;
+    try { r = await fetch(SB_URL + path, { method: o.method || 'GET', headers: headers, body: o.body === undefined ? undefined : JSON.stringify(o.body), signal: ctl.signal, credentials: 'omit', referrerPolicy: 'no-referrer' }); }
+    catch (e) { const er = new Error('network'); er.network = true; throw er; }
+    let j = null; const t = await r.text(); if (t) { try { j = JSON.parse(t); } catch (e) { j = null; } }
+    if (!r.ok) { const er = new Error((j && (j.msg || j.message || j.error_description || j.error)) || 'request failed'); er.status = r.status; er.code = j && (j.error_code || j.code); throw er; }
+    return j;
+  } finally { clearTimeout(tm); }
+}
+function friendly(e) {
+  if (!e) return 'Something went wrong.';
+  if (e.network) return 'Petal could not reach the cloud. Check your connection. Your entries are still saved on this device.';
+  const m = String(e.message || '').toLowerCase(), c = String(e.code || '');
+  if (c === 'email_not_confirmed' || m.indexOf('not confirmed') >= 0) return 'Please confirm your email first. Check your inbox for the message from Petal.';
+  if (c === 'invalid_credentials' || m.indexOf('invalid login') >= 0) return 'That email and password do not match.';
+  if (c === 'weak_password' || m.indexOf('password') >= 0 && e.status === 422) return 'That password is too weak. Try a longer one.';
+  if (c === 'same_password') return 'Choose a password you have not used for this account before.';
+  if (e.status === 429 || c === 'over_request_rate_limit' || c === 'over_email_send_rate_limit') return 'Too many tries. Wait a few minutes and try again.';
+  if (e.status === 401 || e.status === 403) return 'Your session ended. Please log in again.';
+  return 'The cloud returned an error (' + (e.status || 'unknown') + '). Your entries are still saved on this device.';
+}
+const redirectTo = () => /^https?:$/.test(location.protocol) ? '?redirect_to=' + encodeURIComponent(location.origin + location.pathname) : '';
+
+function setSession(j, keep) {
+  const u = j.user || {}; const prev = cloud.acct && keep ? cloud.acct : null;
+  cloud.acct = { email: u.email || (prev && prev.email) || '', uid: u.id || (prev && prev.uid) || '', access_token: j.access_token, refresh_token: j.refresh_token, expires_at: Date.now() + (Number(j.expires_in) || 3600) * 1000, lastRev: prev ? prev.lastRev : 0, dirty: prev ? prev.dirty : false };
+  saveAcct();
+}
+async function ensureToken() {
+  const a = cloud.acct; if (!a) throw Object.assign(new Error('signed out'), { status: 401 });
+  if (a.expires_at - Date.now() > 60000) return a.access_token;
+  try { const j = await sb('/auth/v1/token?grant_type=refresh_token', { method: 'POST', body: { refresh_token: a.refresh_token } }); setSession(j, true); return cloud.acct.access_token; }
+  catch (e) { if (e.status === 400 || e.status === 401 || e.status === 403) { dropSession('Your session ended. Please log in again. Your entries are still on this device.'); } throw e; }
+}
+function dropSession(msg) { cloud.acct = null; saveAcct(); cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus(msg ? 'error' : 'off', msg || ''); if (msg) toast(msg); render(); }
+
+/* ---- Status text ---- */
+function setStatus(s, note) { cloud.status = s; cloud.note = note || ''; if (s === 'synced') cloud.lastOk = new Date().toISOString(); paintStatus(); }
+function statusText() {
+  if (!signedIn()) return cloud.status === 'error' && cloud.note ? cloud.note : '';
+  const t = cloud.lastOk ? ' at ' + fmtTime(cloud.lastOk) : '';
+  return { synced: 'Saved to the cloud' + t + '.', saving: 'Saving to the cloud…', offline: 'Waiting for a connection. Changes are safe on this device and will upload later.', paused: 'Cloud saving is paused. Tap Sync now to choose what to do.', error: cloud.note || 'The cloud copy needs attention.', checking: 'Checking the cloud…', off: 'Signed in.' }[cloud.status] || '';
+}
+function paintStatus() { document.querySelectorAll('.cloudstat').forEach((n) => { n.textContent = statusText(); }); }
+function cloudFootNode() { return signedIn() ? h('span', { class: 'verno small cloudstat', role: 'status', text: statusText() }) : null; }
+
+/* ---- Sync ---- */
+const hasJournal = (j) => { const c = counts(j); return c.periods + c.flow + c.products + c.pain + c.moods + c.relief > 0; };
+function payloadObj() { return { app: 'petal', type: 'journal-backup', version: VERSION, appVersion: APP_VERSION, savedAt: new Date().toISOString(), settings: settings, journal: data }; }
+function parseCloud(p) {
+  if (!isObj(p) || p.app !== 'petal' || p.version !== VERSION) return null;
+  const cj = cleanJournal(p.journal), cs = p.settings === undefined ? { errors: [], settings: null } : cleanSettings(p.settings);
+  if (cj.errors.length || cs.errors.length) return null;
+  return { journal: cj.journal, settings: cs.settings };
+}
+// Called by persist() after every local change.
+function cloudNotify() {
+  if (cloud.applying || !signedIn()) return;
+  cloud.acct.dirty = true; cloud.seq++; saveAcct();
+  if (cloud.paused) return;
+  clearTimeout(cloud.timer); cloud.timer = setTimeout(push, 2500);
+}
+async function pull() { const tok = await ensureToken(); const rows = await sb('/rest/v1/petal_journals?user_id=eq.' + encodeURIComponent(cloud.acct.uid) + '&select=data,rev,updated_at', { token: tok }); return Array.isArray(rows) && rows.length ? rows[0] : null; }
+async function syncNow(manual) {
+  if (!signedIn() || !cloudReady()) return;
+  if (cloud.busy) { cloud.again = true; return; }
+  cloud.busy = true; cloud.paused = false; setStatus('checking');
+  try { reconcile(await pull(), manual); }
+  catch (e) { if (e.network) setStatus('offline'); else if (signedIn()) setStatus('error', friendly(e)); }
+  finally { cloud.busy = false; if (cloud.again) { cloud.again = false; schedulePush(); } }
+}
+const schedulePush = () => { clearTimeout(cloud.timer); cloud.timer = setTimeout(push, 800); };
+function reconcile(row, manual) {
+  const a = cloud.acct;
+  if (!row) {
+    cloud.rev = 0;
+    if (!hasJournal(data)) { setStatus('synced'); return; }
+    if (a.lastRev === 0 && !manual) { openFirstUpload(); return; }
+    push(); return;
+  }
+  cloud.rev = row.rev;
+  const parsed = parseCloud(row.data);
+  if (!parsed) { setStatus('error', 'The cloud copy could not be read, so Petal left it alone. Your entries on this device are safe.'); return; }
+  if (JSON.stringify(parsed.journal) === JSON.stringify(data)) { a.lastRev = row.rev; a.dirty = false; saveAcct(); setStatus('synced'); return; }
+  if (!hasJournal(data)) { adopt(parsed, row); return; }
+  if (a.lastRev === row.rev) { push(); return; } // the cloud has not changed since this device last synced, so this device is ahead
+  if (a.lastRev > 0 && !a.dirty) { adopt(parsed, row); return; } // only the cloud changed
+  openConflict(parsed, row);
+}
+function adopt(parsed, row) {
+  if (state.storage.mode === 'blocked') { setStatus('error', 'Saved data on this device could not be read, so Petal did not change anything. See the message at the top of the page.'); return; }
+  cloud.applying = true; data = parsed.journal; if (parsed.settings) { settings = parsed.settings; applyTheme(); }
+  persist(); cloud.applying = false;
+  cloud.acct.lastRev = row.rev; cloud.acct.dirty = false; cloud.rev = row.rev; saveAcct(); setStatus('synced'); render(); toast('Your journal was loaded from the cloud.');
+}
+async function push() {
+  if (!signedIn() || !cloudReady() || cloud.paused) return;
+  if (cloud.busy) { cloud.again = true; return; }
+  if (state.storage.mode === 'blocked') return;
+  cloud.busy = true; setStatus('saving'); const seq = cloud.seq, a = cloud.acct;
+  try {
+    const tok = await ensureToken(); let rows;
+    if (!cloud.rev) rows = await sb('/rest/v1/petal_journals', { method: 'POST', token: tok, prefer: 'return=representation', body: { user_id: a.uid, data: payloadObj(), rev: 1 } });
+    else rows = await sb('/rest/v1/petal_journals?user_id=eq.' + encodeURIComponent(a.uid) + '&rev=eq.' + cloud.rev, { method: 'PATCH', token: tok, prefer: 'return=representation', body: { data: payloadObj(), rev: cloud.rev + 1, updated_at: new Date().toISOString() } });
+    if (!Array.isArray(rows) || !rows.length) throw Object.assign(new Error('conflict'), { conflict: true });
+    cloud.rev = rows[0].rev; if (cloud.acct) { cloud.acct.lastRev = cloud.rev; if (cloud.seq === seq) cloud.acct.dirty = false; saveAcct(); }
+    setStatus('synced');
+  } catch (e) {
+    if (e.conflict || e.status === 409) { cloud.busy = false; cloud.rev = 0; await syncNow(true); return; }
+    if (e.network) setStatus('offline'); else if (signedIn()) setStatus('error', friendly(e));
+  } finally { cloud.busy = false; if (signedIn() && (cloud.seq !== seq || cloud.again)) { cloud.again = false; if (cloud.status !== 'offline' && cloud.status !== 'error') schedulePush(); } }
+}
+
+/* ---- Choice dialogs ---- */
+function sideInfo(title, j, extra) { const c = counts(j); return h('div', { class: 'info' }, h('strong', { text: title }), h('p', { class: 'small', text: c.periods + ' periods, ' + c.flow + ' flow, ' + c.products + ' products, ' + c.pain + ' pain, ' + c.moods + ' mood, ' + c.relief + ' relief. Dates: ' + dateRange(j) + '.' + (extra || '') })); }
+function openConflict(parsed, row) {
+  cloud.paused = true; setStatus('paused');
+  openInfoDialog('Two different journals', [h('p', { text: 'The journal on this device and the copy in your account are different. Choose which one to keep. The other one will be replaced.' }), sideInfo('This device', data), sideInfo('Your account', parsed.journal, ' Saved ' + fmtShort(dateOfIso(row.updated_at)) + '.'),
+    h('button', { type: 'button', class: 'btn', text: 'Download a backup of this device first', onclick: () => download('petal-backup-before-sync-' + todayStr() + '.json', 'application/json', backupPayload()) }),
+    h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn primary', text: 'Use my account copy', onclick: () => { $('#dlg').close(); adopt(parsed, row); } }), h('button', { type: 'button', class: 'btn danger solid', text: 'Use this device', onclick: () => { $('#dlg').close(); cloud.paused = false; cloud.acct.lastRev = row.rev; cloud.rev = row.rev; cloud.acct.dirty = true; saveAcct(); push(); } }), h('button', { type: 'button', class: 'btn', text: 'Decide later', onclick: () => { $('#dlg').close(); render(); } }))]);
+}
+function openFirstUpload() {
+  cloud.paused = true; setStatus('paused');
+  openInfoDialog('Save this journal to your account?', [h('p', { text: 'There is already a journal on this device, and your account has nothing saved yet. If this is your journal, save it to your account. If this device is shared, choose Not now.' }), sideInfo('On this device', data),
+    h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn primary', text: 'Save it to my account', onclick: () => { $('#dlg').close(); cloud.paused = false; cloud.acct.dirty = true; saveAcct(); push(); } }), h('button', { type: 'button', class: 'btn', text: 'Not now', onclick: () => { $('#dlg').close(); render(); } }))]);
+}
+
+/* ---- Account forms ---- */
+const EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+function fld(id, label, input, hint) { return h('div', { class: 'field' }, h('label', { for: id, text: label }), hint ? h('p', { class: 'hint', text: hint }) : null, input); }
+function pwInputs(ids) { return ids.map((id) => document.getElementById(id)); }
+function showPwToggle(ids) { return h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', onchange: (e) => { pwInputs(ids).forEach((i) => { if (i) i.type = e.target.checked ? 'text' : 'password'; }); } }), h('span', { text: 'Show password' })))); }
+function formShell(title, fields, submitText, onSubmit, extra) {
+  const err = h('p', { class: 'notice', role: 'alert', id: 'acErr', hidden: true }), go = h('button', { type: 'button', class: 'btn primary', id: 'acGo', text: submitText });
+  const fail = (m) => { err.textContent = m; err.hidden = false; err.scrollIntoView({ block: 'nearest' }); };
+  const run = async () => { err.hidden = true; go.disabled = true; try { await onSubmit(fail); } catch (e) { fail(friendly(e)); } finally { go.disabled = false; } };
+  go.addEventListener('click', run);
+  openInfoDialog(title, [err].concat(fields, [h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() })), extra || null]));
+  $('#dlg').querySelectorAll('input[type=email],input[type=password],input[type=text]').forEach((i) => i.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(); } }));
+}
+function openSignUp() {
+  const em = h('input', { type: 'email', id: 'acEmail', autocomplete: 'email', inputmode: 'email', required: '' }), p1 = h('input', { type: 'password', id: 'acPw', autocomplete: 'new-password', minlength: '8' }), p2 = h('input', { type: 'password', id: 'acPw2', autocomplete: 'new-password' });
+  const ok = h('input', { type: 'checkbox', id: 'acOk' });
+  formShell('Create an account', [h('p', { text: 'An account saves a copy of your journal in the cloud so you can use it on other devices and get it back if this browser is cleared. It is optional.' }), fld('acEmail', 'Email', em), fld('acPw', 'Password', p1, 'At least 8 characters. A few random words make a strong password.'), fld('acPw2', 'Type the password again', p2), showPwToggle(['acPw', 'acPw2']),
+    h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, ok, h('span', { text: 'I understand that my journal, including notes, will be stored on a cloud server' }))))],
+  'Create account', async (fail) => {
+    const email = em.value.trim();
+    if (!EMAIL_RE.test(email)) return fail('Enter a valid email address.');
+    if (p1.value.length < 8) return fail('Use at least 8 characters for your password.');
+    if (p1.value !== p2.value) return fail('The two passwords are not the same.');
+    if (!ok.checked) return fail('Please tick the box to say you understand your journal will be stored in the cloud.');
+    const j = await sb('/auth/v1/signup' + redirectTo(), { method: 'POST', body: { email: email, password: p1.value } });
+    if (j && j.access_token) { setSession(j); $('#dlg').close(); toast('Your account is ready.'); render(); syncNow(); return; }
+    openInfoDialog('Check your email', [h('p', { text: 'If this email can be used, Petal sent a message to ' + email + '. Open it and follow the link to confirm your account, then log in here.' }), h('p', { class: 'small muted', text: 'It can take a few minutes. Check your spam folder too.' }), h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn primary', text: 'OK', onclick: () => $('#dlg').close() }))]);
+  }, h('p', { class: 'small muted', text: 'Already have an account? Close this and tap Log in.' }));
+}
+function openLogIn() {
+  const em = h('input', { type: 'email', id: 'acEmail', autocomplete: 'email', inputmode: 'email', required: '' }), p1 = h('input', { type: 'password', id: 'acPw', autocomplete: 'current-password' });
+  formShell('Log in', [fld('acEmail', 'Email', em), fld('acPw', 'Password', p1), showPwToggle(['acPw'])], 'Log in', async (fail) => {
+    const email = em.value.trim(); if (!EMAIL_RE.test(email) || !p1.value) return fail('Enter your email and password.');
+    const j = await sb('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: email, password: p1.value } });
+    setSession(j); $('#dlg').close(); toast('You are logged in.'); render(); syncNow();
+  }, h('p', { class: 'small' }, h('button', { type: 'button', class: 'alink', text: 'Forgot your password?', onclick: openForgot })));
+}
+function openForgot() {
+  const em = h('input', { type: 'email', id: 'acEmail', autocomplete: 'email', inputmode: 'email' });
+  formShell('Reset your password', [h('p', { text: 'Enter your account email. If it matches an account, Petal sends a link to choose a new password.' }), fld('acEmail', 'Email', em)], 'Send the link', async (fail) => {
+    const email = em.value.trim(); if (!EMAIL_RE.test(email)) return fail('Enter a valid email address.');
+    await sb('/auth/v1/recover' + redirectTo(), { method: 'POST', body: { email: email } });
+    openInfoDialog('Check your email', [h('p', { text: 'If ' + email + ' has an account, a reset link is on its way. It can take a few minutes.' }), h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn primary', text: 'OK', onclick: () => $('#dlg').close() }))]);
+  });
+}
+function openNewPassword(title) {
+  const p1 = h('input', { type: 'password', id: 'acPw', autocomplete: 'new-password', minlength: '8' }), p2 = h('input', { type: 'password', id: 'acPw2', autocomplete: 'new-password' });
+  formShell(title || 'Choose a new password', [fld('acPw', 'New password', p1, 'At least 8 characters.'), fld('acPw2', 'Type it again', p2), showPwToggle(['acPw', 'acPw2'])], 'Save password', async (fail) => {
+    if (p1.value.length < 8) return fail('Use at least 8 characters.'); if (p1.value !== p2.value) return fail('The two passwords are not the same.');
+    const tok = await ensureToken(); await sb('/auth/v1/user', { method: 'PUT', token: tok, body: { password: p1.value } });
+    $('#dlg').close(); toast('Your password is changed.');
+  });
+}
+async function logOut() {
+  const a = cloud.acct; try { if (a) await sb('/auth/v1/logout', { method: 'POST', token: a.access_token }); } catch (e) { /* signing out here still works */ }
+  dropSession(); toast('You are logged out. Your journal is still on this device.');
+}
+async function deleteCloudCopy() {
+  if (!await confirmBox({ title: 'Delete the cloud copy?', body: 'This removes the journal saved in your account. The journal on this device stays. Cloud saving continues, so the next change uploads a new copy.', okText: 'Delete cloud copy', danger: true })) return;
+  try { const tok = await ensureToken(); await sb('/rest/v1/petal_journals?user_id=eq.' + encodeURIComponent(cloud.acct.uid), { method: 'DELETE', token: tok }); cloud.rev = 0; cloud.acct.lastRev = 0; cloud.acct.dirty = true; saveAcct(); toast('The cloud copy is deleted.'); render(); }
+  catch (e) { toast(friendly(e)); }
+}
+function openDeleteAccount() {
+  const inp = h('input', { type: 'text', id: 'delAcc', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete my account', disabled: true }), msg = h('p', { class: 'notice', role: 'alert', hidden: true });
+  inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
+  go.addEventListener('click', async () => {
+    go.disabled = true; msg.hidden = true;
+    try { const tok = await ensureToken(); await sb('/rest/v1/rpc/delete_my_account', { method: 'POST', token: tok, body: {} }); dropSession(); $('#dlg').close(); toast('Your account and its cloud copy are deleted. Your journal is still on this device.'); }
+    catch (e) { msg.textContent = friendly(e); msg.hidden = false; go.disabled = inp.value.trim() !== 'DELETE'; }
+  });
+  openInfoDialog('Delete your account?', [msg, h('p', { text: 'This permanently deletes your account and the journal saved in it. It cannot be undone. The journal on this device is not deleted.' }), h('div', { class: 'field' }, h('label', { for: 'delAcc', text: 'Type DELETE to confirm' }), inp), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Keep my account', onclick: () => $('#dlg').close() }))]);
+}
+function accountCard() {
+  const kids = [];
+  if (!cloudReady()) { kids.push(h('p', { class: 'muted', text: 'Accounts are not turned on in this copy of Petal yet. Your journal is saved in this browser only.' })); return card('Account and cloud copy', kids); }
+  if (!signedIn()) {
+    kids.push(h('p', { text: 'Optional. Petal works without an account and keeps your entries in this browser. With an account, a copy of your journal is also saved in the cloud, so you can open it on other devices and get it back if this browser is cleared.' }),
+      h('ul', null, h('li', { text: 'What is uploaded: all of your entries, notes, and settings.' }), h('li', { text: 'It travels over a secure connection and is stored on Supabase servers.' }), h('li', { text: 'It is not end-to-end encrypted. The service that hosts it, and the person who runs this Petal, can technically access stored data.' }), h('li', { text: 'You can delete the cloud copy or your account at any time from this card.' })),
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', id: 'acSign', text: 'Create account', onclick: openSignUp }), h('button', { type: 'button', class: 'btn', id: 'acLog', text: 'Log in', onclick: openLogIn })));
+    if (cloud.status === 'error' && cloud.note) kids.push(h('p', { class: 'notice', role: 'status', text: cloud.note }));
+  } else {
+    kids.push(h('p', null, 'Signed in as ', h('strong', { text: cloud.acct.email || 'your account' }), '.'), h('p', { class: 'info cloudstat', role: 'status', text: statusText() }),
+      h('p', { class: 'small', text: 'Your journal stays on this device and a copy is saved to your account after each change. Using Petal on a second device? Log in there and your journal loads.' }),
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn primary', id: 'acSync', text: 'Sync now', onclick: () => syncNow(true) }), h('button', { type: 'button', class: 'btn', id: 'acOut', text: 'Log out', onclick: logOut }), h('button', { type: 'button', class: 'btn', text: 'Change password', onclick: () => openNewPassword('Change your password') })),
+      h('details', { class: 'more' }, h('summary', { text: 'Delete options' }), h('p', { class: 'small', text: 'Deleting the cloud copy keeps your account and this device\'s journal. Deleting your account removes both the account and the cloud copy.' }), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Delete cloud copy', onclick: deleteCloudCopy }), h('button', { type: 'button', class: 'btn danger', text: 'Delete my account…', onclick: openDeleteAccount }))));
+  }
+  return card('Account and cloud copy', kids, null, 'accountCard');
+}
+
+/* ---- Start up ---- */
+function readAuthHash() {
+  const raw = location.hash.replace(/^#/, ''); if (!raw || raw.indexOf('=') < 0) return null;
+  const p = new URLSearchParams(raw); if (!p.get('access_token') && !p.get('error_description') && !p.get('error')) return null;
+  return { at: p.get('access_token'), rt: p.get('refresh_token'), type: p.get('type'), exp: Number(p.get('expires_in')) || 3600, err: p.get('error_description') || p.get('error') };
+}
+async function cloudInit() {
+  loadAcct();
+  if (cloudReady()) {
+    const hsh = readAuthHash();
+    if (hsh) {
+      try { history.replaceState(null, '', location.pathname + location.search); } catch (e) { /* fine */ }
+      if (hsh.err) { toast('That email link did not work: ' + hsh.err.replace(/\+/g, ' ')); }
+      else if (hsh.at && hsh.rt) {
+        try { const u = await sb('/auth/v1/user', { token: hsh.at }); setSession({ access_token: hsh.at, refresh_token: hsh.rt, expires_in: hsh.exp, user: u }); state.view = 'settings'; render(); if (hsh.type === 'recovery') openNewPassword('Choose a new password'); else toast('Your email is confirmed. You are logged in.'); }
+        catch (e) { toast(friendly(e)); }
+      }
+    }
+  }
+  window.addEventListener('online', () => { if (signedIn() && cloud.acct.dirty) schedulePush(); else if (signedIn()) syncNow(); });
+  document.addEventListener('visibilitychange', () => { if (!document.hidden && signedIn() && !cloud.busy && !cloud.paused && !$('#dlg').open && !cloud.acct.dirty) syncNow(); });
+  setInterval(() => { if (signedIn() && cloud.acct.dirty && !cloud.paused && !cloud.busy && (cloud.status === 'offline' || cloud.status === 'error')) schedulePush(); }, 60000);
+  if (signedIn() && cloudReady()) { setStatus('checking'); render(); syncNow(); }
+}
 
 /* ================= 12. Learn ================= */
 const CATS = ['All', 'Basics', 'Products', 'Pain and feelings', 'Your journal', 'Getting help'];
@@ -1785,6 +2051,8 @@ function learnWords(root) {
 function setSetting(patch, msg, focusId) { Object.assign(settings, patch); applyTheme(); const r = persist(); if (r.ok) { state.saveError = ''; toast(msg || 'Your setting is saved.'); } else state.saveError = r.reason; render(focusId); }
 function viewSettings(root) {
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Settings' }));
+  // Account
+  root.append(accountCard());
   // Theme
   root.append(card('Theme', chipsTheme()));
   // Estimates
@@ -1817,7 +2085,7 @@ function viewSettings(root) {
     h('div', { class: 'field', style: 'margin-top:14px' }, h('label', { for: 'impFile', text: 'Restore from a Petal JSON backup' }), h('p', { class: 'hint', text: 'You will see a preview first. Nothing changes until you confirm. Importing replaces your current journal.' }), h('input', { type: 'file', id: 'impFile', accept: '.json,application/json', onchange: onImportFile })),
     h('details', { class: 'more' }, h('summary', { text: 'CSV layout' }), h('p', { class: 'small', text: 'One row per entry. Columns: ' + CSV_COLS.join(', ') + '. record_type is period, flow, product, pain, mood, or relief. Unused columns are empty. Lists are joined with "; ". Text that starts with = + - or @ gets a \' in front so spreadsheets do not run it. The JSON backup keeps your original text.' }))]));
   // Delete
-  root.append(card('Delete all data', [h('p', { text: 'This removes your journal and settings from this browser. Files you exported earlier and your browser history are not affected.' }), h('button', { type: 'button', class: 'btn danger', id: 'delAll', text: 'Delete all data…', onclick: openDeleteAll })], 'soft'));
+  root.append(card('Delete all data', [h('p', { text: 'This removes your journal and settings from this browser and logs you out. A copy saved in your account is not affected. Files you exported earlier and your browser history are not affected either.' }), h('button', { type: 'button', class: 'btn danger', id: 'delAll', text: 'Delete all data…', onclick: openDeleteAll })], 'soft'));
 }
 function toggle(id, label, on, fn) { return h('div', { class: 'field' }, h('div', { class: 'chips' }, h('label', { class: 'chip' }, h('input', { type: 'checkbox', id: 'set-' + id, checked: on, onchange: (e) => fn(e.target.checked) }), h('span', { text: label })))); }
 function chipsTheme() {
@@ -1877,7 +2145,7 @@ function readmeText(stamp) {
     '  README.txt            This file.',
     '',
     'WHY THIS EXISTS',
-    'Petal keeps your entries in your web browser, not on a server. Browsers can lose that data if you clear site data, switch browsers or devices, or use a private window. This zip gives you two things to keep elsewhere: the app, so you can always open it, and a backup of your entries, so you can always put them back.',
+    'Petal always keeps your entries in your web browser first. If you made an optional account, a copy is also saved in the cloud. Browsers can lose local data if you clear site data, switch browsers or devices, or use a private window, and an account is not a guarantee either. This zip gives you two things to keep on your own device: the app, so you can always open it, and a backup of your entries, so you can always put them back.',
     '',
     'SET IT UP (about 5 minutes)',
     '  1. Unzip the file. On Windows, right-click it and choose Extract All. On a Mac, double-click it. On a phone, use your Files app and tap the zip.',
@@ -1947,12 +2215,12 @@ function openDeleteAll() {
   const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
   inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
   go.addEventListener('click', () => {
-    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); } } catch (e) { ok = false; }
+    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); s.removeItem(KEY_A); } } catch (e) { ok = false; } cloud.acct = null; cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus('off');
     data = emptyData(); settings = defaultSettings(); applyTheme(); state.sel = todayStr(); state.saveError = ''; if (ok && state.storage.mode === 'blocked') { state.storage.mode = 'ok'; state.storage.raw = null; }
     $('#dlg').close(); state.view = 'today'; render(); toast(ok ? 'Petal data in this browser is deleted. Files you exported earlier and your browser history are not affected.' : 'Your journal was cleared on this page, but the browser would not remove the stored copy.');
   });
   openInfoDialog('Delete all data?', [h('p', { text: 'This will permanently delete:' }), h('ul', null, h('li', { text: c.periods + ' period records, ' + c.flow + ' flow entries, ' + c.products + ' product entries' }), h('li', { text: c.pain + ' pain entries, ' + c.moods + ' mood and symptom entries, ' + c.relief + ' medication or relief entries' }), h('li', { text: 'Your settings, including theme and custom symptoms' }), h('li', { text: 'Only Petal\'s own storage in this browser. Nothing else in your browser is touched.' })),
-    h('p', { class: 'muted small', text: 'This does not delete files you exported earlier, and it does not clear your browser history.' }), h('button', { type: 'button', class: 'btn', text: 'Download a backup first', onclick: exportJSON }),
+    h('p', { class: 'muted small', text: 'This does not delete files you exported earlier, and it does not clear your browser history. It also logs you out. If you have an account, the copy saved in the cloud is not deleted. Delete that from the Account card in Settings first if you want it gone.' }), h('button', { type: 'button', class: 'btn', text: 'Download a backup first', onclick: exportJSON }),
     h('div', { class: 'field', style: 'margin-top:12px' }, h('label', { for: 'delWord', text: 'Type DELETE to confirm' }), inp), h('div', { class: 'actions' }, go, h('button', { type: 'button', class: 'btn', text: 'Keep my data', onclick: () => $('#dlg').close() }))]);
 }
 function openPrintDialog() {
@@ -1999,16 +2267,16 @@ function openDownload() {
 }
 function openSources() {
   const src = Object.keys(SOURCES).map((k) => h('li', null, extLink(SOURCES[k]), h('br'), h('span', { class: 'small muted', text: SOURCES[k].status })));
-  openInfoDialog('About Petal and sources', [h('p', { text: 'Petal v' + APP_VERSION + ' is a private period journal and learning tool. It is not a medical service and cannot diagnose, treat, or monitor anything. It works without internet. Only the source links below need internet.' }), h('p', { class: 'small', text: 'Article text was written for this app in plain language. It was not medically reviewed. Source checks below say exactly what was and was not opened.' }), h('ul', null, src)]);
+  openInfoDialog('About Petal and sources', [h('p', { text: 'Petal v' + APP_VERSION + ' is a private period journal and learning tool. It is not a medical service and cannot diagnose, treat, or monitor anything. It works without internet. Only the source links, and the optional account, need internet.' }), h('p', { class: 'small', text: 'Article text was written for this app in plain language. It was not medically reviewed. Source checks below say exactly what was and was not opened.' }), h('ul', null, src)]);
 }
 function openPrivacy() {
   const st = state.storage.mode === 'ok' && !state.saveError ? 'Storage is working. New entries are being written to this browser.' : state.storage.mode === 'memory' ? 'Storage is not available. Entries only exist while this page stays open.' : state.storage.mode === 'blocked' ? 'Saved data that could not be read is blocking saving. See the message at the top of the page.' : 'The last save did not work: ' + state.saveError;
-  openInfoDialog('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are not automatically sent to a server. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups if you want to keep a separate copy.' }),
-    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup.', 'No account, ads, analytics, or tracking. Petal makes no network requests with your data.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Backups, the zip download, and Delete all data are in Settings.' })]);
+  openInfoDialog('Your data and privacy', [h('p', { role: 'status', class: 'info', text: 'Storage status: ' + st }), h('p', { text: 'Your entries are stored in this browser. They are only sent to a server if you choose to create an account, which is optional. Browser data can be cleared or lost, and people who can access your browser profile may be able to access this journal. Export backups, or use an account, if you want to keep a separate copy.' }),
+    h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, password-protected, permanent, or a backup. An account password protects the cloud copy, not this device.', 'Petal has no ads, analytics, or tracking. Without an account, it sends nothing anywhere. With an account, your journal is sent to the cloud, where it is not end-to-end encrypted.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Accounts, backups, and Delete all data are in Settings. The zip download is in the footer.' })]);
 }
 function render(focusId) {
   renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m);
-  m.append(h('p', { class: 'ver' }, h('span', { class: 'verno', text: 'Petal v' + APP_VERSION }), h('button', { type: 'button', class: 'footlink', id: 'privacyLink', text: 'Data and privacy', onclick: openPrivacy }), h('button', { type: 'button', class: 'footlink', id: 'sourcesLink', text: 'Sources', onclick: openSources }), h('button', { type: 'button', class: 'footlink', id: 'downloadLink', text: 'Download', onclick: openDownload })));
+  m.append(h('p', { class: 'ver' }, h('span', { class: 'verno', text: 'Petal v' + APP_VERSION }), h('button', { type: 'button', class: 'footlink', id: 'privacyLink', text: 'Data and privacy', onclick: openPrivacy }), h('button', { type: 'button', class: 'footlink', id: 'sourcesLink', text: 'Sources', onclick: openSources }), h('button', { type: 'button', class: 'footlink', id: 'downloadLink', text: 'Download', onclick: openDownload }), cloudFootNode()));
   if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
 }
 function go(view) { state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
@@ -2018,7 +2286,7 @@ function init() {
   $('#brand').append(flowerIcon(28), h('span', { text: 'Petal' }));
   $('#helpBtn').addEventListener('click', openHelp);
   ['dlg', 'confirm', 'gloss'].forEach((id) => wireDialog($('#' + id)));
-  render();
+  render(); cloudInit();
   setInterval(() => { const box = $('#timerCard'); if (box && $('#dlg').open === false) fillTimer(box); }, 30000);
   document.addEventListener('visibilitychange', () => { const box = $('#timerCard'); if (!document.hidden && box) fillTimer(box); });
 }
@@ -2026,4 +2294,4 @@ init();
 })();
 </script>
 </body>
-</html>
+   </html>
