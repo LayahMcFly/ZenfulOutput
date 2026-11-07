@@ -300,6 +300,9 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 .day{background:var(--field);aspect-ratio:1/1;min-height:120px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--caramel) transparent}   /* every day stays a square; scroll inside it to see more tasks */
 .day::-webkit-scrollbar{width:6px}.day::-webkit-scrollbar-thumb{background:var(--caramel);border-radius:3px}
 .day>.chip{flex:none}
+.shopmark{display:block;flex:none;width:100%;text-align:left;border:1px dashed var(--accent);background:var(--wash,transparent);color:inherit;font:inherit;font-size:.8em;padding:3px 6px;margin-top:3px;cursor:pointer;overflow-wrap:anywhere}
+.agenda-day .shopmark{font-size:.95em;margin:6px 0}
+.cartdot{font:inherit;font-size:11px;line-height:1}
 .day{position:relative}
 .day>:not(.xmark){position:relative;z-index:1}
 .day:nth-child(7n+1),.day:nth-child(7n){background:var(--wknd)}
@@ -461,7 +464,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.1.0';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.1.1';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -826,26 +829,27 @@ function calendarView(){
   const list=D.tasks.filter(pass);
   const byDay={};list.filter(t=>t.due).forEach(t=>{taskDays(t).forEach(k=>{(byDay[k]=byDay[k]||[]).push(t)})});
   Object.values(byDay).forEach(a=>a.sort(byDate));
-  const tdy=todayStr();
+  const tdy=todayStr(),lowBy=shopLowMap();
   let cells='',mcells='';
   const crossing=ST.crossOff;
   for(let i=0;i<rows*7;i++){
-    const d=new Date(yr,mo,1-lead+i),k=ymd(d),ts=byDay[k]||[];
+    const d=new Date(yr,mo,1-lead+i),k=ymd(d),ts=byDay[k]||[],ls=lowBy[k]||[];
     const past=crossing&&k<tdy,spc=ts.some(t=>t.special),other=d.getMonth()!==mo;
     const longDate=fmtDate(k,{weekday:'long',month:'long',day:'numeric'});
-    const note=(past?'. This day has passed.':'')+(spc?'. Special occasion.':'');
+    const note=(past?'. This day has passed.':'')+(spc?'. Special occasion.':'')+(ls.length?'. Running out: '+ls.map(x=>x.name).join(', ')+'.':'');
     cells+=`<div class="day${other?' other':''}${k===tdy?' today':''}${past?' crossed':''}${spc?' special':''}" data-date="${k}">
       ${past?XMARK:''}
       <button type="button" class="dnum" data-act="addday" data-date="${k}" data-fk="day-${k}" aria-label="Add a task on ${esc(longDate)}${note}"${k===tdy?' aria-current="date"':''}><span class="dn">${d.getDate()}${spc?CIRCLE:''}</span>${k===tdy?'<small>Today</small>':''}</button>
+      ${ls.map(shopMark).join('')}
       ${ts.slice(0,3).map(t=>chip(t,k)).join('')}
       ${ts.length>3?`<button type="button" class="more" data-act="daylist" data-date="${k}">+${ts.length-3} more</button>`:''}</div>`;
     mcells+=`<button type="button" class="mday${other?' other':''}${k===tdy?' today':''}" data-act="daylist" data-date="${k}" data-fk="md-${k}" aria-label="${esc(longDate)}, ${ts.length} task${ts.length===1?'':'s'}${note}"${k===tdy?' aria-current="date"':''}>
-      ${past?XMARK:''}<span class="dn">${d.getDate()}${spc?CIRCLE:''}</span><span class="dots" aria-hidden="true">${ts.slice(0,4).map(t=>{const g=group(t.groupId);return`<i style="--c:${g?esc(g.color):'var(--caramel)'}"></i>`}).join('')}</span></button>`;
+      ${past?XMARK:''}<span class="dn">${d.getDate()}${spc?CIRCLE:''}</span><span class="dots" aria-hidden="true">${ls.length?'<b class="cartdot">🛒</b>':''}${ts.slice(0,4).map(t=>{const g=group(t.groupId);return`<i style="--c:${g?esc(g.color):'var(--caramel)'}"></i>`}).join('')}</span></button>`;
   }
-  const legend=`<p class="legend muted small"><span>${crossing?'<svg class="lx" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4l14 15M18 4L4 18"/></svg>Day has passed':''}</span><span><svg class="lc" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 12C2 6 8 2 13 3c5 1 7 7 4 12-3 4-9 4-12 0-1-1-2-3-2-5 0-3 3-6 6-7"/></svg>Special occasion</span></p>`;
+  const legend=`<p class="legend muted small"><span>${crossing?'<svg class="lx" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4l14 15M18 4L4 18"/></svg>Day has passed':''}</span><span><svg class="lc" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 12C2 6 8 2 13 3c5 1 7 7 4 12-3 4-9 4-12 0-1-1-2-3-2-5 0-3 3-6 6-7"/></svg>Special occasion</span><span>🛒 Shopping item runs out</span></p>`;
   const mini=`<div class="mini" role="group" aria-label="${esc(title)}">${['S','M','T','W','T','F','S'].map((w,i)=>`<div class="dow" aria-hidden="true">${w}</div>`).join('')}${mcells}</div>`;
-  const agendaDays=Object.keys(byDay).filter(k=>k.slice(0,7)===yr+'-'+pad(mo+1)).sort();
-  const agenda=agendaDays.length?agendaDays.map(k=>`<section class="agenda-day"><h3>${esc(fmtDate(k,{weekday:'long',month:'long',day:'numeric'}))}${k===tdy?' · Today':''}</h3>${byDay[k].map(t=>taskRow(t,'ag')).join('')}</section>`).join(''):`<div class="empty">No tasks on the calendar this month${UI.f.person!=='all'||UI.f.group!=='all'||UI.f.status!=='all'?' with these filters':''}. Use “Add task” to create one.</div>`;
+  const agendaDays=[...new Set([...Object.keys(byDay),...Object.keys(lowBy)])].filter(k=>k.slice(0,7)===yr+'-'+pad(mo+1)).sort();
+  const agenda=agendaDays.length?agendaDays.map(k=>`<section class="agenda-day"><h3>${esc(fmtDate(k,{weekday:'long',month:'long',day:'numeric'}))}${k===tdy?' · Today':''}</h3>${(lowBy[k]||[]).map(shopMark).join('')}${(byDay[k]||[]).map(t=>taskRow(t,'ag')).join('')}</section>`).join(''):`<div class="empty">No tasks on the calendar this month${UI.f.person!=='all'||UI.f.group!=='all'||UI.f.status!=='all'?' with these filters':''}. Use “Add task” to create one.</div>`;
   const undated=D.tasks.filter(t=>!t.due&&pass(t)).sort(byDate);
   const narrow=innerWidth<720, agendaMode=ST.calMode==='agenda'||narrow;
   return`<div class="page-head"><h2 class="sr">Calendar</h2></div>
@@ -980,6 +984,8 @@ function shopSaveLocal(){try{localStorage.setItem(SHOPKEY,JSON.stringify(SHL||[]
 const shopItems=()=>CL.on?(CL.products||[]):shopLocal();
 const shopGet=id=>shopItems().find(p=>p.id===id);
 const shopSentence=p=>`${p.name} has ${p.qty} left, ${p.opened?'one is opened':'none opened'}${p.goneBy?', all gone by '+fmtDate(p.goneBy,{month:'short',day:'numeric',year:'numeric'}):''}.`;
+const shopLowMap=()=>{const m={};shopItems().filter(p=>p.low&&p.goneBy).forEach(p=>{(m[p.goneBy]=m[p.goneBy]||[]).push(p)});return m};
+const shopMark=p=>`<button type="button" class="shopmark" data-act="shopgo" title="${esc(shopSentence(p))}">🛒 ${esc(p.name)} runs out</button>`;
 function shopCard(p){
   const nm=p.url?`<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.name)}</a>`:esc(p.name);
   return`<li class="prod${p.low?' low':''}"><h4>${nm}${p.low?' <span class="lowtag">Running low</span>':''}</h4>
@@ -1021,6 +1027,7 @@ function openLowForm(p){
 }
 async function shopClick(a,b,id){
   switch(a){
+    case'shopgo':closeDlg();UI.view='shop';render();window.scrollTo(0,0);return true;
     case'shopnew':openProductForm(null);return true;
     case'shopedit':{const p=shopGet(id);if(p)openProductForm(p);return true}
     case'shoplow':{const p=shopGet(id);if(p)openLowForm(p);return true}
@@ -1252,8 +1259,8 @@ function openDetail(id){const t=task(id);if(t){openDlg(detailHTML(t),id);if(CL.o
 function refreshDetail(){const d=$('#dlg'),t=task(d.dataset.task);if(!t){closeDlg();return}d.innerHTML=detailHTML(t);const b=d.querySelector('[data-act=toggletask]');if(b)b.focus()}
 
 function openDayList(k){
-  const ts=D.tasks.filter(t=>onDay(t,k)&&pass(t)).sort(byDate);
-  openDlg(`<div class="dbody">${dhead(fmtDate(k,{weekday:'long',month:'long',day:'numeric',year:'numeric'}))}${ts.map(t=>taskRow(t,'dl')).join('')||'<p class="muted">No tasks on this day.</p>'}
+  const ts=D.tasks.filter(t=>onDay(t,k)&&pass(t)).sort(byDate),ls=shopLowMap()[k]||[];
+  openDlg(`<div class="dbody">${dhead(fmtDate(k,{weekday:'long',month:'long',day:'numeric',year:'numeric'}))}${ls.map(shopMark).join('')}${ts.map(t=>taskRow(t,'dl')).join('')||(ls.length?'':'<p class="muted">No tasks on this day.</p>')}
     <div class="row"><button class="btn" data-act="addday" data-date="${k}">+ Add task on this day</button></div></div>`);
 }
 
