@@ -19,7 +19,7 @@ window.FAMILY_CONFIG = {
   // <<< FILL IN LATER (Setup Guide step 6): the ID of your family Team.
   // Leave as "" until you create the Team. While it is empty, the first signed-in
   // person sees a one-time "Create the family team" screen.
-  teamId: "",
+  teamId: "6aef70c8002b376dccce",
 
   // The IDs below match the Setup Guide. If you create your database, tables and
   // bucket with these exact IDs you do not need to change anything here.
