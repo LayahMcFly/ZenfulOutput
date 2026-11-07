@@ -259,6 +259,12 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 .panel.glow::after{content:"Customize";position:absolute;top:-10px;right:14px;background:var(--accent);color:var(--on-accent);font:700 10px/1 var(--label);letter-spacing:.12em;text-transform:uppercase;padding:4px 8px}
 @keyframes glowspin{to{--ga:360deg}}
 @keyframes glowpulse{0%,100%{box-shadow:0 0 0 0 transparent}50%{box-shadow:0 0 16px -2px var(--accent)}}
+.plist{display:grid;gap:10px;margin:10px 0 0;padding:0;list-style:none}
+.prod{border:1px solid var(--line);background:var(--card,#fff);padding:12px 14px;display:grid;gap:6px}
+.prod.low{border-left:5px solid var(--accent)}
+.prod h4{margin:0;font-size:1.05em;overflow-wrap:anywhere}
+.prod p{margin:0}
+.lowtag{display:inline-block;margin-left:6px;padding:2px 7px;background:var(--accent);color:var(--on-accent);font:700 10px/1.4 var(--label);letter-spacing:.1em;text-transform:uppercase;vertical-align:middle}
 .panel{background:var(--linen);border:1px solid var(--line);padding:18px 20px;margin-top:20px}
 .panel h2{font-size:28px;margin-bottom:10px}
 .panel h3+.muted,.panel h3+p{margin-bottom:12px}
@@ -455,7 +461,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.0.8';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.1.0';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -782,7 +788,7 @@ const pass=t=>{
 const sel=(id,label,opts,val,extra='')=>`<div class="field"><label for="${id}">${label}</label><select id="${id}" ${extra}>${opts.map(o=>`<option value="${esc(o[0])}"${String(o[0])===String(val)?' selected':''}>${esc(o[1])}</option>`).join('')}</select></div>`;
 
 function tabsNav(){
-  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['members',CL.on?'Members':'People'],...(CL.on?[['workspaces','Workspaces']]:[]),...(cyOn()?[['cycle','Cycle 🔒']]:[]),['settings','Settings']];
+  const tabs=[['calendar','Calendar'],['mine','My Tasks'],['groups','Groups'],['shop','Shopping'],['members',CL.on?'Members':'People'],...(CL.on?[['workspaces','Workspaces']]:[]),...(cyOn()?[['cycle','Cycle 🔒']]:[]),['settings','Settings']];
   return`<nav class="tabs" aria-label="Main">${tabs.map(t=>`<button type="button" data-act="nav" data-v="${t[0]}" data-fk="nav-${t[0]}" ${(UI.view===t[0]||(UI.view==='group'&&t[0]==='groups'))?'aria-current="page"':''}>${t[1]}</button>`).join('')}</nav>`;
 }
 function header(){
@@ -960,12 +966,111 @@ function settingsView(){
     ${cyDanger()}`;
 }
 
+/* ---- shopping ---- */
+const SHOPKEY='familyBoard.products.v1';
+const httpUrl=s=>{s=String(s||'').trim();if(!/^https?:\/\//i.test(s))return'';try{return new URL(s).href}catch{return''}};
+let SHL=null;
+function shopLocal(){
+  if(SHL)return SHL;
+  let a=[];try{a=JSON.parse(localStorage.getItem(SHOPKEY)||'[]')}catch{}
+  SHL=(Array.isArray(a)?a:[]).filter(p=>p&&typeof p.name==='string'&&p.name.trim()).slice(0,300).map(p=>({id:String(p.id||uid()).slice(0,40),name:p.name.trim().slice(0,80),url:httpUrl(p.url),low:!!p.low,qty:Number.isInteger(p.qty)&&p.qty>=0&&p.qty<=999?p.qty:0,opened:!!p.opened,goneBy:/^\d{4}-\d{2}-\d{2}$/.test(p.goneBy||'')?p.goneBy:'',by:String(p.by||'').slice(0,40),at:String(p.at||'')}));
+  return SHL;
+}
+function shopSaveLocal(){try{localStorage.setItem(SHOPKEY,JSON.stringify(SHL||[]))}catch{toast('That change could not be saved to this browser.',true)}}
+const shopItems=()=>CL.on?(CL.products||[]):shopLocal();
+const shopGet=id=>shopItems().find(p=>p.id===id);
+const shopSentence=p=>`${p.name} has ${p.qty} left, ${p.opened?'one is opened':'none opened'}${p.goneBy?', all gone by '+fmtDate(p.goneBy,{month:'short',day:'numeric',year:'numeric'}):''}.`;
+function shopCard(p){
+  const nm=p.url?`<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.name)}</a>`:esc(p.name);
+  return`<li class="prod${p.low?' low':''}"><h4>${nm}${p.low?' <span class="lowtag">Running low</span>':''}</h4>
+    ${p.low?`<p>${esc(shopSentence(p))}${p.by?' Flagged by '+esc(p.by)+'.':''}</p>`:'<p class="muted">Stocked.</p>'}
+    <div class="row"><button type="button" class="btn sm" data-act="shoplow" data-id="${esc(p.id)}">${p.low?'Update':'Running low'}</button>${p.low?`<button type="button" class="btn soft sm" data-act="shopbought" data-id="${esc(p.id)}">Bought it</button>`:''}<button type="button" class="btn soft sm" data-act="shopedit" data-id="${esc(p.id)}">Edit</button><button type="button" class="btn danger sm" data-act="shopdel" data-id="${esc(p.id)}">Delete</button></div></li>`;
+}
+function shopView(){
+  const head=`<div class="page-head"><h2>Shopping</h2><button class="btn" data-act="shopnew" data-fk="shopnew">+ New product</button></div>`;
+  if(CL.on&&CL.noShop)return head+'<div class="empty">Shopping needs two small database updates. In Supabase, open SQL Editor and run <strong>supabase-step-11-products.sql</strong>, then <strong>supabase-step-12-low-alerts.sql</strong>. Then refresh this page.</div>';
+  const all=shopItems().slice(),byName=(a,b)=>a.name.localeCompare(b.name);
+  const low=all.filter(p=>p.low).sort((a,b)=>(a.goneBy||'9').localeCompare(b.goneBy||'9')||byName(a,b)),ok=all.filter(p=>!p.low).sort(byName);
+  return`${head}<p class="muted">Add the things you buy again and again. When one is almost gone, tap Running low and say how many are left.${CL.on?' Everyone else in the workspace gets an alert.':' Alerts only go out in shared mode.'}</p>
+    <section class="panel"><h3>Running low (${low.length})</h3>${low.length?`<ul class="plist">${low.map(shopCard).join('')}</ul>`:'<p class="muted">Nothing is running low.</p>'}</section>
+    <section class="panel"><h3>All other products (${ok.length})</h3>${ok.length?`<ul class="plist">${ok.map(shopCard).join('')}</ul>`:'<p class="muted">No products yet. Tap “+ New product” and add one, like “Chickpea noodles boxes”, with a link if you want.</p>'}</section>`;
+}
+function openProductForm(p){
+  openDlg(`<form id="shopform" class="dbody" data-id="${p?esc(p.id):''}" novalidate>${dhead(p?'Edit product':'New product')}
+    <p class="err" id="sperr" role="alert" hidden></p>
+    <div class="field"><label for="sp-name">Product name</label><input id="sp-name" type="text" maxlength="80" required value="${p?esc(p.name):''}" placeholder="Chickpea noodles boxes"></div>
+    <div class="field"><label for="sp-url">Link (optional)</label><input id="sp-url" type="url" maxlength="500" inputmode="url" value="${p?esc(p.url):''}" placeholder="https://www.amazon.com/..."><small class="muted">Amazon, Instacart, Walmart, or any store page.</small></div>
+    <div class="row"><button class="btn" type="submit">${p?'Save product':'Add product'}</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+}
+function openLowForm(p){
+  openDlg(`<form id="shoplow" class="dbody" data-id="${esc(p.id)}" novalidate>${dhead('Running low: '+p.name)}
+    <p class="err" id="slerr" role="alert" hidden></p>
+    <div class="field"><label for="sl-qty">How many are left? An opened one counts as 1.</label><input id="sl-qty" type="number" inputmode="numeric" min="0" max="999" step="1" value="${p.low?p.qty:''}" placeholder="5"></div>
+    <fieldset class="swatches"><legend>Is one opened?</legend>
+      <label class="chk"><input type="radio" name="sl-open" value="yes"${p.low&&p.opened?' checked':''}> Yes</label>
+      <label class="chk"><input type="radio" name="sl-open" value="no"${p.low&&p.opened?'':' checked'}> No</label></fieldset>
+    <div class="field"><label for="sl-date">All gone by (optional)</label><input id="sl-date" type="date" value="${esc(p.low?p.goneBy:'')}"></div>
+    <p class="muted" id="sl-prev" aria-live="polite"></p>
+    <p class="muted small">${CL.on?'Everyone else in the workspace gets a bell alert and a phone alert.':'This is saved on this device. No alerts go out because nobody else shares this board.'}</p>
+    <div class="row"><button class="btn" type="submit">${p.low?'Update':'Send alert'}</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
+  const f=$('#shoplow'),upd=()=>{
+    const q=parseInt($('#sl-qty').value,10),d=$('#sl-date').value;
+    $('#sl-prev').textContent=Number.isInteger(q)&&q>=0?shopSentence({name:p.name,qty:q,opened:($('input[name=sl-open]:checked')||{}).value==='yes',goneBy:d}):'';
+  };
+  f.addEventListener('input',upd);f.addEventListener('change',upd);upd();
+}
+async function shopClick(a,b,id){
+  switch(a){
+    case'shopnew':openProductForm(null);return true;
+    case'shopedit':{const p=shopGet(id);if(p)openProductForm(p);return true}
+    case'shoplow':{const p=shopGet(id);if(p)openLowForm(p);return true}
+    case'shopbought':{
+      const p=shopGet(id);if(!p)return true;
+      if(CL.on)await cloudDo(()=>rpc('product_bought',{p_id:id}),'Marked as bought.');
+      else{Object.assign(p,{low:false,qty:0,opened:false,goneBy:'',by:'',at:''});shopSaveLocal();render();toast('Marked as bought.')}
+      return true;
+    }
+    case'shopdel':{
+      const p=shopGet(id);if(!p)return true;
+      if(!await confirmBox('Delete “'+p.name+'”?','It is removed from the shopping list'+(CL.on?' for everyone in the workspace.':'.'),'Delete product',true))return true;
+      if(CL.on)await cloudDo(()=>rpc('product_delete',{p_id:id}),'Product deleted.');
+      else{SHL=shopLocal().filter(x=>x.id!==id);shopSaveLocal();render();toast('Product deleted.')}
+      return true;
+    }
+  }
+  return false;
+}
+function shopSubmit(f){
+  if(f.id==='shopform'){
+    const name=$('#sp-name').value.trim(),raw=$('#sp-url').value.trim(),er=$('#sperr'),id=f.dataset.id;
+    if(!name){er.textContent='Give the product a name.';er.hidden=false;$('#sp-name').focus();return true}
+    const url=raw?httpUrl(raw):'';
+    if(raw&&!url){er.textContent='The link must start with http:// or https://';er.hidden=false;$('#sp-url').focus();return true}
+    if(CL.on)cloudDo(()=>rpc('product_save',{p_id:id||null,p_ws:CL.wsId,p_name:name,p_url:url||null}),id?'Product saved.':'Product added.').then(ok=>{if(ok)closeDlg()});
+    else{
+      if(id){const p=shopGet(id);if(p)Object.assign(p,{name,url})}
+      else shopLocal().push({id:uid(),name,url,low:false,qty:0,opened:false,goneBy:'',by:'',at:''});
+      shopSaveLocal();closeDlg();render();toast(id?'Product saved.':'Product added.');
+    }
+    return true;
+  }
+  if(f.id==='shoplow'){
+    const id=f.dataset.id,er=$('#slerr'),qraw=$('#sl-qty').value.trim(),date=$('#sl-date').value;
+    if(!/^\d{1,3}$/.test(qraw)){er.textContent='Enter how many are left, from 0 to 999.';er.hidden=false;$('#sl-qty').focus();return true}
+    const qty=parseInt(qraw,10),opened=($('input[name=sl-open]:checked')||{}).value==='yes';
+    if(CL.on)cloudDo(()=>rpc('product_low',{p_id:id,p_qty:qty,p_opened:opened,p_gone_by:date||null}),'Alert sent. Everyone else in the workspace has been told.').then(ok=>{if(ok)closeDlg()});
+    else{const p=shopGet(id);if(p)Object.assign(p,{low:true,qty,opened,goneBy:date,by:'',at:new Date().toISOString()});shopSaveLocal();closeDlg();render();toast('Saved as running low.')}
+    return true;
+  }
+  return false;
+}
+
 /* ---- render ---- */
 const verFoot=()=>`<footer class="verline">Family Board v${APP_VERSION}</footer>`;
 function render(){
   const ae=document.activeElement,fk=ae&&ae.dataset&&ae.dataset.fk,sy=window.scrollY;
-  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:cloudMembersView,workspaces:cloudWorkspacesView,cycle:cycleGuard,settings:settingsViewCloud}
-    :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,members:membersView,cycle:cycleGuard,settings:settingsView};
+  const views=CL.on?{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,shop:shopView,members:cloudMembersView,workspaces:cloudWorkspacesView,cycle:cycleGuard,settings:settingsViewCloud}
+    :{calendar:calendarView,mine:myView,groups:groupsView,group:groupView,shop:shopView,members:membersView,cycle:cycleGuard,settings:settingsView};
   {const src=CL.on?'cloud':'local';if(CY.src!==src){cyReset();CY.src=src}if(!CY.loaded&&!CL.on)cyLoad()}
   let stage=CL.stage;
   if(CL.on&&CL.minUntil&&Date.now()<CL.minUntil){stage='loading';clearTimeout(render.mt);render.mt=setTimeout(render,CL.minUntil-Date.now()+30)}
@@ -1264,6 +1369,7 @@ document.addEventListener('click',async e=>{
     return;
   }
   const a=b.dataset.act,id=b.dataset.id;
+  if(await shopClick(a,b,id))return;
   if(await cloudClick(a,b,id))return;
   switch(a){
     case'nav':UI.view=b.dataset.v;render();window.scrollTo(0,0);break;
@@ -1330,6 +1436,7 @@ document.addEventListener('click',async e=>{
 });
 document.addEventListener('submit',e=>{
   const f=e.target;e.preventDefault();
+  if(shopSubmit(f))return;
   if(cloudSubmit(f))return;
   if(f.id==='tform')return submitTask(f);
   if(f.id==='gform'){
@@ -1522,6 +1629,11 @@ async function cloudLoad(){
   D={app:'family-board',version:1,workspace:{name:ws?ws.name:'Workspace',createdAt:''},members,groups,tasks,currentUserId:CL.session.user_id};
   const me0=members.find(m=>m.id===CL.session.user_id);
   CL.invites=['owner','admin'].includes(me0.role)?await get('invites?workspace_id=eq.'+w+'&used_by=is.null&select=*&order=created_at.desc'):[];
+  if(!CL.noShop){
+    try{const pr=await get('products?workspace_id=eq.'+w+'&select=*&order=name');
+      CL.products=(pr||[]).map(r=>({id:r.id,name:r.name,url:httpUrl(r.url),low:!!r.low,qty:r.qty_left||0,opened:!!r.opened,goneBy:r.gone_by||'',by:r.flagged_by||'',at:r.flagged_at||''}))}
+    catch(e){if(/products/i.test(e.message||'')){CL.noShop=true;CL.products=[]}else throw e}
+  }
   CL.stale=false;
 }
 async function cloudAfterAuth(){
@@ -1620,13 +1732,14 @@ function noteText(n){
     const who=n.actor_name||'Someone';
     return n.for_name?`${who} finished “${n.task_title}” for ${n.for_name} in ${n.workspace_name}.`:`${who} finished “${n.task_title}” in ${n.workspace_name}.`;
   }
+  if(n.kind==='low')return`${n.actor_name||'Someone'} flagged “${n.task_title}” as running low in ${n.workspace_name}: ${n.outcome}.`;
   if(n.kind==='reminder')return`“${n.task_title}” is due ${n.outcome} in ${n.workspace_name}.`;
   if(n.kind==='request')return`${n.actor_name||'Someone'} asks to ${n.task_title} in ${n.workspace_name}.`;
   if(n.kind==='request_result')return`${n.actor_name||'An owner'} ${n.outcome==='approved'?'approved':'rejected'} your request to ${n.task_title}.`;
   return`${n.actor_name||'Someone'} assigned you “${n.task_title}” in ${n.workspace_name}.${due}`;
 }
-const NKINDS=['assigned','completed','request','request_result','reminder'];
-const noteTitle=n=>n.kind==='completed'?'Task finished':n.kind==='request'?'Request waiting':n.kind==='request_result'?'Request '+(n.outcome==='approved'?'approved':'rejected'):n.kind==='reminder'?'Coming up':'New task for you';
+const NKINDS=['assigned','completed','request','request_result','reminder','low'];
+const noteTitle=n=>n.kind==='completed'?'Task finished':n.kind==='request'?'Request waiting':n.kind==='request_result'?'Request '+(n.outcome==='approved'?'approved':'rejected'):n.kind==='reminder'?'Coming up':n.kind==='low'?'Running low':'New task for you';
 const reqOf=id=>(CL.reqs||[]).find(r=>r.id===id);
 function updateBadge(){
   const b=$('#nbadge');if(!b)return;const c=unreadCount();
@@ -1678,7 +1791,7 @@ function openNotes(){
   openDlg(`<div class="dbody">${dhead('Notifications')}
     ${notePrefsHTML()}
     ${list.length?`<ul class="nlist">${list.map(noteItem).join('')}</ul>`
-      :'<p class="muted">Nothing yet. You will see it here when someone assigns you a task, when anyone in the workspace finishes one, or when a member asks an owner for something.</p>'}
+      :'<p class="muted">Nothing yet. You will see it here when someone assigns you a task, when anyone in the workspace finishes one, when something on the shopping list is running low, or when a member asks an owner for something.</p>'}
   </div>`);
   if(unreadCount()){
     rpc('mark_notifications_read',{}).then(()=>{CL.notes.forEach(n=>{if(!n.read_at)n.read_at=new Date().toISOString()});updateBadge()}).catch(()=>{});
@@ -1767,6 +1880,7 @@ function dbHint(m){
   if(/set_prefs|user_prefs/i.test(m))return'Your database needs a small update before reminder settings can be saved. Run supabase-step-6-reminders.sql in Supabase.';
   if(/assignee_ids/i.test(m))return'Your database needs a small update before a task can be shared with several people. Run supabase-update-all.sql in Supabase.';
   if(/start_date|per_day|repeat/i.test(m))return'Your database needs a small update before repeating and long tasks can be saved. Run supabase-update-all.sql in Supabase.';
+  if(/products|product_save|product_low|product_bought|product_delete/i.test(m))return'Your database needs the Shopping steps. Run supabase-step-11-products.sql, then supabase-step-12-low-alerts.sql, in Supabase.';
   if(/steps/i.test(m))return'Your database needs a small update before task steps can be saved. Run supabase-update-all.sql in Supabase.';
   if(/special/i.test(m))return'Your database needs a small update before special occasions can be saved. Run supabase-update-special.sql in Supabase.';
   if(/private_profiles|cycle_logs/i.test(m))return'Your database needs a small update before the private tracker works. Run supabase-update-all.sql in Supabase.';
@@ -2425,7 +2539,8 @@ async function cloudClick(a,b,id){
     case'opennote':{
       const n=CL.notes.find(x=>x.id===id);closeDlg();if(!n)return true;
       if(n.workspace_id!==CL.wsId)await cloudSwitch(n.workspace_id);
-      if(n.task_id&&task(n.task_id))openDetail(n.task_id);
+      if(n.kind==='low'){UI.view='shop';render();window.scrollTo(0,0)}
+      else if(n.task_id&&task(n.task_id))openDetail(n.task_id);
       else toast('That task is no longer there.',true);
       return true;
     }
