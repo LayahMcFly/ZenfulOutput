@@ -300,6 +300,7 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 .day{background:var(--field);aspect-ratio:1/1;min-height:120px;padding:6px;display:flex;flex-direction:column;gap:4px;min-width:0;overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:var(--caramel) transparent}   /* every day stays a square; scroll inside it to see more tasks */
 .day::-webkit-scrollbar{width:6px}.day::-webkit-scrollbar-thumb{background:var(--caramel);border-radius:3px}
 .day>.chip{flex:none}
+.shopcat{margin:14px 0 0;font:700 12px/1.2 var(--label);letter-spacing:.12em;text-transform:uppercase;color:var(--muted,inherit)}
 .shopmark{display:block;flex:none;width:100%;text-align:left;border:1px dashed var(--accent);background:var(--wash,transparent);color:inherit;font:inherit;font-size:.8em;padding:3px 6px;margin-top:3px;cursor:pointer;overflow-wrap:anywhere}
 .agenda-day .shopmark{font-size:.95em;margin:6px 0}
 .cartdot{font:inherit;font-size:11px;line-height:1}
@@ -464,7 +465,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.1.1';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.2.0';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -973,11 +974,13 @@ function settingsView(){
 /* ---- shopping ---- */
 const SHOPKEY='familyBoard.products.v1';
 const httpUrl=s=>{s=String(s||'').trim();if(!/^https?:\/\//i.test(s))return'';try{return new URL(s).href}catch{return''}};
+const cleanCat=c=>String(c||'').replace(/\s+/g,' ').trim().slice(0,40);
+const STARTCATS=['Food','Drinks','Pills','Household'];
 let SHL=null;
 function shopLocal(){
   if(SHL)return SHL;
   let a=[];try{a=JSON.parse(localStorage.getItem(SHOPKEY)||'[]')}catch{}
-  SHL=(Array.isArray(a)?a:[]).filter(p=>p&&typeof p.name==='string'&&p.name.trim()).slice(0,300).map(p=>({id:String(p.id||uid()).slice(0,40),name:p.name.trim().slice(0,80),url:httpUrl(p.url),low:!!p.low,qty:Number.isInteger(p.qty)&&p.qty>=0&&p.qty<=999?p.qty:0,opened:!!p.opened,goneBy:/^\d{4}-\d{2}-\d{2}$/.test(p.goneBy||'')?p.goneBy:'',by:String(p.by||'').slice(0,40),at:String(p.at||'')}));
+  SHL=(Array.isArray(a)?a:[]).filter(p=>p&&typeof p.name==='string'&&p.name.trim()).slice(0,300).map(p=>({id:String(p.id||uid()).slice(0,40),name:p.name.trim().slice(0,80),url:httpUrl(p.url),cat:cleanCat(p.cat),low:!!p.low,qty:Number.isInteger(p.qty)&&p.qty>=0&&p.qty<=999?p.qty:0,opened:!!p.opened,goneBy:/^\d{4}-\d{2}-\d{2}$/.test(p.goneBy||'')?p.goneBy:'',by:String(p.by||'').slice(0,40),at:String(p.at||'')}));
   return SHL;
 }
 function shopSaveLocal(){try{localStorage.setItem(SHOPKEY,JSON.stringify(SHL||[]))}catch{toast('That change could not be saved to this browser.',true)}}
@@ -986,6 +989,12 @@ const shopGet=id=>shopItems().find(p=>p.id===id);
 const shopSentence=p=>`${p.name} has ${p.qty} left, ${p.opened?'one is opened':'none opened'}${p.goneBy?', all gone by '+fmtDate(p.goneBy,{month:'short',day:'numeric',year:'numeric'}):''}.`;
 const shopLowMap=()=>{const m={};shopItems().filter(p=>p.low&&p.goneBy).forEach(p=>{(m[p.goneBy]=m[p.goneBy]||[]).push(p)});return m};
 const shopMark=p=>`<button type="button" class="shopmark" data-act="shopgo" title="${esc(shopSentence(p))}">🛒 ${esc(p.name)} runs out</button>`;
+function shopGrouped(list){
+  const m=new Map();list.forEach(p=>{const c=p.cat||'';(m.get(c)||m.set(c,[]).get(c)).push(p)});
+  const keys=[...m.keys()].sort((a,b)=>(a===''?1:0)-(b===''?1:0)||a.localeCompare(b));
+  if(keys.length===1&&keys[0]==='')return`<ul class="plist">${list.map(shopCard).join('')}</ul>`;
+  return keys.map(c=>`<h4 class="shopcat">${esc(c||'No group')} (${m.get(c).length})</h4><ul class="plist">${m.get(c).map(shopCard).join('')}</ul>`).join('');
+}
 function shopCard(p){
   const nm=p.url?`<a href="${esc(p.url)}" target="_blank" rel="noopener noreferrer">${esc(p.name)}</a>`:esc(p.name);
   return`<li class="prod${p.low?' low':''}"><h4>${nm}${p.low?' <span class="lowtag">Running low</span>':''}</h4>
@@ -998,14 +1007,15 @@ function shopView(){
   const all=shopItems().slice(),byName=(a,b)=>a.name.localeCompare(b.name);
   const low=all.filter(p=>p.low).sort((a,b)=>(a.goneBy||'9').localeCompare(b.goneBy||'9')||byName(a,b)),ok=all.filter(p=>!p.low).sort(byName);
   return`${head}<p class="muted">Add the things you buy again and again. When one is almost gone, tap Running low and say how many are left.${CL.on?' Everyone else in the workspace gets an alert.':' Alerts only go out in shared mode.'}</p>
-    <section class="panel"><h3>Running low (${low.length})</h3>${low.length?`<ul class="plist">${low.map(shopCard).join('')}</ul>`:'<p class="muted">Nothing is running low.</p>'}</section>
-    <section class="panel"><h3>All other products (${ok.length})</h3>${ok.length?`<ul class="plist">${ok.map(shopCard).join('')}</ul>`:'<p class="muted">No products yet. Tap “+ New product” and add one, like “Chickpea noodles boxes”, with a link if you want.</p>'}</section>`;
+    <section class="panel"><h3>Running low (${low.length})</h3>${low.length?shopGrouped(low):'<p class="muted">Nothing is running low.</p>'}</section>
+    <section class="panel"><h3>All other products (${ok.length})</h3>${ok.length?shopGrouped(ok):'<p class="muted">No products yet. Tap “+ New product” and add one, like “Chickpea noodles boxes”, with a link if you want.</p>'}</section>`;
 }
 function openProductForm(p){
   openDlg(`<form id="shopform" class="dbody" data-id="${p?esc(p.id):''}" novalidate>${dhead(p?'Edit product':'New product')}
     <p class="err" id="sperr" role="alert" hidden></p>
     <div class="field"><label for="sp-name">Product name</label><input id="sp-name" type="text" maxlength="80" required value="${p?esc(p.name):''}" placeholder="Chickpea noodles boxes"></div>
     <div class="field"><label for="sp-url">Link (optional)</label><input id="sp-url" type="url" maxlength="500" inputmode="url" value="${p?esc(p.url):''}" placeholder="https://www.amazon.com/..."><small class="muted">Amazon, Instacart, Walmart, or any store page.</small></div>
+    <div class="field"><label for="sp-cat">Group (optional)</label><input id="sp-cat" type="text" maxlength="40" list="sp-cats" autocomplete="off" value="${p?esc(p.cat):''}" placeholder="Food, Pills, Drinks, or make your own"><datalist id="sp-cats">${[...new Set([...STARTCATS,...shopItems().map(x=>x.cat).filter(Boolean)])].sort().map(c=>`<option value="${esc(c)}">`).join('')}</datalist><small class="muted">Type a new name to create a group. Products with the same group name sit together.</small></div>
     <div class="row"><button class="btn" type="submit">${p?'Save product':'Add product'}</button><button type="button" class="btn soft" data-act="closedlg">Cancel</button></div></form>`);
 }
 function openLowForm(p){
@@ -1053,10 +1063,19 @@ function shopSubmit(f){
     if(!name){er.textContent='Give the product a name.';er.hidden=false;$('#sp-name').focus();return true}
     const url=raw?httpUrl(raw):'';
     if(raw&&!url){er.textContent='The link must start with http:// or https://';er.hidden=false;$('#sp-url').focus();return true}
-    if(CL.on)cloudDo(()=>rpc('product_save',{p_id:id||null,p_ws:CL.wsId,p_name:name,p_url:url||null}),id?'Product saved.':'Product added.').then(ok=>{if(ok)closeDlg()});
+    const cat=cleanCat($('#sp-cat').value);
+    let warn=false;
+    if(CL.on)cloudDo(async()=>{
+      const a={p_id:id||null,p_ws:CL.wsId,p_name:name,p_url:url||null};
+      try{await rpc('product_save',{...a,p_category:cat})}
+      catch(e){   // database without step 13: save without the group
+        if(!/product_save|p_category/i.test(e.message||''))throw e;
+        await rpc('product_save',a);warn=!!cat;
+      }
+    },id?'Product saved.':'Product added.').then(ok=>{if(ok){closeDlg();if(warn)toast('Saved without the group. Run supabase-step-13-product-groups.sql in Supabase to turn groups on.',true)}});
     else{
-      if(id){const p=shopGet(id);if(p)Object.assign(p,{name,url})}
-      else shopLocal().push({id:uid(),name,url,low:false,qty:0,opened:false,goneBy:'',by:'',at:''});
+      if(id){const p=shopGet(id);if(p)Object.assign(p,{name,url,cat})}
+      else shopLocal().push({id:uid(),name,url,cat,low:false,qty:0,opened:false,goneBy:'',by:'',at:''});
       shopSaveLocal();closeDlg();render();toast(id?'Product saved.':'Product added.');
     }
     return true;
@@ -1638,7 +1657,7 @@ async function cloudLoad(){
   CL.invites=['owner','admin'].includes(me0.role)?await get('invites?workspace_id=eq.'+w+'&used_by=is.null&select=*&order=created_at.desc'):[];
   if(!CL.noShop){
     try{const pr=await get('products?workspace_id=eq.'+w+'&select=*&order=name');
-      CL.products=(pr||[]).map(r=>({id:r.id,name:r.name,url:httpUrl(r.url),low:!!r.low,qty:r.qty_left||0,opened:!!r.opened,goneBy:r.gone_by||'',by:r.flagged_by||'',at:r.flagged_at||''}))}
+      CL.products=(pr||[]).map(r=>({id:r.id,name:r.name,url:httpUrl(r.url),cat:cleanCat(r.category),low:!!r.low,qty:r.qty_left||0,opened:!!r.opened,goneBy:r.gone_by||'',by:r.flagged_by||'',at:r.flagged_at||''}))}
     catch(e){if(/products/i.test(e.message||'')){CL.noShop=true;CL.products=[]}else throw e}
   }
   CL.stale=false;
