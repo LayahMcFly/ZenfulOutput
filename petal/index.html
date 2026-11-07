@@ -7,239 +7,6 @@
 <meta name="referrer" content="no-referrer">
 <meta name="theme-color" content="#ecdfc8">
 <title>My Journal</title>
-<!-- Pattern lock: nothing in Petal is shown until the secret pattern is drawn. 3 wrong tries = 30 second lockout. -->
-<script>
-(function () {
-  var PATTERN_CODE = '1skjwfubocd';   // code for the secret pattern
-  var MAX_TRIES = 3, LOCK_MS = 30000, MIN_DOTS = 4;
-  var STATE_KEY = 'petalLockState';
-
-  var maker = /[?&]makepattern(&|=|$)/.test(location.search);
-
-  /* simple string hash, so the pattern is not written out in plain numbers */
-  function hash(str) {
-    var h1 = 0xdeadbeef, h2 = 0x41c6ce57, ch, i;
-    for (i = 0; i < str.length; i++) {
-      ch = str.charCodeAt(i);
-      h1 = Math.imul(h1 ^ ch, 2654435761);
-      h2 = Math.imul(h2 ^ ch, 1597334677);
-    }
-    h1 = Math.imul(h1 ^ (h1 >>> 16), 2246822507);
-    h1 ^= Math.imul(h2 ^ (h2 >>> 13), 3266489909);
-    h2 = Math.imul(h2 ^ (h2 >>> 16), 2246822507);
-    h2 ^= Math.imul(h1 ^ (h1 >>> 13), 3266489909);
-    return (4294967296 * (2097151 & h2) + (h1 >>> 0)).toString(36);
-  }
-  function codeFor(sel) { return hash('petal-lock:' + sel.join('-')); }
-
-  /* Tries and lockout are kept in three places (site storage, tab storage, tab name),
-     and the strictest value wins, so reloading the page cannot clear them. */
-  function readOne(raw) { try { return JSON.parse(raw) || {}; } catch (e) { return {}; } }
-  function load() {
-    var parts = [], raw;
-    try { parts.push(readOne(localStorage.getItem(STATE_KEY))); } catch (e) {}
-    try { parts.push(readOne(sessionStorage.getItem(STATE_KEY))); } catch (e) {}
-    try { if (window.name.indexOf(STATE_KEY + '=') === 0) parts.push(readOne(window.name.slice(STATE_KEY.length + 1))); } catch (e) {}
-    var out = { fails: 0, until: 0 };
-    parts.forEach(function (p) {
-      out.fails = Math.max(out.fails, p.fails || 0);
-      out.until = Math.max(out.until, p.until || 0);
-    });
-    return out;
-  }
-  function save(s) {
-    var raw = JSON.stringify(s);
-    try { localStorage.setItem(STATE_KEY, raw); } catch (e) {}
-    try { sessionStorage.setItem(STATE_KEY, raw); } catch (e) {}
-    try { window.name = STATE_KEY + '=' + raw; } catch (e) {}
-  }
-
-  /* hide everything else right away so nothing flashes before the lock appears */
-  var css = document.getElementById('petal-lock-style');
-  if (!css) { css = document.createElement('style'); css.id = 'petal-lock-style';  css.textContent =
-    'html.pl-locked body>*:not(#petal-lock){visibility:hidden!important}' +
-    'html[data-locked] body>#petal-lock[id]{visibility:visible!important}' +
-    'html.pl-locked,html.pl-locked body{overflow:hidden}' +
-    '#petal-lock{--bg:#ecdfc8;--card:#fbf5e8;--ink:#40291d;--soft:#6d523f;--accent:#9b5565;--line:#d9c6a6;' +
-    'position:fixed;inset:0;z-index:2147483647;display:flex;align-items:center;justify-content:center;padding:20px;' +
-    'background:var(--bg);color:var(--ink);font:400 18px/1.5 Georgia,"Times New Roman",serif}' +
-    '@media (prefers-color-scheme:dark){#petal-lock{--bg:#241a14;--card:#3a2c22;--ink:#f1e6d2;--soft:#c9b79e;--accent:#e08aa0;--line:#57432f}}' +
-    '#petal-lock .box{width:min(340px,100%);text-align:center;background:var(--card);border:1px solid var(--line);' +
-    'border-top:8px solid var(--accent);padding:26px 22px 22px;box-shadow:0 14px 24px -16px rgba(0,0,0,.45)}' +
-    '#petal-lock h1{font:400 30px/1.1 Georgia,serif;margin:8px 0 4px}' +
-    '#petal-lock .sub{margin:0 0 14px;color:var(--soft);font-size:16px}' +
-    '#petal-lock .pad{position:relative;width:min(260px,72vw);aspect-ratio:1;margin:0 auto;touch-action:none;user-select:none;-webkit-user-select:none;outline:none;border-radius:12px}' +
-    '#petal-lock .pad svg{width:100%;height:100%;display:block}' +
-    '#petal-lock .ring{fill:none;stroke:var(--line);stroke-width:3}' +
-    '#petal-lock .core{fill:var(--soft);opacity:.55}' +
-    '#petal-lock .on .ring{stroke:var(--accent);stroke-width:4}' +
-    '#petal-lock .on .core{fill:var(--accent);opacity:1}' +
-    '#petal-lock .cur .ring{stroke:var(--ink);stroke-dasharray:6 5}' +
-    '#petal-lock .trail{fill:none;stroke:var(--accent);stroke-width:6;stroke-linecap:round;stroke-linejoin:round;opacity:.75}' +
-    '#petal-lock .pad:focus-visible{box-shadow:0 0 0 3px var(--accent)}' +
-    '#petal-lock .msg{min-height:3em;margin:12px 0 0;font-size:16px;color:var(--soft)}' +
-    '#petal-lock .msg.bad{color:var(--accent);font-weight:700}' +
-    '#petal-lock .pad.shake{animation:pl-shake .4s}' +
-    '#petal-lock .pad.off{opacity:.35;pointer-events:none}' +
-    '#petal-lock code{display:block;margin:8px 0;padding:10px;background:var(--bg);border:1px solid var(--line);word-break:break-all;font:700 15px ui-monospace,Courier,monospace;color:var(--ink)}' +
-    '#petal-lock button{font:700 13px ui-monospace,Courier,monospace;letter-spacing:.08em;text-transform:uppercase;background:var(--accent);color:#fff;border:0;border-radius:3px;padding:12px 16px;min-height:44px;cursor:pointer}' +
-    '@keyframes pl-shake{20%,60%{transform:translateX(-8px)}40%,80%{transform:translateX(8px)}}' +
-    '@media (prefers-reduced-motion:reduce){#petal-lock .pad.shake{animation:none}}';
-  (document.head || document.documentElement).appendChild(css); }
-  document.documentElement.classList.add('pl-locked');
-
-  function build() {
-    var NS = 'http://www.w3.org/2000/svg';
-    var wrap = document.createElement('div');
-    wrap.id = 'petal-lock';
-    wrap.setAttribute('role', 'dialog');
-    wrap.setAttribute('aria-label', 'Petal pattern lock');
-    wrap.innerHTML =
-      '<div class="box">' +
-      '<svg width="44" height="44" viewBox="0 0 32 32" aria-hidden="true"><path d="M16 4c5.6 4.9 8.2 9.2 8.2 13.1a8.2 8.2 0 0 1-16.4 0C7.8 13.2 10.4 8.9 16 4z" fill="#9b5565"/><path d="M16 12c2.8 2.4 3.9 4.4 3.9 6.1a3.9 3.9 0 0 1-7.8 0c0-1.7 1.1-3.7 3.9-6.1z" fill="#fbf5e8"/></svg>' +
-      '<h1>Petal</h1>' +
-      '<p class="sub">' + (maker ? 'Draw a new pattern to get its code.' : 'Draw your pattern to open.') + '</p>' +
-      '<div class="pad" tabindex="0" role="application" aria-label="Pattern pad. Use arrow keys to move, space to add a dot, enter to finish, escape to clear."></div>' +
-      '<p class="msg" aria-live="polite"></p>' +
-      '</div>';
-    document.body.appendChild(wrap);
-
-    var pad = wrap.querySelector('.pad'), msg = wrap.querySelector('.msg');
-    var svg = document.createElementNS(NS, 'svg');
-    svg.setAttribute('viewBox', '0 0 300 300');
-    var trail = document.createElementNS(NS, 'polyline');
-    trail.setAttribute('class', 'trail');
-    svg.appendChild(trail);
-    var dots = [];
-    for (var i = 0; i < 9; i++) {
-      var g = document.createElementNS(NS, 'g');
-      var cx = 50 + (i % 3) * 100, cy = 50 + Math.floor(i / 3) * 100;
-      var ring = document.createElementNS(NS, 'circle');
-      ring.setAttribute('class', 'ring'); ring.setAttribute('cx', cx); ring.setAttribute('cy', cy); ring.setAttribute('r', 26);
-      var core = document.createElementNS(NS, 'circle');
-      core.setAttribute('class', 'core'); core.setAttribute('cx', cx); core.setAttribute('cy', cy); core.setAttribute('r', 8);
-      g.appendChild(ring); g.appendChild(core); svg.appendChild(g);
-      dots.push({ g: g, x: cx, y: cy });
-    }
-    pad.appendChild(svg);
-
-    var sel = [], drawing = false, cursor = 4, keyMode = false, tick = null;
-
-    function render(px, py) {
-      var pts = sel.map(function (d) { return dots[d].x + ',' + dots[d].y; });
-      if (px != null && sel.length) pts.push(px + ',' + py);
-      trail.setAttribute('points', pts.join(' '));
-      dots.forEach(function (d, i) {
-        d.g.setAttribute('class', (sel.indexOf(i) > -1 ? 'on' : '') + (keyMode && i === cursor ? ' cur' : ''));
-      });
-    }
-    function say(text, bad) { msg.textContent = text; msg.className = 'msg' + (bad ? ' bad' : ''); }
-    function clear() { sel = []; drawing = false; render(); }
-    function hit(x, y) {
-      for (var i = 0; i < 9; i++) {
-        var dx = x - dots[i].x, dy = y - dots[i].y;
-        if (dx * dx + dy * dy < 46 * 46) return i;
-      }
-      return -1;
-    }
-    function coords(e) {
-      var r = pad.getBoundingClientRect();
-      return [(e.clientX - r.left) / r.width * 300, (e.clientY - r.top) / r.height * 300];
-    }
-
-    function lockedFor() { var s = load(); return s.until && s.until > Date.now() ? Math.ceil((s.until - Date.now()) / 1000) : 0; }
-    function showLock() {
-      var left = lockedFor();
-      if (left > 0) {
-        pad.classList.add('off'); say('Too many tries. Try again in ' + left + 's.', true);
-        if (!tick) tick = setInterval(showLock, 250);
-      } else {
-        pad.classList.remove('off');
-        if (tick) { clearInterval(tick); tick = null; say('Draw your pattern to open.'); }
-      }
-    }
-
-    function finish() {
-      drawing = false; render();
-      if (sel.length < MIN_DOTS) {
-        if (sel.length) say('Connect at least ' + MIN_DOTS + ' dots.', true);
-        setTimeout(clear, 500); return;
-      }
-      var code = codeFor(sel);
-      if (maker) {
-        msg.innerHTML = 'Replace <b>PATTERN_CODE</b> in the lock with:<code>' + code + '</code><button type="button">Draw again</button>';
-        msg.querySelector('button').onclick = function () { clear(); say(''); };
-        return;
-      }
-      if (code === PATTERN_CODE) {
-        save({});
-        document.documentElement.classList.remove('pl-locked');
-        wrap.remove();
-        armRelock();
-        return;
-      }
-      var s = load(); s.fails = (s.fails || 0) + 1;
-      pad.classList.remove('shake'); void pad.offsetWidth; pad.classList.add('shake');
-      if (s.fails >= MAX_TRIES) { s.fails = 0; s.until = Date.now() + LOCK_MS; save(s); setTimeout(clear, 400); showLock(); return; }
-      save(s);
-      say('Wrong pattern. ' + (MAX_TRIES - s.fails) + (MAX_TRIES - s.fails === 1 ? ' try left.' : ' tries left.'), true);
-      setTimeout(clear, 500);
-    }
-
-    pad.addEventListener('pointerdown', function (e) {
-      if (lockedFor()) return;
-      keyMode = false; clear(); say('');
-      drawing = true; pad.setPointerCapture(e.pointerId);
-      var c = coords(e), h = hit(c[0], c[1]);
-      if (h > -1) sel.push(h);
-      render(c[0], c[1]);
-      e.preventDefault();
-    });
-    pad.addEventListener('pointermove', function (e) {
-      if (!drawing) return;
-      var c = coords(e), h = hit(c[0], c[1]);
-      if (h > -1 && sel.indexOf(h) === -1) sel.push(h);
-      render(c[0], c[1]);
-    });
-    pad.addEventListener('pointerup', function () { if (drawing) finish(); });
-    pad.addEventListener('pointercancel', function () { if (drawing) clear(); });
-
-    pad.addEventListener('keydown', function (e) {
-      if (lockedFor()) return;
-      var k = e.key, moved = true;
-      if (k === 'ArrowRight' && cursor % 3 < 2) cursor++;
-      else if (k === 'ArrowLeft' && cursor % 3 > 0) cursor--;
-      else if (k === 'ArrowDown' && cursor < 6) cursor += 3;
-      else if (k === 'ArrowUp' && cursor > 2) cursor -= 3;
-      else if (k === ' ') { if (sel.indexOf(cursor) === -1) sel.push(cursor); }
-      else if (k === 'Enter') { finish(); }
-      else if (k === 'Escape' || k === 'Backspace') { clear(); }
-      else moved = false;
-      if (moved) { keyMode = true; render(); e.preventDefault(); }
-    });
-
-    showLock();
-    if (!maker) pad.focus({ preventScroll: true });
-  }
-
-  /* Lock again whenever the page is left or brought back: switching tabs or apps,
-     the screen turning off, or the browser restoring the tab without a reload. */
-  var armed = false;
-  function lockNow() {
-    document.documentElement.classList.add('pl-locked');
-    if (!document.getElementById('petal-lock')) build();
-  }
-  function armRelock() {
-    if (armed) return;
-    armed = true;
-    document.addEventListener('visibilitychange', function () { if (document.hidden) lockNow(); });
-    window.addEventListener('pagehide', lockNow);
-    window.addEventListener('pageshow', function (e) { if (e.persisted) lockNow(); });
-  }
-
-  if (document.body) build(); else document.addEventListener('DOMContentLoaded', build);
-})();
-</script>
 <script id="prelock">try{if(localStorage.getItem('petal.v2.lock'))document.documentElement.setAttribute('data-locked','')}catch(e){}</script>
 <meta name="description" content="Petal is a private journal for tracking your period. It works offline, and an account is optional.">
 <meta property="og:type" content="website">
@@ -537,6 +304,19 @@ html[data-locked] body{background:var(--paper)}
   #printArea th,#printArea td{border:1px solid #444;padding:3pt 5pt;text-align:left;vertical-align:top}
   #printArea tr{break-inside:avoid}
 }
+
+.pdet{border:1px solid var(--line);border-radius:3px;background:var(--card);margin:8px 0}
+.pdet summary{cursor:pointer;padding:10px 12px;min-height:44px;display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px}
+.pdet summary .ptxt{flex:1 1 220px;font-weight:700}
+.pdet summary .bar{flex:1 1 100%;margin:0}
+.pdet summary .tag{margin:0}
+.pdet>p,.pdet>ul{margin-left:12px;margin-right:12px}
+.plist{list-style:none;padding:0;margin:6px 12px 12px}
+.plist li{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;padding:6px 0;border-top:1px solid var(--line)}
+.small-btn{min-height:44px;padding:8px 12px;font-size:12px}
+.howsum{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
+.sugg{border-color:var(--accent);background:var(--soft)}
+.sugg-title{font:700 18px/1.3 var(--body);margin:4px 0}
 </style>
 </head>
 <body>
@@ -566,12 +346,12 @@ html[data-locked] body{background:var(--paper)}
 (function () {
 'use strict';
 // A copy of this page's own source, taken before anything is drawn, so the zip download can include a working app file.
-const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(' data-locked=""', '').replace(/<style id="petal-lock-style">[\s\S]*?<\/style>/, '').replace(' class="pl-locked"', '');
+const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.replace(' data-locked=""', '');
 
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.1.2'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.2.0'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -773,7 +553,8 @@ const state = {
   view: 'today', sel: todayStr(), calMonth: todayStr().slice(0, 7), calMode: 'grid',
   learnTab: 'articles', learnQ: '', learnCat: 'All', article: null, glossQ: '',
   storage: { mode: 'ok', raw: null, reason: '' }, // mode: ok | memory | blocked
-  saveError: '', timerLevels: {}, timerDismissed: {}
+  saveError: '', timerLevels: {}, timerDismissed: {},
+  cycTab: 'summaries', patRange: '90', patFrom: '', patTo: '', patOpen: {}, suggest: null, readFrom: null
 };
 
 const isObj = (v) => v && typeof v === 'object' && !Array.isArray(v);
@@ -914,6 +695,7 @@ function persist() {
 }
 // Called after any change. Only says "saved" once storage has succeeded.
 function saved(okMsg) {
+  state.suggest = null; // a reading suggestion belongs to the save that produced it
   const r = persist();
   if (r.ok) { state.saveError = ''; toast(okMsg || 'Your entry is saved.'); }
   else { state.saveError = r.reason; }
@@ -1126,7 +908,7 @@ function openPeriodForm(o) {
         if (m[1] === 'f') { const cur = flowOn(m[2]); upsert(data.flow, { id: cur ? cur.id : uid(), date: m[2], level: sel.value, leaks: cur ? cur.leaks : false, between: cur ? cur.between : false, overnight: cur ? cur.overnight : false, note: cur ? cur.note : '' }); }
         else { let t = atTime(m[2], 12, 0); if (t > nowIso) t = new Date(Date.now() - 60000).toISOString(); data.pain.push({ id: uid(), ts: t, intensity: Number(sel.value), locations: [], types: [], startTime: '', duration: null, impact: '', relief: [], note: '' }); }
       });
-      saved(mode === 'end' ? 'Your period is marked as ended.' : 'Your period record is saved.'); return null;
+      const sr = saved(mode === 'end' ? 'Your period is marked as ended.' : 'Your period record is saved.'); if (sr.ok && !ex && mode === 'start') offerReading('period', {}); return null;
     }
   });
 }
@@ -1156,7 +938,7 @@ function openFlowForm(id) {
       const same = flowOn(date);
       upsert(data.flow, { id: ex ? ex.id : same ? same.id : uid(), date, level, leaks: f.querySelector('#fl-leaks').checked, between: f.querySelector('#fl-between').checked, overnight: f.querySelector('#fl-night').checked, note: val(f, 'fl-note') });
       if (ex && same && ex.id !== same.id) remove(data.flow, ex.id);
-      saved('Your flow entry is saved.'); return null;
+      const sr = saved('Your flow entry is saved.'); if (sr.ok && !ex && !same) offerReading('flow', { level }); return null;
     }
   });
 }
@@ -1197,7 +979,7 @@ function openProductForm(id, pre) {
         if (bad.length) errs.push({ id: 'pr-action', msg: 'Your log already shows a tampon in at that time, so this would mean two at once. Choose "Changed", or add a "Removed" entry first.' });
       }
       if (errs.length) return errs;
-      upsert(data.products, rec); saved('Your product entry is saved.'); return null;
+      upsert(data.products, rec); const sr = saved('Your product entry is saved.'); if (sr.ok && !ex) offerReading('product', rec); return null;
     }
   });
 }
@@ -1227,8 +1009,9 @@ function openPainForm(id) {
       if (inten === '') errs.push({ id: 'pn-int', msg: 'Choose a number from 0 to 10.' });
       let dur = null; if (durS) { dur = Number(durS); if (!Number.isInteger(dur) || dur < 1 || dur > 1440) errs.push({ id: 'pn-dur', msg: 'Use a whole number of minutes from 1 to 1440.' }); }
       if (errs.length) return errs;
-      upsert(data.pain, { id: ex ? ex.id : uid(), ts, intensity: Number(inten), locations: getVals(f, 'loc'), types: getVals(f, 'ptype'), startTime: val(f, 'pn-start'), duration: dur, impact: getVal(f, 'impact'), relief: getVals(f, 'prelief'), note: val(f, 'pn-note') });
-      saved('Your pain entry is saved.'); return null;
+      const rec = { id: ex ? ex.id : uid(), ts, intensity: Number(inten), locations: getVals(f, 'loc'), types: getVals(f, 'ptype'), startTime: val(f, 'pn-start'), duration: dur, impact: getVal(f, 'impact'), relief: getVals(f, 'prelief'), note: val(f, 'pn-note') };
+      upsert(data.pain, rec);
+      const sr = saved('Your pain entry is saved.'); if (sr.ok && !ex) offerReading('pain', rec); return null;
     }
   });
 }
@@ -1271,8 +1054,9 @@ function openMoodForm(id) {
       const none = f.querySelector('#md-none').checked, moods = getVals(f, 'mood'), energy = getVal(f, 'energy'), sq = getVal(f, 'sq'), note = val(f, 'md-note');
       if (!errs.length && !moods.length && !energy && !syms.length && !none && sleep === null && !sq && !note) errs.push({ id: 'md-mood', msg: 'Choose at least one thing to record, or close this window.' });
       if (errs.length) return errs;
-      upsert(data.moods, { id: ex ? ex.id : uid(), date, created: ex ? ex.created : new Date().toISOString(), moods, energy, sleepHours: sleep, sleepQuality: sq, symptoms: syms, noSymptoms: none, note });
-      saved('Your entry is saved.'); return null;
+      const rec = { id: ex ? ex.id : uid(), date, created: ex ? ex.created : new Date().toISOString(), moods, energy, sleepHours: sleep, sleepQuality: sq, symptoms: syms, noSymptoms: none, note };
+      upsert(data.moods, rec);
+      const sr = saved('Your entry is saved.'); if (sr.ok && !ex) offerReading('mood', rec); return null;
     }
   });
 }
@@ -1394,6 +1178,7 @@ function viewToday(root) {
   const tc = h('section', { class: 'card', id: 'timerCard' }); fillTimer(tc); if (settings.tamponTimer || settings.padTimer) root.append(tc);
   const est = estimateCard(); if (est) root.append(est);
   root.append(card('Add to ' + fmtShort(logDate()), quickRow()), card('Activity for ' + fmtShort(sel), activityList(sel)), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'See cycle summaries', onclick: () => go('cycles') })));
+  const pc = patternsTodayCard(); if (pc) root.append(pc);
 }
 function introCard() {
   const c = card('Welcome to Petal', [
@@ -1499,6 +1284,7 @@ function viewCycles(root) {
   const today = todayStr(), ps = periodsSorted().reverse(), iv = intervals();
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Cycle summaries' }), h('button', { type: 'button', class: 'btn', text: 'Back to Today', onclick: () => go('today') }),
     h('p', { class: 'info', text: 'Based on your recorded entries. Days with no entry are not recorded, which is different from having no symptoms.' }));
+  if (patternsTabs(root)) return;
   root.append(card('How these numbers work', h('ul', null,
     h('li', null, 'Period length counts both the first and last day.'), h('li', null, rich(h('span'), 'Cycle length is the number of calendar days from one period\'s first day to the next period\'s first day. See {{cycle}}.')),
     h('li', null, 'A period that is still ongoing is not counted as complete.'), h('li', null, 'Petal does not judge whether a length is normal.'))));
@@ -2316,6 +2102,358 @@ function lockCard() {
     h('div', { class: 'btn-row' }, on ? [h('button', { type: 'button', class: 'btn', id: 'lockChange', text: 'Change pattern', onclick: () => openPatternSetup('change') }), h('button', { type: 'button', class: 'btn', id: 'lockOff', text: 'Turn off', onclick: openPatternOff }), h('button', { type: 'button', class: 'btn', text: 'Lock now', onclick: () => { lockState.open = false; showLock(); } })] : h('button', { type: 'button', class: 'btn primary', id: 'lockOn', text: 'Set a pattern', onclick: () => openPatternSetup('set') }))]);
 }
 
+/* ================= Recorded patterns and related reading =================
+   Everything here is derived on the fly from the journal. Nothing calculated is stored.
+   Counting rules (also shown to the person under "How this is counted"):
+   - A day is "covered" for a category only when the person explicitly recorded something for it.
+     Symptoms: a symptom was ticked, or "No symptoms today" was ticked. Pain: a pain entry exists.
+     Impact: a pain entry has an impact chosen (including "No disruption"). Flow-only and
+     product-only entries cover none of these. A day with no entry is unknown, never "none".
+   - Counts are distinct calendar days. Several entries on one day count once.
+   - Symptom names are matched after trimming, collapsing spaces and ignoring capitalization. Nothing else is merged.
+   - "Recurring" means recorded on at least 2 different dates. It is an interface rule, not a medical threshold. */
+
+const PAT_IMPACTS = ['sleep', 'slowed', 'missed', 'unable'];
+const PAT_IMPACT_TEXT = { sleep: 'interrupted sleep', slowed: 'slowed down', missed: 'missed school or work', unable: 'unable to do usual activities' };
+const PAT_NOTE = 'Based only on what you recorded. Missing entries do not mean you had no symptoms.';
+const dayWord = (n) => (n === 1 ? 'day' : 'days');
+
+function symNorm(name) { return String(name).trim().replace(/\s+/g, ' ').toLowerCase(); }
+function symLabel(name) {
+  const k = symNorm(name), known = SYMPTOMS.find((s) => s.toLowerCase() === k); if (known) return known;
+  const c = String(name).trim().replace(/\s+/g, ' '); return c.charAt(0).toUpperCase() + c.slice(1).toLowerCase();
+}
+function patOrder(a, b) { // most days, then most recently recorded, then label
+  return (b.dates.length - a.dates.length) || (a.last < b.last ? 1 : a.last > b.last ? -1 : 0) || (a.label < b.label ? -1 : a.label > b.label ? 1 : 0);
+}
+function patItem(map, key, label, date, id) {
+  let o = map.get(key); if (!o) { o = { key, label, dates: [], ids: {}, last: '' }; map.set(key, o); }
+  if (!o.ids[date]) { o.ids[date] = []; o.dates.push(date); }
+  o.ids[date].push(id); if (date > o.last) o.last = date;
+}
+function patFinish(map, sorter) { const a = Array.from(map.values()); a.forEach((o) => o.dates.sort()); return a.sort(sorter || patOrder); }
+
+function patRange(key) {
+  const today = todayStr();
+  if (key === 'custom') {
+    const f = state.patFrom, t = state.patTo;
+    if (!isDateStr(f) || !isDateStr(t)) return { error: 'Choose a start date and an end date.' };
+    if (f > t) return { error: 'The start date must be the same as or before the end date.' };
+    if (t > today) return { error: 'The end date can be today or earlier.' };
+    return { from: f, to: t, days: dayDiff(f, t) + 1 };
+  }
+  const n = Number(key) || 90; return { from: addDays(today, -(n - 1)), to: today, days: n };
+}
+
+// Date-range analysis: actual logged days only.
+function computePatterns(from, to) {
+  const inR = (d) => d >= from && d <= to;
+  const symCov = new Set(), symNone = new Set(), syms = new Map();
+  data.moods.forEach((m) => {
+    if (!m || !isDateStr(m.date) || !inR(m.date)) return;
+    const list = Array.isArray(m.symptoms) ? m.symptoms : [];
+    if (list.length || m.noSymptoms === true) symCov.add(m.date);
+    if (m.noSymptoms === true && !list.length) symNone.add(m.date);
+    list.forEach((s) => { if (!s || typeof s.name !== 'string') return; const k = symNorm(s.name); if (k) patItem(syms, k, symLabel(s.name), m.date, m.id); });
+  });
+  const named = new Set(); syms.forEach((o) => o.dates.forEach((d) => named.add(d)));
+  const symNoneOnly = Array.from(symNone).filter((d) => !named.has(d)).length;
+
+  const painByDay = new Map(), locs = new Map(), types = new Map(), imps = new Map(), impCov = new Set(), impNone = new Set();
+  data.pain.forEach((p) => {
+    if (!p || typeof p.intensity !== 'number' || isNaN(Date.parse(p.ts))) return;
+    const d = dateOfIso(p.ts); if (!isDateStr(d) || !inR(d)) return;
+    let day = painByDay.get(d); if (!day) { day = { date: d, max: -1, entries: [] }; painByDay.set(d, day); }
+    day.entries.push(p); if (p.intensity > day.max) day.max = p.intensity;
+    (p.locations || []).forEach((l) => patItem(locs, l, labelOf(PAIN_LOC, l) || l, d, p.id));
+    (p.types || []).forEach((t) => patItem(types, t, labelOf(PAIN_TYPE, t) || t, d, p.id));
+    if (p.impact) { impCov.add(d); if (p.impact === 'none') impNone.add(d); else if (PAT_IMPACTS.includes(p.impact)) patItem(imps, p.impact, PAT_IMPACT_TEXT[p.impact], d, p.id); }
+  });
+  const painDays = Array.from(painByDay.values()).sort((a, b) => (a.date < b.date ? -1 : 1));
+  let high = null, highDates = [], avg = null;
+  if (painDays.length) {
+    high = Math.max.apply(null, painDays.map((x) => x.max)); highDates = painDays.filter((x) => x.max === high).map((x) => x.date);
+    avg = Math.round(painDays.reduce((s, x) => s + x.max, 0) / painDays.length * 10) / 10;
+  }
+  const impItems = patFinish(imps, (a, b) => patOrder(a, b) || 0);
+  const entryDays = new Set(); symCov.forEach((d) => entryDays.add(d)); painByDay.forEach((v, d) => entryDays.add(d));
+  return {
+    from, to, entryDays: entryDays.size,
+    sym: { covered: symCov.size, noneOnly: symNoneOnly, items: patFinish(syms), covSet: symCov },
+    pain: { days: painDays, high, highDates, avg, locs: patFinish(locs), types: patFinish(types) },
+    imp: { covered: impCov.size, none: impNone.size, items: impItems }
+  };
+}
+
+// Completed-period analysis. Only periods with an end date that sit fully inside the range.
+function comparePeriods(P) {
+  const { from, to } = P, valid = (p) => p && isDateStr(p.start) && (p.end === null || p.end === undefined || (isDateStr(p.end) && p.end >= p.start));
+  const all = data.periods.filter(valid);
+  const completeIn = all.filter((p) => p.end && p.start >= from && p.end <= to).sort((a, b) => (a.start < b.start ? -1 : 1));
+  const completeOut = all.filter((p) => p.end && !(p.start >= from && p.end <= to)).length;
+  const ongoing = all.filter((p) => !p.end && p.start <= to).length;
+  const overlaps = (p, o) => o.id !== p.id && p.start <= (o.end || '9999-12-31') && o.start <= p.end;
+  const ambiguous = completeIn.filter((p) => all.some((o) => overlaps(p, o)));
+  const usable = completeIn.filter((p) => !ambiguous.includes(p));
+  const within = (p, d) => d >= p.start && d <= p.end;
+  const rows = usable.map((p) => {
+    const symInfo = Array.from(P.sym.covSet).some((d) => within(p, d));
+    const painDays = P.pain.days.filter((x) => within(p, x.date));
+    const impInfo = P.imp.items.some((o) => o.dates.some((d) => within(p, d)));
+    return { p, symInfo, painDays, impInfo };
+  });
+  const symRows = rows.filter((r) => r.symInfo), painRows = rows.filter((r) => r.painDays.length);
+  const impCovered = new Set(); data.pain.forEach((x) => { if (x && x.impact && !isNaN(Date.parse(x.ts))) impCovered.add(dateOfIso(x.ts)); });
+  const impRows = rows.filter((r) => Array.from(impCovered).some((d) => within(r.p, d) && d >= from && d <= to));
+  const symCounts = P.sym.items.map((o) => ({ o, n: symRows.filter((r) => o.dates.some((d) => within(r.p, d))).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n || patOrder(a.o, b.o));
+  const impCounts = P.imp.items.map((o) => ({ o, n: impRows.filter((r) => o.dates.some((d) => within(r.p, d))).length })).filter((x) => x.n > 0).sort((a, b) => b.n - a.n || patOrder(a.o, b.o));
+  return { completeIn, completeOut, ongoing, ambiguous, usable, symRows, painRows, impRows, symCounts, impCounts };
+}
+
+/* ---- Rendering helpers ---- */
+function patOpenState() { if (!state.patOpen) state.patOpen = {}; return state.patOpen; }
+// A count that opens to the days and entries behind it. Each entry has an Edit button that uses the normal edit form.
+function patCount(key, text, item, type, maxN, extra) {
+  const open = patOpenState(), d = h('details', { class: 'pdet' });
+  if (open[key]) d.open = true;
+  d.addEventListener('toggle', () => { open[key] = d.open; });
+  const s = h('summary'); s.append(h('span', { class: 'ptxt', text }));
+  if (item.dates.length >= 2 && !item.noTag) s.append(h('span', { class: 'tag', text: 'Recurring' }));
+  if (maxN) s.append(h('span', { class: 'bar', 'aria-hidden': 'true' }, h('span', { style: 'width:' + Math.max(4, Math.round(item.dates.length / maxN * 100)) + '%' })));
+  const ul = h('ul', { class: 'plist' });
+  item.dates.slice().reverse().forEach((date) => {
+    const li = h('li'); li.append(h('span', { text: fmtShort(date) + (extra ? ' ' + extra(date) : '') }));
+    (item.ids[date] || []).forEach((id, i, arr) => li.append(h('button', { type: 'button', class: 'btn small-btn', 'aria-label': 'Edit entry from ' + fmtShort(date) + (arr.length > 1 ? ' (' + (i + 1) + ' of ' + arr.length + ')' : ''), text: arr.length > 1 ? 'Edit ' + (i + 1) : 'Edit', onclick: () => editEntry(type, id) })));
+    ul.append(li);
+  });
+  d.append(s, h('p', { class: 'small muted', text: 'Days behind this count:' }), ul);
+  return h('div', { class: 'prow' }, d);
+}
+
+function patObservations(P) {
+  const o = [], s = P.sym.items[0], cov = P.sym.covered;
+  if (s) {
+    const n = s.dates.length;
+    o.push('Most often logged symptom: ' + s.label + ', on ' + (cov >= n ? n + ' of ' + cov + ' ' + dayWord(cov) + ' with symptom information.' : n + ' ' + dayWord(n) + '.'));
+  }
+  if (P.pain.days.length) {
+    const D = P.pain.days.length;
+    o.push('Pain was recorded on ' + D + ' ' + dayWord(D) + '. Highest score: ' + P.pain.high + ' out of 10' + (P.pain.highDates.length === 1 ? ' on ' + fmtShort(P.pain.highDates[0]) : ' on ' + P.pain.highDates.length + ' days') + '.');
+  }
+  const im = P.imp.items[0];
+  if (im) o.push('You recorded ' + im.label + ' on ' + im.dates.length + ' ' + dayWord(im.dates.length) + '.');
+  return o;
+}
+
+function patternsTodayCard() {
+  if (!data.moods.length && !data.pain.length) return null;
+  const to = todayStr(), from = addDays(to, -89), P = computePatterns(from, to), obs = patObservations(P);
+  const kids = [h('p', { class: 'small muted', text: 'Last 90 days: ' + fmtShort(from) + ' to ' + fmtShort(to) + '.' })];
+  if (!obs.length) kids.push(h('p', { text: 'No symptoms, pain, or daily-life impact are recorded in these dates.' }));
+  else {
+    kids.push(h('ul', null, obs.map((t) => h('li', { text: t }))));
+    if (P.entryDays < 3) kids.push(h('p', { class: 'small', text: 'A few entries are available. Add more whenever you want to see a fuller picture.' }));
+  }
+  kids.push(h('p', { class: 'small muted', text: PAT_NOTE }), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', id: 'patDetails', text: 'View details', onclick: () => { state.cycTab = 'patterns'; go('cycles'); } })));
+  return card('Your recorded patterns', kids, null, null);
+}
+
+// Tabs at the top of the cycle summaries. Returns true when the patterns tab is showing.
+function patternsTabs(root) {
+  const tab = state.cycTab === 'patterns' ? 'patterns' : 'summaries';
+  const mk = (k, label) => h('button', { type: 'button', class: 'btn' + (tab === k ? ' primary' : ''), id: 'cyc-' + k, 'aria-pressed': tab === k ? 'true' : 'false', text: label, onclick: () => { if (state.cycTab !== k) { state.cycTab = k; render('cyc-' + k); } } });
+  root.append(h('div', { class: 'btn-row', role: 'group', 'aria-label': 'Choose a view' }, mk('summaries', 'Period summaries'), mk('patterns', 'Recorded patterns')));
+  if (tab === 'patterns') { viewPatterns(root); return true; }
+  return false;
+}
+
+function viewPatterns(root) {
+  const key = state.patRange || '90', R = patRange(key);
+  const choose = h('fieldset', { class: 'field' }, h('legend', { text: 'Date range' })), wrap = h('div', { class: 'chips' });
+  [['30', 'Last 30 days'], ['90', 'Last 90 days'], ['180', 'Last 180 days'], ['custom', 'Custom range']].forEach(([v, l]) => wrap.append(h('label', { class: 'chip' }, h('input', { type: 'radio', name: 'patrange', id: 'pat-r-' + v, value: v, checked: key === v, onchange: () => { state.patRange = v; if (v === 'custom' && !state.patFrom) { state.patTo = todayStr(); state.patFrom = addDays(state.patTo, -29); } render('pat-r-' + v); } }), h('span', { text: l }))));
+  choose.append(wrap);
+  root.append(h('h2', { text: 'Recorded patterns' }), choose);
+  if (key === 'custom') {
+    const from = h('input', { type: 'date', id: 'patFrom', value: state.patFrom || '', max: todayStr() }), to = h('input', { type: 'date', id: 'patTo', value: state.patTo || '', max: todayStr() });
+    root.append(h('div', { class: 'field' }, h('label', { for: 'patFrom', text: 'From' }), from), h('div', { class: 'field' }, h('label', { for: 'patTo', text: 'To (included)' }), to),
+      h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', id: 'patApply', text: 'Show these dates', onclick: () => { state.patFrom = from.value; state.patTo = to.value; render('patApply'); } })));
+  }
+  if (R.error) { root.append(h('p', { class: 'info', role: 'alert', text: R.error })); return; }
+  root.append(h('p', { class: 'big', text: fmtShort(R.from) + ' to ' + fmtShort(R.to) }), h('p', { class: 'muted small', text: R.days + ' ' + dayWord(R.days) + ', counting both the first and last date.' }), h('p', { class: 'info', text: PAT_NOTE }));
+  const P = computePatterns(R.from, R.to), none = 'No entries for this category in the selected dates.', few = () => h('p', { class: 'small', text: 'A few entries are available. Add more whenever you want to see a fuller picture.' });
+
+  // 1. Symptoms
+  const sk = [], sc = P.sym.covered;
+  if (!sc) sk.push(h('p', { text: none }));
+  else {
+    sk.push(h('p', { text: 'Symptom information was recorded on ' + sc + ' ' + dayWord(sc) + ' in this date range.' }));
+    if (P.sym.noneOnly) sk.push(h('p', { class: 'small', text: 'On ' + P.sym.noneOnly + ' of those ' + dayWord(sc) + ' you recorded no symptoms.' }));
+    if (!P.sym.items.length) sk.push(h('p', { text: 'No individual symptoms were recorded in these dates.' }));
+    else {
+      sk.push(h('p', { class: 'small muted', text: 'Each count is the number of different days with that symptom out of the days with symptom information. Select a count to see the days.' }));
+      const max = P.sym.items[0].dates.length;
+      P.sym.items.forEach((o) => { const n = o.dates.length; sk.push(patCount('sym:' + o.key, n === 1 ? o.label + ': recorded on 1 day' : o.label + ': ' + n + ' of ' + sc + ' ' + dayWord(sc), o, 'mood', max)); });
+    }
+    if (sc < 3) sk.push(few());
+  }
+  root.append(card('Symptoms in this date range', sk));
+
+  // 2. Pain
+  const pk = [], D = P.pain.days.length;
+  if (!D) pk.push(h('p', { text: none }));
+  else {
+    pk.push(h('p', { text: 'Pain was recorded on ' + D + ' ' + dayWord(D) + ' in this date range.' }));
+    const hi = { dates: P.pain.highDates, ids: {}, last: P.pain.highDates[P.pain.highDates.length - 1] };
+    P.pain.days.forEach((x) => { if (x.max === P.pain.high) hi.ids[x.date] = x.entries.filter((e) => e.intensity === P.pain.high).map((e) => e.id); });
+    pk.push(patCount('pain:high', 'Highest score recorded: ' + P.pain.high + ' out of 10 (' + hi.dates.length + ' ' + dayWord(hi.dates.length) + ')', { dates: hi.dates, ids: hi.ids, last: hi.last, noTag: true }, 'pain', 0));
+    pk.push(h('p', { text: 'Average of daily highest logged pain scores: ' + P.pain.avg + ' out of 10, across ' + D + ' ' + dayWord(D) + '.' }));
+    const all = { dates: P.pain.days.map((x) => x.date), ids: {}, last: P.pain.days[D - 1].date, noTag: true };
+    P.pain.days.forEach((x) => { all.ids[x.date] = x.entries.map((e) => e.id); });
+    pk.push(patCount('pain:days', 'Days with a pain entry: ' + D, all, 'pain', 0, (d) => '(highest ' + P.pain.days.find((x) => x.date === d).max + ')'));
+    const where = P.pain.locs.filter((o) => o.dates.length >= 1), kinds = P.pain.types;
+    if (where.length && D >= 2) { pk.push(h('h3', { text: 'Where it was recorded' })); where.forEach((o) => pk.push(patCount('ploc:' + o.key, o.label + ': ' + o.dates.length + ' ' + dayWord(o.dates.length), o, 'pain', where[0].dates.length))); }
+    if (kinds.length && D >= 2) { pk.push(h('h3', { text: 'What kind of pain' })); kinds.forEach((o) => pk.push(patCount('ptype:' + o.key, o.label + ': ' + o.dates.length + ' ' + dayWord(o.dates.length), o, 'pain', kinds[0].dates.length))); }
+    if (D < 3) pk.push(few());
+  }
+  root.append(card('Pain in this date range', pk));
+
+  // 3. Impacts
+  const ik = [], ic = P.imp.covered;
+  if (!ic) ik.push(h('p', { text: none }));
+  else {
+    ik.push(h('p', { text: 'Daily-life impact was recorded on ' + ic + ' ' + dayWord(ic) + ' in this date range.' }));
+    if (P.imp.none) ik.push(h('p', { class: 'small', text: '"No disruption" was recorded on ' + P.imp.none + ' ' + dayWord(P.imp.none) + '.' }));
+    if (!P.imp.items.length) ik.push(h('p', { text: 'No interruptions to daily life were recorded in these dates.' }));
+    else { const max = P.imp.items[0].dates.length; P.imp.items.forEach((o) => ik.push(patCount('imp:' + o.key, 'You recorded ' + o.label + ' on ' + o.dates.length + ' ' + dayWord(o.dates.length) + '.', o, 'pain', max))); }
+    if (ic < 3) ik.push(few());
+  }
+  root.append(card('Daily-life impact in this date range', ik));
+
+  // 4. Completed periods
+  const C = comparePeriods(P), ck = [];
+  ck.push(h('p', { class: 'small muted', text: 'This is a separate count. It looks at completed periods only, and only those that start and end inside the selected dates.' }));
+  if (!C.completeIn.length) ck.push(h('p', { text: 'No completed periods start and end inside these dates.' }));
+  else {
+    ck.push(h('p', { text: C.completeIn.length + ' completed ' + (C.completeIn.length === 1 ? 'period starts and ends' : 'periods start and end') + ' in this date range.' }));
+    const sRows = C.symRows.length, extra = C.usable.length - sRows;
+    ck.push(h('h3', { text: 'Symptoms' }));
+    if (sRows < 2) ck.push(h('p', { text: 'A comparison needs at least 2 completed periods with symptom information. ' + (sRows ? 'One has it so far.' : 'None have it so far.') }));
+    else {
+      C.symCounts.forEach((x) => ck.push(h('p', { text: x.o.label + ' was recorded during ' + x.n + ' of ' + sRows + ' completed periods with symptom information.' })));
+      if (extra > 0) ck.push(h('p', { class: 'small', text: (extra === 1 ? 'One additional completed period had' : extra + ' additional completed periods had') + ' no symptom information.' }));
+    }
+    ck.push(h('h3', { text: 'Pain' }));
+    if (C.painRows.length < 2) ck.push(h('p', { text: 'A comparison needs at least 2 completed periods with a pain entry. ' + (C.painRows.length ? 'One has it so far.' : 'None have it so far.') }));
+    else {
+      C.painRows.forEach((r) => { const hi = Math.max.apply(null, r.painDays.map((x) => x.max)); ck.push(h('p', { text: fmtShort(r.p.start) + ' to ' + fmtShort(r.p.end) + ': highest score ' + hi + ' out of 10, pain recorded on ' + r.painDays.length + ' ' + dayWord(r.painDays.length) + '.' })); });
+      const e2 = C.usable.length - C.painRows.length; if (e2 > 0) ck.push(h('p', { class: 'small', text: (e2 === 1 ? 'One additional completed period had' : e2 + ' additional completed periods had') + ' no pain entry.' }));
+    }
+    ck.push(h('h3', { text: 'Daily-life impact' }));
+    if (C.impRows.length < 2) ck.push(h('p', { text: 'A comparison needs at least 2 completed periods with a recorded impact. ' + (C.impRows.length ? 'One has it so far.' : 'None have it so far.') }));
+    else {
+      if (!C.impCounts.length) ck.push(h('p', { text: 'No interruptions to daily life were recorded during these periods.' }));
+      C.impCounts.forEach((x) => ck.push(h('p', { text: x.o.label.charAt(0).toUpperCase() + x.o.label.slice(1) + ' was recorded during ' + x.n + ' of ' + C.impRows.length + ' completed periods with impact information.' })));
+      const e3 = C.usable.length - C.impRows.length; if (e3 > 0) ck.push(h('p', { class: 'small', text: (e3 === 1 ? 'One additional completed period had' : e3 + ' additional completed periods had') + ' no impact information.' }));
+    }
+    ck.push(h('p', { class: 'small muted', text: 'A symptom counts as recorded during a period when you logged it on at least one date from the first to the last day of that period. A period without it is not a period without the symptom.' }));
+  }
+  if (C.ambiguous.length) ck.push(h('p', { class: 'info', text: C.ambiguous.length + ' completed ' + (C.ambiguous.length === 1 ? 'period overlaps' : 'periods overlap') + ' another period record, so ' + (C.ambiguous.length === 1 ? 'it was' : 'they were') + ' left out. Edit the period dates if this is a mistake.' }));
+  if (C.completeOut) ck.push(h('p', { class: 'small muted', text: C.completeOut + ' other completed ' + (C.completeOut === 1 ? 'period starts' : 'periods start') + ' or ends outside the selected dates and is not included.' }));
+  if (C.ongoing) ck.push(h('p', { class: 'small muted', text: 'An ongoing period is not counted until you mark its last day.' }));
+  root.append(card('Completed periods in this date range', ck));
+
+  // 5. Method
+  const how = h('details', { class: 'card' }); how.append(h('summary', { class: 'howsum', text: 'How this is counted' }), h('ul', null,
+    h('li', { text: 'Date range: ' + fmtShort(R.from) + ' to ' + fmtShort(R.to) + ', using your local dates. Both the first and last date are included.' }),
+    h('li', { text: 'Counts are different days, not entries. Two headache entries on the same day count as one day. Several impacts on one day count once for each impact.' }),
+    h('li', { text: 'Coverage: a day counts as having symptom information only if you ticked a symptom or "No symptoms today". It counts as having pain information if you logged a pain entry, and impact information if you chose an impact on a pain entry. Flow and product entries do not count for these.' }),
+    h('li', { text: 'A day with no entry is unknown. It is never treated as a day without symptoms, pain, or impact.' }),
+    h('li', { text: 'Symptom names are matched after removing extra spaces and ignoring capital letters. Names that are spelled differently stay separate.' }),
+    h('li', { text: 'Average of daily highest logged pain scores: for each day with pain entries, Petal takes the highest score, then averages those daily values. It is not the average pain through a day.' }),
+    h('li', { text: 'Completed periods: only periods with a last day that start and end inside the selected dates. Entries are matched to a period by date, from its first to its last day. Periods that overlap another period record are left out.' }),
+    h('li', { text: '"Recurring" appears when something was recorded on at least 2 different dates. This is a rule for this screen, not a medical threshold.' }),
+    h('li', { text: 'Petal does not diagnose, predict, or explain why something happened. It counts what you recorded.' })));
+  root.append(how);
+}
+
+/* ================= Related reading suggestions =================
+   Explicit mapping, in priority order. For one save, the first rule that matches the entry's
+   structured fields and is not hidden, already shown today, or being read, is used. Notes and other
+   free text are never read. A suggestion appears only after a new entry is saved by the person.
+   It is never shown for edits, imports, cloud sync, or when the app opens. */
+const READ_RULES = [
+  { id: 'cramps', kind: 'pain', test: (r) => Array.isArray(r.types) && r.types.includes('cramping'), line: 'Want to learn more about cramps?' },
+  { id: 'products', kind: 'product', test: (r) => ['pad', 'tampon', 'cup', 'disc', 'underwear'].includes(r.product), line: 'You logged a product change. This guide explains period-product options.' },
+  { id: 'flow', kind: 'flow', test: (r) => FLOW.some((f) => f[0] === r.level), line: 'You logged flow. This article may help explain the topic.' },
+  { id: 'mood', kind: 'mood', test: (r) => (Array.isArray(r.moods) && r.moods.length > 0) || !!r.energy || !!r.sleepQuality || (r.sleepHours !== null && r.sleepHours !== undefined), line: 'You logged mood, energy, or sleep. This article may help explain the topic.' },
+  { id: 'started', kind: 'period', test: () => true, line: 'You started a period record. This article may help explain the topic.' },
+  { id: 'help', kind: 'pain', test: (r) => PAT_IMPACTS.includes(r.impact), line: 'You recorded how pain affected your day. This article may help explain the topic.' }
+];
+const READ_FROM_LABEL = { today: 'Today', calendar: 'Calendar', cycles: 'Cycle summaries', settings: 'Settings' };
+
+// Device-local preferences and a small "shown on" record. Separate from the journal, settings, backups and cloud copy.
+const KEY_H = 'petal.v2.hints';
+const hints = { on: true, hidden: [], shown: {}, saveFail: false };
+function loadHints() {
+  try {
+    const s = ls(), raw = s && s.getItem(KEY_H); if (!raw) return;
+    const o = JSON.parse(raw); if (!o || o.version !== 1) return;
+    const known = (id) => typeof id === 'string' && ARTICLES.some((a) => a.id === id);
+    hints.on = o.on !== false; hints.hidden = Array.isArray(o.hidden) ? o.hidden.filter(known) : [];
+    if (o.shown && typeof o.shown === 'object') Object.keys(o.shown).forEach((k) => { if (known(k) && isDateStr(o.shown[k])) hints.shown[k] = o.shown[k]; });
+  } catch (e) { /* unreadable: keep defaults, leave the stored value alone */ }
+}
+function saveHints() {
+  try { const s = ls(); if (!s) throw new Error('no storage'); s.setItem(KEY_H, JSON.stringify({ version: 1, on: hints.on, hidden: hints.hidden, shown: hints.shown })); hints.saveFail = false; return true; }
+  catch (e) { hints.saveFail = true; return false; }
+}
+function resetHints() { hints.on = true; hints.hidden = []; hints.shown = {}; hints.saveFail = false; state.suggest = null; state.readFrom = null; }
+loadHints();
+
+// Call only right after a NEW entry was saved and persisted successfully.
+function offerReading(kind, rec) {
+  state.suggest = null;
+  if (!hints.on || !rec) return;
+  const today = todayStr();
+  for (const rule of READ_RULES) {
+    if (rule.kind !== kind || !rule.test(rec)) continue;
+    const a = ARTICLES.find((x) => x.id === rule.id); if (!a) continue;
+    if (hints.hidden.includes(a.id) || hints.shown[a.id] === today) continue;
+    if (state.view === 'learn' && state.article === a.id) continue;
+    state.suggest = { id: a.id, line: rule.line }; hints.shown[a.id] = today; saveHints(); render(); return;
+  }
+}
+function suggestionCard() {
+  const s = state.suggest, a = s && ARTICLES.find((x) => x.id === s.id); if (!a) return null;
+  const close = (msg) => { state.suggest = null; if (msg) toast(msg); render('viewTitle'); };
+  return h('section', { class: 'card sugg', 'aria-labelledby': 'suggLabel' },
+    h('p', { class: 'sectag' }, h('span', { class: 'tag', id: 'suggLabel', text: 'Related reading' })),
+    h('p', { class: 'sugg-title', text: a.title }), h('p', { text: s.line }), h('p', { class: 'small muted', text: 'About ' + readMins(a) + ' min read' }),
+    h('div', { class: 'btn-row' },
+      h('button', { type: 'button', class: 'btn primary', id: 'suggRead', 'aria-label': 'Read article: ' + a.title, text: 'Read article', onclick: () => { state.readFrom = { view: state.view, sel: state.sel, calMonth: state.calMonth, calMode: state.calMode }; state.suggest = null; openArticle(a.id); } }),
+      h('button', { type: 'button', class: 'btn', text: 'Dismiss', onclick: () => close() }),
+      h('button', { type: 'button', class: 'btn', text: 'Hide suggestions like this', onclick: () => { if (!hints.hidden.includes(a.id)) hints.hidden.push(a.id); const ok = saveHints(); close(ok ? 'Suggestions like this are hidden. You can turn them back on in Settings.' : 'Hidden for now. Petal could not save this choice on this device, so it may return after you close the page.'); } })));
+}
+function placeSuggestion(m) {
+  if (!state.suggest || state.view === 'learn') return;
+  const c = suggestionCard(); if (!c) return;
+  const anchor = m.querySelector('#logBtn') || m.querySelector('#viewTitle'); if (anchor) anchor.after(c); else m.prepend(c);
+}
+function returnFromArticle() {
+  const rf = state.readFrom; if (!rf) return;
+  state.readFrom = null; state.article = null; state.view = rf.view; state.sel = rf.sel; state.calMonth = rf.calMonth; state.calMode = rf.calMode;
+  render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0);
+}
+function hintsCard() {
+  const n = hints.hidden.length, kids = [
+    h('p', { class: 'muted', text: 'When on, Petal can show one small link to an article after you save a new entry. It looks only at the choices you made in the form, never at your notes. Nothing opens by itself. These choices stay on this device and are not part of backups or your cloud copy.' }),
+    toggle('hints', 'Show related reading after I save a new entry', hints.on, (v) => { hints.on = v; if (!v) state.suggest = null; const ok = saveHints(); toast(ok ? (v ? 'Related reading suggestions are on.' : 'Related reading suggestions are off.') : 'This choice could not be saved on this device. It applies until you close the page.'); render('set-hints'); }),
+    h('p', { class: 'small', text: n ? 'Hidden suggestion topics: ' + n + '.' : 'No suggestion topics are hidden.' }),
+    h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', id: 'hintsReset', text: 'Reset hidden article suggestions', disabled: !n, onclick: () => { hints.hidden = []; const ok = saveHints(); toast(ok ? 'Hidden article suggestions are reset.' : 'Reset for now. Petal could not save this on this device.'); render('set-hints'); } }))];
+  if (hints.saveFail) kids.push(h('p', { class: 'info', role: 'status', text: 'Petal could not save these choices on this device. They apply until you close the page.' }));
+  return card('Related reading suggestions', kids);
+}
+
 /* ================= 12. Learn ================= */
 const CATS = ['All', 'Basics', 'Products', 'Pain and feelings', 'Your journal', 'Getting help'];
 let curArticle = null; // the article being drawn, so source markers can be numbered
@@ -2373,9 +2511,9 @@ function viewLearn(root) {
 }
 function learnArticle(root, a) {
   curArticle = a; const secId = (i) => 'sec-' + a.id + '-' + i;
-  const back = () => h('button', { type: 'button', class: 'btn', text: 'Back to all articles', onclick: () => { const id = 'art-' + a.id; state.article = null; render(id); window.scrollTo(0, 0); } });
+  const back = () => h('button', { type: 'button', class: 'btn', text: 'Back to all articles', onclick: () => { const id = 'art-' + a.id; state.article = null; state.readFrom = null; render(id); window.scrollTo(0, 0); } });
   const goTo = (id) => { const t = document.getElementById(id); if (t) { t.scrollIntoView({ block: 'start' }); t.focus(); } };
-  root.append(h('div', { class: 'btn-row' }, back()));
+  root.append(h('div', { class: 'btn-row' }, state.readFrom ? h('button', { type: 'button', class: 'btn primary', id: 'artReturn', text: 'Back to ' + (READ_FROM_LABEL[state.readFrom.view] || 'where you were'), onclick: returnFromArticle }) : null, back()));
   const art = h('article', { class: 'essay', 'aria-labelledby': 'artTitle' });
   art.append(h('p', { class: 'meta' }, h('span', { class: 'tag', text: a.cat }), 'About ' + readMins(a) + ' min read'), h('h2', { id: 'artTitle', tabindex: '-1', text: a.title }), h('p', { class: 'lede', text: a.summary }));
   if (a.sections.length >= 4) {
@@ -2423,6 +2561,7 @@ function viewSettings(root) {
   root.append(lockCard());
   // Theme
   root.append(card('Theme', chipsTheme()));
+  root.append(hintsCard());
   // Estimates
   root.append(card('Period estimate', [h('p', { class: 'muted', text: 'Off by default. When on, Petal needs 3 completed start-to-start cycles, then shows a window of days based on the median of your latest 6. It is a simple estimate, not a medically checked prediction.' }), toggle('est', 'Show period estimates', settings.estimates, (v) => setSetting({ estimates: v }, v ? 'Estimates are on.' : 'Estimates are off.', 'set-est'))]));
   // Change reminders
@@ -2583,7 +2722,7 @@ function openDeleteAll() {
   const c = counts(data), inp = h('input', { type: 'text', id: 'delWord', autocomplete: 'off' }), go = h('button', { type: 'button', class: 'btn danger solid', text: 'Delete everything', disabled: true });
   inp.addEventListener('input', () => { go.disabled = inp.value.trim() !== 'DELETE'; });
   go.addEventListener('click', () => {
-    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); s.removeItem(KEY_A); s.removeItem(KEY_L); s.removeItem(KEY_LF); } } catch (e) { ok = false; } lockState.cfg = null; cloud.acct = null; cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus('off');
+    const s = ls(); let ok = true; try { if (s) { s.removeItem(KEY_J); s.removeItem(KEY_S); s.removeItem(KEY_A); s.removeItem(KEY_L); s.removeItem(KEY_LF); s.removeItem(KEY_H); } } catch (e) { ok = false; } resetHints(); lockState.cfg = null; cloud.acct = null; cloud.rev = 0; cloud.paused = false; clearTimeout(cloud.timer); setStatus('off');
     data = emptyData(); settings = defaultSettings(); applyTheme(); state.sel = todayStr(); state.saveError = ''; if (ok && state.storage.mode === 'blocked') { state.storage.mode = 'ok'; state.storage.raw = null; }
     $('#dlg').close(); state.view = 'today'; render(); toast(ok ? 'Petal data in this browser is deleted. Files you exported earlier and your browser history are not affected.' : 'Your journal was cleared on this page, but the browser would not remove the stored copy.');
   });
@@ -2643,11 +2782,11 @@ function openPrivacy() {
     h('ul', null, ['Private browsing may not keep your entries.', 'Moving or opening this file in a different way can change which browser storage it can reach.', 'Exported files contain private information, so store them carefully.', 'Petal cannot clear your browser history or secure a shared device.', 'Browser storage is not encrypted, permanent, or a backup. The optional pattern lock hides the screen but does not encrypt anything. An account password protects the cloud copy, not this device.', 'Petal has no ads, analytics, or tracking. Without an account, it sends nothing anywhere. With an account, your journal is sent to the cloud, where it is not end-to-end encrypted.'].map((x) => h('li', { text: x }))), h('p', { class: 'small', text: 'Accounts, backups, and Delete all data are in Settings. The zip download is in the footer.' })]);
 }
 function render(focusId) {
-  renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m);
+  renderBanners(); renderNav(); const m = $('#main'); m.replaceChildren(); VIEWS[state.view](m); placeSuggestion(m);
   m.append(h('p', { class: 'ver' }, h('span', { class: 'verno', text: 'Petal v' + APP_VERSION }), h('button', { type: 'button', class: 'footlink', id: 'privacyLink', text: 'Data and privacy', onclick: openPrivacy }), h('button', { type: 'button', class: 'footlink', id: 'sourcesLink', text: 'Sources', onclick: openSources }), h('button', { type: 'button', class: 'footlink', id: 'downloadLink', text: 'Download', onclick: openDownload }), cloudFootNode()));
   if (focusId) { const f = document.getElementById(focusId); if (f) f.focus(); }
 }
-function go(view) { state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
+function go(view) { state.suggest = null; if (view !== 'learn') state.readFrom = null; state.view = view; render(); const t = $('#viewTitle'); if (t) t.focus(); window.scrollTo(0, 0); }
 
 function init() {
   initStorage(); applyTheme(); const locked = lockInit();
@@ -2663,4 +2802,4 @@ init();
 })();
 </script>
 </body>
-   </html>
+</html>
