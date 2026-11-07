@@ -11,10 +11,10 @@ window.FAMILY_CONFIG = {
 
   // <<< REPLACE: copy the "API Endpoint" from Appwrite Console > your project > Settings.
   // It looks like https://<REGION>.cloud.appwrite.io/v1  (keep the /v1 at the end).
-  endpoint: "https://REGION.cloud.appwrite.io/v1",
+  endpoint: "https://nyc.cloud.appwrite.io/v1",
 
   // <<< REPLACE: copy the "Project ID" from Appwrite Console > your project > Settings.
-  projectId: "YOUR_PROJECT_ID",
+  projectId: "6aef6a03002636be44c2",
 
   // <<< FILL IN LATER (Setup Guide step 6): the ID of your family Team.
   // Leave as "" until you create the Team. While it is empty, the first signed-in
