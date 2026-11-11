@@ -581,7 +581,7 @@ const cleanRecipe=(r,stamp)=>{
 };
 
 /* ---------- Online account (Supabase email + password) ---------- */
-const VERSION='v2.0.0';
+const VERSION='v2.0.1';
 const SB_URL='https://rkbsivxrlsflhfrlgwuk.supabase.co';
 const SB_KEY='sb_publishable_MBLZA6K7i44e8OFmO9eFFA_YzyskoAR';
 const sbKey=()=>(SB_KEY||store.get('rb_sbkey')||'').trim();
@@ -681,7 +681,7 @@ async function syncNow(){
     G.busy=false;updateBar();
     if(G.again){G.again=false;Drive.schedule()}
   }
-  if(merged&&!/^#\/(new|edit)/.test(location.hash))route();
+  if(merged&&!/^#\/(new|edit|cookbook)/.test(location.hash))route();
 }
 const Drive={
   schedule(){
@@ -1324,6 +1324,7 @@ async function renderHome(){
     <button class="btn soft" id="onlyfav" aria-pressed="${S.onlyFavs}" data-act="onlyfav">Hearted</button>
     <button class="btn soft" data-act="dinner">What's for dinner?</button>
     <a class="btn" href="#/new">Add a recipe</a>
+    <a class="btn soft" href="#/cookbook">Make a cookbook</a>
   </div>
   <div class="fchips types" role="group" aria-label="Show"><button type="button" class="fchip" data-act="rtype" data-t="" aria-pressed="${!S.type}">All</button><button type="button" class="fchip" data-act="rtype" data-t="dish" aria-pressed="${S.type==='dish'}">Dishes</button><button type="button" class="fchip" data-act="rtype" data-t="meal" aria-pressed="${S.type==='meal'}">Meals</button></div>
   <div class="chips" id="chips"></div>
@@ -1464,13 +1465,41 @@ async function renderEditor(slug){
 }
 
 /* ---------- router ---------- */
+/* ---------- Cookbook maker (a separate file, cookbook.js, loaded only when it is opened) ---------- */
+let cbLoading=null;
+function loadCookbook(){
+  if(window.RBCookbook)return Promise.resolve();
+  if(!cbLoading)cbLoading=new Promise((res,rej)=>{
+    const sc=document.createElement('script');sc.src='cookbook.js?v='+VERSION;
+    sc.onload=()=>res();sc.onerror=()=>{cbLoading=null;sc.remove();rej(new Error('LOAD'))};
+    document.head.appendChild(sc);
+  });
+  return cbLoading;
+}
+async function renderCookbook(){
+  app.innerHTML=slim()+'<p class="note">Opening the cookbook maker…</p>';
+  window.scrollTo(0,0);
+  try{await loadCookbook()}catch{
+    app.innerHTML=slim()+'<p class="err" role="alert">I could not load the cookbook maker. Its file, cookbook.js, needs to sit in the same folder as this page. Check your connection and try again.</p>';return;
+  }
+  if(!/^#\/cookbook/.test(location.hash))return;
+  RBCookbook.mount(app,{
+    header:()=>slim(),
+    recipes:()=>S.demo,
+    toast,
+    exit:()=>{location.hash='#/'},
+    author:''
+  });
+}
 function route(){
+  if(window.RBCookbook)RBCookbook.unmount();
   if(CK.on)cookClose();
   const p=(location.hash.slice(1)||'/').split('/').filter(Boolean);
   const arg=p[1]?decodeURIComponent(p[1]):'';
   if(p[0]==='recipe'&&arg)return renderRecipe(arg);
   if(p[0]==='new')return renderEditor(null);
   if(p[0]==='edit'&&arg)return renderEditor(arg);
+  if(p[0]==='cookbook')return renderCookbook();
   return renderHome();
 }
 window.addEventListener('hashchange',route);
