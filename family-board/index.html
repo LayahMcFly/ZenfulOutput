@@ -318,6 +318,7 @@ input[type=range]{padding:0;border:0;background:none;min-height:32px;accent-colo
 .legend{display:flex;gap:6px 22px;flex-wrap:wrap;align-items:center;margin-top:12px}
 .legend span{display:inline-flex;gap:8px;align-items:center}
 .legend svg{width:22px;height:22px;flex:none}
+@media(max-width:719px){.legend{gap:4px 14px;margin:8px 0 14px}.legend span{gap:5px}.legend svg{width:16px;height:16px}}
 .legend svg path{fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:2.4}
 .legend .lx path{stroke:var(--ink);stroke-opacity:.5}
 .legend .lc path{stroke:var(--mark)}
@@ -465,7 +466,7 @@ const PALETTE=[
   {hex:'#8a6a2f',name:'Ochre'},{hex:'#6b4a5c',name:'Plum'},{hex:'#3f6b5f',name:'Pine'},{hex:'#7a5d49',name:'Clay'}
 ];
 const HEX=/^#[0-9a-f]{6}$/i;
-const APP_VERSION='2.2.0';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
+const APP_VERSION='2.2.2';   // bump on every change: 2.0.1, 2.0.2 ... and 2.1.0 / 3.0.0 for bigger releases
 const KEY='familyBoard.workspace.v1', SKEY='familyBoard.settings.v1';
 const MODEKEY='familyBoard.mode.v1', CFGKEY='familyBoard.cloudConfig.v1', SESSKEY='familyBoard.session.v1', INVKEY='familyBoard.pendingInvite.v1', WSKEY='familyBoard.lastWorkspace.v1';
 
@@ -850,7 +851,12 @@ function calendarView(){
   const legend=`<p class="legend muted small"><span>${crossing?'<svg class="lx" viewBox="0 0 22 22" aria-hidden="true"><path d="M4 4l14 15M18 4L4 18"/></svg>Day has passed':''}</span><span><svg class="lc" viewBox="0 0 22 22" aria-hidden="true"><path d="M3 12C2 6 8 2 13 3c5 1 7 7 4 12-3 4-9 4-12 0-1-1-2-3-2-5 0-3 3-6 6-7"/></svg>Special occasion</span><span>🛒 Shopping item runs out</span></p>`;
   const mini=`<div class="mini" role="group" aria-label="${esc(title)}">${['S','M','T','W','T','F','S'].map((w,i)=>`<div class="dow" aria-hidden="true">${w}</div>`).join('')}${mcells}</div>`;
   const agendaDays=[...new Set([...Object.keys(byDay),...Object.keys(lowBy)])].filter(k=>k.slice(0,7)===yr+'-'+pad(mo+1)).sort();
-  const agenda=agendaDays.length?agendaDays.map(k=>`<section class="agenda-day"><h3>${esc(fmtDate(k,{weekday:'long',month:'long',day:'numeric'}))}${k===tdy?' · Today':''}</h3>${(lowBy[k]||[]).map(shopMark).join('')}${(byDay[k]||[]).map(t=>taskRow(t,'ag')).join('')}</section>`).join(''):`<div class="empty">No tasks on the calendar this month${UI.f.person!=='all'||UI.f.group!=='all'||UI.f.status!=='all'?' with these filters':''}. Use “Add task” to create one.</div>`;
+  const AGMAX=10;
+  let agTotal=0;const agDays=agendaDays.slice().sort().reverse().map(k=>({k,items:[...(byDay[k]||[]).slice().reverse().map(t=>({t})),...(lowBy[k]||[]).map(x=>({x}))]}));
+  agDays.forEach(d=>{agTotal+=d.items.length});
+  let agLeft=AGMAX;const agShown=[];
+  for(const d of agDays){if(agLeft<=0)break;const it=d.items.slice(0,agLeft);agLeft-=it.length;agShown.push({k:d.k,items:it})}
+  const agenda=agendaDays.length?agShown.map(d=>`<section class="agenda-day"><h3>${esc(fmtDate(d.k,{weekday:'long',month:'long',day:'numeric'}))}${d.k===tdy?' · Today':''}</h3>${d.items.map(i=>i.x?shopMark(i.x):taskRow(i.t,'ag')).join('')}</section>`).join('')+(agTotal>AGMAX?`<p class="muted small">Showing the newest ${AGMAX} of ${agTotal} this month.</p>`:''):`<div class="empty">No tasks on the calendar this month${UI.f.person!=='all'||UI.f.group!=='all'||UI.f.status!=='all'?' with these filters':''}. Use “Add task” to create one.</div>`;
   const undated=D.tasks.filter(t=>!t.due&&pass(t)).sort(byDate);
   const narrow=innerWidth<720, agendaMode=ST.calMode==='agenda'||narrow;
   return`<div class="page-head"><h2 class="sr">Calendar</h2></div>
@@ -863,8 +869,8 @@ function calendarView(){
       <span class="seg view-toggle" role="group" aria-label="Calendar layout"><button class="btn soft" data-act="calmode" data-m="month" aria-pressed="${!agendaMode}" data-fk="m-month">Month</button><button class="btn soft" data-act="calmode" data-m="agenda" aria-pressed="${agendaMode}" data-fk="m-agenda">Agenda</button></span>
       <button class="btn" data-act="addtask" data-fk="addtop">+ Add task</button></div>
     ${filtersHTML()}
-    ${narrow?mini+agenda:agendaMode?agenda:`<div class="cal cal-only" role="group" aria-label="${esc(title)}">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w=>`<div class="dow">${w}</div>`).join('')}${cells}</div>`}
-    ${legend}
+    ${narrow?mini+legend+agenda:agendaMode?agenda:`<div class="cal cal-only" role="group" aria-label="${esc(title)}">${['Sun','Mon','Tue','Wed','Thu','Fri','Sat'].map(w=>`<div class="dow">${w}</div>`).join('')}${cells}</div>`}
+    ${narrow?'':legend}
     <section class="panel" aria-labelledby="und-h"><h3 id="und-h">No due date (${undated.length})</h3>
       ${undated.length?undated.map(t=>taskRow(t,'un')).join(''):'<p class="muted">Every task that matches the filters has a due date.</p>'}</section>`;
 }
