@@ -317,6 +317,20 @@ html[data-locked] body{background:var(--paper)}
 .howsum{cursor:pointer;font-weight:700;min-height:44px;display:flex;align-items:center}
 .sugg{border-color:var(--accent);background:var(--soft)}
 .sugg-title{font:700 18px/1.3 var(--body);margin:4px 0}
+
+.pinshow{display:flex;justify-content:center;gap:12px;margin:8px 0 16px;min-height:20px}
+.pindot{width:16px;height:16px;border-radius:50%;border:2.5px solid var(--accent);background:var(--linen)}
+.pindot.on{background:var(--accent)}
+.pinkeys{display:grid;grid-template-columns:repeat(3,72px);gap:12px;justify-content:center;margin-bottom:8px}
+.pinkey{width:72px;height:72px;min-height:72px;border-radius:50%;border:2.5px solid var(--accent);background:var(--linen);color:var(--ink);font:700 26px/1 var(--mono,monospace);cursor:pointer;display:flex;align-items:center;justify-content:center;padding:0;touch-action:manipulation}
+.pinkey:hover{background:var(--soft)}
+.pinkey:active{background:var(--accent);color:var(--paper)}
+.pinkey.fn{font-size:22px;border-style:dashed}
+.pinkey:disabled{opacity:.45;cursor:default}
+.pinpad.bad .pindot{border-color:var(--err);background:var(--err)}
+.pinkey:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+@media (max-width:340px){.pinkeys{grid-template-columns:repeat(3,64px);gap:10px}.pinkey{width:64px;height:64px;min-height:64px}}
+.pinpad.bad .pinshow{animation:padshake .4s}
 </style>
 </head>
 <body>
@@ -351,7 +365,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.repla
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.2.0'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.3.0'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -2001,11 +2015,11 @@ async function cloudInit() {
   if (signedIn() && cloudReady()) { setStatus('checking'); render(); syncNow(); }
 }
 
-/* ================= 11b. Pattern lock =================
-   An optional screen lock. It shows every time Petal is opened or reloaded. It hides the screen from casual viewers and
+/* ================= 11b. PIN or pattern lock =================
+   An optional screen lock, either a numeric PIN or a pattern. It shows every time Petal is opened or reloaded. It hides the screen from casual viewers and
    does not encrypt anything: the journal is still stored in the browser. */
 const KEY_L = 'petal.v2.lock', KEY_LF = 'petal.v2.lockfails';
-const LOCK_TRIES = 3, LOCK_SECONDS = 30, LOCK_MIN_DOTS = 4;
+const LOCK_TRIES = 3, LOCK_SECONDS = 30, LOCK_MIN_DOTS = 4, PIN_MIN = 4, PIN_MAX = 8;
 const lockState = { cfg: null, fails: 0, until: 0, tick: null, open: false };
 
 function lhash(salt, pat) { // small synchronous hash, repeated; fine for a screen lock
@@ -2016,9 +2030,13 @@ function lhash(salt, pat) { // small synchronous hash, repeated; fine for a scre
 }
 function loadLock() { try { const s = ls(); const r = s && s.getItem(KEY_L); const c = r ? JSON.parse(r) : null; lockState.cfg = isObj(c) && typeof c.salt === 'string' && typeof c.hash === 'string' ? c : null; const f = s && s.getItem(KEY_LF); const fo = f ? JSON.parse(f) : null; if (isObj(fo)) { lockState.fails = Math.max(0, Math.min(LOCK_TRIES, Number(fo.fails) || 0)); lockState.until = Number(fo.until) || 0; } } catch (e) { lockState.cfg = null; } }
 function saveFails() { try { const s = ls(); if (s) s.setItem(KEY_LF, JSON.stringify({ fails: lockState.fails, until: lockState.until })); } catch (e) { /* the count just resets on reload */ } }
-function setPattern(pat) { const salt = Math.random().toString(36).slice(2) + Date.now().toString(36); lockState.cfg = { salt: salt, hash: lhash(salt, pat), n: pat.length }; try { const s = ls(); if (!s) return false; s.setItem(KEY_L, JSON.stringify(lockState.cfg)); s.removeItem(KEY_LF); } catch (e) { lockState.cfg = null; return false; } lockState.fails = 0; lockState.until = 0; return true; }
+
+/* A stored lock is { salt, hash, n, type }. A saved lock with no type from an older version is a pattern. */
+const lockType = () => (lockState.cfg && lockState.cfg.type === 'pin' ? 'pin' : 'pattern');
+const lockSecret = (type, s) => (type === 'pin' ? 'pin:' + s : s);
+function setSecret(type, s) { const salt = Math.random().toString(36).slice(2) + Date.now().toString(36); lockState.cfg = { salt: salt, hash: lhash(salt, lockSecret(type, s)), n: s.length, type: type }; try { const st = ls(); if (!st) throw new Error('no storage'); st.setItem(KEY_L, JSON.stringify(lockState.cfg)); st.removeItem(KEY_LF); } catch (e) { loadLock(); return false; } lockState.fails = 0; lockState.until = 0; return true; }
 function clearPattern() { lockState.cfg = null; lockState.fails = 0; lockState.until = 0; try { const s = ls(); if (s) { s.removeItem(KEY_L); s.removeItem(KEY_LF); } } catch (e) { /* nothing to clear */ } }
-const patternOk = (pat) => !!lockState.cfg && lhash(lockState.cfg.salt, pat) === lockState.cfg.hash;
+const patternOk = (s) => !!lockState.cfg && lhash(lockState.cfg.salt, lockSecret(lockType(), s)) === lockState.cfg.hash;
 
 /* Pattern pad: drag across the dots. Also fine to tap dots one at a time. */
 function patternPad(onDone, label) {
@@ -2039,67 +2057,125 @@ function patternPad(onDone, label) {
   svg.padApi = { reset: () => { seq = []; down = false; cur = null; draw(); }, disable: (v) => { disabled = v; svg.classList.toggle('padoff', v); }, flash: (cls) => { svg.classList.add(cls); setTimeout(() => svg.classList.remove(cls), 500); } };
   return svg;
 }
+
+/* PIN pad: round number keys laid out like a phone keypad (1 2 3 on top, 0 at the bottom). Typing digits on a keyboard works too. */
+function pinPad(onDone, o) {
+  o = o || {}; let v = '', disabled = false;
+  const wrap = h('div', { class: 'pinpad', role: 'group', 'aria-label': 'PIN keypad' }), show = h('div', { class: 'pinshow', role: 'img' }), keys = h('div', { class: 'pinkeys' });
+  const paint = () => { const slots = o.autoLen || Math.max(PIN_MIN, v.length); show.replaceChildren(); for (let i = 0; i < slots; i++) show.append(h('span', { class: 'pindot' + (i < v.length ? ' on' : '') })); show.setAttribute('aria-label', v.length + (v.length === 1 ? ' digit' : ' digits') + ' entered'); };
+  const submit = () => { if (disabled || !v) return; onDone(v); };
+  const press = (d) => { if (disabled || v.length >= PIN_MAX) return; v += d; paint(); if (o.autoLen && v.length === o.autoLen) submit(); };
+  const back = () => { if (disabled) return; v = v.slice(0, -1); paint(); };
+  ['1', '2', '3', '4', '5', '6', '7', '8', '9'].forEach((d) => keys.append(h('button', { type: 'button', class: 'pinkey', 'aria-label': d, text: d, onclick: () => press(d) })));
+  keys.append(h('button', { type: 'button', class: 'pinkey fn', 'aria-label': 'Delete last digit', text: '⌫', onclick: back }), h('button', { type: 'button', class: 'pinkey', 'aria-label': '0', text: '0', onclick: () => press('0') }), h('button', { type: 'button', class: 'pinkey fn', 'aria-label': o.okLabel || 'Enter PIN', text: '✓', onclick: submit }));
+  wrap.addEventListener('keydown', (e) => { if (/^[0-9]$/.test(e.key)) { e.preventDefault(); press(e.key); } else if (e.key === 'Backspace') { e.preventDefault(); back(); } else if (e.key === 'Enter') { e.preventDefault(); submit(); } });
+  wrap.append(show, keys); paint();
+  wrap.padApi = { reset: () => { v = ''; paint(); }, disable: (d) => { disabled = d; keys.querySelectorAll('button').forEach((b) => { b.disabled = d; }); }, flash: (cls) => { wrap.classList.add(cls); setTimeout(() => wrap.classList.remove(cls), 500); }, focus: () => { const k = keys.querySelector('.pinkey'); if (k) k.focus(); } };
+  return wrap;
+}
+
 const cleanDigits = (v) => String(v).replace(/[^1-9]/g, '').split('').filter((d, i, a) => a.indexOf(d) === i).join('');
+const lockSecretTooShort = (type, s) => (type === 'pin' ? s.length < PIN_MIN : s.length < LOCK_MIN_DOTS);
+const lockPad = (type, onDone, auto) => (type === 'pin' ? pinPad(onDone, { autoLen: auto }) : patternPad(onDone));
+const LOCK_WORD = { pin: 'PIN', pattern: 'pattern' };
+
+/* "Forgot" options on the lock screen. Petal cannot check who you are on its own, so it checks the password of the
+   account that is logged in on this device. Without one, the only way back in is erasing Petal's data on this device. */
+function forgotBlock(onRemoved) {
+  const word = LOCK_WORD[lockType()], d = h('details', { class: 'more' }), msg = h('p', { class: 'small', role: 'status', 'aria-live': 'polite', id: 'forgotMsg' });
+  let email = ''; try { const s = ls(), r = s && s.getItem(KEY_A), a = r ? JSON.parse(r) : null; if (isObj(a) && typeof a.email === 'string' && typeof a.refresh_token === 'string') email = a.email; } catch (e) { email = ''; }
+  d.append(h('summary', { text: 'Forgot your ' + word + '?' }));
+  if (email && cloudReady()) {
+    const pw = h('input', { type: 'password', id: 'forgotPw', autocomplete: 'current-password' }), go = h('button', { type: 'button', class: 'btn', id: 'forgotGo', text: 'Verify and remove the lock' });
+    const run = async () => {
+      if (!pw.value) { msg.textContent = 'Enter your account password.'; return; }
+      go.disabled = true; msg.textContent = 'Checking your password.';
+      try { await sb('/auth/v1/token?grant_type=password', { method: 'POST', body: { email: email, password: pw.value } }); pw.value = ''; clearPattern(); onRemoved(); }
+      catch (e) { msg.textContent = friendly(e); } finally { go.disabled = false; pw.value = ''; }
+    };
+    go.addEventListener('click', run); pw.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); run(); } });
+    d.append(h('p', { class: 'small', text: 'Enter the password for your Petal account (' + email + '). If it matches, the lock is removed and you can set a new one in Settings. Your journal stays as it is.' }), h('div', { class: 'field' }, h('label', { for: 'forgotPw', text: 'Account password' }), pw), go);
+  } else {
+    d.append(h('p', { class: 'small', text: 'No Petal account is logged in on this device, so Petal cannot tell that it is you, and it will not reset the lock for anyone who asks. The only way back in is to erase Petal\'s data on this device (below). You can restore your journal afterwards from a backup file or by logging in to your account.' }));
+  }
+  const er = h('details', { class: 'more' }), conf = h('input', { type: 'text', id: 'forgotDel', autocomplete: 'off' });
+  er.append(h('summary', { text: 'Erase Petal data on this device' }), h('p', { class: 'small', text: 'This deletes the journal, settings, and lock saved in this browser. It does not touch a cloud copy or backup files. Type DELETE to confirm.' }), h('div', { class: 'field' }, h('label', { for: 'forgotDel', text: 'Type DELETE' }), conf),
+    h('button', { type: 'button', class: 'btn danger', id: 'forgotErase', text: 'Erase and start fresh', onclick: () => {
+      if (conf.value.trim() !== 'DELETE') { msg.textContent = 'Type DELETE exactly to confirm.'; return; }
+      try { const s = ls(); if (s) [KEY_J, KEY_S, KEY_A, KEY_L, KEY_LF, KEY_H].forEach((k) => s.removeItem(k)); } catch (e) { msg.textContent = 'This browser would not let Petal erase its data.'; return; }
+      location.reload();
+    } }));
+  d.append(msg, er);
+  return d;
+}
 
 /* Lock screen */
 function showLock() {
   if (!lockState.cfg || lockState.open) return; lockState.open = true; document.documentElement.setAttribute('data-locked', '');
+  const type = lockType(), isPin = type === 'pin';
   let box = document.getElementById('lock'); if (box) box.remove();
   box = h('div', { id: 'lock', class: 'lock', role: 'dialog', 'aria-modal': 'true', 'aria-labelledby': 'lockTitle' }); document.body.append(box);
   document.querySelectorAll('#app, .skip').forEach((n) => n.setAttribute('inert', ''));
-  const msg = h('p', { class: 'lockmsg', role: 'status', 'aria-live': 'polite', id: 'lockMsg' }), txt = h('input', { type: 'text', inputmode: 'numeric', id: 'lockTxt', autocomplete: 'off', placeholder: 'For example 1 4 7 8 9' });
-  const pad = patternPad((p) => attempt(p));
-  const unlock = () => { lockState.open = false; box.remove(); document.documentElement.removeAttribute('data-locked'); if (lockState.after) { const f = lockState.after; lockState.after = null; f(); } document.querySelectorAll('#app, .skip').forEach((n) => n.removeAttribute('inert')); const m = $('#main'); if (m) { m.setAttribute('tabindex', '-1'); m.focus({ preventScroll: true }); } };
+  const msg = h('p', { class: 'lockmsg', role: 'status', 'aria-live': 'polite', id: 'lockMsg' });
+  const txt = isPin ? null : h('input', { type: 'text', inputmode: 'numeric', id: 'lockTxt', autocomplete: 'off', placeholder: 'For example 1 4 7 8 9' });
+  const pad = lockPad(type, (p) => attempt(p), isPin ? lockState.cfg.n : 0);
+  const unlock = () => { clearInterval(lockState.tick); lockState.open = false; box.remove(); document.documentElement.removeAttribute('data-locked'); if (lockState.after) { const f = lockState.after; lockState.after = null; f(); } document.querySelectorAll('#app, .skip').forEach((n) => n.removeAttribute('inert')); const m = $('#main'); if (m) { m.setAttribute('tabindex', '-1'); m.focus({ preventScroll: true }); } };
   const remaining = () => Math.max(0, Math.ceil((lockState.until - Date.now()) / 1000));
-  const paintLocked = () => { const s = remaining(); if (s <= 0) { clearInterval(lockState.tick); lockState.fails = 0; lockState.until = 0; saveFails(); pad.padApi.disable(false); txt.disabled = false; goBtn.disabled = false; msg.textContent = 'You can try again.'; return; } pad.padApi.disable(true); txt.disabled = true; goBtn.disabled = true; msg.textContent = 'Too many tries. Try again in ' + s + ' second' + (s === 1 ? '' : 's') + '.'; };
-  const attempt = (pat) => {
+  const setOff = (off) => { pad.padApi.disable(off); if (txt) txt.disabled = off; if (goBtn) goBtn.disabled = off; };
+  const paintLocked = () => { const s = remaining(); if (s <= 0) { clearInterval(lockState.tick); lockState.fails = 0; lockState.until = 0; saveFails(); setOff(false); msg.textContent = 'You can try again.'; return; } setOff(true); msg.textContent = 'Too many tries. Try again in ' + s + ' second' + (s === 1 ? '' : 's') + '.'; };
+  const attempt = (s) => {
     if (remaining() > 0) return;
-    if (pat.length < LOCK_MIN_DOTS) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
-    if (patternOk(pat)) { lockState.fails = 0; lockState.until = 0; saveFails(); unlock(); return; }
-    lockState.fails++; pad.padApi.flash('bad'); setTimeout(() => pad.padApi.reset(), 450); txt.value = '';
+    if (lockSecretTooShort(type, s)) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = isPin ? 'Enter at least ' + PIN_MIN + ' digits.' : 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
+    if (patternOk(s)) { lockState.fails = 0; lockState.until = 0; saveFails(); unlock(); return; }
+    lockState.fails++; pad.padApi.flash('bad'); setTimeout(() => pad.padApi.reset(), 450); if (txt) txt.value = '';
     if (lockState.fails >= LOCK_TRIES) { lockState.until = Date.now() + LOCK_SECONDS * 1000; saveFails(); clearInterval(lockState.tick); paintLocked(); lockState.tick = setInterval(paintLocked, 500); }
-    else { saveFails(); const left = LOCK_TRIES - lockState.fails; msg.textContent = 'That is not the right pattern. ' + left + ' ' + (left === 1 ? 'try' : 'tries') + ' left.'; }
+    else { saveFails(); const left = LOCK_TRIES - lockState.fails; msg.textContent = 'That is not the right ' + LOCK_WORD[type] + '. ' + left + ' ' + (left === 1 ? 'try' : 'tries') + ' left.'; }
   };
-  const goBtn = h('button', { type: 'button', class: 'btn', id: 'lockGo', text: 'Unlock', onclick: () => attempt(cleanDigits(txt.value)) });
-  txt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); attempt(cleanDigits(txt.value)); } });
-  box.append(h('div', { class: 'lockcard' }, h('div', { class: 'book-title' }, flowerIcon(28), h('span', { text: 'Petal' })), h('h1', { id: 'lockTitle', class: 'locktitle', text: 'Draw your pattern to open Petal' }), pad, msg,
-    h('details', { class: 'more' }, h('summary', { text: 'Type the dot numbers instead' }), h('p', { class: 'small', text: 'The dots are numbered 1 to 9 from left to right, top to bottom. Type the numbers in the order you would draw them.' }), h('div', { class: 'field' }, h('label', { for: 'lockTxt', text: 'Dot numbers' }), txt), goBtn),
-    h('details', { class: 'more' }, h('summary', { text: 'Forgot your pattern?' }), h('p', { class: 'small', text: 'Petal cannot reset it for you, because that would let anyone get in. To remove the lock, clear this site\'s data in your browser settings. That also clears the journal saved in this browser, so restore it afterwards from a backup file or by logging in to your account.' }))));
+  const goBtn = isPin ? null : h('button', { type: 'button', class: 'btn', id: 'lockGo', text: 'Unlock', onclick: () => attempt(cleanDigits(txt.value)) });
+  if (txt) txt.addEventListener('keydown', (e) => { if (e.key === 'Enter') { e.preventDefault(); attempt(cleanDigits(txt.value)); } });
+  const forgot = forgotBlock(() => { state.view = 'settings'; unlock(); toast('The lock is removed. Set a new PIN or pattern below.'); });
+  box.append(h('div', { class: 'lockcard' }, h('div', { class: 'book-title' }, flowerIcon(28), h('span', { text: 'Petal' })), h('h1', { id: 'lockTitle', class: 'locktitle', text: isPin ? 'Enter your PIN to open Petal' : 'Draw your pattern to open Petal' }), pad, msg,
+    isPin ? null : h('details', { class: 'more' }, h('summary', { text: 'Type the dot numbers instead' }), h('p', { class: 'small', text: 'The dots are numbered 1 to 9 from left to right, top to bottom. Type the numbers in the order you would draw them.' }), h('div', { class: 'field' }, h('label', { for: 'lockTxt', text: 'Dot numbers' }), txt), goBtn),
+    forgot));
   if (remaining() > 0) { paintLocked(); lockState.tick = setInterval(paintLocked, 500); } else if (lockState.fails > 0) { msg.textContent = (LOCK_TRIES - lockState.fails) + ' ' + (LOCK_TRIES - lockState.fails === 1 ? 'try' : 'tries') + ' left.'; }
-  setTimeout(() => { const s = box.querySelector('svg'); s && s.focus && s.focus(); }, 50);
+  setTimeout(() => { if (isPin) pad.padApi.focus(); else { const s = box.querySelector('svg'); s && s.focus && s.focus(); } }, 50);
 }
 function lockInit() {
+  window.addEventListener('pageshow', (e) => { if (e.persisted && lockState.cfg) { loadLock(); showLock(); } });
   loadLock(); if (!lockState.cfg) document.documentElement.removeAttribute('data-locked');
   if (lockState.cfg) showLock();
   return !!lockState.cfg;
-  window.addEventListener('pageshow', (e) => { if (e.persisted && lockState.cfg) { loadLock(); showLock(); } });
 }
 
-/* Settings: turn the lock on, change it, or turn it off */
-function openPatternSetup(mode) { // mode: 'set' | 'change'
-  let first = null; const msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: 'Draw a pattern that connects at least ' + LOCK_MIN_DOTS + ' dots.' });
-  const done = (pat) => {
-    if (pat.length < LOCK_MIN_DOTS) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
-    if (!first) { first = pat; pad.padApi.reset(); msg.textContent = 'Now draw it again to confirm.'; return; }
-    if (first !== pat) { first = null; pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Those did not match. Draw your new pattern again from the start.'; return; }
-    if (!setPattern(pat)) { msg.textContent = 'This browser would not let Petal save the lock, so it was not turned on.'; return; }
-    $('#dlg').close(); toast('Pattern lock is on. Petal will ask for it every time it opens.'); render();
+/* Settings: turn the lock on, change it, switch type, or turn it off */
+function openLockSetup(type, mode) { // type: 'pin' | 'pattern'; mode: 'set' | 'change'
+  const isPin = type === 'pin', word = LOCK_WORD[type]; let first = null;
+  const msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: isPin ? 'Choose a PIN of ' + PIN_MIN + ' to ' + PIN_MAX + ' digits, then tap the check mark.' : 'Draw a pattern that connects at least ' + LOCK_MIN_DOTS + ' dots.' });
+  const done = (s) => {
+    if (lockSecretTooShort(type, s)) { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = isPin ? 'Use at least ' + PIN_MIN + ' digits.' : 'Connect at least ' + LOCK_MIN_DOTS + ' dots.'; return; }
+    if (!first) { first = s; pad.padApi.reset(); msg.textContent = isPin ? 'Now enter it again to confirm.' : 'Now draw it again to confirm.'; return; }
+    if (first !== s) { first = null; pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'Those did not match. Start again with your new ' + word + '.'; return; }
+    if (!setSecret(type, s)) { msg.textContent = 'This browser would not let Petal save the lock, so it was not turned on.'; return; }
+    $('#dlg').close(); toast((isPin ? 'PIN' : 'Pattern') + ' lock is on. Petal will ask for it every time it opens.'); render('lockChange');
   };
-  const pad = patternPad(done);
-  openInfoDialog(mode === 'change' ? 'Change your pattern' : 'Set a pattern lock', [h('p', { text: 'Petal will ask for this pattern every time the page is opened or reloaded. You can also type it as numbers, so keep the order in mind.' }), msg, pad,
-    h('p', { class: 'small muted', text: 'This is a screen lock. It keeps casual viewers out but does not encrypt your journal. If you forget the pattern, the only way back in is clearing this site\'s data, which also clears the journal in this browser. Download a backup first.' }),
+  const pad = isPin ? pinPad(done) : patternPad(done);
+  const title = (mode === 'change' ? 'Change your ' : 'Set a ') + word + (mode === 'change' ? '' : ' lock');
+  openInfoDialog(title, [h('p', { text: 'Petal will ask for this ' + word + ' every time the page is opened or reloaded. ' + (isPin ? 'Pick something you will remember, and not something others could guess.' : 'You can also type it as numbers, so keep the order in mind.') }), msg, pad,
+    h('p', { class: 'small muted', text: 'This is a screen lock. It keeps casual viewers out but does not encrypt your journal. If you forget it, Petal can check the password of the account you are logged in with and then remove the lock. Without an account, the only way back in is erasing Petal\'s data on this device, so download a backup first.' }),
     h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+  if (isPin) setTimeout(() => pad.padApi.focus(), 60);
 }
-function openPatternOff() {
-  const msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: 'Draw your current pattern to turn the lock off.' });
-  const pad = patternPad((pat) => { if (patternOk(pat)) { clearPattern(); $('#dlg').close(); toast('Pattern lock is off.'); render(); } else { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'That is not the right pattern.'; } });
-  openInfoDialog('Turn off the pattern lock', [msg, pad, h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+function openLockOff() {
+  const type = lockType(), word = LOCK_WORD[type], msg = h('p', { class: 'notice', role: 'status', 'aria-live': 'polite', text: (type === 'pin' ? 'Enter' : 'Draw') + ' your current ' + word + ' to turn the lock off.' });
+  const pad = lockPad(type, (s) => { if (patternOk(s)) { clearPattern(); $('#dlg').close(); toast('The lock is off.'); render('lockOn'); } else { pad.padApi.flash('bad'); pad.padApi.reset(); msg.textContent = 'That is not the right ' + word + '.'; } }, type === 'pin' ? lockState.cfg.n : 0);
+  openInfoDialog('Turn off the lock', [msg, pad, h('div', { class: 'actions' }, h('button', { type: 'button', class: 'btn', text: 'Cancel', onclick: () => $('#dlg').close() }))]);
+  if (type === 'pin') setTimeout(() => pad.padApi.focus(), 60);
 }
 function lockCard() {
-  const on = !!lockState.cfg;
-  return card('Pattern lock', [h('p', { text: on ? 'On. Petal asks for your pattern every time it opens or reloads.' : 'Optional. Add a pattern like a phone lock screen, so Petal asks for it every time it opens or reloads. After 3 wrong tries it waits 30 seconds.' }),
-    h('p', { class: 'small muted', text: 'It is a screen lock, not encryption. It does not stop someone with access to your browser\'s stored data.' }),
-    h('div', { class: 'btn-row' }, on ? [h('button', { type: 'button', class: 'btn', id: 'lockChange', text: 'Change pattern', onclick: () => openPatternSetup('change') }), h('button', { type: 'button', class: 'btn', id: 'lockOff', text: 'Turn off', onclick: openPatternOff }), h('button', { type: 'button', class: 'btn', text: 'Lock now', onclick: () => { lockState.open = false; showLock(); } })] : h('button', { type: 'button', class: 'btn primary', id: 'lockOn', text: 'Set a pattern', onclick: () => openPatternSetup('set') }))]);
+  const on = !!lockState.cfg, type = lockType(), other = type === 'pin' ? 'pattern' : 'pin';
+  return card('PIN or pattern lock', [h('p', { text: on ? 'On, using a ' + LOCK_WORD[type] + '. Petal asks for it every time it opens or reloads.' : 'Optional. Create your own PIN or pattern, like a phone lock screen, so Petal asks for it every time it opens or reloads. After 3 wrong tries it waits 30 seconds.' }),
+    h('p', { class: 'small muted', text: 'It is a screen lock, not encryption. It does not stop someone with access to your browser\'s stored data. If you forget it, Petal can check the password of the account you are logged in with and then remove the lock. Without an account, the only reset is erasing Petal\'s data on this device.' }),
+    h('div', { class: 'btn-row' }, on ? [h('button', { type: 'button', class: 'btn', id: 'lockChange', text: 'Change ' + LOCK_WORD[type], onclick: () => openLockSetup(type, 'change') }), h('button', { type: 'button', class: 'btn', id: 'lockSwitch', text: 'Use a ' + LOCK_WORD[other] + ' instead', onclick: () => openLockSetup(other, 'change') }), h('button', { type: 'button', class: 'btn', id: 'lockOff', text: 'Turn off', onclick: openLockOff }), h('button', { type: 'button', class: 'btn', text: 'Lock now', onclick: () => { lockState.open = false; showLock(); } })] : [h('button', { type: 'button', class: 'btn primary', id: 'pinOn', text: 'Set a PIN', onclick: () => openLockSetup('pin', 'set') }), h('button', { type: 'button', class: 'btn', id: 'lockOn', text: 'Set a pattern', onclick: () => openLockSetup('pattern', 'set') })])]);
 }
 
 /* ================= Recorded patterns and related reading =================
