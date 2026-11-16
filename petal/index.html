@@ -223,7 +223,8 @@ button.gloss{font:inherit;letter-spacing:inherit;text-transform:inherit;color:in
 .day.today{border:2px solid var(--ink)}
 .day.today .n{text-decoration:underline}
 .day.inperiod{border-color:var(--accent);border-width:2px}
-.day.est{border:2px dashed var(--accent)}
+.day.est{border:3px dashed var(--accent-strong);box-shadow:inset 0 0 0 2px var(--paper)}
+.day.estmid{border-style:solid;border-width:3px}
 .day.sel{background:var(--btn);color:var(--on-btn);border-color:var(--btn)}
 .day.sel .sym{color:inherit}
 .legend{list-style:none;padding:0;margin:8px 0 0;display:flex;flex-wrap:wrap;gap:6px 16px;font-size:16px}
@@ -365,7 +366,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.repla
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.4.0'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.4.1'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -1253,6 +1254,7 @@ function estimateCard() {
       h('p', { class: 'muted small', text: (e.low ? 'An early estimate from ' + e.n + (e.n === 1 ? ' cycle' : ' cycles') + ', so the window is wider. It gets steadier as you log more. ' : '') + 'A simple estimate, not a medically checked prediction. It can be wrong.' }));
   }
   if (e.state !== 'insufficient') kids.push(h('p', { class: 'small' }, rich(h('span'), 'How it is worked out: the {{median}} of your latest ' + e.n + ' cycle ' + (e.n === 1 ? 'length' : 'lengths') + ' is ' + e.m + ' days, counted from your latest start on ' + fmtShort(e.last) + '. The window stretches to cover your shortest (' + e.mn + ') and longest (' + e.mx + ') recent cycles, and at least ' + e.pad + ' days either side.')));
+  if (e.state === 'ok') kids.push(h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', id: 'estCal', text: 'Show on calendar', onclick: () => { state.calMonth = (e.lo >= today ? e.lo : today).slice(0, 7); state.sel = e.mid >= today ? e.mid : today; go('calendar'); } })));
   kids.push(h('button', { type: 'button', class: 'btn', text: 'Turn estimates off', onclick: () => { settings.estimates = false; settings.estimatesAsked = true; saved('Estimates are off.'); } }));
   return card('Next period estimate', kids);
 }
@@ -1261,15 +1263,15 @@ function estimateCard() {
 function dayInfo(date, est) {
   const f = flowOn(date), e = entriesOn(date), n = e.products.length + e.pain.length + e.moods.length + e.relief.length, p = periodOn(date), today = todayStr();
   const inEst = est.state === 'ok' && date >= today && date >= est.lo && date <= est.hi;
-  return { f, n, p, inEst };
+  return { f, n, p, inEst, mid: inEst && date === est.mid };
 }
 function dayLabel(date, d, today) {
   const bits = [fmtLong(date)]; if (date === today) bits.push('Today'); if (date === state.sel) bits.push('Selected');
   if (d.f) bits.push(d.f.level === 'none' ? 'No bleeding logged' : 'Bleeding logged: ' + labelOf(FLOW, d.f.level).toLowerCase()); else if (d.p) bits.push('Inside a logged period, no flow entry');
-  if (d.n) bits.push(d.n + (d.n === 1 ? ' other entry' : ' other entries')); if (d.inEst) bits.push('Inside the estimated window, not logged');
+  if (d.n) bits.push(d.n + (d.n === 1 ? ' other entry' : ' other entries')); if (d.mid) bits.push('Best guess for the first day of your next period, not logged'); else if (d.inEst) bits.push('Inside the estimated window, not logged');
   return bits.join('. ');
 }
-function symFor(d) { return (d.f ? (d.f.level === 'none' ? '◇' : '●') : d.p ? '○' : '') + (d.n ? '▪' : '') + (d.inEst ? '✦' : ''); }
+function symFor(d) { return (d.f ? (d.f.level === 'none' ? '◇' : '●') : d.p ? '○' : '') + (d.n ? '▪' : '') + (d.mid ? '★' : d.inEst ? '✦' : ''); }
 function viewCalendar(root) {
   const today = todayStr(), [y, m] = state.calMonth.split('-').map(Number), est = computeEstimate();
   root.append(h('h1', { id: 'viewTitle', tabindex: '-1', text: 'Calendar' }));
@@ -1287,7 +1289,7 @@ function viewCalendar(root) {
     const head = h('tr', null, [0, 1, 2, 3, 4, 5, 6].map((i) => { const dt = new Date(2023, 0, 1 + i); return h('th', { scope: 'col' }, h('abbr', { title: dt.toLocaleDateString(undefined, { weekday: 'long' }), text: dt.toLocaleDateString(undefined, { weekday: 'short' }).slice(0, 3) })); }));
     const rows = []; for (let i = 0; i < cells.length; i += 7) rows.push(h('tr', null, cells.slice(i, i + 7).map((date) => {
       if (!date) return h('td'); const d = dayInfo(date, est);
-      return h('td', null, h('button', { type: 'button', id: 'day-' + date, class: 'day' + (d.f && d.f.level !== 'none' ? ' bleed' : '') + (d.p ? ' inperiod' : '') + (date === today ? ' today' : '') + (d.inEst ? ' est' : '') + (date === state.sel ? ' sel' : ''), 'aria-label': dayLabel(date, d, today), 'aria-current': date === today ? 'date' : null, onclick: () => choose(date) },
+      return h('td', null, h('button', { type: 'button', id: 'day-' + date, class: 'day' + (d.f && d.f.level !== 'none' ? ' bleed' : '') + (d.p ? ' inperiod' : '') + (date === today ? ' today' : '') + (d.inEst ? ' est' : '') + (d.mid ? ' estmid' : '') + (date === state.sel ? ' sel' : ''), 'aria-label': dayLabel(date, d, today), 'aria-current': date === today ? 'date' : null, onclick: () => choose(date) },
         h('span', { class: 'n', 'aria-hidden': 'true', text: String(Number(date.slice(8))) }), h('span', { class: 'sym', 'aria-hidden': 'true', text: symFor(d) })));
     })));
     root.append(h('div', { class: 'card' }, h('table', { class: 'cal' }, h('caption', { class: 'sr-only', text: monthName }), h('thead', null, head), h('tbody', null, rows))));
@@ -1297,7 +1299,7 @@ function viewCalendar(root) {
     }))));
   }
   if (!hasAnyData()) root.append(h('p', { class: 'info' }, 'Nothing logged yet. Add an entry whenever you\'re ready. Days with bleeding, pain, products, or mood entries get a mark here, and tapping any day lets you log for it. If you turn on estimates in Settings, a dashed outline will show an estimated window once there is enough history.'));
-  const L = [['●', 'Bleeding logged'], ['○', 'Inside a logged period, no flow entry'], ['◇', 'No bleeding logged'], ['▪', 'Other entries'], ['✦', 'Estimated window (not logged)'], ['Underlined number', 'Today'], ['Filled day', 'Selected day']];
+  const L = [['●', 'Bleeding logged'], ['○', 'Inside a logged period, no flow entry'], ['◇', 'No bleeding logged'], ['▪', 'Other entries'], ['✦', 'Estimated window for your next start, outlined with dashes (not logged)'], ['★', 'Best guess for the first day (solid outline)'], ['Underlined number', 'Today'], ['Filled day', 'Selected day']];
   root.append(h('section', { 'aria-label': 'Legend', class: 'card soft' }, h('h2', { text: 'Legend' }), h('ul', { class: 'legend' }, L.map((l) => h('li', null, h('strong', { 'aria-hidden': 'true', text: l[0] + ' ' }), l[1]))), h('p', { class: 'small muted', text: 'Estimated days only appear if you turn estimates on in Settings. They are guesses, not records.' })));
   const sd = state.sel;
   root.append(card(fmtLong(sd), [(periodOn(sd) ? h('p', { class: 'info', text: 'This day is inside a period you logged' + (periodOn(sd).end ? '.' : ' (still going, counted through today).') }) : null), quickRow(), activityList(sd), h('div', { class: 'btn-row' }, h('button', { type: 'button', class: 'btn', text: 'Open on Today screen', onclick: () => go('today') }))]));
