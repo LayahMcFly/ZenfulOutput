@@ -366,7 +366,7 @@ const SELF_HTML = '<!DOCTYPE html>\n' + document.documentElement.outerHTML.repla
 /* ================= 1. Constants and reference lists ================= */
 const VERSION = 1;
 const KEY_J = 'petal.v1.journal', KEY_S = 'petal.v1.settings', KEY_T = 'petal.v1.storagetest';
-const APP_VERSION = '2.4.2'; // shown in the footer and Settings, and saved in backups
+const APP_VERSION = '2.4.3'; // shown in the footer and Settings, and saved in backups
 const THEMES = [
   { id: 'lavender', name: 'Lavender Journal', bg: '#ecdfc8', sw: ['#ecdfc8', '#6D4AA5', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#6D4AA5', P: '#dccaf0', LF: '#a8996b' } },
   { id: 'peach', name: 'Peach Notebook', bg: '#ecdfc8', sw: ['#ecdfc8', '#A44939', '#6f4a33'], fr: { L: '#f7efdf', C: '#b0845b', R: '#A44939', P: '#f4cdbd', LF: '#a8996b' } },
@@ -1287,6 +1287,7 @@ function viewCalendar(root) {
     h('h2', { 'aria-live': 'polite', style: 'margin:0 6px', text: monthName }), h('button', { type: 'button', class: 'btn icon', id: 'calNext', 'aria-label': 'Next month', onclick: () => shift(1) }, icon('next')),
     h('button', { type: 'button', class: 'btn', text: 'Today', onclick: () => { state.calMonth = today.slice(0, 7); state.sel = today; render('calToday'); }, id: 'calToday' }),
     h('span', { class: 'seg' }, h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.calMode === 'grid'), text: 'Grid', onclick: () => { state.calMode = 'grid'; render(); } }), h('button', { type: 'button', class: 'btn', 'aria-pressed': String(state.calMode === 'list'), text: 'List', onclick: () => { state.calMode = 'list'; render(); } }))));
+  if (est.state === 'ok') root.append(h('p', { class: 'info', id: 'estNote' }, h('strong', { text: 'Next period estimate: ' + fmtShort(est.lo) + ' to ' + fmtShort(est.hi) + '. ' }), 'The dashed days (✦) are the days your next period might start. The ★ is the best guess for the first day. They do not show how long the period will last, and your logged periods stay marked with a solid outline.'));
   const dim = new Date(y, m, 0).getDate(), pre = new Date(y, m - 1, 1).getDay(), dates = [];
   for (let i = 1; i <= dim; i++) dates.push(state.calMonth + '-' + pad2(i));
   const choose = (date) => { state.sel = date; render('day-' + date); };
