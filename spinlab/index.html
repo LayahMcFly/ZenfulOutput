@@ -244,7 +244,7 @@ footer.foot a{color:var(--soft)}
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> or <b>Save MP3</b>, and your mixes with <b>Record mix</b>, which saves an MP3. Nothing goes online for either.</p>
   <h3>Videos</h3>
   <ul>
-    <li>Load a video (MP4, WebM, and on most computers MOV) the same way as a song. SpinLab pulls out the sound, puts it on the deck and saves it to your Downloads as a WAV file right away.</li>
+    <li>Load a video (MP4, WebM, and on most computers MOV) the same way as a song. SpinLab pulls out the sound and puts it on the deck. Nothing downloads until you press Save WAV or Save MP3.</li>
   </ul>
   <h3>Waveform</h3>
   <ul>
@@ -274,7 +274,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.3'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.4'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -666,9 +666,8 @@ class Deck {
       this.startOffset = 0; this.cuePoint = 0; this.cues = [null, null, null, null]; this.loop = { on: false, start: 0, end: 0 };
       this.sel = null; this.undo = []; this.redo = []; this.bpm = null;
       this.peaks = computePeaks(buf); this.ver++; this.view = { start: 0, len: buf.duration };
-      this.fromVideo = isVideo;
       this.ui();
-      if (isVideo) { download(encodeWAV(buf), this.name + '.wav'); toast('The video’s sound is on deck ' + this.id + ' and was saved as ' + this.name + '.wav'); }
+      if (isVideo) toast('The video’s sound is on deck ' + this.id + '. Use Save WAV or Save MP3 to keep it as a file.');
       detectBPM(buf).then(b => { if (this.buffer === buf && b) { this.bpm = b; this.updateEcho(); this.ui(); } else if (!b) this.ui(); });
     } catch (e) {
       this.ui(); toast(isVideo ? 'The sound in this video could not be read. MP4 and WebM videos work best.' : 'That file could not be read as audio. Try an MP3, WAV, M4A or OGG.');
@@ -807,7 +806,7 @@ function waveHTML(d) {
 function deckHTML(d) {
   const id = d.id;
   return `<div class="row" style="justify-content:space-between">
-      <div class="row"><span class="tag">${id}</span><label class="btn" title="Load a song or a video from this device. A video's sound is saved as a WAV file for you.">${I.load}Load<input type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.webm,.mp4,.m4v,.mov,.mkv" class="sr" data-r="file"></label></div>
+      <div class="row"><span class="tag">${id}</span><label class="btn" title="Load a song or a video from this device">${I.load}Load<input type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.webm,.mp4,.m4v,.mov,.mkv" class="sr" data-r="file"></label></div>
       <div class="row"><div class="bpm" data-r="bpm">---.-<small data-r="bpmsub">BPM</small></div></div>
     </div>
     <div class="row">
@@ -1056,7 +1055,7 @@ function color(d, a) { const h = d.color, r = parseInt(h.slice(1, 3), 16), g = p
 /* ---------------- deck UI (non-canvas) ---------------- */
 function renderDeckUI(d) {
   const e = d.el; if (!e) return;
-  e.title.innerHTML = d.buffer ? escapeHTML(d.name) + `<small>${d.buffer.numberOfChannels > 1 ? 'Stereo' : 'Mono'} · ${(d.buffer.sampleRate / 1000).toFixed(1)} kHz${d.fromVideo ? ' · from video' : ''}${d.undo.length ? ' · edited' : ''}</small>` : 'No song loaded<small>Press Load or drop a file here</small>';
+  e.title.innerHTML = d.buffer ? escapeHTML(d.name) + `<small>${d.buffer.numberOfChannels > 1 ? 'Stereo' : 'Mono'} · ${(d.buffer.sampleRate / 1000).toFixed(1)} kHz${d.undo.length ? ' · edited' : ''}</small>` : 'No song loaded<small>Press Load or drop a file here</small>';
   e.len.textContent = fmt(d.dur);
   const eb = d.bpm ? d.bpm * d.rate : null;
   e.bpm.innerHTML = (eb ? eb.toFixed(1) : '---.-') + `<small>${d.bpm ? 'BPM · song ' + d.bpm.toFixed(1) : d.buffer ? 'BPM · finding…' : 'BPM'}</small>`;
