@@ -147,8 +147,9 @@ canvas.over{display:block;width:100%;height:30px;cursor:pointer;border-top:1px s
 .mixer{padding:14px;display:grid;gap:12px}
 canvas.spec{width:100%;height:84px;display:block;border-radius:10px;background:#070910;border:1px solid var(--line)}
 .mixgrid{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center;justify-items:center}
-.mixgrid .ca{--c:var(--a)}
-.mixgrid .cb{--c:var(--b)}
+.mixgrid .ca{--c:var(--a);grid-column:1}
+.mixgrid .cb{--c:var(--b);grid-column:3}
+.mixgrid .rl{grid-column:2}
 .mixgrid .rl{font:700 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);text-align:center;min-width:56px}
 .mixgrid .kn{gap:2px}
 .chan{display:flex;gap:8px;align-items:flex-end;height:170px;margin-top:6px}
@@ -173,15 +174,25 @@ dialog h3{margin:16px 0 6px;font-size:13px;letter-spacing:.1em;text-transform:up
 dialog ul{margin:0;padding-left:18px}
 dialog li{margin:4px 0}
 kbd{font:600 11px var(--mono);background:#0e1220;border:1px solid var(--line2);border-bottom-width:2px;border-radius:5px;padding:1px 5px}
+/* one deck until the user adds deck B */
+.adddeck{display:none;width:100%;justify-content:center;padding:14px;border-style:dashed;border-color:color-mix(in srgb,var(--b) 45%,var(--line2));color:var(--b);font-size:14px;border-radius:16px;background:rgba(244,114,182,.05)}
+.adddeck:hover{background:rgba(244,114,182,.10);border-color:var(--b)}
+.adddeck svg{width:18px;height:18px}
+body.single .adddeck{display:inline-flex}
+body.single #wB,body.single #dB,body.single .mixgrid .cb,body.single .xf{display:none}
+body.single .console{grid-template-columns:1fr minmax(300px,380px)}
+body.single .mixgrid{grid-template-columns:auto auto;justify-content:center;column-gap:22px}
+body.single .deck [data-a="sync"]{display:none}
+.closedeck{margin-left:auto}
 footer.foot{text-align:center;color:var(--dim);font-size:12px;padding:6px 10px}
 footer.foot a{color:var(--soft)}
 
 @media (max-width:1100px){
-  .console{grid-template-columns:1fr 1fr}
+  .console,body.single .console{grid-template-columns:1fr 1fr}
   .mixer{grid-column:1 / -1;order:-1}
 }
 @media (max-width:720px){
-  .console{grid-template-columns:1fr}
+  .console,body.single .console{grid-template-columns:1fr}
   .times{font-size:12px;gap:8px}
   canvas.wave{height:96px}
   .selinfo{margin-left:0;width:100%}
@@ -189,7 +200,7 @@ footer.foot a{color:var(--soft)}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body>
+<body class="single">
 <header class="top">
   <a class="brand" href="./" aria-label="SpinLab">
     <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#141824"/><circle cx="30" cy="34" r="20" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="30" cy="34" r="13" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="30" cy="34" r="7" fill="#f472b6"/><circle cx="30" cy="34" r="2" fill="#0b0d14"/><path d="M50 8v22l-6 6" fill="none" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/></svg>
@@ -207,6 +218,7 @@ footer.foot a{color:var(--soft)}
 
 <main>
   <section class="panel wrow a" id="wA" aria-label="Deck A waveform"></section>
+  <button class="btn adddeck" id="addDeck" title="Open a second deck to mix two songs together"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add another track (Deck B)</button>
   <section class="panel wrow b" id="wB" aria-label="Deck B waveform"></section>
 
   <section class="console">
@@ -229,7 +241,7 @@ footer.foot a{color:var(--soft)}
 
 <dialog id="help">
   <h2>How to use SpinLab</h2>
-  <p>Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> and your mixes with <b>Record mix</b>.</p>
+  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> and your mixes with <b>Record mix</b>.</p>
   <h3>Waveform</h3>
   <ul>
     <li>Click to jump. Drag to select a part of the song. Shift + click stretches the selection.</li>
@@ -248,7 +260,7 @@ footer.foot a{color:var(--soft)}
   <h3>Keyboard</h3>
   <ul>
     <li>The deck you touched last is the active one (it gets a colored border). <kbd>Tab</kbd> on its own moves between controls as usual.</li>
-    <li><kbd>Space</kbd> play or pause &middot; <kbd>C</kbd> cue &middot; <kbd>1</kbd>–<kbd>4</kbd> hot cues &middot; <kbd>[</kbd> <kbd>]</kbd> switch deck</li>
+    <li><kbd>Space</kbd> play or pause &middot; <kbd>C</kbd> cue &middot; <kbd>1</kbd>–<kbd>4</kbd> hot cues &middot; <kbd>[</kbd> <kbd>]</kbd> switch deck (when deck B is open)</li>
     <li><kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>X</kbd> <kbd>C</kbd> <kbd>V</kbd> cut, copy, paste &middot; <kbd>Del</kbd> delete &middot; <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>Z</kbd> undo, + <kbd>Shift</kbd> redo &middot; <kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>A</kbd> select all</li>
     <li><kbd>←</kbd> <kbd>→</kbd> nudge the song back or forward one second</li>
     <li>Knobs: drag up or down, use the arrow keys, or double-click to reset.</li>
@@ -258,7 +270,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.0'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.1'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -600,6 +612,7 @@ class Deck {
   }
   setBPM(v) { if (!(v > 20 && v < 400)) return; this.bpm = v; this.updateEcho(); this.ui(); }
   sync() {
+    if (!dual) return toast('Add deck B first, then Sync matches the two decks.');
     const o = this.other;
     if (!this.bpm || !o.bpm) return toast('Both decks need a BPM to sync. Tap or type it in.');
     const target = o.bpm * o.eff; let r = target / this.bpm;
@@ -722,7 +735,7 @@ function escapeHTML(s) { return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<':
 function waveHTML(d) {
   const id = d.id;
   return `<div class="whead"><span class="tag">${id}</span><div class="title" data-r="title">No song loaded<small>Press Load or drop a file here</small></div>
-    <div class="times"><span>Time <b data-r="el">0:00.0</b></span><span>Left <b data-r="rem">0:00.0</b></span><span>Length <b data-r="len">0:00.0</b></span></div></div>
+    ${id === 'B' ? '<button class="btn sm closedeck" data-a="closeB" title="Stop deck B and hide it. Its song comes back if you add deck B again.">Hide deck B</button>' : ''}<div class="times"><span>Time <b data-r="el">0:00.0</b></span><span>Left <b data-r="rem">0:00.0</b></span><span>Length <b data-r="len">0:00.0</b></span></div></div>
   <div class="wave-wrap" data-r="wrap"><canvas class="wave" data-r="cv" aria-label="Deck ${id} waveform. Click to jump, drag to select."></canvas><canvas class="over" data-r="ov" aria-label="Deck ${id} whole-song overview"></canvas></div>
   <div class="tools">
     <button class="btn sm" data-a="selectAll" title="Select all (Ctrl/⌘ A)">${I.all}All</button>
@@ -831,7 +844,7 @@ function setupDeck(d) {
     selectAll: () => d.selectAll(), cut: () => d.cut(true), copy: () => d.copy(), paste: () => d.paste(), del: () => d.cut(false), crop: () => d.crop(),
     fin: () => d.fade('in'), fout: () => d.fade('out'), reverse: () => d.reverse(), loopSel: () => d.loopSel(),
     undo: () => d.restore(d.undo, d.redo), redo: () => d.restore(d.redo, d.undo), zin: () => d.zoom(0.5), zout: () => d.zoom(2), fit: () => d.fit(),
-    follow: () => { d.follow = !d.follow; d.ui(); }, save: () => d.saveWav(),
+    follow: () => { d.follow = !d.follow; d.ui(); }, save: () => d.saveWav(), closeB: () => setDual(false),
     cue: () => d.cue(), play: () => d.toggle(), brake: () => d.doBrake(), sync: () => d.sync(), tap: () => d.tap(),
     treset: () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); },
     lin: () => { if (!d.buffer) return; d.pendIn = d.pos(); toast('Loop start marked. Press Out where it should end.'); d.ui(); },
@@ -1024,9 +1037,17 @@ function setActive(d) { if (activeDeck === d) return; activeDeck = d; decks.forE
 /* ---------------- mixer + master ---------------- */
 knobs.master = makeKnob($('#kMaster'), { min: 0, max: 1.2, value: 0.9, def: 0.9, fmt: v => Math.round(v * 100) + '%', onChange: v => ctx && master.gain.gain.setTargetAtTime(v, ctx.currentTime, 0.01) });
 const xf = $('#xfader');
-function applyXfader() { if (!ctx) return; const x = +xf.value; A.xf.gain.setTargetAtTime(Math.cos(x * Math.PI / 2), ctx.currentTime, 0.008); B.xf.gain.setTargetAtTime(Math.sin(x * Math.PI / 2), ctx.currentTime, 0.008); }
+function applyXfader() { if (!ctx) return; const x = dual ? +xf.value : 0; A.xf.gain.setTargetAtTime(Math.cos(x * Math.PI / 2), ctx.currentTime, 0.008); B.xf.gain.setTargetAtTime(Math.sin(x * Math.PI / 2), ctx.currentTime, 0.008); }
 xf.addEventListener('input', applyXfader);
 xf.addEventListener('dblclick', () => { xf.value = 0.5; applyXfader(); });
+let dual = false;
+function setDual(on) {
+  dual = on; document.body.classList.toggle('single', !on);
+  if (!on) { B.pause(); setActive(A); }
+  else { setActive(B); requestAnimationFrame(() => { sizeCanvas(B.el.cv); sizeCanvas(B.el.ov); B.waveKey = B.ovKey = null; B.fader.set(B.fader.value, true); $('#wB').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }); }
+  applyXfader();
+}
+$('#addDeck').addEventListener('click', () => setDual(true));
 $('#xfCenter').addEventListener('click', () => { xf.value = 0.5; applyXfader(); });
 
 /* ---------------- recording ---------------- */
@@ -1071,7 +1092,7 @@ document.addEventListener('keydown', e => {
   else if (e.key === 'Delete' || e.key === 'Backspace') { if (d.sel) { d.cut(false); e.preventDefault(); } }
   else if (e.key === 'ArrowLeft' && tag !== 'INPUT') { d.seek(d.pos() - 1); e.preventDefault(); }
   else if (e.key === 'ArrowRight' && tag !== 'INPUT') { d.seek(d.pos() + 1); e.preventDefault(); }
-  else if (e.key === '[') setActive(A); else if (e.key === ']') setActive(B);
+  else if (e.key === '[') setActive(A); else if (e.key === ']' && dual) setActive(B);
   else if (e.key === 'Escape' && d.sel) { d.sel = null; d.ui(); }
 });
 
@@ -1080,6 +1101,7 @@ const spec = $('#spec');
 let freq = null, lastT = {};
 function frame() {
   decks.forEach(d => {
+    if (d === B && !dual) return;
     drawDeck(d);
     if (d.buffer) {
       const p = d.pos(), el = fmt(p), rem = '-' + fmt((d.dur - p) / d.eff);
