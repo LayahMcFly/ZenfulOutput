@@ -209,7 +209,7 @@ footer.foot a{color:var(--soft)}
   </a>
   <div class="master">
     <div class="kn"><div class="knob" id="kMaster" style="--kc:#e2e8f0" role="slider" tabindex="0" aria-label="Master volume"></div><span>Master</span></div>
-    <button class="btn rec" id="recBtn" title="Record everything you play into a file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record mix</span></button>
+    <button class="btn rec" id="recBtn" title="Record everything you play into an MP3 file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record mix</span></button>
     <span class="rectime" id="recTime"></span>
     <button class="btn ghost" id="helpBtn" title="How to use SpinLab and keyboard shortcuts"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 6.2a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.1v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".9" fill="currentColor"/></svg>Help</button>
     <a class="home" href="../">&larr; Hub</a>
@@ -241,7 +241,7 @@ footer.foot a{color:var(--soft)}
 
 <dialog id="help">
   <h2>How to use SpinLab</h2>
-  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> or <b>Save MP3</b>, and your mixes with <b>Record mix</b>.</p>
+  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> or <b>Save MP3</b>, and your mixes with <b>Record mix</b>, which saves an MP3. Nothing goes online for either.</p>
   <h3>Videos</h3>
   <ul>
     <li>Load a video (MP4, WebM, and on most computers MOV) the same way as a song. SpinLab pulls out the sound, puts it on the deck and saves it to your Downloads as a WAV file right away.</li>
@@ -274,7 +274,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.2'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.3'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -1093,23 +1093,81 @@ function setDual(on) {
 $('#addDeck').addEventListener('click', () => setDual(true));
 $('#xfCenter').addEventListener('click', () => { xf.value = 0.5; applyXfader(); });
 
-/* ---------------- recording ---------------- */
-let rec = null, recChunks = [], recStart = 0;
-$('#recBtn').addEventListener('click', () => {
+/* ---------------- recording ----------------
+   Records the master output as an MP3, all on this device: an AudioWorklet taps the raw sound
+   and lamejs (lame.min.js, the same file Save MP3 uses) encodes it while you play.
+   If a browser can't do that, it falls back to the browser's own recorder (WebM or M4A). */
+let rec = null, recStart = 0;
+const REC_TAP = `class RecTap extends AudioWorkletProcessor {
+  constructor() { super(); this.on = true; this.n = 0; this.L = new Float32Array(4608); this.R = new Float32Array(4608);
+    this.port.onmessage = e => { if (e.data === 'stop') { this.flush(); this.on = false; this.port.postMessage('done'); } }; }
+  flush() { if (this.n) { this.port.postMessage([this.L.slice(0, this.n), this.R.slice(0, this.n)]); this.n = 0; } }
+  process(inputs) {
+    if (!this.on) return false;
+    const i = inputs[0], l = i && i[0], r = i && (i[1] || i[0]);
+    for (let k = 0; k < 128; k++) { this.L[this.n] = l ? l[k] : 0; this.R[this.n] = r ? r[k] : 0; if (++this.n === this.L.length) this.flush(); }
+    return true;
+  }
+}
+registerProcessor('rec-tap', RecTap);`;
+let tapReady = null;
+function recStamp() { return new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-'); }
+function recUI(on) { $('#recBtn').classList.toggle('on', on); $('#recBtn span').textContent = on ? 'Stop recording' : 'Record mix'; if (!on) $('#recTime').textContent = ''; }
+
+async function startMp3Rec() {
+  if (!window.AudioWorkletNode || !ctx.audioWorklet || ![32000, 44100, 48000].includes(ctx.sampleRate)) return false;
+  try {
+    await loadLame();
+    if (!tapReady) tapReady = ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_TAP], { type: 'application/javascript' })));
+    await tapReady;
+  } catch (e) { tapReady = null; return false; }
+  const node = new AudioWorkletNode(ctx, 'rec-tap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1], channelCount: 2, channelCountMode: 'explicit' });
+  const enc = new lamejs.Mp3Encoder(2, ctx.sampleRate, 192), out = [];
+  const i16 = f => { const o = new Int16Array(f.length); for (let i = 0; i < f.length; i++) { const v = clamp(f[i], -1, 1); o[i] = v < 0 ? v * 0x8000 : v * 0x7fff; } return o; };
+  let finish;
+  node.port.onmessage = e => {
+    if (e.data === 'done') return finish && finish();
+    const m = enc.encodeBuffer(i16(e.data[0]), i16(e.data[1])); if (m.length) out.push(new Int8Array(m));
+  };
+  master.lim.connect(node); node.connect(ctx.destination); // the tap outputs silence; this only keeps it running
+  rec = {
+    kind: 'mp3',
+    stop() {
+      finish = () => {
+        node.port.onmessage = null; try { master.lim.disconnect(node); } catch (e) {} node.disconnect();
+        const end = enc.flush(); if (end.length) out.push(new Int8Array(end));
+        download(new Blob(out, { type: 'audio/mpeg' }), 'spinlab-mix-' + recStamp() + '.mp3');
+        rec = null; recUI(false); toast('Your mix was saved to Downloads as an MP3');
+      };
+      node.port.postMessage('stop');
+    }
+  };
+  return true;
+}
+function startFallbackRec() {
+  if (!window.MediaRecorder || !master.rec) { toast('This browser can’t record audio. Try Chrome, Edge, Firefox or a recent Safari.'); return false; }
+  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'], type = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
+  let mr; try { mr = new MediaRecorder(master.rec.stream, type ? { mimeType: type } : undefined); } catch (e) { toast('Recording could not start in this browser.'); return false; }
+  const chunks = [];
+  mr.ondataavailable = e => e.data.size && chunks.push(e.data);
+  mr.onstop = () => {
+    const mt = mr.mimeType || type || 'audio/webm', ext = mt.includes('mp4') ? 'm4a' : mt.includes('ogg') ? 'ogg' : 'webm';
+    download(new Blob(chunks, { type: mt }), 'spinlab-mix-' + recStamp() + '.' + ext);
+    rec = null; recUI(false); toast('Your mix was saved to Downloads as ' + ext.toUpperCase() + ' (this browser can’t make MP3 recordings)');
+  };
+  mr.start(1000);
+  rec = { kind: 'media', stop: () => mr.stop() };
+  return true;
+}
+let recStarting = false;
+$('#recBtn').addEventListener('click', async () => {
   ac();
   if (rec) { rec.stop(); return; }
-  if (!window.MediaRecorder || !master.rec) return toast('This browser can’t record audio. Try Chrome, Edge, Firefox or a recent Safari.');
-  const types = ['audio/webm;codecs=opus', 'audio/webm', 'audio/mp4', 'audio/ogg'], type = types.find(t => MediaRecorder.isTypeSupported(t)) || '';
-  try { rec = new MediaRecorder(master.rec.stream, type ? { mimeType: type } : undefined); } catch (e) { rec = null; return toast('Recording could not start in this browser.'); }
-  recChunks = []; recStart = performance.now();
-  rec.ondataavailable = e => e.data.size && recChunks.push(e.data);
-  rec.onstop = () => {
-    const mt = rec.mimeType || type || 'audio/webm', ext = mt.includes('mp4') ? 'm4a' : mt.includes('ogg') ? 'ogg' : 'webm';
-    const blob = new Blob(recChunks, { type: mt }), stamp = new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-');
-    download(blob, 'spinlab-mix-' + stamp + '.' + ext); rec = null; $('#recBtn').classList.remove('on'); $('#recBtn span').textContent = 'Record mix'; $('#recTime').textContent = '';
-    toast('Your mix was saved to Downloads');
-  };
-  rec.start(1000); $('#recBtn').classList.add('on'); $('#recBtn span').textContent = 'Stop recording';
+  if (recStarting) return; recStarting = true;
+  const ok = (await startMp3Rec()) || startFallbackRec();
+  recStarting = false;
+  if (!ok) return;
+  recStart = performance.now(); recUI(true);
   toast('Recording everything you hear. Press Stop recording to save.');
 });
 
