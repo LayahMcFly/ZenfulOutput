@@ -113,6 +113,14 @@ main{padding:14px clamp(10px,2vw,22px);display:grid;gap:14px;max-width:1500px;ma
 .wave-wrap{position:relative;border-radius:10px;overflow:hidden;background:#070910;border:1px solid var(--line);touch-action:none}
 canvas.wave{display:block;width:100%;height:118px;cursor:crosshair}
 canvas.over{display:block;width:100%;height:30px;cursor:pointer;border-top:1px solid var(--line)}
+canvas.ruler{display:block;width:100%;height:22px;cursor:pointer;border-bottom:1px solid var(--line);background:#0b0e17;touch-action:none}
+.selbar{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.selbar .lbl{margin-right:2px}
+.selbar input[type=text]{width:84px;text-align:center}
+.selbar .arrow{color:var(--dim);font-size:12px}
+.sellen{font:600 12px var(--mono);color:var(--soft);min-width:58px}
+.snapsel{display:inline-flex;align-items:center;gap:6px}
+.btn:disabled:hover{border-color:var(--line2);background:linear-gradient(#1d2335,#151a28)}
 .wave-wrap.drag{outline:2px dashed var(--c);outline-offset:-4px}
 .tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
 .tools .sep{width:1px;height:20px;background:var(--line2);margin:0 2px}
@@ -264,6 +272,9 @@ footer.foot a{color:var(--soft)}
   canvas.wave{height:110px}
   canvas.over{height:22px}
   .tools{flex-wrap:nowrap;overflow:hidden;gap:5px}
+  .selbar{flex-wrap:nowrap;overflow:hidden;gap:5px}
+  .selbar .btn.sm{padding:4px 7px}
+  .selbar input[type=text]{padding:3px 6px;width:78px}
   .tools .btn.sm{padding:4px 7px}
   .tools .sep{height:16px}
   .adddeck{padding:8px;font-size:13px}
@@ -293,16 +304,17 @@ footer.foot a{color:var(--soft)}
 }
 /* labels on the waveform toolbar only when there is room for them */
 @media (min-width:1101px) and (max-width:1759px){ .tools .tl{display:none} .tools .btn.sm{padding:5px 7px} }
+@media (min-width:1101px) and (max-width:1439px){ .selbar .tl{display:none} .selbar .lbl{display:none} }
 /* tall enough: everything fits one window and the waveforms take the spare height */
 @media (min-width:1101px) and (min-height:700px){
   html,body{height:100%}
   body{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
   main{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column}
   #wA,#wB{flex:1 1 0;display:flex;flex-direction:column}
-  .wave-wrap{flex:1 1 0;display:flex;flex-direction:column;min-height:66px}
+  .wave-wrap{flex:1 1 0;display:flex;flex-direction:column;min-height:88px}
   canvas.wave{flex:1 1 0;height:0;min-height:48px}
   canvas.over{flex:none}
-  .whead,.tools{flex:none}
+  .whead,.tools,.selbar,canvas.ruler{flex:none}
   .adddeck,.statusbar{flex:none}
   /* the console keeps its natural height when it fits; on short screens its panels scroll inside */
   .console{flex:0 1 auto;min-height:150px;grid-template-rows:minmax(0,1fr)}
@@ -326,6 +338,8 @@ footer.foot a{color:var(--soft)}
   .brand{margin-right:0}
   .proj{flex:1 1 100%;max-width:none;order:3}
   .proj input{font-size:16px}
+  .selbar input[type=text]{font-size:16px;width:96px;padding:6px 8px}
+  canvas.ruler{height:26px}
   .master{order:4;width:100%;display:grid;grid-template-columns:auto 1fr 1fr;gap:8px;align-items:center}
   .master .kn{grid-row:span 2}
   .master .btn{justify-content:center;min-height:44px;padding:8px 10px}
@@ -436,7 +450,11 @@ footer.foot a{color:var(--soft)}
   </ul>
   <h3>Waveform</h3>
   <ul>
-    <li>Click to jump. Drag to select a part of the song. Shift + click stretches the selection.</li>
+    <li><b>The ruler</b> (the strip with the times, above the waveform) moves the white playhead. Click it or drag along it.</li>
+    <li><b>The waveform</b> is for selecting. Drag across it to select a part. Drag a selection’s edge to adjust it. Click once to clear the selection. When nothing is selected, a click moves the playhead.</li>
+    <li><b>Snap</b> makes selections land on the beat (¼ beat to 1 bar). Bright lines are bars, faint lines are beats. If the grid is off, put the playhead on a kick and press <b>Beat 1 here</b>.</li>
+    <li>Type exact <b>Start</b> and <b>End</b> times in the selection bar. <b>Play it</b> plays just the selection. <b>Repeat ×2</b> doubles it for stutters. <b>Silence</b> mutes it.</li>
+    <li><kbd>Shift</kbd> + <kbd>←</kbd> <kbd>→</kbd> grows or shrinks the selection by one snap step. <kbd>P</kbd> plays the selection. <kbd>Esc</kbd> clears it.</li>
     <li>Scroll the mouse wheel (or use the zoom buttons) to zoom in around the cursor. Shift + wheel scrolls sideways.</li>
     <li>The thin strip under the waveform shows the whole song. Click it to jump anywhere.</li>
     <li>Copy something on deck A and paste it into deck B. Paste goes over the selection, or in at the playhead when nothing is selected.</li>
@@ -462,12 +480,18 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.8'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.9'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
 const $ = (s, r = document) => r.querySelector(s);
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
+const fmt2 = t => { const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(2); };
+const parseTime = v => {
+  v = String(v).trim(); if (!v) return null;
+  const m = /^(\d+):(\d{1,2}(?:\.\d*)?)$/.exec(v); if (m) return +m[1] * 60 + +m[2];
+  return /^\d*\.?\d+$/.test(v) ? +v : null;
+};
 const fmt = t => { if (!isFinite(t) || t < 0) t = 0; const m = Math.floor(t / 60), s = t - m * 60; return m + ':' + (s < 10 ? '0' : '') + s.toFixed(1); };
 const CUE_COLORS = ['#f87171', '#fbbf24', '#34d399', '#a78bfa'];
 const BK = 128; // samples per stored waveform bucket
@@ -581,7 +605,11 @@ async function detectBPM(buffer) {
     const a = ac[best - 1], b = ac[best], c = ac[best + 1], den = a - 2 * b + c, shift = den ? 0.5 * (a - c) / den : 0;
     let bpm = 60 * fps / (best + shift);
     while (bpm < 80) bpm *= 2; while (bpm > 170) bpm /= 2;
-    return Math.round(bpm * 10) / 10;
+    // find where the beats fall (phase) so the grid lines up with the kicks
+    const L = 60 * fps / bpm; let bestO = 0, bestS = -1;
+    for (let o = 0; o < Math.floor(L); o++) { let sum = 0; for (let k = 0; o + k * L < n; k++) sum += on[Math.round(o + k * L)] || 0; if (sum > bestS) { bestS = sum; bestO = o; } }
+    const beat = 60 / bpm, offset = ((start + bestO / fps) % beat + beat) % beat;
+    return { bpm: Math.round(bpm * 10) / 10, offset };
   } catch (e) { return null; }
 }
 
@@ -684,7 +712,7 @@ let clipboard = null, activeDeck = null;
 class Deck {
   constructor(id, color) {
     Object.assign(this, { id, color, buffer: null, name: '', playing: false, startCtx: 0, startOffset: 0, rate: 1, bend: 1, src: null,
-      loop: { on: false, start: 0, end: 0 }, pendIn: null, cues: [null, null, null, null], cuePoint: 0, bpm: null, view: { start: 0, len: 1 }, sel: null,
+      loop: { on: false, start: 0, end: 0 }, pendIn: null, cues: [null, null, null, null], cuePoint: 0, bpm: null, beatOff: 0, snap: 1, selStop: null, view: { start: 0, len: 1 }, sel: null,
       undo: [], redo: [], peaks: null, range: 0.16, tempo: 0, echoBeats: 0.5, follow: true, brake: null, taps: [], ver: 0, built: false });
   }
   get dur() { return this.buffer ? this.buffer.duration : 0; }
@@ -744,6 +772,7 @@ class Deck {
   toggle() { (this.playing && !this.brake) ? this.pause() : this.play(); }
   seek(t) {
     if (!this.buffer) return;
+    this.selStop = null;
     t = clamp(t, 0, this.dur);
     if (this.loop.on && (t < this.loop.start || t >= this.loop.end)) this.exitLoop(true);
     if (this.brake) { this.brake = null; this._kill(); this.playing = false; }
@@ -854,11 +883,11 @@ class Deck {
       this.pause(); this._kill();
       this.buffer = buf; this.name = file.name.replace(/\.[^.]+$/, '');
       this.startOffset = 0; this.cuePoint = 0; this.cues = [null, null, null, null]; this.loop = { on: false, start: 0, end: 0 };
-      this.sel = null; this.undo = []; this.redo = []; this.bpm = null;
+      this.sel = null; this.undo = []; this.redo = []; this.bpm = null; this.beatOff = 0; this.selStop = null;
       this.peaks = computePeaks(buf); this.ver++; this.view = { start: 0, len: buf.duration };
       this.ui(); touch();
       if (isVideo) toast('The video’s sound is on deck ' + this.id + '. Use Save WAV or Save MP3 to keep it as a file.');
-      detectBPM(buf).then(b => { if (this.buffer === buf && b) { this.bpm = b; this.updateEcho(); this.ui(); } else if (!b) this.ui(); });
+      detectBPM(buf).then(r => { if (this.buffer === buf && r) { this.bpm = r.bpm; this.beatOff = r.offset; this.updateEcho(); this.ui(); } else if (!r) this.ui(); });
     } catch (e) {
       this.ui(); toast(isVideo ? 'The sound in this video could not be read. MP4 and WebM videos work best.' : 'That file could not be read as audio. Try an MP3, WAV, M4A or OGG.');
     }
@@ -868,16 +897,16 @@ class Deck {
   reset() {
     this.pause(); this._kill(); this.brake = null;
     Object.assign(this, { buffer: null, name: '', startOffset: 0, cuePoint: 0, cues: [null, null, null, null], loop: { on: false, start: 0, end: 0 }, pendIn: null,
-      sel: null, undo: [], redo: [], bpm: null, peaks: null, range: 0.16, tempo: 0, bend: 1, echoBeats: 0.5, follow: true, view: { start: 0, len: 1 } });
+      sel: null, undo: [], redo: [], bpm: null, beatOff: 0, snap: 1, selStop: null, peaks: null, range: 0.16, tempo: 0, bend: 1, echoBeats: 0.5, follow: true, view: { start: 0, len: 1 } });
     this.ver++; this.waveKey = this.ovKey = null;
-    this.el.range.value = '0.16'; this.el.tempo.value = 0; this.el.echoT.value = '0.5'; this.setRate();
+    this.el.range.value = '0.16'; this.el.tempo.value = 0; this.el.echoT.value = '0.5'; this.el.snap.value = '1'; this.setRate();
     Object.values(this.k).forEach(k => k.set(k.def)); this.fader.set(this.fader.def);
     this.ui();
   }
   state() {
     return { name: this.name, audio: this.buffer ? encodeWAV(this.buffer) : null, cues: this.cues.slice(), cuePoint: this.cuePoint,
       loop: { start: this.loop.start, end: this.loop.end }, bpm: this.bpm, range: this.range, tempo: this.tempo, echoBeats: this.echoBeats, follow: this.follow,
-      knobs: Object.fromEntries(Object.entries(this.k).map(([n, k]) => [n, k.value])), fader: this.fader.value };
+      knobs: Object.fromEntries(Object.entries(this.k).map(([n, k]) => [n, k.value])), fader: this.fader.value, beatOff: this.beatOff, snap: this.snap };
   }
   async applyState(st) {
     this.reset();
@@ -889,6 +918,7 @@ class Deck {
     this.name = st.name || ''; this.cues = (st.cues || [null, null, null, null]).slice(0, 4); this.cuePoint = st.cuePoint || 0;
     this.loop = { on: false, start: st.loop ? st.loop.start : 0, end: st.loop ? st.loop.end : 0 };
     this.bpm = st.bpm || null; this.range = st.range || 0.16; this.tempo = st.tempo || 0; this.echoBeats = st.echoBeats || 0.5; this.follow = st.follow !== false;
+    this.beatOff = st.beatOff || 0; this.snap = st.snap ?? 1; this.el.snap.value = String(this.snap);
     this.el.range.value = String(this.range); this.el.tempo.value = this.tempo; this.el.echoT.value = String(this.echoBeats); this.setRate();
     if (st.knobs) for (const [n, v] of Object.entries(st.knobs)) if (this.k[n]) this.k[n].set(v);
     if (st.fader != null) this.fader.set(st.fader);
@@ -962,6 +992,50 @@ class Deck {
   }
   selectAll() { if (this.buffer) { this.sel = { a: 0, b: this.dur }; this.ui(); } }
   loopSel() { if (this.needSel('loop')) { this.setLoop(this.sel.a, this.sel.b); this.seekInLoop(); } }
+  /* beat grid + selection helpers */
+  snapUnit() { return (60 / (this.bpm || 120)) * (this.snap || 1); }
+  snapT(t) {
+    if (!this.snap || !this.bpm) return clamp(t, 0, this.dur);
+    const q = this.snapUnit(), o = this.beatOff;
+    return clamp(o + Math.round((t - o) / q) * q, 0, this.dur);
+  }
+  setSel(a, b) {
+    if (!this.buffer) return;
+    a = clamp(a, 0, this.dur); b = clamp(b, 0, this.dur);
+    if (b < a) [a, b] = [b, a];
+    this.sel = b - a >= 0.005 ? { a, b } : null; this.ui();
+  }
+  playSel() {
+    if (!this.needSel('play')) return;
+    const { a, b } = this.sel;
+    if (this.loop.on) this.exitLoop(true);
+    this.seek(a); if (!this.playing) this.play();
+    this.selStop = { a, b };
+  }
+  zoomSel() {
+    if (!this.needSel('zoom to')) return;
+    const { a, b } = this.sel, len = Math.max(0.05, (b - a) * 1.25);
+    this.view = { start: clamp(a - (len - (b - a)) / 2, 0, Math.max(0, this.dur - len)), len: Math.min(len, this.dur) }; this.ui();
+  }
+  repeatSel() {
+    if (!this.needSel('repeat')) return;
+    const { a, b } = this.sel, len = b - a, p = this.pos();
+    this.pushUndo();
+    this.replace(insertBuf(this.buffer, sliceBuf(this.buffer, a, b), b), p >= b ? p + len : p, t => t >= b ? t + len : t);
+    this.sel = { a, b: b + len }; this.ui();
+    toast('Repeated. The selection is now ' + (2 * len).toFixed(2) + 's. Press again to double it.');
+  }
+  silenceSel() {
+    if (!this.needSel('silence')) return;
+    const { a, b } = this.sel, nb = cloneBuf(this.buffer), sr = nb.sampleRate, s0 = Math.floor(a * sr), s1 = Math.min(nb.length, Math.floor(b * sr));
+    for (let c = 0; c < nb.numberOfChannels; c++) nb.getChannelData(c).fill(0, s0, s1);
+    this.pushUndo(); this.replace(nb, this.pos()); toast('Silenced ' + (b - a).toFixed(2) + 's');
+  }
+  gridHere() {
+    if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
+    this.beatOff = this.pos(); this.ui(); touch();
+    toast(this.bpm ? 'Beat grid lined up: beat 1 is at the playhead' : 'Beat 1 set. Add the BPM (Tap or type it) to see the grid.');
+  }
   saveWav() {
     if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
     const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer;
@@ -998,19 +1072,19 @@ function waveHTML(d) {
   const id = d.id;
   return `<div class="whead"><span class="tag">${id}</span><div class="title" data-r="title">No song loaded<small>Press Load or drop a file here</small></div>
     ${id === 'B' ? '<button class="btn sm closedeck" data-a="closeB" title="Stop deck B and hide it. Its song comes back if you add deck B again.">Hide deck B</button>' : ''}<div class="times"><span>Time <b data-r="el">0:00.0</b></span><span>Left <b data-r="rem">0:00.0</b></span><span>Length <b data-r="len">0:00.0</b></span></div></div>
-  <div class="wave-wrap" data-r="wrap"><canvas class="wave" data-r="cv" aria-label="Deck ${id} waveform. Click to jump, drag to select."></canvas><canvas class="over" data-r="ov" aria-label="Deck ${id} whole-song overview"></canvas></div>
+  <div class="wave-wrap" data-r="wrap"><canvas class="ruler" data-r="rl" aria-label="Deck ${id} time ruler. Click or drag here to move the playhead."></canvas><canvas class="wave" data-r="cv" aria-label="Deck ${id} waveform. Drag to select a part. Drag a selection's edge to adjust it."></canvas><canvas class="over" data-r="ov" aria-label="Deck ${id} whole-song overview"></canvas></div>
   <div class="tools">
     <button class="btn sm" data-a="selectAll" title="Select all (Ctrl/⌘ A)">${I.all}<span class="tl">All</span></button>
-    <button class="btn sm" data-a="cut" title="Cut (Ctrl/⌘ X)">${I.cut}<span class="tl">Cut</span></button>
-    <button class="btn sm" data-a="copy" title="Copy (Ctrl/⌘ C)">${I.copy}<span class="tl">Copy</span></button>
-    <button class="btn sm" data-a="paste" title="Paste (Ctrl/⌘ V)">${I.paste}<span class="tl">Paste</span></button>
-    <button class="btn sm" data-a="del" title="Delete (Del)">${I.del}<span class="tl">Delete</span></button>
-    <button class="btn sm" data-a="crop" title="Keep only the selection">${I.crop}<span class="tl">Crop</span></button>
+    <button class="btn sm" data-a="cut" data-need="sel" title="Cut (Ctrl/⌘ X)">${I.cut}<span class="tl">Cut</span></button>
+    <button class="btn sm" data-a="copy" data-need="sel" title="Copy (Ctrl/⌘ C)">${I.copy}<span class="tl">Copy</span></button>
+    <button class="btn sm" data-a="paste" data-need="clip" title="Paste (Ctrl/⌘ V)">${I.paste}<span class="tl">Paste</span></button>
+    <button class="btn sm" data-a="del" data-need="sel" title="Delete (Del)">${I.del}<span class="tl">Delete</span></button>
+    <button class="btn sm" data-a="crop" data-need="sel" title="Keep only the selection">${I.crop}<span class="tl">Crop</span></button>
     <span class="sep"></span>
-    <button class="btn sm" data-a="fin" title="Fade the selection in">${I.fin}<span class="tl">Fade in</span></button>
-    <button class="btn sm" data-a="fout" title="Fade the selection out">${I.fout}<span class="tl">Fade out</span></button>
+    <button class="btn sm" data-a="fin" data-need="sel" title="Fade the selection in">${I.fin}<span class="tl">Fade in</span></button>
+    <button class="btn sm" data-a="fout" data-need="sel" title="Fade the selection out">${I.fout}<span class="tl">Fade out</span></button>
     <button class="btn sm" data-a="reverse" title="Play the selection (or the whole song) backwards">${I.rev}<span class="tl">Reverse</span></button>
-    <button class="btn sm" data-a="loopSel" title="Loop the selection">${I.loop}<span class="tl">Loop it</span></button>
+    <button class="btn sm" data-a="loopSel" data-need="sel" title="Loop the selection">${I.loop}<span class="tl">Loop it</span></button>
     <span class="sep"></span>
     <button class="btn sm" data-a="undo" title="Undo (Ctrl/⌘ Z)">${I.undo}<span class="tl">Undo</span></button>
     <button class="btn sm" data-a="redo" title="Redo (Ctrl/⌘ Shift Z)">${I.redo}<span class="tl">Redo</span></button>
@@ -1021,6 +1095,20 @@ function waveHTML(d) {
     <button class="btn sm on" data-a="follow" data-r="follow" title="Keep the playhead in view while zoomed in">${I.follow}<span class="tl">Follow</span></button>
     <button class="btn sm" data-a="save" title="Save the edited song (or just the selection) as a WAV file">${I.save}Save WAV</button>
     <button class="btn sm" data-a="mp3" title="Save the edited song (or just the selection) as an MP3 file">${I.save}Save MP3</button>
+  </div>
+  <div class="selbar">
+    <label class="snapsel" title="Make selections land exactly on the beat"><span class="lbl">Snap</span><select data-r="snap" aria-label="Snap selections to"><option value="0">Off</option><option value="0.25">¼ beat</option><option value="0.5">½ beat</option><option value="1" selected>1 beat</option><option value="4">1 bar</option></select></label>
+    <span class="sep"></span>
+    <span class="lbl">Selection</span>
+    <input type="text" data-r="selA" aria-label="Selection start (minutes:seconds)" placeholder="start" autocomplete="off" spellcheck="false">
+    <span class="arrow">→</span>
+    <input type="text" data-r="selB" aria-label="Selection end (minutes:seconds)" placeholder="end" autocomplete="off" spellcheck="false">
+    <span class="sellen" data-r="sellen"></span>
+    <button class="btn sm" data-a="playSel" data-need="sel" title="Play just the selection (P)">${I.play}<span class="tl">Play it</span></button>
+    <button class="btn sm" data-a="zoomSel" data-need="sel" title="Zoom in to the selection">${I.zin}<span class="tl">Zoom to it</span></button>
+    <button class="btn sm" data-a="repeat" data-need="sel" title="Repeat the selection right after itself. Press again to double it (stutter)">${I.loop}<span class="tl">Repeat ×2</span></button>
+    <button class="btn sm" data-a="silence" data-need="sel" title="Make the selection silent">${I.del}<span class="tl">Silence</span></button>
+    <button class="btn sm" data-a="gridHere" title="Line the beat grid up so beat 1 is at the white playhead">${I.fit}<span class="tl">Beat 1 here</span></button>
     <span class="selinfo" data-r="selinfo"></span>
   </div>`;
 }
@@ -1073,7 +1161,7 @@ function setupDeck(d) {
   w.innerHTML = waveHTML(d); dk.innerHTML = '<div class="dk">' + deckHTML(d) + '</div>';
   const r = n => [w, dk, ...mx].map(x => x.querySelector(`[data-r="${n}"]`)).find(Boolean);
   d.el = {};
-  ['title', 'el', 'rem', 'len', 'wrap', 'cv', 'ov', 'follow', 'selinfo', 'file', 'bpm', 'play', 'range', 'tval', 'tempo', 'bpmIn', 'loopinfo', 'lexit', 'echoT', 'meter', 'fader'].forEach(n => d.el[n] = r(n));
+  ['title', 'el', 'rem', 'len', 'wrap', 'rl', 'cv', 'ov', 'follow', 'selinfo', 'snap', 'selA', 'selB', 'sellen', 'file', 'bpm', 'play', 'range', 'tval', 'tempo', 'bpmIn', 'loopinfo', 'lexit', 'echoT', 'meter', 'fader'].forEach(n => d.el[n] = r(n));
   d.el.meterI = d.el.meter.querySelector('i');
   d.el.pads = [...dk.querySelectorAll('.pad')];
   d.el.loopBtns = [...dk.querySelectorAll('[data-loop]')];
@@ -1105,7 +1193,8 @@ function setupDeck(d) {
     selectAll: () => d.selectAll(), cut: () => d.cut(true), copy: () => d.copy(), paste: () => d.paste(), del: () => d.cut(false), crop: () => d.crop(),
     fin: () => d.fade('in'), fout: () => d.fade('out'), reverse: () => d.reverse(), loopSel: () => d.loopSel(),
     undo: () => d.restore(d.undo, d.redo), redo: () => d.restore(d.redo, d.undo), zin: () => d.zoom(0.5), zout: () => d.zoom(2), fit: () => d.fit(),
-    follow: () => { d.follow = !d.follow; d.ui(); }, save: () => d.saveWav(), mp3: () => d.saveMp3(), closeB: () => setDual(false),
+    follow: () => { d.follow = !d.follow; d.ui(); },
+    playSel: () => d.playSel(), zoomSel: () => d.zoomSel(), repeat: () => d.repeatSel(), silence: () => d.silenceSel(), gridHere: () => d.gridHere(), save: () => d.saveWav(), mp3: () => d.saveMp3(), closeB: () => setDual(false),
     cue: () => d.cue(), play: () => d.toggle(), brake: () => d.doBrake(), sync: () => d.sync(), tap: () => d.tap(),
     treset: () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); },
     lin: () => { if (!d.buffer) return; d.pendIn = d.pos(); toast('Loop start marked. Press Out where it should end.'); d.ui(); },
@@ -1137,6 +1226,20 @@ function setupDeck(d) {
   d.el.tempo.addEventListener('dblclick', () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); });
   d.el.range.addEventListener('change', () => { const r = +d.el.range.value, cur = d.tempo * d.range; d.range = r; d.tempo = clamp(cur / r, -1, 1); d.el.tempo.value = d.tempo; d.setRate(); touch(); });
   d.el.echoT.addEventListener('change', () => { d.echoBeats = +d.el.echoT.value; d.updateEcho(); touch(); });
+  d.el.snap.addEventListener('change', () => { d.snap = +d.el.snap.value; touch(); if (d.snap && !d.bpm) toast('Snap needs a BPM. Tap the beat or type it in.'); d.ui(); });
+  d.edBtns = [...w.querySelectorAll('[data-need]')];
+  const selInput = () => {
+    if (!d.buffer) return d.ui();
+    const a = parseTime(d.el.selA.value), b = parseTime(d.el.selB.value);
+    if (a != null && b != null && b > a) d.setSel(a, b);
+    else if (a != null && b == null) d.setSel(a, a + d.snapUnit());
+    else if (a == null && b != null && d.sel) d.setSel(d.sel.a, b);
+    else { d.ui(); toast('Type times like 1:23.5 or 83.5'); }
+  };
+  [d.el.selA, d.el.selB].forEach(inp => {
+    inp.addEventListener('change', selInput);
+    inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } else if (e.key === 'Escape') { e.preventDefault(); d.ui(); inp.blur(); } });
+  });
   d.el.bpmIn.addEventListener('change', () => { const v = +d.el.bpmIn.value; if (v > 20 && v < 400) d.setBPM(v); else d.ui(); });
   d.el.file.addEventListener('change', () => { d.load(d.el.file.files[0]); d.el.file.value = ''; });
 
@@ -1148,7 +1251,7 @@ function setupDeck(d) {
   });
 
   setupWaveInput(d);
-  const ro = new ResizeObserver(() => { sizeCanvas(d.el.cv); sizeCanvas(d.el.ov); d.ovKey = null; d.waveKey = null; });
+  const ro = new ResizeObserver(() => { sizeCanvas(d.el.cv); sizeCanvas(d.el.ov); sizeCanvas(d.el.rl); d.ovKey = null; d.waveKey = null; });
   ro.observe(d.el.cv);
 }
 
@@ -1156,34 +1259,62 @@ function sizeCanvas(cv) { const dpr = Math.min(2, window.devicePixelRatio || 1),
 
 /* ---------------- waveform interaction ---------------- */
 function setupWaveInput(d) {
-  const cv = d.el.cv, ov = d.el.ov;
+  const cv = d.el.cv, ov = d.el.ov, rl = d.el.rl;
   const tAt = x => { const r = cv.getBoundingClientRect(); return clamp(d.view.start + (x - r.left) / r.width * d.view.len, 0, d.dur); };
+  const xOf = t => { const r = cv.getBoundingClientRect(); return r.left + (t - d.view.start) / d.view.len * r.width; };
+  const edgeAt = (x, touchy) => {
+    if (!d.sel) return null; const R = touchy ? 18 : 8, da = Math.abs(x - xOf(d.sel.a)), db = Math.abs(x - xOf(d.sel.b));
+    if (Math.min(da, db) > R) return null; return da <= db ? 'a' : 'b';
+  };
+  const autoScroll = x => {
+    const r = cv.getBoundingClientRect();
+    if (d.view.len < d.dur) { if (x > r.right - 24) d.view.start = Math.min(d.dur - d.view.len, d.view.start + d.view.len * 0.02); else if (x < r.left + 24) d.view.start = Math.max(0, d.view.start - d.view.len * 0.02); }
+  };
   let down = null;
+  // The waveform is for selecting. Drag to select, drag an edge to adjust, click to clear.
   cv.addEventListener('pointerdown', e => {
     if (!d.buffer) { d.el.file.click(); return; }
     e.preventDefault(); cv.setPointerCapture(e.pointerId);
-    const t = tAt(e.clientX);
-    if (e.shiftKey && d.sel) { const anchor = Math.abs(t - d.sel.a) < Math.abs(t - d.sel.b) ? d.sel.b : d.sel.a; down = { x: e.clientX, t0: anchor, moved: true, id: e.pointerId }; d.sel = { a: Math.min(anchor, t), b: Math.max(anchor, t) }; d.ui(); }
-    else down = { x: e.clientX, t0: t, moved: false, id: e.pointerId };
+    const t = tAt(e.clientX), edge = edgeAt(e.clientX, e.pointerType !== 'mouse');
+    if (edge) down = { mode: 'edge', edge, id: e.pointerId };
+    else if (e.shiftKey && d.sel) { const anchor = Math.abs(t - d.sel.a) < Math.abs(t - d.sel.b) ? d.sel.b : d.sel.a; down = { mode: 'edge', edge: anchor === d.sel.a ? 'b' : 'a', id: e.pointerId }; d.setSel(anchor, d.snapT(t)); }
+    else down = { mode: 'new', x: e.clientX, raw: t, t0: d.snapT(t), moved: false, id: e.pointerId };
     d.dragging = true;
   });
   cv.addEventListener('pointermove', e => {
-    if (!down || down.id !== e.pointerId) return;
-    if (!down.moved && Math.abs(e.clientX - down.x) < 4) return;
-    down.moved = true; const t = tAt(e.clientX);
-    d.sel = { a: Math.min(down.t0, t), b: Math.max(down.t0, t) };
-    // auto-scroll near edges when zoomed in
-    const r = cv.getBoundingClientRect();
-    if (d.view.len < d.dur) { if (e.clientX > r.right - 20) d.view.start = Math.min(d.dur - d.view.len, d.view.start + d.view.len * 0.02); else if (e.clientX < r.left + 20) d.view.start = Math.max(0, d.view.start - d.view.len * 0.02); }
-    d.ui();
+    if (!down) { cv.style.cursor = d.buffer && edgeAt(e.clientX, false) ? 'ew-resize' : 'crosshair'; return; }
+    if (down.id !== e.pointerId) return;
+    const t = d.snapT(tAt(e.clientX));
+    if (down.mode === 'edge') {
+      let { a, b } = d.sel || { a: t, b: t };
+      if (down.edge === 'a') a = t; else b = t;
+      if (b < a) { [a, b] = [b, a]; down.edge = down.edge === 'a' ? 'b' : 'a'; }
+      if (b - a >= 0.005) d.sel = { a, b };
+    } else {
+      if (!down.moved && Math.abs(e.clientX - down.x) < 6) return;
+      down.moved = true;
+      const a = Math.min(down.t0, t), b = Math.max(down.t0, t);
+      d.sel = b - a >= 0.005 ? { a, b } : null;
+    }
+    autoScroll(e.clientX); d.ui();
   });
   const up = e => {
     if (!down || down.id !== e.pointerId) return;
-    if (!down.moved) { d.sel = null; d.seek(down.t0); }
-    else if (d.sel && d.sel.b - d.sel.a < 0.005) d.sel = null;
+    if (down.mode === 'new' && !down.moved) {
+      // a plain click: clear the selection if there is one, otherwise move the playhead
+      if (d.sel) d.sel = null; else d.seek(down.raw);
+    }
     down = null; d.dragging = false; d.ui();
   };
   cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  cv.addEventListener('pointerleave', () => { if (!down) cv.style.cursor = ''; });
+  // The ruler is for the playhead. Click or drag to scrub.
+  let rlDown = null, lastSeek = 0;
+  const rlT = x => { const r = rl.getBoundingClientRect(); return clamp(d.view.start + (x - r.left) / r.width * d.view.len, 0, d.dur); };
+  rl.addEventListener('pointerdown', e => { if (!d.buffer) return d.el.file.click(); e.preventDefault(); rl.setPointerCapture(e.pointerId); rlDown = e.pointerId; d.dragging = true; d.seek(rlT(e.clientX)); lastSeek = performance.now(); });
+  rl.addEventListener('pointermove', e => { if (rlDown !== e.pointerId) return; const now = performance.now(); if (now - lastSeek > 45) { d.seek(rlT(e.clientX)); lastSeek = now; } });
+  const rlUp = e => { if (rlDown !== e.pointerId) return; d.seek(rlT(e.clientX)); rlDown = null; d.dragging = false; };
+  rl.addEventListener('pointerup', rlUp); rl.addEventListener('pointercancel', rlUp);
   cv.addEventListener('wheel', e => {
     if (!d.buffer) return; e.preventDefault();
     if (e.shiftKey || Math.abs(e.deltaX) > Math.abs(e.deltaY)) { const dx = e.shiftKey ? e.deltaY : e.deltaX; d.view.start = clamp(d.view.start + dx / cv.clientWidth * d.view.len, 0, d.dur - d.view.len); d.ui(); }
@@ -1221,7 +1352,9 @@ function drawDeck(d) {
   if (!d.buffer) {
     g.fillStyle = '#5b6379'; g.font = `600 ${13 * dpr}px Inter, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
     g.fillText('Drop a song here, or click to choose one', W / 2, H / 2);
-    const og = ov.getContext('2d'); og.clearRect(0, 0, ov.width, ov.height); return;
+    const og = ov.getContext('2d'); og.clearRect(0, 0, ov.width, ov.height);
+    if (d.el.rl.width) d.el.rl.getContext('2d').clearRect(0, 0, d.el.rl.width, d.el.rl.height);
+    return;
   }
   const p = d.pos(), v = d.view;
   // follow the playhead while zoomed in
@@ -1242,10 +1375,25 @@ function drawDeck(d) {
   const px = clamp(X(p), 0, W);
   g.drawImage(d.layerOff, 0, 0);
   if (px > 0) g.drawImage(d.layerOn, 0, 0, px, H, 0, 0, px, H);
-  // beat ticks when zoomed in enough
-  if (d.bpm && v.len < 30) {
-    const bl = 60 / d.bpm; g.fillStyle = 'rgba(255,255,255,.07)';
-    for (let t = Math.ceil(v.start / bl) * bl; t < v.start + v.len; t += bl) g.fillRect(X(t), H - 8 * dpr, dpr, 8 * dpr);
+  // beat grid: faint beat lines, brighter bar lines (every 4 beats from beat 1)
+  if (d.bpm) {
+    const bl = 60 / d.bpm, o = d.beatOff, pxPerBeat = bl / v.len * W;
+    if (pxPerBeat >= 5 * dpr || pxPerBeat * 4 >= 8 * dpr) {
+      const k0 = Math.ceil((v.start - o) / bl), k1 = Math.floor((v.start + v.len - o) / bl);
+      for (let k = k0; k <= k1; k++) {
+        const bar = ((k % 4) + 4) % 4 === 0;
+        if (!bar && pxPerBeat < 5 * dpr) continue;
+        g.fillStyle = bar ? 'rgba(255,255,255,.16)' : 'rgba(255,255,255,.06)';
+        g.fillRect(X(o + k * bl), 0, dpr, H);
+      }
+    }
+  }
+  // selection handles
+  if (d.sel) {
+    g.fillStyle = '#e2e8f0';
+    for (const t of [d.sel.a, d.sel.b]) { const x = X(t); g.fillRect(x - dpr, 0, 2 * dpr, H); g.fillRect(x - 4 * dpr, H / 2 - 12 * dpr, 8 * dpr, 24 * dpr); }
+    g.fillStyle = '#0b0d14';
+    for (const t of [d.sel.a, d.sel.b]) { const x = X(t); g.fillRect(x - dpr, H / 2 - 7 * dpr, 2 * dpr, 14 * dpr); }
   }
   // cue point
   g.fillStyle = '#fb923c'; const cx = X(d.cuePoint); g.beginPath(); g.moveTo(cx - 6 * dpr, 0); g.lineTo(cx + 6 * dpr, 0); g.lineTo(cx, 8 * dpr); g.fill();
@@ -1258,6 +1406,8 @@ function drawDeck(d) {
   g.fillStyle = '#fff'; g.fillRect(px - dpr, 0, 2 * dpr, H);
   g.shadowColor = d.color; g.shadowBlur = 10 * dpr; g.fillRect(px - dpr / 2, 0, dpr, H); g.shadowBlur = 0;
 
+  drawRuler(d, p);
+
   // overview
   const og = ov.getContext('2d'), OW = ov.width, OH = ov.height, okey = [OW, OH, d.ver].join('|');
   if (d.ovKey !== okey) { d.ovKey = okey; const sv = d.view; d.view = { start: 0, len: d.dur }; d.ovLayer = renderWaveLayer(d, OW, OH, color(d, 0.55)); d.view = sv; }
@@ -1268,6 +1418,31 @@ function drawDeck(d) {
   d.cues.forEach((c, i) => { if (c != null) { og.fillStyle = CUE_COLORS[i]; og.fillRect(OX(c), 0, dpr * 1.5, OH); } });
   if (L.on) { og.fillStyle = 'rgba(251,191,36,.35)'; og.fillRect(OX(L.start), 0, Math.max(dpr, OX(L.end - L.start)), OH); }
   og.fillStyle = '#fff'; og.fillRect(OX(p) - dpr / 2, 0, dpr * 1.5, OH);
+}
+function drawRuler(d, p) {
+  const rl = d.el.rl; if (!rl.width) sizeCanvas(rl);
+  const g = rl.getContext('2d'), W = rl.width, H = rl.height, dpr = W / Math.max(1, rl.clientWidth), v = d.view, X = t => (t - v.start) / v.len * W;
+  g.clearRect(0, 0, W, H);
+  // loop and selection bands
+  const L = d.loop;
+  if (L.on) { g.fillStyle = 'rgba(251,191,36,.25)'; g.fillRect(X(L.start), 0, X(L.end) - X(L.start), H); }
+  if (d.sel) { g.fillStyle = 'rgba(226,232,240,.16)'; g.fillRect(X(d.sel.a), 0, X(d.sel.b) - X(d.sel.a), H); }
+  // time labels at a spacing that stays readable
+  const steps = [0.05, 0.1, 0.25, 0.5, 1, 2, 5, 10, 15, 30, 60, 120, 300], minPx = 64 * dpr;
+  const step = steps.find(st => st / v.len * W >= minPx) || 600;
+  g.font = `600 ${10 * dpr}px ui-monospace, Menlo, Consolas, monospace`; g.textBaseline = 'top'; g.textAlign = 'left';
+  for (let t = Math.ceil(v.start / step) * step; t <= v.start + v.len; t += step) {
+    const x = X(t); g.fillStyle = '#3b4560'; g.fillRect(x, H - 7 * dpr, dpr, 7 * dpr);
+    const m = Math.floor(t / 60), sec = t - m * 60, dec = step >= 1 ? 0 : (String(step).split('.')[1] || '').length;
+    g.fillStyle = '#8b93a9'; g.fillText(m + ':' + (sec < 10 ? '0' : '') + sec.toFixed(dec), x + 3 * dpr, 3 * dpr);
+    for (let i = 1; i < 4; i++) { const xm = X(t + step * i / 4); if (xm < W) { g.fillStyle = '#262d40'; g.fillRect(xm, H - 4 * dpr, dpr, 4 * dpr); } }
+  }
+  // playhead marker
+  const px = X(p);
+  if (px >= -8 && px <= W + 8) {
+    g.fillStyle = '#fff'; g.beginPath(); g.moveTo(px - 6 * dpr, 0); g.lineTo(px + 6 * dpr, 0); g.lineTo(px + 6 * dpr, H - 9 * dpr); g.lineTo(px, H); g.lineTo(px - 6 * dpr, H - 9 * dpr); g.closePath(); g.fill();
+    g.fillStyle = d.color; g.fillRect(px - dpr, 3 * dpr, 2 * dpr, H - 9 * dpr);
+  }
 }
 function color(d, a) { const h = d.color, r = parseInt(h.slice(1, 3), 16), g = parseInt(h.slice(3, 5), 16), b = parseInt(h.slice(5, 7), 16); return `rgba(${r},${g},${b},${a})`; }
 
@@ -1290,7 +1465,13 @@ function renderDeckUI(d) {
   e.lexit.classList.toggle('on', L.on); e.lexit.style.setProperty('--c', '#fbbf24');
   e.loopBtns.forEach(b => { const n = +b.dataset.loop; b.classList.toggle('on', L.on && beats != null && Math.abs(beats - n) < 0.01); b.style.setProperty('--c', '#fbbf24'); });
   e.follow.classList.toggle('on', d.follow);
-  e.selinfo.textContent = d.sel ? `Selected ${fmt(d.sel.a)}–${fmt(d.sel.b)} (${(d.sel.b - d.sel.a).toFixed(2)}s)` : (clipboard ? `Clipboard: ${clipboard.duration.toFixed(2)}s` : '');
+  e.selinfo.textContent = clipboard ? `Clipboard: ${clipboard.duration.toFixed(2)}s` : '';
+  if (document.activeElement !== e.selA) e.selA.value = d.sel ? fmt2(d.sel.a) : '';
+  if (document.activeElement !== e.selB) e.selB.value = d.sel ? fmt2(d.sel.b) : '';
+  const sb = d.sel && d.bpm ? (d.sel.b - d.sel.a) / (60 / d.bpm) : null;
+  e.sellen.textContent = d.sel ? (sb && Math.abs(sb - Math.round(sb)) < 0.02 ? Math.round(sb) + (Math.round(sb) === 1 ? ' beat' : ' beats') : (d.sel.b - d.sel.a).toFixed(2) + 's') : '';
+  if (d.edBtns) d.edBtns.forEach(b => b.disabled = !d.buffer || (b.dataset.need === 'sel' ? !d.sel : !clipboard));
+  e.selA.disabled = e.selB.disabled = !d.buffer;
 }
 function updateClipInfo() { decks.forEach(renderDeckUI); }
 function setActive(d) { if (activeDeck === d) return; activeDeck = d; decks.forEach(x => { x.wrowEl.classList.toggle('active', x === d); x.deckEl.classList.toggle('active', x === d); }); }
@@ -1580,6 +1761,12 @@ document.addEventListener('keydown', e => {
   else if (k === 'c') d.cue();
   else if ('1234'.includes(e.key) && e.key.length === 1) d.hotCue(+e.key - 1);
   else if (e.key === 'Delete' || e.key === 'Backspace') { if (d.sel) { d.cut(false); e.preventDefault(); } }
+  else if (e.shiftKey && (e.key === 'ArrowLeft' || e.key === 'ArrowRight') && tag !== 'INPUT') {
+    if (!d.buffer) return; e.preventDefault();
+    const q = d.snapUnit() * (e.key === 'ArrowLeft' ? -1 : 1);
+    if (d.sel) d.setSel(d.sel.a, Math.max(d.sel.a + 0.01, d.sel.b + q)); else { const p = d.snapT(d.pos()); d.setSel(p, p + Math.abs(q)); }
+  }
+  else if (k === 'p') d.playSel();
   else if (e.key === 'ArrowLeft' && tag !== 'INPUT') { d.seek(d.pos() - 1); e.preventDefault(); }
   else if (e.key === 'ArrowRight' && tag !== 'INPUT') { d.seek(d.pos() + 1); e.preventDefault(); }
   else if (e.key === '[') setActive(A); else if (e.key === ']' && dual) setActive(B);
@@ -1592,6 +1779,7 @@ let freq = null, lastT = {};
 function frame() {
   decks.forEach(d => {
     if (d === B && !dual) return;
+    if (d.selStop) { if (!d.playing || d.loop.on) d.selStop = null; else if (d.pos() >= d.selStop.b - 0.01) { const a = d.selStop.a; d.selStop = null; d.pause(); d.seek(a); } }
     drawDeck(d);
     if (d.buffer) {
       const p = d.pos(), el = fmt(p), rem = '-' + fmt((d.dur - p) / d.eff);
