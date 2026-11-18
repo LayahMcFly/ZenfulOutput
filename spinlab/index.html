@@ -120,7 +120,18 @@ canvas.over{display:block;width:100%;height:30px;cursor:pointer;border-top:1px s
 
 /* ---------- console ---------- */
 .console{display:grid;grid-template-columns:1fr minmax(300px,380px) 1fr;gap:14px;align-items:start}
-.deck{padding:14px;display:grid;gap:14px;--c:var(--a)}
+.deck{padding:14px;--c:var(--a);container-type:inline-size}
+.dk{display:grid;gap:14px}
+/* wide deck panel: controls sit in two columns instead of one long stack */
+@container (min-width:700px){
+  .dk{grid-template-columns:1fr 1fr;column-gap:22px;align-items:start}
+  .dk > :nth-child(1){grid-column:1;grid-row:1}
+  .dk > :nth-child(2){grid-column:1;grid-row:2}
+  .dk > :nth-child(3){grid-column:1;grid-row:3}
+  .dk > :nth-child(4){grid-column:2;grid-row:1}
+  .dk > :nth-child(5){grid-column:2;grid-row:2 / span 1}
+  .dk > :nth-child(6){grid-column:2;grid-row:3}
+}
 .deck.b{--c:var(--b)}
 .deck.active{border-color:color-mix(in srgb,var(--c) 45%,var(--line))}
 .row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
@@ -134,9 +145,12 @@ canvas.over{display:block;width:100%;height:30px;cursor:pointer;border-top:1px s
 .pad.set{background:linear-gradient(var(--pc),color-mix(in srgb,var(--pc) 60%,#000));color:#0b0d14;border-color:transparent;box-shadow:0 0 16px -4px var(--pc)}
 .pad small{display:block;font:600 10px var(--mono);opacity:.8}
 .pad:active{transform:translateY(1px)}
+.transport{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.transport .btn{justify-content:center}
+body.single .transport{grid-template-columns:repeat(3,1fr)}
 .loops{display:grid;grid-template-columns:repeat(6,1fr);gap:6px}
 .loops .btn{justify-content:center;padding:7px 4px}
-.fx{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap}
+.fx{display:flex;gap:16px;align-items:flex-end;flex-wrap:wrap;justify-content:space-around}
 
 /* ---------- knobs ---------- */
 .kn{display:grid;justify-items:center;gap:4px;min-width:52px}
@@ -148,20 +162,20 @@ canvas.over{display:block;width:100%;height:30px;cursor:pointer;border-top:1px s
 /* ---------- mixer ---------- */
 .mixer{padding:14px;display:grid;gap:12px}
 canvas.spec{width:100%;height:84px;display:block;border-radius:10px;background:#070910;border:1px solid var(--line)}
-.mixgrid{display:grid;grid-template-columns:1fr auto 1fr;gap:6px 10px;align-items:center;justify-items:center}
-.mixgrid .ca{--c:var(--a);grid-column:1}
-.mixgrid .cb{--c:var(--b);grid-column:3}
-.mixgrid .rl{grid-column:2}
-.mixgrid .rl{font:700 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);text-align:center;min-width:56px}
-.mixgrid .kn{gap:2px}
-.chan{display:flex;gap:8px;align-items:flex-end;height:170px;margin-top:6px}
-.fader{position:relative;width:34px;height:170px;cursor:ns-resize;touch-action:none}
+.mixgrid{display:flex;justify-content:center;align-items:stretch;gap:14px}
+.mixgrid .ca{--c:var(--a)}
+.mixgrid .cb{--c:var(--b)}
+.mstrip{display:flex;flex-direction:column;align-items:center;gap:6px}
+.mstrip .tag{margin-bottom:2px}
+.mstrip .kn{gap:1px;min-width:56px}
+.chan{display:flex;gap:8px;align-items:stretch;margin-top:34px;min-height:170px}
+.fader{position:relative;width:34px;min-height:150px;cursor:ns-resize;touch-action:none}
 .fader .slot{position:absolute;left:50%;top:10px;bottom:10px;width:6px;transform:translateX(-50%);border-radius:4px;background:#070910;border:1px solid var(--line2)}
 .fader .fill{position:absolute;left:50%;bottom:10px;width:6px;transform:translateX(-50%);border-radius:4px;background:linear-gradient(0deg,color-mix(in srgb,var(--c) 40%,#000),var(--c))}
 .fader .cap{position:absolute;left:0;width:34px;height:22px;border-radius:5px;background:linear-gradient(#e7ebf5,#9aa3ba);border:1px solid #0b0d14;box-shadow:0 3px 8px rgba(0,0,0,.6);transform:translateY(50%)}
 .fader .cap::after{content:"";position:absolute;left:5px;right:5px;top:10px;height:2px;background:#0b0d14;border-radius:2px}
-.meter{width:10px;height:170px;border-radius:5px;background:#070910;border:1px solid var(--line2);position:relative;overflow:hidden}
-.meter i{position:absolute;left:0;right:0;bottom:0;height:0;background:linear-gradient(0deg,#22c55e 0%,#22c55e 60%,#fbbf24 80%,#ef4444 100%);background-size:100% 168px;background-position:bottom}
+.meter{width:10px;min-height:150px;border-radius:5px;background:#070910;border:1px solid var(--line2);position:relative;overflow:hidden}
+.meter i{position:absolute;inset:0;background:linear-gradient(0deg,#22c55e 0%,#22c55e 60%,#fbbf24 80%,#ef4444 100%);clip-path:inset(100% 0 0 0)}
 .xf{display:grid;gap:6px}
 .xf .row{justify-content:space-between}
 .xf input{--c:#cbd5e1}
@@ -183,7 +197,6 @@ kbd{font:600 11px var(--mono);background:#0e1220;border:1px solid var(--line2);b
 body.single .adddeck{display:inline-flex}
 body.single #wB,body.single #dB,body.single .mixgrid .cb,body.single .xf{display:none}
 body.single .console{grid-template-columns:1fr minmax(300px,380px)}
-body.single .mixgrid{grid-template-columns:auto auto;justify-content:center;column-gap:22px}
 body.single .deck [data-a="sync"]{display:none}
 .closedeck{margin-left:auto}
 /* project bar, library, confirm, offline */
@@ -229,6 +242,84 @@ footer.foot a{color:var(--soft)}
   canvas.wave{height:96px}
   .selinfo{margin-left:0;width:100%}
 }
+/* ===== desktop: looks and behaves like an app window ===== */
+@media (min-width:1101px){
+  header.top{padding:8px 14px;gap:14px;flex-wrap:nowrap}
+  .brand{margin-right:0}
+  .brand svg{width:28px;height:28px}
+  .brand b{font-size:18px}
+  .proj{flex:0 1 360px}
+  .proj input{padding:6px 10px;font-size:13px}
+  .master{margin-left:auto;flex-wrap:nowrap;gap:8px}
+  .master .kn{display:flex;flex-direction:row-reverse;align-items:center;gap:6px;min-width:0}
+  .master .knob{width:32px;height:32px}
+  .master .btn{padding:6px 10px}
+  main{max-width:none;padding:10px 12px 8px;gap:8px}
+  .panel{border-radius:12px}
+  .wrow{padding:8px 10px;gap:6px}
+  .whead{flex-wrap:nowrap}
+  .tag{width:22px;height:22px;font-size:12px;border-radius:6px}
+  .title{font-size:13.5px}
+  .times{font-size:12px}
+  canvas.wave{height:110px}
+  canvas.over{height:22px}
+  .tools{flex-wrap:nowrap;overflow:hidden;gap:5px}
+  .tools .btn.sm{padding:4px 7px}
+  .tools .sep{height:16px}
+  .adddeck{padding:8px;font-size:13px}
+  .console{grid-template-columns:minmax(0,1fr) 380px minmax(0,1fr);gap:8px;align-items:stretch}
+  .deck{padding:12px}
+  .dk{gap:12px}
+  .btn.big{padding:9px 12px;font-size:13px;border-radius:10px}
+  .bpm{font-size:22px}
+  .pad{height:38px}
+  .mixer{padding:10px 12px;gap:10px;align-content:start}
+  canvas.spec{height:56px}
+  .knob{width:40px;height:40px}
+  .xf{gap:4px}
+  .mstrip{display:grid;grid-template-columns:repeat(2,auto);justify-items:center;align-content:start;gap:4px 6px}
+  .mstrip .tag{grid-column:1 / -1}
+  .mstrip .kn{min-width:52px}
+  .mixgrid{gap:10px}
+  body.single .console{grid-template-columns:minmax(0,1fr) 250px}
+  .statusbar{display:flex;align-items:center;gap:14px;padding:0 12px 8px}
+  .statusbar .offline{margin:0;width:auto;flex:0 1 auto;padding:5px 6px 5px 10px;gap:10px;border-radius:10px}
+  .offline svg.big{width:22px;height:22px}
+  .offline div{flex:0 1 auto}
+  .offline b{font-size:12.5px;white-space:nowrap}
+  .offline p{display:none}
+  .offline .btn.big{padding:5px 10px;font-size:12px;border-radius:8px}
+  .statusbar footer.foot{flex:1;text-align:right;padding:0}
+}
+/* labels on the waveform toolbar only when there is room for them */
+@media (min-width:1101px) and (max-width:1759px){ .tools .tl{display:none} .tools .btn.sm{padding:5px 7px} }
+/* tall enough: everything fits one window and the waveforms take the spare height */
+@media (min-width:1101px) and (min-height:700px){
+  html,body{height:100%}
+  body{display:flex;flex-direction:column;overflow:hidden;padding-bottom:0}
+  main{flex:1 1 auto;min-height:0;width:100%;display:flex;flex-direction:column}
+  #wA,#wB{flex:1 1 0;display:flex;flex-direction:column}
+  .wave-wrap{flex:1 1 0;display:flex;flex-direction:column;min-height:66px}
+  canvas.wave{flex:1 1 0;height:0;min-height:48px}
+  canvas.over{flex:none}
+  .whead,.tools{flex:none}
+  .adddeck,.statusbar{flex:none}
+  /* the console keeps its natural height when it fits; on short screens its panels scroll inside */
+  .console{flex:0 1 auto;min-height:150px;grid-template-rows:minmax(0,1fr)}
+  .console > .panel{min-height:0;overflow-y:auto;overscroll-behavior:contain;scrollbar-width:thin;scrollbar-color:#323a52 transparent}
+  .console > .panel::-webkit-scrollbar{width:8px}
+  .console > .panel::-webkit-scrollbar-thumb{background:#323a52;border-radius:8px}
+}
+@media (min-width:1101px) and (min-height:700px) and (max-height:899px){
+  canvas.over{height:16px}
+  .wrow{padding:6px 10px;gap:4px}
+  .whead .title small{display:none}
+  .deck{padding:10px}
+  .dk{gap:9px}
+  .mixer{gap:8px}
+  canvas.spec{height:44px}
+}
+
 /* library as a full-screen panel on phones */
 @media (max-width:720px){
   header.top{position:relative;gap:10px;padding:10px 12px}
@@ -302,12 +393,14 @@ footer.foot a{color:var(--soft)}
     <div class="panel deck b" id="dB" aria-label="Deck B controls"></div>
   </section>
 </main>
+<div class="statusbar">
 <section class="panel offline" id="offline">
   <svg class="big" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#121725" stroke="#323a52"/><path d="M16 8v11M11 14.5l5 5 5-5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23.5h14" stroke="#f472b6" stroke-width="2.4" stroke-linecap="round"/></svg>
   <div><b>Use SpinLab without internet</b><p id="offlineText">Download the whole app as one HTML file. Open it from your computer any time, even with no connection. Saved projects stay with the browser you save them in, so the downloaded copy starts with its own empty library.</p></div>
   <button class="btn big" id="offlineBtn"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download SpinLab (HTML)</button>
 </section>
 <footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
+</div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
@@ -369,7 +462,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.7'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.8'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -556,6 +649,7 @@ function makeFader(el, opt) {
     else if (e.key === 'ArrowDown' || e.key === 'ArrowLeft') { f.set(f.value - st); e.preventDefault(); e.stopPropagation(); }
   });
   requestAnimationFrame(() => f.set(f.value, true));
+  new ResizeObserver(() => f.set(f.value, true)).observe(el);
   return f;
 }
 // shared gradient for knob caps
@@ -906,25 +1000,25 @@ function waveHTML(d) {
     ${id === 'B' ? '<button class="btn sm closedeck" data-a="closeB" title="Stop deck B and hide it. Its song comes back if you add deck B again.">Hide deck B</button>' : ''}<div class="times"><span>Time <b data-r="el">0:00.0</b></span><span>Left <b data-r="rem">0:00.0</b></span><span>Length <b data-r="len">0:00.0</b></span></div></div>
   <div class="wave-wrap" data-r="wrap"><canvas class="wave" data-r="cv" aria-label="Deck ${id} waveform. Click to jump, drag to select."></canvas><canvas class="over" data-r="ov" aria-label="Deck ${id} whole-song overview"></canvas></div>
   <div class="tools">
-    <button class="btn sm" data-a="selectAll" title="Select all (Ctrl/⌘ A)">${I.all}All</button>
-    <button class="btn sm" data-a="cut" title="Cut (Ctrl/⌘ X)">${I.cut}Cut</button>
-    <button class="btn sm" data-a="copy" title="Copy (Ctrl/⌘ C)">${I.copy}Copy</button>
-    <button class="btn sm" data-a="paste" title="Paste (Ctrl/⌘ V)">${I.paste}Paste</button>
-    <button class="btn sm" data-a="del" title="Delete (Del)">${I.del}Delete</button>
-    <button class="btn sm" data-a="crop" title="Keep only the selection">${I.crop}Crop</button>
+    <button class="btn sm" data-a="selectAll" title="Select all (Ctrl/⌘ A)">${I.all}<span class="tl">All</span></button>
+    <button class="btn sm" data-a="cut" title="Cut (Ctrl/⌘ X)">${I.cut}<span class="tl">Cut</span></button>
+    <button class="btn sm" data-a="copy" title="Copy (Ctrl/⌘ C)">${I.copy}<span class="tl">Copy</span></button>
+    <button class="btn sm" data-a="paste" title="Paste (Ctrl/⌘ V)">${I.paste}<span class="tl">Paste</span></button>
+    <button class="btn sm" data-a="del" title="Delete (Del)">${I.del}<span class="tl">Delete</span></button>
+    <button class="btn sm" data-a="crop" title="Keep only the selection">${I.crop}<span class="tl">Crop</span></button>
     <span class="sep"></span>
-    <button class="btn sm" data-a="fin" title="Fade the selection in">${I.fin}Fade in</button>
-    <button class="btn sm" data-a="fout" title="Fade the selection out">${I.fout}Fade out</button>
-    <button class="btn sm" data-a="reverse" title="Play the selection (or the whole song) backwards">${I.rev}Reverse</button>
-    <button class="btn sm" data-a="loopSel" title="Loop the selection">${I.loop}Loop it</button>
+    <button class="btn sm" data-a="fin" title="Fade the selection in">${I.fin}<span class="tl">Fade in</span></button>
+    <button class="btn sm" data-a="fout" title="Fade the selection out">${I.fout}<span class="tl">Fade out</span></button>
+    <button class="btn sm" data-a="reverse" title="Play the selection (or the whole song) backwards">${I.rev}<span class="tl">Reverse</span></button>
+    <button class="btn sm" data-a="loopSel" title="Loop the selection">${I.loop}<span class="tl">Loop it</span></button>
     <span class="sep"></span>
-    <button class="btn sm" data-a="undo" title="Undo (Ctrl/⌘ Z)">${I.undo}Undo</button>
-    <button class="btn sm" data-a="redo" title="Redo (Ctrl/⌘ Shift Z)">${I.redo}Redo</button>
+    <button class="btn sm" data-a="undo" title="Undo (Ctrl/⌘ Z)">${I.undo}<span class="tl">Undo</span></button>
+    <button class="btn sm" data-a="redo" title="Redo (Ctrl/⌘ Shift Z)">${I.redo}<span class="tl">Redo</span></button>
     <span class="sep"></span>
     <button class="btn sm" data-a="zout" title="Zoom out">${I.zout}</button>
     <button class="btn sm" data-a="zin" title="Zoom in">${I.zin}</button>
     <button class="btn sm" data-a="fit" title="Show the whole song">${I.fit}</button>
-    <button class="btn sm on" data-a="follow" data-r="follow" title="Keep the playhead in view while zoomed in">${I.follow}Follow</button>
+    <button class="btn sm on" data-a="follow" data-r="follow" title="Keep the playhead in view while zoomed in">${I.follow}<span class="tl">Follow</span></button>
     <button class="btn sm" data-a="save" title="Save the edited song (or just the selection) as a WAV file">${I.save}Save WAV</button>
     <button class="btn sm" data-a="mp3" title="Save the edited song (or just the selection) as an MP3 file">${I.save}Save MP3</button>
     <span class="selinfo" data-r="selinfo"></span>
@@ -936,7 +1030,7 @@ function deckHTML(d) {
       <div class="row"><span class="tag">${id}</span><label class="btn" title="Load a song or a video from this device">${I.load}Load<input type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.webm,.mp4,.m4v,.mov,.mkv" class="sr" data-r="file"></label></div>
       <div class="row"><div class="bpm" data-r="bpm">---.-<small data-r="bpmsub">BPM</small></div></div>
     </div>
-    <div class="row">
+    <div class="transport">
       <button class="btn big" data-a="cue" title="Cue (C)">Cue</button>
       <button class="btn big play" data-a="play" data-r="play" title="Play / pause (Space)">${I.play}Play</button>
       <button class="btn big" data-a="brake" title="Slow to a stop like a turntable">Brake</button>
@@ -966,19 +1060,17 @@ function deckHTML(d) {
       </div></div>`;
 }
 function buildMixer() {
-  const rows = [['gain', 'Gain'], ['hi', 'High'], ['mid', 'Mid'], ['low', 'Low'], ['filter', 'Filter']];
-  const cell = (id, k) => `<div class="kn c${id.toLowerCase()}" data-d="${id}"><div class="knob" data-k="${k}" role="slider" tabindex="0" aria-label="Deck ${id} ${k === 'hi' ? 'high EQ' : k === 'mid' ? 'mid EQ' : k === 'low' ? 'low EQ' : k}"></div><output></output></div>`;
-  $('#mixgrid').innerHTML = `<span class="tag ca" data-d="A" style="background:var(--a)">A</span><span class="rl">Mixer</span><span class="tag cb" data-d="B" style="background:var(--b)">B</span>` +
-    rows.map(([k, l]) => cell('A', k) + `<span class="rl">${l}</span>` + cell('B', k)).join('') +
-    `<div class="chan ca" data-d="A"><div class="meter" data-r="meter"><i></i></div><div class="fader" data-r="fader" aria-label="Deck A volume"></div></div>
-     <span class="rl">Volume</span>
-     <div class="chan cb" data-d="B"><div class="fader" data-r="fader" aria-label="Deck B volume"></div><div class="meter" data-r="meter"><i></i></div></div>`;
+  const ks = [['gain', 'Gain'], ['hi', 'High'], ['mid', 'Mid'], ['low', 'Low'], ['filter', 'Filter']];
+  const strip = id => `<div class="mstrip c${id.toLowerCase()}" data-d="${id}"><span class="tag">${id}</span>` +
+    ks.map(([k, l]) => `<div class="kn"><div class="knob" data-k="${k}" role="slider" tabindex="0" aria-label="Deck ${id} ${l}${['hi', 'mid', 'low'].includes(k) ? ' EQ' : ''}"></div><span>${l}</span><output></output></div>`).join('') + '</div>';
+  const chan = id => `<div class="chan c${id.toLowerCase()}" data-d="${id}">${id === 'A' ? '<div class="meter" data-r="meter"><i></i></div>' : ''}<div class="fader" data-r="fader" aria-label="Deck ${id} volume"></div>${id === 'B' ? '<div class="meter" data-r="meter"><i></i></div>' : ''}</div>`;
+  $('#mixgrid').innerHTML = strip('A') + chan('A') + chan('B') + strip('B');
 }
 buildMixer();
 const eqDb = v => v < 0 ? v * 26 : v * 6;
 function setupDeck(d) {
   const w = $('#w' + d.id), dk = $('#d' + d.id), mx = [...document.querySelectorAll(`#mixgrid [data-d="${d.id}"]`)];
-  w.innerHTML = waveHTML(d); dk.innerHTML = deckHTML(d);
+  w.innerHTML = waveHTML(d); dk.innerHTML = '<div class="dk">' + deckHTML(d) + '</div>';
   const r = n => [w, dk, ...mx].map(x => x.querySelector(`[data-r="${n}"]`)).find(Boolean);
   d.el = {};
   ['title', 'el', 'rem', 'len', 'wrap', 'cv', 'ov', 'follow', 'selinfo', 'file', 'bpm', 'play', 'range', 'tval', 'tempo', 'bpmIn', 'loopinfo', 'lexit', 'echoT', 'meter', 'fader'].forEach(n => d.el[n] = r(n));
@@ -1510,7 +1602,7 @@ function frame() {
     let lvl = 0;
     if (d.built && (d.playing || d.brake)) { d.meterAn.getFloatTimeDomainData(d.meterBuf); for (let i = 0; i < d.meterBuf.length; i++) { const a = Math.abs(d.meterBuf[i]); if (a > lvl) lvl = a; } }
     d.meterLvl = Math.max(lvl, (d.meterLvl || 0) * 0.9);
-    d.el.meterI.style.height = Math.min(100, d.meterLvl * 100) + '%';
+    d.el.meterI.style.clipPath = 'inset(' + (100 - Math.min(100, d.meterLvl * 100)).toFixed(1) + '% 0 0 0)';
   });
   // spectrum
   if (!spec.width || spec.width !== Math.round(spec.clientWidth * Math.min(2, devicePixelRatio || 1))) sizeCanvas(spec);
