@@ -1,0 +1,20 @@
+THIRD-PARTY NOTICES for SpinLab
+
+SpinLab uses the following open-source software. Its notice must stay with the software.
+
+=== lamejs 1.2.1 (LGPL-3.0) ===
+File: lame.min.js (unmodified, loaded as a separate file only when you press Save MP3)
+
+lamejs is a JavaScript port of LAME, the MP3 encoder.
+  lamejs: https://github.com/zhuker/lamejs
+  LAME:   https://lame.sourceforge.io/
+
+SpinLab uses LAME through lamejs to make MP3 files.
+
+lamejs is free software: you can redistribute it and/or modify it under the
+terms of the GNU Lesser General Public License as published by the Free
+Software Foundation, version 3. A copy of the license is at
+https://www.gnu.org/licenses/lgpl-3.0.html
+
+You may replace lame.min.js with your own build of lamejs. SpinLab will load
+whatever file is saved under that name.

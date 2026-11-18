@@ -235,13 +235,17 @@ footer.foot a{color:var(--soft)}
     <div class="panel deck b" id="dB" aria-label="Deck B controls"></div>
   </section>
 </main>
-<footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a></footer>
+<footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <dialog id="help">
   <h2>How to use SpinLab</h2>
-  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> and your mixes with <b>Record mix</b>.</p>
+  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> or <b>Save MP3</b>, and your mixes with <b>Record mix</b>.</p>
+  <h3>Videos</h3>
+  <ul>
+    <li>Load a video (MP4, WebM, and on most computers MOV) the same way as a song. SpinLab pulls out the sound, puts it on the deck and saves it to your Downloads as a WAV file right away.</li>
+  </ul>
   <h3>Waveform</h3>
   <ul>
     <li>Click to jump. Drag to select a part of the song. Shift + click stretches the selection.</li>
@@ -270,7 +274,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.1'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.2'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -335,6 +339,29 @@ function encodeWAV(b) {
   return new Blob([buf], { type: 'audio/wav' });
 }
 function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+let lameP = null;
+function loadLame() {
+  if (window.lamejs) return Promise.resolve();
+  if (!lameP) lameP = new Promise((res, rej) => { const s = document.createElement('script'); s.src = 'lame.min.js'; s.onload = res; s.onerror = () => { lameP = null; s.remove(); rej(new Error('lame')); }; document.head.appendChild(s); });
+  return lameP;
+}
+async function encodeMP3(b, onProg) {
+  await loadLame();
+  if (![32000, 44100, 48000].includes(b.sampleRate)) { // MP3 only allows certain sample rates
+    const off = new OfflineAudioContext(Math.min(2, b.numberOfChannels), Math.ceil(b.duration * 44100), 44100), s = off.createBufferSource();
+    s.buffer = b; s.connect(off.destination); s.start(); b = await off.startRendering();
+  }
+  const ch = Math.min(2, b.numberOfChannels), enc = new lamejs.Mp3Encoder(ch, b.sampleRate, 192);
+  const i16 = f => { const o = new Int16Array(f.length); for (let i = 0; i < f.length; i++) { const v = clamp(f[i], -1, 1); o[i] = v < 0 ? v * 0x8000 : v * 0x7fff; } return o; };
+  const L = i16(b.getChannelData(0)), R = ch > 1 ? i16(b.getChannelData(1)) : null, block = 1152, out = [];
+  for (let i = 0, n = 0; i < L.length; i += block, n++) {
+    const m = ch > 1 ? enc.encodeBuffer(L.subarray(i, i + block), R.subarray(i, i + block)) : enc.encodeBuffer(L.subarray(i, i + block));
+    if (m.length) out.push(new Int8Array(m));
+    if (n % 300 === 0) { onProg(i / L.length); await new Promise(r => setTimeout(r)); }
+  }
+  const end = enc.flush(); if (end.length) out.push(new Int8Array(end));
+  return new Blob(out, { type: 'audio/mpeg' });
+}
 function computePeaks(b) {
   const n = Math.ceil(b.length / BK), mn = new Float32Array(n), mx = new Float32Array(n), chs = [];
   for (let c = 0; c < b.numberOfChannels; c++) chs.push(b.getChannelData(c));
@@ -629,7 +656,8 @@ class Deck {
   async load(file) {
     if (!file) return;
     ac();
-    this.el.title.innerHTML = 'Loading&hellip;<small>' + escapeHTML(file.name) + '</small>';
+    const isVideo = /^video\//.test(file.type) || /\.(mp4|m4v|mov|mkv|avi|wmv)$/i.test(file.name);
+    this.el.title.innerHTML = (isVideo ? 'Pulling the sound out of the video&hellip;' : 'Loading&hellip;') + '<small>' + escapeHTML(file.name) + '</small>';
     try {
       const data = await file.arrayBuffer();
       const buf = await new Promise((res, rej) => { const p = ctx.decodeAudioData(data, res, rej); if (p && p.catch) p.catch(rej); });
@@ -638,10 +666,12 @@ class Deck {
       this.startOffset = 0; this.cuePoint = 0; this.cues = [null, null, null, null]; this.loop = { on: false, start: 0, end: 0 };
       this.sel = null; this.undo = []; this.redo = []; this.bpm = null;
       this.peaks = computePeaks(buf); this.ver++; this.view = { start: 0, len: buf.duration };
+      this.fromVideo = isVideo;
       this.ui();
+      if (isVideo) { download(encodeWAV(buf), this.name + '.wav'); toast('The video’s sound is on deck ' + this.id + ' and was saved as ' + this.name + '.wav'); }
       detectBPM(buf).then(b => { if (this.buffer === buf && b) { this.bpm = b; this.updateEcho(); this.ui(); } else if (!b) this.ui(); });
     } catch (e) {
-      this.ui(); toast('That file could not be read as audio. Try an MP3, WAV, M4A or OGG.');
+      this.ui(); toast(isVideo ? 'The sound in this video could not be read. MP4 and WebM videos work best.' : 'That file could not be read as audio. Try an MP3, WAV, M4A or OGG.');
     }
   }
 
@@ -717,6 +747,18 @@ class Deck {
     const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer;
     download(encodeWAV(b), (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + '.wav');
   }
+  async saveMp3() {
+    if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
+    if (this.encoding) return toast('Still making the last MP3…');
+    this.encoding = true;
+    const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer, name = (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + '.mp3';
+    try {
+      toast('Making MP3… 0%');
+      const blob = await encodeMP3(b, f => toast('Making MP3… ' + Math.round(f * 100) + '%'));
+      download(blob, name); toast('MP3 saved to Downloads');
+    } catch (e) { toast('The MP3 could not be made. Try Save WAV instead.'); }
+    this.encoding = false;
+  }
   zoom(f, centerT) {
     if (!this.buffer) return;
     const v = this.view, c = centerT ?? (this.playing ? this.pos() : v.start + v.len / 2), rel = (c - v.start) / v.len;
@@ -758,13 +800,14 @@ function waveHTML(d) {
     <button class="btn sm" data-a="fit" title="Show the whole song">${I.fit}</button>
     <button class="btn sm on" data-a="follow" data-r="follow" title="Keep the playhead in view while zoomed in">${I.follow}Follow</button>
     <button class="btn sm" data-a="save" title="Save the edited song (or just the selection) as a WAV file">${I.save}Save WAV</button>
+    <button class="btn sm" data-a="mp3" title="Save the edited song (or just the selection) as an MP3 file">${I.save}Save MP3</button>
     <span class="selinfo" data-r="selinfo"></span>
   </div>`;
 }
 function deckHTML(d) {
   const id = d.id;
   return `<div class="row" style="justify-content:space-between">
-      <div class="row"><span class="tag">${id}</span><label class="btn" title="Load a song from this device">${I.load}Load<input type="file" accept="audio/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.webm" class="sr" data-r="file"></label></div>
+      <div class="row"><span class="tag">${id}</span><label class="btn" title="Load a song or a video from this device. A video's sound is saved as a WAV file for you.">${I.load}Load<input type="file" accept="audio/*,video/*,.mp3,.wav,.m4a,.aac,.ogg,.flac,.opus,.webm,.mp4,.m4v,.mov,.mkv" class="sr" data-r="file"></label></div>
       <div class="row"><div class="bpm" data-r="bpm">---.-<small data-r="bpmsub">BPM</small></div></div>
     </div>
     <div class="row">
@@ -844,7 +887,7 @@ function setupDeck(d) {
     selectAll: () => d.selectAll(), cut: () => d.cut(true), copy: () => d.copy(), paste: () => d.paste(), del: () => d.cut(false), crop: () => d.crop(),
     fin: () => d.fade('in'), fout: () => d.fade('out'), reverse: () => d.reverse(), loopSel: () => d.loopSel(),
     undo: () => d.restore(d.undo, d.redo), redo: () => d.restore(d.redo, d.undo), zin: () => d.zoom(0.5), zout: () => d.zoom(2), fit: () => d.fit(),
-    follow: () => { d.follow = !d.follow; d.ui(); }, save: () => d.saveWav(), closeB: () => setDual(false),
+    follow: () => { d.follow = !d.follow; d.ui(); }, save: () => d.saveWav(), mp3: () => d.saveMp3(), closeB: () => setDual(false),
     cue: () => d.cue(), play: () => d.toggle(), brake: () => d.doBrake(), sync: () => d.sync(), tap: () => d.tap(),
     treset: () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); },
     lin: () => { if (!d.buffer) return; d.pendIn = d.pos(); toast('Loop start marked. Press Out where it should end.'); d.ui(); },
@@ -1013,7 +1056,7 @@ function color(d, a) { const h = d.color, r = parseInt(h.slice(1, 3), 16), g = p
 /* ---------------- deck UI (non-canvas) ---------------- */
 function renderDeckUI(d) {
   const e = d.el; if (!e) return;
-  e.title.innerHTML = d.buffer ? escapeHTML(d.name) + `<small>${d.buffer.numberOfChannels > 1 ? 'Stereo' : 'Mono'} · ${(d.buffer.sampleRate / 1000).toFixed(1)} kHz${d.undo.length ? ' · edited' : ''}</small>` : 'No song loaded<small>Press Load or drop a file here</small>';
+  e.title.innerHTML = d.buffer ? escapeHTML(d.name) + `<small>${d.buffer.numberOfChannels > 1 ? 'Stereo' : 'Mono'} · ${(d.buffer.sampleRate / 1000).toFixed(1)} kHz${d.fromVideo ? ' · from video' : ''}${d.undo.length ? ' · edited' : ''}</small>` : 'No song loaded<small>Press Load or drop a file here</small>';
   e.len.textContent = fmt(d.dur);
   const eb = d.bpm ? d.bpm * d.rate : null;
   e.bpm.innerHTML = (eb ? eb.toFixed(1) : '---.-') + `<small>${d.bpm ? 'BPM · song ' + d.bpm.toFixed(1) : d.buffer ? 'BPM · finding…' : 'BPM'}</small>`;
