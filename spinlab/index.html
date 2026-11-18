@@ -199,6 +199,11 @@ input[type=text]:focus,input[type=number]:focus{border-color:#4a5575;outline:non
 .libitem .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .libitem .info small{color:var(--soft);font-size:12px}
 .libitem input{width:100%;font:600 14px var(--sans);padding:6px 9px}
+.libintro{margin:0 0 12px;color:var(--soft);font-size:13px}
+#libSpace{margin:10px 0 0;color:var(--dim);font:12px var(--mono)}
+#lib{width:min(640px,94vw)}
+.libitem .info[data-l]{cursor:pointer}
+.libitem .info[data-l]:hover b{color:var(--a)}
 .libempty{color:var(--soft);text-align:center;padding:28px 10px;border:1px dashed var(--line2);border-radius:12px}
 .btn.danger:hover{border-color:var(--rec);color:#fecaca}
 .btn.primary{background:linear-gradient(var(--a),#0e7490);color:#071017;border-color:transparent}
@@ -221,6 +226,25 @@ footer.foot a{color:var(--soft)}
   .times{font-size:12px;gap:8px}
   canvas.wave{height:96px}
   .selinfo{margin-left:0;width:100%}
+}
+/* library as a full-screen panel on phones */
+@media (max-width:720px){
+  dialog#lib{width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:none;margin:0;border:0;border-radius:0;padding:0;inset:0}
+  dialog#lib[open]{display:flex;flex-direction:column}
+  #lib .libhead{margin:0;padding:max(14px,env(safe-area-inset-top)) 16px 12px;background:var(--panel2);border-bottom:1px solid var(--line);flex-wrap:nowrap}
+  #lib .libhead h2{font-size:19px}
+  #lib .libhead .btn{min-height:44px;padding:8px 12px}
+  #lib .libintro{margin:0;padding:12px 16px 4px;font-size:12.5px}
+  #lib .liblist{flex:1;max-height:none;padding:10px 16px 16px;gap:10px;overscroll-behavior:contain;-webkit-overflow-scrolling:touch}
+  #libSpace{margin:0;padding:10px 16px max(14px,env(safe-area-inset-bottom));border-top:1px solid var(--line)}
+  .libitem{padding:12px;gap:10px}
+  .libitem .info{flex-basis:100%}
+  .libitem .info b{font-size:15px;white-space:normal;overflow-wrap:anywhere}
+  .libitem .row{width:100%;display:grid;grid-template-columns:2fr 1fr 1fr;gap:8px}
+  .libitem .btn.sm{min-height:44px;justify-content:center;font-size:13.5px;border-radius:10px}
+  .libitem input{font-size:16px;padding:10px 12px}
+  dialog#confirm{width:calc(100vw - 32px)}
+  dialog#confirm .btn{min-height:44px;flex:1;justify-content:center}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
@@ -278,9 +302,9 @@ footer.foot a{color:var(--soft)}
 <dialog id="lib" aria-labelledby="libTitle">
   <div class="libhead"><h2 id="libTitle" style="margin:0">Your library</h2>
     <div class="row"><button class="btn" id="libNew" title="Start an empty project">+ New project</button><button class="btn" id="libClose">Close</button></div></div>
-  <p style="margin:0 0 12px;color:var(--soft);font-size:13px">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
+  <p class="libintro">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
   <ul class="liblist" id="libList"></ul>
-  <p id="libSpace" style="margin:10px 0 0;color:var(--dim);font:12px var(--mono)"></p>
+  <p id="libSpace"></p>
 </dialog>
 <dialog id="confirm" aria-labelledby="confirmMsg">
   <p id="confirmMsg" style="margin:0 0 16px;font-size:15px;max-width:440px"></p>
@@ -333,7 +357,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.5'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.6'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -1354,7 +1378,7 @@ async function renderLibrary() {
   else ul.innerHTML = list.map(p => {
     const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
     const n = p.decks && p.decks.B ? 2 : 1;
-    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${n} deck${n > 1 ? 's' : ''} · ${fmt(p.length || 0).replace(/\.\d$/, '')} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
+    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info" data-l="open" role="button" tabindex="0" title="Open this project"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${n} deck${n > 1 ? 's' : ''} · ${fmt(p.length || 0).replace(/\.\d$/, '')} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
       <div class="row"><button class="btn sm primary" data-l="open">Open</button><button class="btn sm" data-l="rename">Rename</button><button class="btn sm danger" data-l="delete">Delete</button></div></li>`;
   }).join('');
   try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
@@ -1372,6 +1396,7 @@ $('#libList').addEventListener('click', async e => {
     }
   } else if (b.dataset.l === 'rename') {
     const info = li.querySelector('.info'), old = info.querySelector('b').textContent;
+    info.removeAttribute('data-l'); info.removeAttribute('role'); info.removeAttribute('tabindex');
     info.innerHTML = `<input type="text" maxlength="80" aria-label="New name" value="${escapeHTML(old)}">`;
     const inp = info.querySelector('input'); inp.focus(); inp.select();
     let done = false;
@@ -1388,7 +1413,8 @@ $('#libList').addEventListener('click', async e => {
     inp.addEventListener('blur', () => finish(true));
   }
 });
-$('#libBtn').addEventListener('click', () => { renderLibrary(); $('#lib').showModal(); });
+$('#libList').addEventListener('keydown', e => { const i = e.target.closest('.info[data-l]'); if (i && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProject(i.closest('.libitem').dataset.id); } });
+$('#libBtn').addEventListener('click', () => { renderLibrary(); $('#lib').showModal(); $('#libList').scrollTop = 0; });
 $('#libClose').addEventListener('click', () => $('#lib').close());
 $('#libNew').addEventListener('click', newProject);
 $('#saveBtn').addEventListener('click', saveProject);
