@@ -184,6 +184,31 @@ body.single .console{grid-template-columns:1fr minmax(300px,380px)}
 body.single .mixgrid{grid-template-columns:auto auto;justify-content:center;column-gap:22px}
 body.single .deck [data-a="sync"]{display:none}
 .closedeck{margin-left:auto}
+/* project bar, library, confirm, offline */
+.proj{display:flex;align-items:center;gap:8px;flex:1 1 260px;min-width:0;max-width:440px}
+.proj input{width:100%;min-width:0;font:600 14px var(--sans);padding:8px 11px;border-radius:10px;background:#0e1220}
+.proj input::placeholder{color:var(--dim)}
+.pstate{font:600 11px var(--mono);color:var(--dim);white-space:nowrap}
+.pstate.dirty{color:var(--gold)}
+input[type=text]:focus,input[type=number]:focus{border-color:#4a5575;outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.35)}
+.libhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.liblist{list-style:none;margin:0;padding:0;display:grid;gap:8px;max-height:min(60vh,520px);overflow:auto}
+.libitem{display:flex;align-items:center;gap:10px;padding:10px 12px;border:1px solid var(--line2);border-radius:12px;background:#121725;flex-wrap:wrap}
+.libitem.cur{border-color:var(--a);box-shadow:0 0 0 1px var(--a) inset}
+.libitem .info{flex:1 1 200px;min-width:0}
+.libitem .info b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.libitem .info small{color:var(--soft);font-size:12px}
+.libitem input{width:100%;font:600 14px var(--sans);padding:6px 9px}
+.libempty{color:var(--soft);text-align:center;padding:28px 10px;border:1px dashed var(--line2);border-radius:12px}
+.btn.danger:hover{border-color:var(--rec);color:#fecaca}
+.btn.primary{background:linear-gradient(var(--a),#0e7490);color:#071017;border-color:transparent}
+.btn.primary:hover{background:linear-gradient(#67e8f9,var(--a))}
+.btn.warn{background:linear-gradient(#f87171,#b91c1c);color:#fff;border-color:transparent}
+.offline{display:flex;align-items:center;gap:16px;padding:16px 18px;flex-wrap:wrap;max-width:1500px;margin:0 auto 6px;width:calc(100% - 2*clamp(10px,2vw,22px))}
+.offline svg.big{width:38px;height:38px;flex:none}
+.offline div{flex:1 1 280px}
+.offline b{font-size:15px}
+.offline p{margin:3px 0 0;color:var(--soft);font-size:13px}
 footer.foot{text-align:center;color:var(--dim);font-size:12px;padding:6px 10px}
 footer.foot a{color:var(--soft)}
 
@@ -207,9 +232,15 @@ footer.foot a{color:var(--soft)}
     <b>Spin<span>Lab</span></b>
     <span class="ver" id="ver"></span>
   </a>
+  <div class="proj">
+    <input type="text" id="projTitle" placeholder="Untitled project" maxlength="80" aria-label="Project name" autocomplete="off" spellcheck="false">
+    <span class="pstate" id="projState" aria-live="polite"></span>
+  </div>
   <div class="master">
     <div class="kn"><div class="knob" id="kMaster" style="--kc:#e2e8f0" role="slider" tabindex="0" aria-label="Master volume"></div><span>Master</span></div>
-    <button class="btn rec" id="recBtn" title="Record everything you play into an MP3 file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record mix</span></button>
+    <button class="btn" id="saveBtn" title="Save this project to your library (Ctrl/⌘ S)"><svg viewBox="0 0 16 16"><path d="M3 2.5h8l2.5 2.5v8.5h-11z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="5" y="9" width="6" height="4.5" fill="none" stroke="currentColor" stroke-width="1.3"/><path d="M5.5 2.5V5.5h4.5V2.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>Save</button>
+    <button class="btn" id="libBtn" title="Open your saved projects"><svg viewBox="0 0 16 16"><rect x="2" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="6.5" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m11 3.4 2.6-.7 2 10.6-2.6.7z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" transform="translate(-1.2 0)"/></svg>Library</button>
+    <button class="btn rec" id="recBtn" title="Record everything you hear, live, into an MP3 file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record live</span></button>
     <span class="rectime" id="recTime"></span>
     <button class="btn ghost" id="helpBtn" title="How to use SpinLab and keyboard shortcuts"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 6.2a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.1v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".9" fill="currentColor"/></svg>Help</button>
     <a class="home" href="../">&larr; Hub</a>
@@ -235,13 +266,41 @@ footer.foot a{color:var(--soft)}
     <div class="panel deck b" id="dB" aria-label="Deck B controls"></div>
   </section>
 </main>
+<section class="panel offline" id="offline">
+  <svg class="big" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#121725" stroke="#323a52"/><path d="M16 8v11M11 14.5l5 5 5-5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23.5h14" stroke="#f472b6" stroke-width="2.4" stroke-linecap="round"/></svg>
+  <div><b>Use SpinLab without internet</b><p id="offlineText">Download the whole app as one HTML file. Open it from your computer any time, even with no connection. Saved projects stay with the browser you save them in, so the downloaded copy starts with its own empty library.</p></div>
+  <button class="btn big" id="offlineBtn"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download SpinLab (HTML)</button>
+</section>
 <footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+<dialog id="lib" aria-labelledby="libTitle">
+  <div class="libhead"><h2 id="libTitle" style="margin:0">Your library</h2>
+    <div class="row"><button class="btn" id="libNew" title="Start an empty project">+ New project</button><button class="btn" id="libClose">Close</button></div></div>
+  <p style="margin:0 0 12px;color:var(--soft);font-size:13px">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
+  <ul class="liblist" id="libList"></ul>
+  <p id="libSpace" style="margin:10px 0 0;color:var(--dim);font:12px var(--mono)"></p>
+</dialog>
+<dialog id="confirm" aria-labelledby="confirmMsg">
+  <p id="confirmMsg" style="margin:0 0 16px;font-size:15px;max-width:440px"></p>
+  <div class="row" style="justify-content:flex-end"><button class="btn" id="confirmNo">Cancel</button><button class="btn warn" id="confirmYes">OK</button></div>
+</dialog>
 <dialog id="help">
   <h2>How to use SpinLab</h2>
-  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded and nothing is saved after you close the page. Save your edits with <b>Save WAV</b> or <b>Save MP3</b>, and your mixes with <b>Record mix</b>, which saves an MP3. Nothing goes online for either.</p>
+  <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
+  <h3>Projects and the library</h3>
+  <ul>
+    <li>Type a name in the box at the top, then press <b>Save</b> (<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>S</kbd>). If you leave it blank, the project is named Untitled 1, Untitled 2 and so on.</li>
+    <li>A project keeps both decks’ songs with your edits, hot cues, loops, BPM, speed and every knob.</li>
+    <li><b>Library</b> lists your saved projects. Open, rename or delete them there, or start a new one.</li>
+    <li>Projects live in this browser on this device. Clearing the browser’s site data deletes them.</li>
+  </ul>
+  <h3>Save vs. Record live</h3>
+  <ul>
+    <li><b>Save WAV / Save MP3</b> save the song with your waveform edits (cuts, fades, reverse).</li>
+    <li><b>Record live</b> captures what you hear while you play: speed, EQ, effects, loops and both decks mixed together.</li>
+  </ul>
   <h3>Videos</h3>
   <ul>
     <li>Load a video (MP4, WebM, and on most computers MOV) the same way as a song. SpinLab pulls out the sound and puts it on the deck. Nothing downloads until you press Save WAV or Save MP3.</li>
@@ -274,7 +333,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.4'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.5'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -339,6 +398,7 @@ function encodeWAV(b) {
   return new Blob([buf], { type: 'audio/wav' });
 }
 function download(blob, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(blob); a.download = name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }
+function decodeAB(data) { return new Promise((res, rej) => { const p = ctx.decodeAudioData(data, res, rej); if (p && p.catch) p.catch(rej); }); }
 let lameP = null;
 function loadLame() {
   if (window.lamejs) return Promise.resolve();
@@ -417,7 +477,7 @@ function makeKnob(el, opt) {
       <line x1="${23 + 5 * Math.cos(ang)}" y1="${23 + 5 * Math.sin(ang)}" x2="${23 + 12 * Math.cos(ang)}" y2="${23 + 12 * Math.sin(ang)}" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/></svg>`;
     el.setAttribute('aria-valuenow', k.value); el.setAttribute('aria-valuetext', k.fmt(k.value));
     if (k.out) k.out.textContent = k.fmt(k.value);
-    if (!silent) k.onChange(k.value);
+    if (!silent) { k.onChange(k.value); touch(); }
   };
   let y0, v0, id = null;
   el.addEventListener('pointerdown', e => { e.preventDefault(); el.focus(); id = e.pointerId; el.setPointerCapture(id); y0 = e.clientY; v0 = k.value; });
@@ -445,7 +505,7 @@ function makeFader(el, opt) {
     f.value = clamp(v, f.min, f.max); const p = (f.value - f.min) / (f.max - f.min), h = el.clientHeight || 170, track = h - 20;
     cap.style.bottom = (10 + p * track) + 'px'; fill.style.height = (p * track) + 'px';
     el.setAttribute('aria-valuenow', f.value.toFixed(2)); el.setAttribute('aria-valuetext', Math.round(p * 100) + '%');
-    if (!silent) f.onChange(f.value);
+    if (!silent) { f.onChange(f.value); touch(); }
   };
   const fromY = y => { const r = el.getBoundingClientRect(); return f.min + clamp((r.bottom - 10 - y) / (r.height - 20), 0, 1) * (f.max - f.min); };
   let id = null;
@@ -579,7 +639,7 @@ class Deck {
   setLoop(start, end) {
     if (!this.buffer || end - start < 0.01) return;
     end = Math.min(end, this.dur);
-    this.loop = { on: true, start, end };
+    this.loop = { on: true, start, end }; touch();
     const p = this.pos();
     if (this.playing && !this.brake) {
       if (p >= start && p < end && this.src) { this.rebase(); this.src.loop = true; this.src.loopStart = start; this.src.loopEnd = end; }
@@ -617,14 +677,14 @@ class Deck {
   cue() {
     if (!this.buffer) return;
     if (this.playing) { this.pause(); this.seek(this.cuePoint); }
-    else { this.cuePoint = this.pos(); toast('Cue set at ' + fmt(this.cuePoint)); this.ui(); }
+    else { this.cuePoint = this.pos(); toast('Cue set at ' + fmt(this.cuePoint)); this.ui(); touch(); }
   }
   hotCue(i) {
     if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
-    if (this.cues[i] == null) { this.cues[i] = this.pos(); this.ui(); }
+    if (this.cues[i] == null) { this.cues[i] = this.pos(); this.ui(); touch(); }
     else { this.seek(this.cues[i]); if (!this.playing) this.play(); }
   }
-  clearCue(i) { if (this.cues[i] != null) { this.cues[i] = null; this.ui(); toast('Hot cue ' + (i + 1) + ' cleared'); } }
+  clearCue(i) { if (this.cues[i] != null) { this.cues[i] = null; this.ui(); touch(); toast('Hot cue ' + (i + 1) + ' cleared'); } }
 
   /* tempo */
   tap() {
@@ -637,7 +697,7 @@ class Deck {
       this.setBPM(Math.round(60000 / avg / this.eff * 10) / 10);
     } else toast('Keep tapping along with the beat');
   }
-  setBPM(v) { if (!(v > 20 && v < 400)) return; this.bpm = v; this.updateEcho(); this.ui(); }
+  setBPM(v) { if (!(v > 20 && v < 400)) return; this.bpm = v; this.updateEcho(); this.ui(); touch(); }
   sync() {
     if (!dual) return toast('Add deck B first, then Sync matches the two decks.');
     const o = this.other;
@@ -660,18 +720,49 @@ class Deck {
     this.el.title.innerHTML = (isVideo ? 'Pulling the sound out of the video&hellip;' : 'Loading&hellip;') + '<small>' + escapeHTML(file.name) + '</small>';
     try {
       const data = await file.arrayBuffer();
-      const buf = await new Promise((res, rej) => { const p = ctx.decodeAudioData(data, res, rej); if (p && p.catch) p.catch(rej); });
+      const buf = await decodeAB(data);
       this.pause(); this._kill();
       this.buffer = buf; this.name = file.name.replace(/\.[^.]+$/, '');
       this.startOffset = 0; this.cuePoint = 0; this.cues = [null, null, null, null]; this.loop = { on: false, start: 0, end: 0 };
       this.sel = null; this.undo = []; this.redo = []; this.bpm = null;
       this.peaks = computePeaks(buf); this.ver++; this.view = { start: 0, len: buf.duration };
-      this.ui();
+      this.ui(); touch();
       if (isVideo) toast('The video’s sound is on deck ' + this.id + '. Use Save WAV or Save MP3 to keep it as a file.');
       detectBPM(buf).then(b => { if (this.buffer === buf && b) { this.bpm = b; this.updateEcho(); this.ui(); } else if (!b) this.ui(); });
     } catch (e) {
       this.ui(); toast(isVideo ? 'The sound in this video could not be read. MP4 and WebM videos work best.' : 'That file could not be read as audio. Try an MP3, WAV, M4A or OGG.');
     }
+  }
+
+  /* projects */
+  reset() {
+    this.pause(); this._kill(); this.brake = null;
+    Object.assign(this, { buffer: null, name: '', startOffset: 0, cuePoint: 0, cues: [null, null, null, null], loop: { on: false, start: 0, end: 0 }, pendIn: null,
+      sel: null, undo: [], redo: [], bpm: null, peaks: null, range: 0.16, tempo: 0, bend: 1, echoBeats: 0.5, follow: true, view: { start: 0, len: 1 } });
+    this.ver++; this.waveKey = this.ovKey = null;
+    this.el.range.value = '0.16'; this.el.tempo.value = 0; this.el.echoT.value = '0.5'; this.setRate();
+    Object.values(this.k).forEach(k => k.set(k.def)); this.fader.set(this.fader.def);
+    this.ui();
+  }
+  state() {
+    return { name: this.name, audio: this.buffer ? encodeWAV(this.buffer) : null, cues: this.cues.slice(), cuePoint: this.cuePoint,
+      loop: { start: this.loop.start, end: this.loop.end }, bpm: this.bpm, range: this.range, tempo: this.tempo, echoBeats: this.echoBeats, follow: this.follow,
+      knobs: Object.fromEntries(Object.entries(this.k).map(([n, k]) => [n, k.value])), fader: this.fader.value };
+  }
+  async applyState(st) {
+    this.reset();
+    if (!st) return;
+    if (st.audio) {
+      const buf = await decodeAB(await st.audio.arrayBuffer());
+      this.buffer = buf; this.peaks = computePeaks(buf); this.ver++; this.view = { start: 0, len: buf.duration };
+    }
+    this.name = st.name || ''; this.cues = (st.cues || [null, null, null, null]).slice(0, 4); this.cuePoint = st.cuePoint || 0;
+    this.loop = { on: false, start: st.loop ? st.loop.start : 0, end: st.loop ? st.loop.end : 0 };
+    this.bpm = st.bpm || null; this.range = st.range || 0.16; this.tempo = st.tempo || 0; this.echoBeats = st.echoBeats || 0.5; this.follow = st.follow !== false;
+    this.el.range.value = String(this.range); this.el.tempo.value = this.tempo; this.el.echoT.value = String(this.echoBeats); this.setRate();
+    if (st.knobs) for (const [n, v] of Object.entries(st.knobs)) if (this.k[n]) this.k[n].set(v);
+    if (st.fader != null) this.fader.set(st.fader);
+    this.ui();
   }
 
   /* editing */
@@ -688,7 +779,7 @@ class Deck {
     this.view.len = Math.min(this.view.len, d); this.view.start = clamp(this.view.start, 0, d - this.view.len);
     this.startOffset = clamp(newPos, 0, d);
     if (was) this._start(this.startOffset);
-    this.ui();
+    this.ui(); touch();
   }
   needSel(what) { if (!this.buffer) { toast('Load a song on deck ' + this.id + ' first.'); return false; } if (!this.sel) { toast('Drag across the waveform to select the part to ' + what + '.'); return false; } return true; }
   copy() { if (!this.needSel('copy')) return; clipboard = sliceBuf(this.buffer, this.sel.a, this.sel.b); updateClipInfo(); toast('Copied ' + (this.sel.b - this.sel.a).toFixed(2) + 's'); }
@@ -914,10 +1005,10 @@ function setupDeck(d) {
     b.addEventListener('pointerdown', on); b.addEventListener('pointerup', off); b.addEventListener('pointerleave', off); b.addEventListener('pointercancel', off);
   });
 
-  d.el.tempo.addEventListener('input', () => { d.tempo = +d.el.tempo.value; d.setRate(); });
+  d.el.tempo.addEventListener('input', () => { d.tempo = +d.el.tempo.value; d.setRate(); touch(); });
   d.el.tempo.addEventListener('dblclick', () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); });
-  d.el.range.addEventListener('change', () => { const r = +d.el.range.value, cur = d.tempo * d.range; d.range = r; d.tempo = clamp(cur / r, -1, 1); d.el.tempo.value = d.tempo; d.setRate(); });
-  d.el.echoT.addEventListener('change', () => { d.echoBeats = +d.el.echoT.value; d.updateEcho(); });
+  d.el.range.addEventListener('change', () => { const r = +d.el.range.value, cur = d.tempo * d.range; d.range = r; d.tempo = clamp(cur / r, -1, 1); d.el.tempo.value = d.tempo; d.setRate(); touch(); });
+  d.el.echoT.addEventListener('change', () => { d.echoBeats = +d.el.echoT.value; d.updateEcho(); touch(); });
   d.el.bpmIn.addEventListener('change', () => { const v = +d.el.bpmIn.value; if (v > 20 && v < 400) d.setBPM(v); else d.ui(); });
   d.el.file.addEventListener('change', () => { d.load(d.el.file.files[0]); d.el.file.value = ''; });
 
@@ -1080,10 +1171,11 @@ function setActive(d) { if (activeDeck === d) return; activeDeck = d; decks.forE
 knobs.master = makeKnob($('#kMaster'), { min: 0, max: 1.2, value: 0.9, def: 0.9, fmt: v => Math.round(v * 100) + '%', onChange: v => ctx && master.gain.gain.setTargetAtTime(v, ctx.currentTime, 0.01) });
 const xf = $('#xfader');
 function applyXfader() { if (!ctx) return; const x = dual ? +xf.value : 0; A.xf.gain.setTargetAtTime(Math.cos(x * Math.PI / 2), ctx.currentTime, 0.008); B.xf.gain.setTargetAtTime(Math.sin(x * Math.PI / 2), ctx.currentTime, 0.008); }
-xf.addEventListener('input', applyXfader);
+xf.addEventListener('input', () => { applyXfader(); touch(); });
 xf.addEventListener('dblclick', () => { xf.value = 0.5; applyXfader(); });
 let dual = false;
 function setDual(on) {
+  if (dual !== on) touch();
   dual = on; document.body.classList.toggle('single', !on);
   if (!on) { B.pause(); setActive(A); }
   else { setActive(B); requestAnimationFrame(() => { sizeCanvas(B.el.cv); sizeCanvas(B.el.ov); B.waveKey = B.ovKey = null; B.fader.set(B.fader.value, true); $('#wB').scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }); }
@@ -1111,37 +1203,44 @@ const REC_TAP = `class RecTap extends AudioWorkletProcessor {
 registerProcessor('rec-tap', RecTap);`;
 let tapReady = null;
 function recStamp() { return new Date().toISOString().slice(0, 16).replace('T', '_').replace(':', '-'); }
-function recUI(on) { $('#recBtn').classList.toggle('on', on); $('#recBtn span').textContent = on ? 'Stop recording' : 'Record mix'; if (!on) $('#recTime').textContent = ''; }
+function recUI(on) { $('#recBtn').classList.toggle('on', on); $('#recBtn span').textContent = on ? 'Stop recording' : 'Record live'; if (!on) $('#recTime').textContent = ''; }
 
 async function startMp3Rec() {
-  if (!window.AudioWorkletNode || !ctx.audioWorklet || ![32000, 44100, 48000].includes(ctx.sampleRate)) return false;
-  try {
-    await loadLame();
-    if (!tapReady) tapReady = ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_TAP], { type: 'application/javascript' })));
-    await tapReady;
-  } catch (e) { tapReady = null; return false; }
-  const node = new AudioWorkletNode(ctx, 'rec-tap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1], channelCount: 2, channelCountMode: 'explicit' });
+  if (![32000, 44100, 48000].includes(ctx.sampleRate)) return false;
+  try { await loadLame(); } catch (e) { return false; }
   const enc = new lamejs.Mp3Encoder(2, ctx.sampleRate, 192), out = [];
   const i16 = f => { const o = new Int16Array(f.length); for (let i = 0; i < f.length; i++) { const v = clamp(f[i], -1, 1); o[i] = v < 0 ? v * 0x8000 : v * 0x7fff; } return o; };
-  let finish;
-  node.port.onmessage = e => {
-    if (e.data === 'done') return finish && finish();
-    const m = enc.encodeBuffer(i16(e.data[0]), i16(e.data[1])); if (m.length) out.push(new Int8Array(m));
+  const push = (l, r) => { const m = enc.encodeBuffer(i16(l), i16(r)); if (m.length) out.push(new Int8Array(m)); };
+  const save = () => {
+    const end = enc.flush(); if (end.length) out.push(new Int8Array(end));
+    download(new Blob(out, { type: 'audio/mpeg' }), 'spinlab-live-' + recStamp() + '.mp3');
+    rec = null; recUI(false); toast('Your live recording was saved to Downloads as an MP3');
   };
-  master.lim.connect(node); node.connect(ctx.destination); // the tap outputs silence; this only keeps it running
-  rec = {
-    kind: 'mp3',
-    stop() {
-      finish = () => {
-        node.port.onmessage = null; try { master.lim.disconnect(node); } catch (e) {} node.disconnect();
-        const end = enc.flush(); if (end.length) out.push(new Int8Array(end));
-        download(new Blob(out, { type: 'audio/mpeg' }), 'spinlab-mix-' + recStamp() + '.mp3');
-        rec = null; recUI(false); toast('Your mix was saved to Downloads as an MP3');
-      };
-      node.port.postMessage('stop');
-    }
-  };
-  return true;
+  // 1) AudioWorklet (web version)
+  let node = null;
+  if (window.AudioWorkletNode && ctx.audioWorklet) {
+    try {
+      if (!tapReady) tapReady = ctx.audioWorklet.addModule(URL.createObjectURL(new Blob([REC_TAP], { type: 'application/javascript' })));
+      await tapReady;
+      node = new AudioWorkletNode(ctx, 'rec-tap', { numberOfInputs: 1, numberOfOutputs: 1, outputChannelCount: [1], channelCount: 2, channelCountMode: 'explicit' });
+    } catch (e) { tapReady = null; node = null; }
+  }
+  if (node) {
+    let finish;
+    node.port.onmessage = e => { if (e.data === 'done') return finish && finish(); push(e.data[0], e.data[1]); };
+    master.lim.connect(node); node.connect(ctx.destination); // the tap outputs silence; this only keeps it running
+    rec = { kind: 'mp3', stop() { finish = () => { node.port.onmessage = null; try { master.lim.disconnect(node); } catch (e) {} node.disconnect(); save(); }; node.port.postMessage('stop'); } };
+    return true;
+  }
+  // 2) ScriptProcessor (works when the downloaded copy is opened straight from a file)
+  if (ctx.createScriptProcessor) {
+    const sp = ctx.createScriptProcessor(4096, 2, 2);
+    sp.onaudioprocess = e => { const ib = e.inputBuffer; push(ib.getChannelData(0).slice(), ib.getChannelData(ib.numberOfChannels > 1 ? 1 : 0).slice()); };
+    master.lim.connect(sp); sp.connect(ctx.destination);
+    rec = { kind: 'mp3', stop() { sp.onaudioprocess = null; try { master.lim.disconnect(sp); } catch (e) {} sp.disconnect(); save(); } };
+    return true;
+  }
+  return false;
 }
 function startFallbackRec() {
   if (!window.MediaRecorder || !master.rec) { toast('This browser can’t record audio. Try Chrome, Edge, Firefox or a recent Safari.'); return false; }
@@ -1151,8 +1250,8 @@ function startFallbackRec() {
   mr.ondataavailable = e => e.data.size && chunks.push(e.data);
   mr.onstop = () => {
     const mt = mr.mimeType || type || 'audio/webm', ext = mt.includes('mp4') ? 'm4a' : mt.includes('ogg') ? 'ogg' : 'webm';
-    download(new Blob(chunks, { type: mt }), 'spinlab-mix-' + recStamp() + '.' + ext);
-    rec = null; recUI(false); toast('Your mix was saved to Downloads as ' + ext.toUpperCase() + ' (this browser can’t make MP3 recordings)');
+    download(new Blob(chunks, { type: mt }), 'spinlab-live-' + recStamp() + '.' + ext);
+    rec = null; recUI(false); toast('Your live recording was saved to Downloads as ' + ext.toUpperCase() + ' (this browser can’t make MP3 recordings)');
   };
   mr.start(1000);
   rec = { kind: 'media', stop: () => mr.stop() };
@@ -1170,6 +1269,166 @@ $('#recBtn').addEventListener('click', async () => {
   toast('Recording everything you hear. Press Stop recording to save.');
 });
 
+/* ---------------- projects + library (IndexedDB, on this device) ---------------- */
+let project = { id: null, created: null }, dirty = false, saving = false, dbP = null;
+function touch() { if (!dirty) { dirty = true; showState(); } }
+function showState() {
+  const el = $('#projState'); if (!el) return;
+  el.textContent = dirty && (A.buffer || B.buffer) ? 'Not saved' : project.id ? 'Saved' : '';
+  el.classList.toggle('dirty', dirty && !!(A.buffer || B.buffer));
+}
+function setClean() { dirty = false; showState(); }
+function openDB() {
+  if (!dbP) dbP = new Promise((res, rej) => {
+    if (!window.indexedDB) return rej(new Error('noidb'));
+    const r = indexedDB.open('spinlab', 1);
+    r.onupgradeneeded = () => r.result.createObjectStore('projects', { keyPath: 'id' });
+    r.onsuccess = () => res(r.result); r.onerror = () => { dbP = null; rej(r.error); };
+  });
+  return dbP;
+}
+function idb(mode, fn) {
+  return openDB().then(db => new Promise((res, rej) => {
+    const t = db.transaction('projects', mode), req = fn(t.objectStore('projects')); let out;
+    if (req) req.onsuccess = () => out = req.result;
+    t.oncomplete = () => res(out); t.onerror = t.onabort = () => rej(t.error);
+  }));
+}
+const idbPut = r => idb('readwrite', s => s.put(r)), idbGet = id => idb('readonly', s => s.get(id)), idbAll = () => idb('readonly', s => s.getAll()), idbDel = id => idb('readwrite', s => s.delete(id));
+async function nextUntitled() {
+  let n = 0; try { (await idbAll()).forEach(p => { const m = /^Untitled (\d+)$/.exec(p.title || ''); if (m) n = Math.max(n, +m[1]); }); } catch (e) {}
+  return 'Untitled ' + (n + 1);
+}
+async function saveProject() {
+  if (!A.buffer && !B.buffer) return toast('Load a song first, then save the project.');
+  if (saving) return; saving = true; toast('Saving project…');
+  try {
+    let title = $('#projTitle').value.trim();
+    if (!title) { title = await nextUntitled(); $('#projTitle').value = title; }
+    const now = Date.now(), id = project.id || 'p' + now.toString(36) + Math.random().toString(36).slice(2, 6);
+    const recd = { id, title, created: project.created || now, updated: now, dual, xfader: +xf.value, master: knobs.master.value,
+      length: Math.max(A.dur, B.buffer ? B.dur : 0), decks: { A: A.state(), B: B.buffer ? B.state() : null } };
+    await idbPut(recd);
+    project = { id, created: recd.created }; setClean();
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    toast('Saved “' + title + '” to your library');
+    if ($('#lib').open) renderLibrary();
+  } catch (e) {
+    toast(e && e.name === 'QuotaExceededError' ? 'There isn’t enough storage space on this device to save this project.' : 'The project could not be saved in this browser.');
+  }
+  saving = false;
+}
+function askConfirm(msg, yes = 'OK') {
+  const d = $('#confirm'); $('#confirmMsg').textContent = msg; $('#confirmYes').textContent = yes;
+  return new Promise(res => {
+    const done = v => { d.close(); $('#confirmYes').onclick = $('#confirmNo').onclick = d.oncancel = null; res(v); };
+    $('#confirmYes').onclick = () => done(true); $('#confirmNo').onclick = () => done(false); d.oncancel = e => { e.preventDefault(); done(false); };
+    d.showModal(); $('#confirmNo').focus();
+  });
+}
+const unsaved = () => dirty && (A.buffer || B.buffer);
+async function openProject(id) {
+  if (unsaved() && !(await askConfirm('Open this project? The changes you haven’t saved in the current one will be lost.', 'Open'))) return;
+  ac(); toast('Opening project…');
+  try {
+    const p = await idbGet(id); if (!p) return toast('That project could not be found.');
+    if (rec) rec.stop();
+    await A.applyState(p.decks.A); await B.applyState(p.decks.B);
+    setDual(!!p.dual && !!p.decks.B); xf.value = p.xfader ?? 0.5; applyXfader(); knobs.master.set(p.master ?? 0.9);
+    project = { id: p.id, created: p.created }; $('#projTitle').value = p.title || ''; setClean(); setActive(A);
+    $('#lib').close(); toast('Opened “' + (p.title || 'Untitled') + '”');
+  } catch (e) { toast('That project could not be opened.'); }
+}
+async function newProject() {
+  if (unsaved() && !(await askConfirm('Start a new project? The changes you haven’t saved in the current one will be lost.', 'Start new'))) return;
+  if (rec) rec.stop();
+  A.reset(); B.reset(); setDual(false); xf.value = 0.5; applyXfader(); knobs.master.set(0.9);
+  project = { id: null, created: null }; $('#projTitle').value = ''; setClean(); $('#lib').close();
+}
+async function renderLibrary() {
+  const ul = $('#libList');
+  let list = [];
+  try { list = (await idbAll()).sort((a, b) => b.updated - a.updated); }
+  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save projects here. Private or incognito windows often block it.</li>'; return; }
+  if (!list.length) { ul.innerHTML = '<li class="libempty">No saved projects yet. Load a song, give it a name at the top, and press Save.</li>'; }
+  else ul.innerHTML = list.map(p => {
+    const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+    const n = p.decks && p.decks.B ? 2 : 1;
+    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${n} deck${n > 1 ? 's' : ''} · ${fmt(p.length || 0).replace(/\.\d$/, '')} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
+      <div class="row"><button class="btn sm primary" data-l="open">Open</button><button class="btn sm" data-l="rename">Rename</button><button class="btn sm danger" data-l="delete">Delete</button></div></li>`;
+  }).join('');
+  try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
+}
+$('#libList').addEventListener('click', async e => {
+  const b = e.target.closest('[data-l]'); if (!b) return;
+  const li = b.closest('.libitem'), id = li.dataset.id;
+  if (b.dataset.l === 'open') openProject(id);
+  else if (b.dataset.l === 'delete') {
+    const name = li.querySelector('b').textContent;
+    if (await askConfirm('Delete “' + name + '”? This can’t be undone.', 'Delete')) {
+      await idbDel(id).catch(() => {});
+      if (id === project.id) { project = { id: null, created: null }; dirty = true; showState(); }
+      renderLibrary(); toast('Deleted “' + name + '”');
+    }
+  } else if (b.dataset.l === 'rename') {
+    const info = li.querySelector('.info'), old = info.querySelector('b').textContent;
+    info.innerHTML = `<input type="text" maxlength="80" aria-label="New name" value="${escapeHTML(old)}">`;
+    const inp = info.querySelector('input'); inp.focus(); inp.select();
+    let done = false;
+    const finish = async ok => {
+      if (done) return; done = true;
+      const v = inp.value.trim();
+      if (ok && v && v !== old) {
+        const p = await idbGet(id).catch(() => null);
+        if (p) { p.title = v; await idbPut(p).catch(() => {}); if (id === project.id) $('#projTitle').value = v; toast('Renamed to “' + v + '”'); }
+      }
+      renderLibrary();
+    };
+    inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') finish(true); else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); finish(false); } });
+    inp.addEventListener('blur', () => finish(true));
+  }
+});
+$('#libBtn').addEventListener('click', () => { renderLibrary(); $('#lib').showModal(); });
+$('#libClose').addEventListener('click', () => $('#lib').close());
+$('#libNew').addEventListener('click', newProject);
+$('#saveBtn').addEventListener('click', saveProject);
+$('#projTitle').addEventListener('input', touch);
+$('#projTitle').addEventListener('change', async () => {
+  // renaming an already-saved project updates its library entry right away
+  const v = $('#projTitle').value.trim(); if (!project.id || !v) return;
+  const p = await idbGet(project.id).catch(() => null); if (p && p.title !== v) { p.title = v; await idbPut(p).catch(() => {}); }
+});
+$('#projTitle').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#projTitle').blur(); } });
+window.addEventListener('beforeunload', e => { if (unsaved()) { e.preventDefault(); e.returnValue = ''; } });
+
+/* ---------------- download the whole app as one offline HTML file ---------------- */
+const IS_OFFLINE_COPY = !!document.querySelector('meta[name="spinlab-offline"]');
+const SITE = 'https://layahmcfly.github.io/ZenfulOutput/';
+if (IS_OFFLINE_COPY) {
+  $('#offlineText').textContent = 'This is the offline copy of SpinLab, saved on your computer. It works with no internet. To get the newest version, download it again from the website.';
+  $('#offlineBtn').innerHTML = 'Open the website';
+  $('#offlineBtn').onclick = () => window.open(SITE + 'spinlab/', '_blank', 'noopener');
+} else {
+  $('#offlineBtn').addEventListener('click', async () => {
+    try {
+      toast('Packing SpinLab into one file…');
+      const get = u => fetch(u, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
+      const [html, lame] = await Promise.all([get(location.href.split('#')[0].split('?')[0]), get('lame.min.js')]);
+      let out = html.replace('<meta name="theme-color"', () => '<meta name="spinlab-offline" content="1">\n<meta name="theme-color"');
+      const notice = '<!--\n  Offline copy of SpinLab v' + APP_VERSION + ', downloaded ' + new Date().toISOString().slice(0, 10) + ' from ' + SITE + 'spinlab/\n' +
+        '  It includes lamejs 1.2.1 (https://github.com/zhuker/lamejs), a JavaScript port of LAME (https://lame.sourceforge.io/),\n' +
+        '  used unmodified under the GNU Lesser General Public License v3 (https://www.gnu.org/licenses/lgpl-3.0.html).\n-->\n';
+      out = out.replace('<script>\n\'use strict\';', () => notice + '<script>\n' + lame.replace(/<\/script/gi, '<\\/script') + '\n<\/script>\n<script>\n\'use strict\';');
+      out = out.split('href="../LICENSE.txt"').join('href="' + SITE + 'LICENSE.txt"')
+               .split('href="Third%20party%20notice.txt"').join('href="' + SITE + 'spinlab/Third%20party%20notice.txt"')
+               .split('href="../"').join('href="' + SITE + '"');
+      if (!out.includes('function lamejs(')) throw new Error('pack');
+      download(new Blob([out], { type: 'text/html' }), 'SpinLab-v' + APP_VERSION + '.html');
+      toast('Saved SpinLab-v' + APP_VERSION + '.html to Downloads. Open it any time, even offline.');
+    } catch (e) { toast('The offline file could not be made right now. Try again while you’re online.'); }
+  });
+}
+
 /* ---------------- help ---------------- */
 $('#helpBtn').addEventListener('click', () => $('#help').showModal());
 $('#helpClose').addEventListener('click', () => $('#help').close());
@@ -1177,7 +1436,8 @@ $('#helpClose').addEventListener('click', () => $('#help').close());
 /* ---------------- keyboard ---------------- */
 document.addEventListener('keydown', e => {
   const t = e.target, tag = t && t.tagName;
-  if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || $('#help').open) return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!document.querySelector('dialog[open]')) saveProject(); return; }
+  if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || document.querySelector('dialog[open]')) return;
   const d = activeDeck || A, mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
   if (mod) {
     if (k === 'x') { d.cut(true); e.preventDefault(); } else if (k === 'c') { d.copy(); e.preventDefault(); } else if (k === 'v') { d.paste(); e.preventDefault(); }
