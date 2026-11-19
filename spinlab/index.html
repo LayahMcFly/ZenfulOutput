@@ -27,7 +27,7 @@
 <meta property="og:description" content="A two-deck DJ mixer in your browser. Your songs never leave your device.">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/">
 <meta name="theme-color" content="#0b0d14">
-<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d14'/%3E%3Ccircle cx='30' cy='34' r='20' fill='%23141824' stroke='%2322d3ee' stroke-width='3'/%3E%3Ccircle cx='30' cy='34' r='7' fill='%23f472b6'/%3E%3Ccircle cx='30' cy='34' r='2' fill='%230b0d14'/%3E%3Cpath d='M50 8v22l-6 6' fill='none' stroke='%23e2e8f0' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
+<link rel="icon" id="favicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d14'/%3E%3Ccircle cx='30' cy='34' r='20' fill='%23141824' stroke='%2322d3ee' stroke-width='3'/%3E%3Ccircle cx='30' cy='34' r='7' fill='%23f472b6'/%3E%3Ccircle cx='30' cy='34' r='2' fill='%230b0d14'/%3E%3Cpath d='M50 8v22l-6 6' fill='none' stroke='%23e2e8f0' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{
   --bg:#0b0d14;--panel:#121622;--panel2:#181d2c;--line:#262d40;--line2:#323a52;
@@ -277,8 +277,8 @@ body.mode-create .statusbar{flex:none}
 .poct{font:700 13px var(--mono);min-width:76px;text-align:center;color:var(--ink);flex:none}
 .kn.inline{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:0;flex:none}
 .kn.inline .knob{width:32px;height:32px}
-canvas.roll{flex:1 1 0;height:0;min-height:44px;max-height:220px;width:100%;display:block;border-radius:10px;background:#070910;border:1px solid var(--line);cursor:pointer}
-.pkeys{flex:2.6 1 0;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+canvas.roll{width:100%;display:block;border-radius:10px;background:#070910;border:1px solid var(--line);cursor:pointer}
+.pkeys{flex:1 1 auto;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
 .pkb{position:relative;height:100%;display:flex}
 .pk-w{flex:1 1 0;position:relative;margin:0 1px;border-radius:0 0 8px 8px;background:linear-gradient(#ffffff,#eef0f5 80%,#d5dae5);box-shadow:inset 0 -6px 0 #bcc3d2,0 2px 3px rgba(0,0,0,.55);cursor:pointer;transition:background .05s}
 .pk-w.pb{background:linear-gradient(#f5efff,#ddd0fb)}
@@ -310,6 +310,87 @@ html.phone body.mode-create .btn{min-height:36px}
 @media (orientation:portrait){
   html.phone body.mode-create{position:fixed;top:0;left:0;min-height:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform-origin:top left;transform:rotate(90deg) translateY(-100%)}
 }
+
+/* ===== home screen ===== */
+#home{display:none}
+body.mode-home #home{display:flex}
+body.mode-home header.top,body.mode-home main{display:none!important}
+body.mode-home{display:flex;flex-direction:column;min-height:100vh;min-height:100dvh;padding-bottom:0}
+body.mode-home .statusbar{margin-top:auto}
+#home{flex-direction:column;align-items:stretch;gap:clamp(16px,3vw,26px);padding:clamp(14px,3vw,30px) clamp(10px,3vw,36px) 18px;max-width:1100px;margin:0 auto;width:100%}
+.hbrand{display:flex;align-items:center;gap:12px;justify-content:center;position:relative}
+.hbrand svg{width:42px;height:42px}
+.hbrand b{font-size:clamp(24px,4vw,32px);letter-spacing:-.02em}
+.hbrand b span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
+.hbrand .home{position:absolute;right:0;top:50%;transform:translateY(-50%)}
+.hcols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2.5vw,28px)}
+.hcol{display:grid;gap:12px;align-content:start;min-width:0}
+.hbtn{appearance:none;-webkit-appearance:none;width:100%;border-radius:22px;border:1px solid var(--line2);padding:clamp(16px,3.5vw,34px) 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s;touch-action:manipulation}
+.hbtn svg{width:clamp(64px,13vw,120px);height:clamp(64px,13vw,120px)}
+.hbtn .hname{font:800 clamp(22px,4vw,34px)/1 var(--sans);letter-spacing:-.01em}
+.hbtn small{font:500 clamp(11.5px,1.6vw,14px)/1.3 var(--sans);color:var(--soft);text-align:center;min-height:2.6em;display:flex;align-items:flex-start;justify-content:center}
+.hcol.dj .hbtn{background:radial-gradient(120% 90% at 50% 0%,rgba(34,211,238,.20),transparent 60%),linear-gradient(#182033,#10141f);border-color:color-mix(in srgb,var(--a) 35%,var(--line2))}
+.hcol.pn .hbtn{background:radial-gradient(120% 90% at 50% 0%,rgba(167,139,250,.24),transparent 60%),linear-gradient(#1c1a33,#12111f);border-color:color-mix(in srgb,#a78bfa 40%,var(--line2))}
+.hcol.dj .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(34,211,238,.55);border-color:var(--a)}
+.hcol.pn .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(167,139,250,.6);border-color:#a78bfa}
+.hbtn:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.i-dj .spin{transform-origin:42px 48px;animation:hspin 3.2s linear infinite}
+@keyframes hspin{to{transform:rotate(360deg)}}
+.i-pn .k{animation:hkey 2.4s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 0}
+.i-pn .k2{animation-delay:.3s}.i-pn .k3{animation-delay:.6s}.i-pn .k4{animation-delay:.9s}
+@keyframes hkey{0%,30%,100%{fill:#f4f6fb;transform:none}12%{fill:#c4b5fd;transform:scaleY(.94)}}
+.hlibhead{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.hlist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
+.hitem{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line2);border-radius:12px;background:#121725;min-width:0}
+.hcol.dj .hitem.cur{border-color:var(--a)} .hcol.pn .hitem.cur{border-color:#a78bfa}
+.hopen{appearance:none;-webkit-appearance:none;flex:1;min-width:0;text-align:left;background:none;border:0;color:inherit;cursor:pointer;padding:6px 8px;border-radius:8px;font:inherit}
+.hopen:hover{background:rgba(255,255,255,.04)}
+.hopen:focus-visible{outline:2px solid var(--gold)}
+.hopen b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14px}
+.hopen small{display:block;color:var(--soft);font-size:11.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.hitem .btn.icon{padding:7px;flex:none}
+.hitem input[type=text]{flex:1;min-width:0;width:auto;font:600 14px var(--sans);padding:7px 9px}
+.hlist .libempty{padding:18px 10px;font-size:13px}
+@media (max-width:520px){ .hitem{flex-wrap:wrap} .hopen{flex-basis:100%} .hitem .btn.icon{flex:1;justify-content:center} }
+
+/* ===== piano mode: just the piano and the instruments ===== */
+body.mode-create header.top,body.mode-create .statusbar{display:none!important}
+.ptop{display:flex;align-items:center;gap:8px;flex:none;overflow-x:auto;scrollbar-width:none;padding:2px}
+.ptop::-webkit-scrollbar{display:none}
+.ptop > *{flex:none}
+.instr{display:flex;gap:6px}
+.ibtn{appearance:none;-webkit-appearance:none;border:1px solid var(--line2);background:linear-gradient(#1d2335,#151a28);color:var(--soft);border-radius:12px;padding:7px 12px;display:flex;align-items:center;gap:8px;font:700 13px var(--sans);cursor:pointer;touch-action:manipulation;transition:box-shadow .12s,border-color .12s,color .12s}
+.ibtn svg{width:22px;height:22px;flex:none}
+.ibtn:hover{color:var(--ink);border-color:#4a5575}
+.ibtn[aria-checked="true"]{color:#fff;border-color:var(--ic);box-shadow:0 0 0 1px var(--ic) inset,0 0 18px -5px var(--ic);background:linear-gradient(color-mix(in srgb,var(--ic) 30%,#1d2335),#151a28)}
+.ibtn[aria-checked="true"] svg{color:var(--ic)}
+.ibtn:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.octv{display:flex;align-items:center;gap:4px;margin-left:auto}
+.octv .btn{padding:8px 10px}
+.recpill{appearance:none;-webkit-appearance:none;border:0;border-radius:999px;padding:8px 14px;font:700 13px var(--mono);color:#fff;background:linear-gradient(#ef4444,#b91c1c);cursor:pointer;display:inline-flex;gap:8px;align-items:center;box-shadow:0 0 18px -4px #ef4444}
+.recpill.playing{background:linear-gradient(#a78bfa,#6d28d9);box-shadow:0 0 18px -4px #a78bfa}
+.recpill[hidden]{display:none}
+.drawer-bg{position:fixed;inset:0;z-index:44;background:rgba(3,5,10,.55)}
+.drawer-bg[hidden]{display:none}
+.drawer{position:fixed;top:0;left:0;bottom:0;width:min(370px,88%);z-index:45;background:linear-gradient(var(--panel2),var(--panel));border-right:1px solid var(--line2);box-shadow:24px 0 48px -24px #000;transform:translateX(-104%);transition:transform .22s ease;display:flex;flex-direction:column;overflow-y:auto;padding:14px 16px max(16px,env(safe-area-inset-bottom));overscroll-behavior:contain}
+.drawer.open{transform:none}
+.dhead{display:flex;justify-content:space-between;align-items:center;padding-bottom:8px}
+.dhead b{font-size:17px}
+.dsec{display:grid;gap:9px;padding:12px 0;border-top:1px solid var(--line)}
+.dgrid3{display:grid;grid-template-columns:1.5fr 1.2fr auto;gap:8px}
+.dgrid2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.drawer .btn{justify-content:center}
+.drawer canvas.roll{flex:none;height:110px;min-height:0;max-height:none}
+.drawer .ctime{text-align:left}
+.drawer .cinfo{margin:0;padding:0}
+#crTitle{flex:1;width:auto;min-width:0;font:600 14px var(--sans);padding:8px 10px}
+#crSend{width:100%;margin-top:0}
+html.phone body.mode-create #createView{padding:6px 8px max(6px,env(safe-area-inset-bottom))}
+html.phone .ibtn span{display:none}
+html.phone .ibtn{padding:8px 11px}
+html.phone body.mode-create .btn{min-height:38px}
+@media (max-width:900px){ .ibtn span{display:none} }
+@media (prefers-reduced-motion:reduce){ .i-dj .spin,.i-pn .k{animation:none} .drawer{transition:none} }
 
 /* ===== desktop: looks and behaves like an app window ===== */
 @media (min-width:1101px){
@@ -427,17 +508,14 @@ html.phone body.mode-create .btn{min-height:36px}
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 </head>
-<body class="single">
+<body class="single mode-home">
 <header class="top">
   <a class="brand" href="./" aria-label="SpinLab">
     <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#141824"/><circle cx="30" cy="34" r="20" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="30" cy="34" r="13" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="30" cy="34" r="7" fill="#f472b6"/><circle cx="30" cy="34" r="2" fill="#0b0d14"/><path d="M50 8v22l-6 6" fill="none" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/></svg>
     <b>Spin<span>Lab</span></b>
     <span class="ver" id="ver"></span>
   </a>
-  <div class="modesw" role="group" aria-label="Mode">
-    <button type="button" data-mode="dj" aria-pressed="true" title="DJ mode: decks, mixer and the DJ library"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>DJ</button>
-    <button type="button" data-mode="create" aria-pressed="false" title="Create mode: play the piano, record and save creations"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 3v6M10.5 3v6M8 9v4M5.5 9v4M10.5 9v4" stroke="currentColor" stroke-width="1.3"/></svg>Create</button>
-  </div>
+  <button class="btn" id="homeBtn" title="Back to the home screen (DJ or Piano)"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M6.6 13.5V9.6h2.8v3.9" fill="none" stroke="currentColor" stroke-width="1.4"/></svg>Home</button>
   <div class="proj">
     <input type="text" id="projTitle" placeholder="Untitled project" maxlength="80" aria-label="Project name" autocomplete="off" spellcheck="false">
     <span class="pstate" id="projState" aria-live="polite"></span>
@@ -472,40 +550,76 @@ html.phone body.mode-create .btn{min-height:36px}
     <div class="panel deck b" id="dB" aria-label="Deck B controls"></div>
   </section>
 </main>
-<section id="createView" aria-label="Create mode">
-  <div class="cbar panel">
-    <button class="btn crrec" id="crRec" title="Record what you play (R). Your earlier takes play along so you can layer parts."><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record</span></button>
-    <button class="btn crplay" id="crPlay" title="Play or stop (Space)"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg><span>Play</span></button>
-    <button class="btn" id="crBack" title="Back to the start"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button>
-    <span class="ctime" id="crTime">0:00.0 <small>/ 0:00.0</small></span>
-    <span class="sep"></span>
-    <button class="btn" id="crMetro" title="Click along with the beat while playing and recording"><svg viewBox="0 0 16 16"><path d="M5.5 1.5h5l2.5 13h-10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11 11.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Metronome</button>
-    <input type="number" id="crBpm" min="40" max="240" step="1" value="100" aria-label="Metronome speed in BPM"><span class="lbl">BPM</span>
-    <span class="sep"></span>
-    <button class="btn" id="crUndo" title="Remove the last recording you made (Ctrl/⌘ Z)"><svg viewBox="0 0 16 16"><path d="M5 3 2 6l3 3M2 6h7.5a4 4 0 0 1 0 8H6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo take</button>
-    <button class="btn danger" id="crClear" title="Remove every recorded note"><svg viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Clear</button>
-    <span class="sep"></span>
-    <button class="btn" id="crWav" title="Save your creation as a WAV file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save WAV</button>
-    <button class="btn" id="crMp3" title="Save your creation as an MP3 file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save MP3</button>
-    <button class="btn" id="crSend" title="Put your creation on a DJ deck so you can mix it"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>Send to DJ</button>
-    <span class="cinfo" id="crInfo"></span>
-  </div>
-  <canvas class="roll" id="crRoll" aria-label="Your recorded notes. Click to move the playhead."></canvas>
-  <div class="pbar panel">
-    <span class="lbl">Sound</span>
-    <select id="crSound" aria-label="Piano sound"><option value="piano">Grand piano</option><option value="epiano">Electric piano</option><option value="synth">Synth</option><option value="organ">Organ</option><option value="bass">Bass</option></select>
-    <span class="sep"></span>
-    <button class="btn sm" id="crOctDn" title="Move the keyboard down an octave (Z)">− Octave</button>
-    <span class="poct" id="crOctLbl">C3</span>
-    <button class="btn sm" id="crOctUp" title="Move the keyboard up an octave (X)">Octave +</button>
-    <span class="sep"></span>
-    <button class="btn sm" id="crSus" title="Let notes ring after you let go. On a computer, hold Shift.">Sustain</button>
-    <button class="btn sm on" id="crLabels" title="Show note names on the keys">Note names</button>
-    <span class="sep"></span>
-    <div class="kn inline" style="--kc:#a78bfa"><div class="knob" id="crVol" role="slider" tabindex="0" aria-label="Piano volume"></div><span>Volume</span></div>
-    <div class="kn inline" style="--kc:#a78bfa"><div class="knob" id="crRev" role="slider" tabindex="0" aria-label="Piano reverb"></div><span>Reverb</span></div>
+<section id="createView" aria-label="Piano">
+  <div class="ptop">
+    <button class="btn" id="crMenuBtn" aria-controls="crMenu" aria-expanded="false" title="Menu: record, play back, metronome, save and more"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Menu</span></button>
+    <div class="instr" role="radiogroup" aria-label="Instrument"><button type="button" class="ibtn" role="radio" aria-checked="true" data-sound="piano" style="--ic:#a78bfa" title="Grand piano"><svg viewBox="0 0 24 24"><path d="M4 18V9a5 5 0 0 1 5-5h3c2 0 3 1.5 3 3.5S16.5 11 19 11a1.5 1.5 0 0 1 1 1.5V18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 15h16M8 15v3M12 15v3M16 15v3" stroke="currentColor" stroke-width="1.4"/><path d="M6 18v2.5M18 18v2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Grand piano</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="epiano" style="--ic:#22d3ee" title="Electric piano"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 12v5M11 12v5M15 12v5M19 12v5" stroke="currentColor" stroke-width="1.3"/><path d="M13 2 9.5 6.5h3L10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Electric piano</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="synth" style="--ic:#f472b6" title="Synth"><svg viewBox="0 0 24 24"><path d="M2.5 12h3l2-6 3 12 3-12 3 12 2-6h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Synth</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="organ" style="--ic:#fbbf24" title="Organ"><svg viewBox="0 0 24 24"><path d="M4 20V10M8 20V6M12 20V3M16 20V6M20 20V10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M2.5 20.5h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Organ</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="bass" style="--ic:#34d399" title="Bass"><svg viewBox="0 0 24 24"><path d="M9 15.5a3.6 3.6 0 1 1-4-5.5c1.2-.4 2.2-.2 3 .4L17.5 2.5l2.2 2.2-8 9.4c.4.8.3 1.6-.2 2.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="6" cy="14.5" r="1.2" fill="currentColor"/></svg><span>Bass</span></button></div>
+    <button type="button" class="recpill" id="crPill" hidden></button>
+    <div class="octv">
+      <button class="btn" id="crOctDn" title="Move the keyboard down an octave (Z)" aria-label="Octave down"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <span class="poct" id="crOctLbl">C3</span>
+      <button class="btn" id="crOctUp" title="Move the keyboard up an octave (X)" aria-label="Octave up"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
   </div>
   <div class="pkeys" id="pKeys"><div class="pkb" id="pKb"></div></div>
+  <div class="drawer-bg" id="crMenuBg" hidden></div>
+  <aside class="drawer" id="crMenu" aria-label="Piano menu" inert>
+    <div class="dhead"><b>Piano menu</b><button class="btn sm" id="crMenuClose" aria-label="Close the menu"><svg viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="dsec">
+      <label class="lbl" for="crTitle">Name</label>
+      <div class="row" style="flex-wrap:nowrap"><input type="text" id="crTitle" placeholder="Untitled creation" maxlength="80" autocomplete="off" spellcheck="false"><span class="pstate" id="crState" aria-live="polite"></span></div>
+    </div>
+    <div class="dsec">
+      <span class="lbl">Record</span>
+      <div class="dgrid3"><button class="btn crrec" id="crRec" title="Record what you play (R). Your earlier takes play along so you can layer parts."><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record</span></button><button class="btn crplay" id="crPlay" title="Play or stop (Space)"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg><span>Play</span></button><button class="btn" id="crBack" title="Back to the start"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button></div>
+      <span class="ctime" id="crTime">0:00.0 <small>/ 0:00.0</small></span>
+      <canvas class="roll" id="crRoll" aria-label="Your recorded notes. Click to move the playhead."></canvas>
+      <div class="dgrid2"><button class="btn" id="crUndo" title="Remove the last recording you made (Ctrl/⌘ Z)"><svg viewBox="0 0 16 16"><path d="M5 3 2 6l3 3M2 6h7.5a4 4 0 0 1 0 8H6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo take</button><button class="btn danger" id="crClear" title="Remove every recorded note"><svg viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Clear</button></div>
+      <span class="cinfo" id="crInfo"></span>
+    </div>
+    <div class="dsec">
+      <span class="lbl">Metronome</span>
+      <div class="row" style="flex-wrap:nowrap"><button class="btn" id="crMetro" title="Click along with the beat while playing and recording"><svg viewBox="0 0 16 16"><path d="M5.5 1.5h5l2.5 13h-10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11 11.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Metronome</button><input type="number" id="crBpm" min="40" max="240" step="1" value="100" aria-label="Metronome speed in BPM"><span class="lbl">BPM</span></div>
+    </div>
+    <div class="dsec">
+      <span class="lbl">Sound</span>
+      <div class="dgrid2"><button class="btn" id="crSus" title="Let notes ring after you let go. On a computer, hold Shift.">Sustain</button><button class="btn on" id="crLabels" title="Show note names on the keys">Note names</button></div>
+      <div class="row" style="justify-content:space-around">
+        <div class="kn" style="--kc:#a78bfa"><div class="knob" id="crVol" role="slider" tabindex="0" aria-label="Piano volume"></div><span>Volume</span><output></output></div>
+        <div class="kn" style="--kc:#a78bfa"><div class="knob" id="crRev" role="slider" tabindex="0" aria-label="Piano reverb"></div><span>Reverb</span><output></output></div>
+      </div>
+    </div>
+    <div class="dsec">
+      <span class="lbl">Save</span>
+      <div class="dgrid2">
+        <button class="btn primary" id="crSaveBtn" title="Save to your Piano library (Ctrl/⌘ S)"><svg viewBox="0 0 16 16"><path d="M3 2.5h8l2.5 2.5v8.5h-11z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><rect x="5" y="9" width="6" height="4.5" fill="none" stroke="currentColor" stroke-width="1.3"/></svg>Save</button>
+        <button class="btn" id="crLibBtn" title="Your saved piano creations"><svg viewBox="0 0 16 16"><rect x="2" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="6.5" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m9.8 3.4 2.6-.7 2 10.6-2.6.7z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Library</button>
+        <button class="btn" id="crWav" title="Save your creation as a WAV file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save WAV</button><button class="btn" id="crMp3" title="Save your creation as an MP3 file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save MP3</button>
+      </div>
+      <button class="btn" id="crSend" title="Put your creation on a DJ deck so you can mix it"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>Send to DJ</button>
+    </div>
+    <div class="dsec dgrid2">
+      <button class="btn" id="crHelpBtn">Help</button>
+      <button class="btn" id="crHomeBtn"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>Home</button>
+    </div>
+  </aside>
+</section>
+<section id="home" aria-label="SpinLab home">
+  <div class="hbrand">
+    <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#141824"/><circle cx="30" cy="34" r="20" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="30" cy="34" r="7" fill="#f472b6"/><circle cx="30" cy="34" r="2" fill="#0b0d14"/><path d="M50 8v22l-6 6" fill="none" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/></svg>
+    <b>Spin<span>Lab</span></b><span class="ver" id="ver3"></span>
+    <a class="home" href="../">&larr; Hub</a>
+  </div>
+  <div class="hcols">
+    <div class="hcol dj">
+      <button class="hbtn" id="goDJ"><svg class="i-dj" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="10" width="88" height="76" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="spin"><circle cx="42" cy="48" r="28" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="42" cy="48" r="21" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="14" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="8" fill="#f472b6"/><path d="M42 21v7" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/><circle cx="42" cy="48" r="2.4" fill="#0b0d14"/></g><path d="M80 18v30l-9 9" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="80" cy="18" r="4" fill="#e2e8f0"/></svg><span class="hname">DJ</span><small>Mix, loop and remix songs</small></button>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">DJ library</span></div><ul class="hlist" id="homeDJ" data-store="projects"></ul></div>
+    </div>
+    <div class="hcol pn">
+      <button class="hbtn" id="goPiano"><svg class="i-pn" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="14" width="88" height="68" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="keys"><rect class="k k1" x="12" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k2" x="31" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k3" x="50" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k4" x="69" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/></g><rect x="24" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="43" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="62" y="24" width="11" height="30" rx="2" fill="#0b0d14"/></svg><span class="hname">Piano</span><small>Play, record and make songs</small></button>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
+    </div>
+  </div>
 </section>
 <div class="statusbar">
 <section class="panel offline" id="offline">
@@ -532,18 +646,19 @@ html.phone body.mode-create .btn{min-height:36px}
 <dialog id="help">
   <h2>How to use SpinLab</h2>
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
-  <h3>Two modes</h3>
+  <h3>Home: DJ and Piano</h3>
   <ul>
-    <li><b>DJ</b> is for mixing songs: decks, mixer, waveform editing and Record live.</li>
-    <li><b>Create</b> is for making your own music on the piano. On a phone it turns sideways.</li>
-    <li>Each mode has its own library. Saving in DJ mode goes to the DJ library, and saving in Create mode goes to the Create library.</li>
+    <li>The home screen has two buttons. <b>DJ</b> (left) is for mixing songs. <b>Piano</b> (right) is for playing and making your own music. On a phone, Piano turns sideways.</li>
+    <li>Each one has its own library under its button. Tap a saved item to open it, or use the pencil to rename and the bin to delete.</li>
+    <li>Saving in DJ goes to the DJ library. Saving in Piano goes to the Piano library.</li>
   </ul>
-  <h3>Create mode</h3>
+  <h3>Piano</h3>
   <ul>
-    <li>Play the keys with your fingers or mouse. Slide across them to glide. On a computer, the keys <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> play notes, <kbd>Z</kbd> / <kbd>X</kbd> change octave, and holding <kbd>Shift</kbd> is the sustain pedal.</li>
-    <li><b>Record</b> (<kbd>R</kbd>) captures what you play. Record again to add another layer on top while the earlier takes play. <b>Undo take</b> removes the last layer.</li>
-    <li><b>Metronome</b> clicks along at the BPM you set. <kbd>Space</kbd> plays and stops.</li>
-    <li><b>Save WAV</b> / <b>Save MP3</b> make a file. <b>Send to DJ</b> puts your creation on a deck so you can mix it.</li>
+    <li>Pick an instrument at the top: Grand piano, Electric piano, Synth, Organ or Bass. The arrows move the keyboard up or down an octave.</li>
+    <li>Play with your fingers or mouse, and slide across the keys to glide. On a computer, <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> play notes, <kbd>Z</kbd> / <kbd>X</kbd> change octave, and holding <kbd>Shift</kbd> is the sustain pedal.</li>
+    <li>Everything else is in <b>Menu</b>: Record, Play, the note view, Undo take, Clear, metronome, sustain, volume, reverb, Save, Library, Save WAV/MP3 and Send to DJ.</li>
+    <li>While recording or playing back, a small pill at the top shows the time. Tap it to stop. <kbd>R</kbd> records, <kbd>Space</kbd> plays and stops.</li>
+    <li>Record again to add a layer on top while earlier takes play. <b>Undo take</b> removes the last layer.</li>
   </ul>
   <h3>Projects and the library</h3>
   <ul>
@@ -593,7 +708,7 @@ html.phone body.mode-create .btn{min-height:36px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.10'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.11'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -1693,13 +1808,15 @@ $('#recBtn').addEventListener('click', async () => {
 
 /* ---------------- projects + library (IndexedDB, on this device) ----------------
    DJ projects and Create creations are kept in separate stores, so each mode has its own library. */
-let MODE = 'dj';
+let MODE = 'home';
+const titleEl = () => MODE === 'create' ? $('#crTitle') : $('#projTitle');
+const stateEl = () => MODE === 'create' ? $('#crState') : $('#projState');
 let project = { id: null, created: null }, dirty = false, saving = false, dbP = null;
 const STORE = () => MODE === 'create' ? 'creations' : 'projects';
-const hasContent = () => MODE === 'create' ? CR.notes.length > 0 : !!(A.buffer || B.buffer);
+const hasContent = () => MODE === 'create' ? CR.notes.length > 0 : MODE === 'dj' ? !!(A.buffer || B.buffer) : false;
 function touch() { if (!dirty) { dirty = true; showState(); } }
 function showState() {
-  const el = $('#projState'); if (!el) return;
+  const el = stateEl(); if (!el) return;
   const d = dirty && hasContent();
   el.textContent = d ? 'Not saved' : project.id ? 'Saved' : '';
   el.classList.toggle('dirty', d);
@@ -1736,8 +1853,8 @@ async function saveProject() {
   if (!hasContent()) return toast(creating ? 'Record something on the piano first, then save it.' : 'Load a song first, then save the project.');
   if (saving) return; saving = true; toast(creating ? 'Saving creation…' : 'Saving project…');
   try {
-    let title = $('#projTitle').value.trim();
-    if (!title) { title = await nextUntitled(); $('#projTitle').value = title; }
+    let title = titleEl().value.trim();
+    if (!title) { title = await nextUntitled(); titleEl().value = title; }
     const now = Date.now(), id = project.id || (creating ? 'c' : 'p') + now.toString(36) + Math.random().toString(36).slice(2, 6);
     const recd = creating
       ? Object.assign({ id, title, created: project.created || now, updated: now }, crSnapshot())
@@ -1746,7 +1863,7 @@ async function saveProject() {
     await idbPut(recd);
     project = { id, created: recd.created }; setClean();
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-    toast('Saved “' + title + '” to your ' + (creating ? 'Create' : 'DJ') + ' library');
+    toast('Saved “' + title + '” to your ' + (creating ? 'Piano' : 'DJ') + ' library');
     if ($('#lib').open) renderLibrary();
   } catch (e) {
     toast(e && e.name === 'QuotaExceededError' ? 'There isn’t enough storage space on this device to save this.' : 'This could not be saved in this browser.');
@@ -1775,7 +1892,7 @@ async function openProject(id) {
       setDual(!!p.dual && !!p.decks.B); xf.value = p.xfader ?? 0.5; applyXfader(); knobs.master.set(p.master ?? 0.9);
       setActive(A);
     }
-    project = { id: p.id, created: p.created }; $('#projTitle').value = p.title || ''; setClean();
+    project = { id: p.id, created: p.created }; titleEl().value = p.title || ''; setClean();
     $('#lib').close(); toast('Opened “' + (p.title || 'Untitled') + '”');
   } catch (e) { toast('That ' + word + ' could not be opened.'); }
 }
@@ -1784,76 +1901,96 @@ async function newProject() {
   if (unsaved() && !(await askConfirm('Start a new ' + word + '? The changes you haven’t saved in the current one will be lost.', 'Start new'))) return;
   if (MODE === 'create') crApply(null);
   else { if (rec) rec.stop(); A.reset(); B.reset(); setDual(false); xf.value = 0.5; applyXfader(); knobs.master.set(0.9); }
-  project = { id: null, created: null }; $('#projTitle').value = ''; setClean(); $('#lib').close();
+  project = { id: null, created: null }; titleEl().value = ''; setClean(); $('#lib').close();
+}
+function curIdFor(store) { const m = store === 'creations' ? 'create' : 'dj'; return (m === MODE ? project : modeState[m].project).id; }
+function itemMeta(p, store) {
+  const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
+  const len = fmt(p.length || 0).replace(/\.\d$/, '');
+  if (store === 'creations') { const n = (p.notes || []).length; return `${n} note${n === 1 ? '' : 's'} · ${SOUNDS[p.sound] || 'Piano'} · ${len} · ${when}`; }
+  const n = p.decks && p.decks.B ? 2 : 1; return `${n} deck${n > 1 ? 's' : ''} · ${len} · ${when}`;
+}
+const PENCIL = '<svg viewBox="0 0 16 16"><path d="M3 13l.6-2.8L10.8 3a1.4 1.4 0 0 1 2 2l-7.2 7.2z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+const BIN = '<svg viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>';
+async function fillList(ul, store, compact) {
+  let list = [];
+  try { list = (await idbAll(store)).sort((a, b) => b.updated - a.updated); }
+  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save here. Private or incognito windows often block it.</li>'; return; }
+  const creating = store === 'creations', cur = curIdFor(store);
+  if (!list.length) { ul.innerHTML = '<li class="libempty">' + (creating ? (compact ? 'No piano creations yet.' : 'No saved creations yet. Open the menu, press Record, play, then Save.') : (compact ? 'No DJ projects yet.' : 'No saved projects yet. Load a song, give it a name at the top, and press Save.')) + '</li>'; return; }
+  ul.innerHTML = list.map(p => compact
+    ? `<li class="hitem${p.id === cur ? ' cur' : ''}" data-id="${p.id}" data-store="${store}"><button class="hopen" data-l="open" title="Open"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${itemMeta(p, store)}</small></button><button class="btn sm icon" data-l="rename" aria-label="Rename ${escapeHTML(p.title || 'Untitled')}" title="Rename">${PENCIL}</button><button class="btn sm icon danger" data-l="delete" aria-label="Delete ${escapeHTML(p.title || 'Untitled')}" title="Delete">${BIN}</button></li>`
+    : `<li class="libitem${p.id === cur ? ' cur' : ''}" data-id="${p.id}" data-store="${store}"><div class="info" data-l="open" role="button" tabindex="0" title="Open this"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${itemMeta(p, store)}${p.id === cur ? ' · open now' : ''}</small></div>
+      <div class="row"><button class="btn sm primary" data-l="open">Open</button><button class="btn sm" data-l="rename">Rename</button><button class="btn sm danger" data-l="delete">Delete</button></div></li>`).join('');
 }
 async function renderLibrary() {
-  const ul = $('#libList'), creating = MODE === 'create';
-  $('#libTitle').textContent = creating ? 'Create library' : 'DJ library';
+  const creating = MODE === 'create';
+  $('#libTitle').textContent = creating ? 'Piano library' : 'DJ library';
   $('#libNew').textContent = creating ? '+ New creation' : '+ New project';
   $('#libIntro').textContent = creating
-    ? 'Your piano creations, saved in this browser on this device with every note, the sound, metronome speed and knob settings. Nothing is uploaded. DJ projects are kept in the DJ library.'
-    : 'DJ projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded. Piano creations are kept in the Create library.';
-  let list = [];
-  try { list = (await idbAll()).sort((a, b) => b.updated - a.updated); }
-  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save here. Private or incognito windows often block it.</li>'; return; }
-  if (!list.length) ul.innerHTML = '<li class="libempty">' + (creating ? 'No saved creations yet. Press Record, play the piano, give it a name at the top, and press Save.' : 'No saved projects yet. Load a song, give it a name at the top, and press Save.') + '</li>';
-  else ul.innerHTML = list.map(p => {
-    const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-    const len = fmt(p.length || 0).replace(/\.\d$/, '');
-    let meta;
-    if (creating) { const n = (p.notes || []).length; meta = `${n} note${n === 1 ? '' : 's'} · ${SOUNDS[p.sound] || 'Piano'} · ${len}`; }
-    else { const n = p.decks && p.decks.B ? 2 : 1; meta = `${n} deck${n > 1 ? 's' : ''} · ${len}`; }
-    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info" data-l="open" role="button" tabindex="0" title="Open this"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${meta} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
-      <div class="row"><button class="btn sm primary" data-l="open">Open</button><button class="btn sm" data-l="rename">Rename</button><button class="btn sm danger" data-l="delete">Delete</button></div></li>`;
-  }).join('');
+    ? 'Your piano creations, saved in this browser on this device with every note, the instrument, metronome speed and knob settings. Nothing is uploaded. DJ projects are kept in the DJ library.'
+    : 'DJ projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded. Piano creations are kept in the Piano library.';
+  await fillList($('#libList'), STORE(), false);
   try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
 }
-$('#libList').addEventListener('click', async e => {
+function renderHome() { fillList($('#homeDJ'), 'projects', true); fillList($('#homePiano'), 'creations', true); }
+const rerender = ul => ul.id === 'libList' ? renderLibrary() : renderHome();
+async function listClick(e) {
   const b = e.target.closest('[data-l]'); if (!b) return;
-  const li = b.closest('.libitem'), id = li.dataset.id;
-  if (b.dataset.l === 'open') openProject(id);
-  else if (b.dataset.l === 'delete') {
+  const ul = e.currentTarget, li = b.closest('li'), id = li.dataset.id, store = li.dataset.store, target = store === 'creations' ? 'create' : 'dj';
+  if (b.dataset.l === 'open') { if (MODE !== target) await setMode(target, true); openProject(id); return; }
+  if (b.dataset.l === 'delete') {
     const name = li.querySelector('b').textContent;
     if (await askConfirm('Delete “' + name + '”? This can’t be undone.', 'Delete')) {
-      await idbDel(id).catch(() => {});
-      if (id === project.id) { project = { id: null, created: null }; dirty = true; showState(); }
-      renderLibrary(); toast('Deleted “' + name + '”');
+      await idbDel(id, store).catch(() => {});
+      if (id === curIdFor(store)) { const st = target === MODE ? null : modeState[target]; if (st) { st.project = { id: null, created: null }; st.dirty = true; } else { project = { id: null, created: null }; dirty = true; showState(); } }
+      rerender(ul); toast('Deleted “' + name + '”');
     }
-  } else if (b.dataset.l === 'rename') {
-    const info = li.querySelector('.info'), old = info.querySelector('b').textContent;
-    info.removeAttribute('data-l'); info.removeAttribute('role'); info.removeAttribute('tabindex');
-    info.innerHTML = `<input type="text" maxlength="80" aria-label="New name" value="${escapeHTML(old)}">`;
-    const inp = info.querySelector('input'); inp.focus(); inp.select();
+    return;
+  }
+  if (b.dataset.l === 'rename') {
+    const holder = li.querySelector('.info, .hopen'), old = holder.querySelector('b').textContent;
+    const inp = document.createElement('input'); inp.type = 'text'; inp.maxLength = 80; inp.value = old; inp.setAttribute('aria-label', 'New name');
+    if (holder.classList.contains('hopen')) { li.querySelectorAll('.btn.icon').forEach(x => x.hidden = true); holder.replaceWith(inp); }
+    else { holder.removeAttribute('data-l'); holder.removeAttribute('role'); holder.removeAttribute('tabindex'); holder.innerHTML = ''; holder.appendChild(inp); }
+    inp.focus(); inp.select();
     let done = false;
     const finish = async ok => {
       if (done) return; done = true;
       const v = inp.value.trim();
       if (ok && v && v !== old) {
-        const p = await idbGet(id).catch(() => null);
-        if (p) { p.title = v; await idbPut(p).catch(() => {}); if (id === project.id) $('#projTitle').value = v; toast('Renamed to “' + v + '”'); }
+        const p = await idbGet(id, store).catch(() => null);
+        if (p) {
+          p.title = v; await idbPut(p, store).catch(() => {});
+          if (id === curIdFor(store)) (target === 'create' ? $('#crTitle') : $('#projTitle')).value = v;
+          toast('Renamed to “' + v + '”');
+        }
       }
-      renderLibrary();
+      rerender(ul);
     };
     inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') finish(true); else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); finish(false); } });
     inp.addEventListener('blur', () => finish(true));
   }
-});
-$('#libList').addEventListener('keydown', e => { const i = e.target.closest('.info[data-l]'); if (i && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProject(i.closest('.libitem').dataset.id); } });
+}
+['#libList', '#homeDJ', '#homePiano'].forEach(sel => $(sel).addEventListener('click', listClick));
+$('#libList').addEventListener('keydown', e => { const i = e.target.closest('.info[data-l]'); if (i && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); openProject(i.closest('li').dataset.id); } });
 $('#libBtn').addEventListener('click', () => { renderLibrary(); $('#lib').showModal(); $('#libList').scrollTop = 0; });
 $('#libClose').addEventListener('click', () => $('#lib').close());
 $('#libNew').addEventListener('click', newProject);
 $('#saveBtn').addEventListener('click', saveProject);
-$('#projTitle').addEventListener('input', touch);
-$('#projTitle').addEventListener('change', async () => {
-  // renaming something already saved updates its library entry right away
-  const v = $('#projTitle').value.trim(); if (!project.id || !v) return;
-  const p = await idbGet(project.id).catch(() => null); if (p && p.title !== v) { p.title = v; await idbPut(p).catch(() => {}); }
+['#projTitle', '#crTitle'].forEach(sel => {
+  const inp = $(sel);
+  inp.addEventListener('input', touch);
+  inp.addEventListener('change', async () => {
+    // renaming something already saved updates its library entry right away
+    const v = inp.value.trim(); if (!project.id || !v) return;
+    const p = await idbGet(project.id).catch(() => null); if (p && p.title !== v) { p.title = v; await idbPut(p).catch(() => {}); }
+  });
+  inp.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); inp.blur(); } });
 });
-$('#projTitle').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#projTitle').blur(); } });
 window.addEventListener('beforeunload', e => {
-  const other = modeState[MODE === 'dj' ? 'create' : 'dj'];
-  const otherUnsaved = other.dirty && (MODE === 'dj' ? CR.notes.length > 0 : !!(A.buffer || B.buffer));
-  if (unsaved() || otherUnsaved) { e.preventDefault(); e.returnValue = ''; }
+  const un = m => (m === MODE ? dirty : modeState[m].dirty) && (m === 'create' ? CR.notes.length > 0 : !!(A.buffer || B.buffer));
+  if (un('dj') || un('create')) { e.preventDefault(); e.returnValue = ''; }
 });
 
 /* ===================== CREATE MODE: piano, recorder, library ===================== */
@@ -2020,7 +2157,7 @@ function crRecord() {
   if (CR.recording) { crStop(); return; }
   crInit(); if (CR.playing) crStop();
   CR.takeId = Date.now(); CR.takeStack.push(CR.takeId); CR.recording = true;
-  crPlay(); toast(CR.notes.length ? 'Recording a new layer. Your earlier takes play along.' : 'Recording. Play the piano.');
+  closeMenu(); crPlay(); toast(CR.notes.length ? 'Recording a new layer. Your earlier takes play along.' : 'Recording. Play the piano.');
 }
 function startMetro() {
   stopMetro(); const beat = 60 / CR.bpm; let k = Math.ceil(CR.pos0 / beat - 1e-6);
@@ -2042,7 +2179,9 @@ function crUI() {
   $('#crPlay').innerHTML = (CR.playing && !CR.recording ? I.pause + '<span>Stop</span>' : I.play + '<span>Play</span>');
   $('#crMetro').classList.toggle('on', CR.metro); $('#crMetro').style.setProperty('--c', '#a78bfa');
   $('#crSus').classList.toggle('on', crSus()); $('#crLabels').classList.toggle('on', CR.labels);
-  $('#crSound').value = CR.sound; if (document.activeElement !== $('#crBpm')) $('#crBpm').value = CR.bpm;
+  document.querySelectorAll('.ibtn').forEach(b => b.setAttribute('aria-checked', String(b.dataset.sound === CR.sound)));
+  if (document.activeElement !== $('#crBpm')) $('#crBpm').value = CR.bpm;
+  const pill = $('#crPill'); pill.hidden = !CR.playing; pill.classList.toggle('playing', CR.playing && !CR.recording);
 }
 function crInfo() {
   const n = CR.notes.length, takes = new Set(CR.notes.map(x => x.take)).size;
@@ -2065,6 +2204,7 @@ function crFrame() {
   const now = crNow();
   const tl = fmt(now) + ' <small>/ ' + fmt(Math.max(crLen(), CR.recording ? now : 0)) + '</small>';
   if (crFrame.last !== tl) { $('#crTime').innerHTML = tl; crFrame.last = tl; }
+  if (CR.playing) { const pt = (CR.recording ? '● REC ' : '▶ ') + fmt(now) + ' · Stop'; if (crFrame.pill !== pt) { $('#crPill').textContent = pt; crFrame.pill = pt; } }
   // playback lights up the keys
   const pb = new Set(); if (CR.playing) for (const n of CR.notes) if (n.t <= now && now < n.t + n.d) pb.add(n.m);
   CR.keyEls.forEach((el, m) => el.classList.toggle('pb', pb.has(m)));
@@ -2073,7 +2213,7 @@ function crFrame() {
   const live = [...CR.live.values()].filter(L => L.note);
   if (!CR.notes.length && !live.length) {
     g.fillStyle = '#5b6379'; g.font = `600 ${12 * dpr}px Inter, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
-    g.fillText(CR.recording ? 'Recording… play the piano' : 'Press Record, then play the piano. Your notes show up here.', W / 2, H / 2);
+    g.fillText(CR.recording ? 'Recording… play the piano' : (cv.clientWidth < 460 ? 'Your recorded notes show up here' : 'Press Record, then play the piano. Your notes show up here.'), W / 2, H / 2);
   }
   const span = Math.max(8, crLen() + 2, now + 2);
   let lo = CR.base, hi = CR.top;
@@ -2112,7 +2252,7 @@ async function crRender() {
   for (const n of CR.notes) startVoice(off, out, n.s, n.m, n.v, n.t + 0.05).release(n.t + 0.05 + n.d);
   return off.startRendering();
 }
-const crName = () => ($('#projTitle').value.trim() || 'My creation');
+const crName = () => ($('#crTitle').value.trim() || 'My creation');
 async function crSave(kind) {
   if (crSave.busy) return; crSave.busy = true;
   try {
@@ -2167,7 +2307,22 @@ $('#crClear').addEventListener('click', async () => { if (!CR.notes.length) retu
 $('#crWav').addEventListener('click', () => crSave('wav'));
 $('#crMp3').addEventListener('click', () => crSave('mp3'));
 $('#crSend').addEventListener('click', crSend);
-$('#crSound').addEventListener('change', () => { CR.sound = $('#crSound').value; touch(); });
+document.querySelectorAll('.ibtn').forEach(b => b.addEventListener('click', () => { CR.sound = b.dataset.sound; crUI(); touch(); }));
+$('.instr').addEventListener('keydown', e => {
+  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); e.stopPropagation();
+  const ks = Object.keys(SOUNDS), i = (ks.indexOf(CR.sound) + (e.key === 'ArrowRight' ? 1 : -1) + ks.length) % ks.length;
+  CR.sound = ks[i]; crUI(); touch(); document.querySelector(`.ibtn[data-sound="${CR.sound}"]`).focus();
+});
+$('#crPill').addEventListener('click', () => crStop());
+function openMenu() { const d = $('#crMenu'); d.inert = false; d.classList.add('open'); $('#crMenuBg').hidden = false; $('#crMenuBtn').setAttribute('aria-expanded', 'true'); setTimeout(() => $('#crMenuClose').focus(), 60); }
+function closeMenu() { const d = $('#crMenu'); if (!d.classList.contains('open')) return; d.classList.remove('open'); d.inert = true; $('#crMenuBg').hidden = true; $('#crMenuBtn').setAttribute('aria-expanded', 'false'); }
+$('#crMenuBtn').addEventListener('click', openMenu);
+$('#crMenuClose').addEventListener('click', () => { closeMenu(); $('#crMenuBtn').focus(); });
+$('#crMenuBg').addEventListener('click', closeMenu);
+$('#crSaveBtn').addEventListener('click', saveProject);
+$('#crLibBtn').addEventListener('click', () => { renderLibrary(); $('#lib').showModal(); $('#libList').scrollTop = 0; });
+$('#crHelpBtn').addEventListener('click', () => $('#help').showModal());
+$('#crHomeBtn').addEventListener('click', () => setMode('home'));
 $('#crOctDn').addEventListener('click', () => crOct(-1));
 $('#crOctUp').addEventListener('click', () => crOct(1));
 $('#crSus').addEventListener('click', () => { CR.susBtn = !CR.susBtn; crSetSus(); });
@@ -2176,6 +2331,7 @@ $('#crLabels').addEventListener('click', () => { CR.labels = !CR.labels; renderK
 /* computer keyboard in Create mode */
 document.addEventListener('keydown', e => {
   if (MODE !== 'create' || document.querySelector('dialog[open]')) return;
+  if (e.key === 'Escape' && $('#crMenu').classList.contains('open')) { closeMenu(); $('#crMenuBtn').focus(); return; }
   const t = e.target, tag = t && t.tagName;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA') return;
   if (e.ctrlKey || e.metaKey) { if (e.key.toLowerCase() === 'z') { e.preventDefault(); crUndoTake(); } return; }
@@ -2198,18 +2354,21 @@ window.addEventListener('blur', () => releaseAllInput());
 /* ---------------- switching modes ---------------- */
 const IS_PHONE = matchMedia('(pointer:coarse)').matches && Math.min(screen.width, screen.height) < 820;
 if (IS_PHONE) document.documentElement.classList.add('phone');
-const modeState = { dj: { project: { id: null, created: null }, dirty: false, title: '' }, create: { project: { id: null, created: null }, dirty: false, title: '' } };
+const modeState = { dj: { project: { id: null, created: null }, dirty: false }, create: { project: { id: null, created: null }, dirty: false } };
 let wentFullscreen = false;
 async function setMode(m, fromTap) {
   if (m === MODE) return;
-  modeState[MODE] = { project, dirty, title: $('#projTitle').value };
-  if (MODE === 'create') { if (CR.playing) crStop(); releaseAllInput(); }
-  MODE = m; ({ project, dirty } = modeState[m]); $('#projTitle').value = modeState[m].title;
-  $('#projTitle').placeholder = m === 'create' ? 'Untitled creation' : 'Untitled project';
+  const prev = MODE;
+  if (prev !== 'home') modeState[prev] = { project, dirty };
+  if (prev === 'create') { if (CR.playing) crStop(); releaseAllInput(); closeMenu(); }
+  MODE = m;
+  if (m !== 'home') ({ project, dirty } = modeState[m]);
   document.body.classList.toggle('mode-create', m === 'create');
-  document.querySelectorAll('.modesw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  document.body.classList.toggle('mode-home', m === 'home');
   if ($('#lib').open) $('#lib').close();
-  showState(); try { localStorage.setItem('spinlab-mode', m); } catch (e) {}
+  showState(); drawFav();
+  if (m === 'home') { renderHome(); window.scrollTo(0, 0); }
+  if (m === 'dj') decks.forEach(d => { d.waveKey = d.ovKey = null; });
   if (m === 'create') {
     requestAnimationFrame(() => { renderKeys(); crUI(); crInfo(); });
     if (IS_PHONE && fromTap) {
@@ -2220,14 +2379,45 @@ async function setMode(m, fromTap) {
       } catch (e) {}
       requestAnimationFrame(renderKeys);
     }
-  } else {
+  } else if (prev === 'create') {
     try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
-    if (wentFullscreen && document.fullscreenElement) { document.exitFullscreen().catch(() => {}); }
+    if (wentFullscreen && document.fullscreenElement) document.exitFullscreen().catch(() => {});
     wentFullscreen = false;
-    decks.forEach(d => { d.waveKey = d.ovKey = null; });
   }
 }
-document.querySelectorAll('.modesw button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode, true)));
+$('#goDJ').addEventListener('click', () => setMode('dj', true));
+$('#goPiano').addEventListener('click', () => setMode('create', true));
+$('#homeBtn').addEventListener('click', () => setMode('home'));
+document.getElementById('ver3').textContent = 'v' + APP_VERSION;
+
+/* animated favicon: a spinning record in DJ, keys being played in Piano */
+const favLink = $('#favicon'), HOME_FAV = favLink.href, favCv = document.createElement('canvas'); favCv.width = favCv.height = 64;
+let favT = 0, favAng = 0;
+function drawFav() {
+  if (MODE === 'home') { if (favLink.getAttribute('href') !== HOME_FAV) { favLink.type = 'image/svg+xml'; favLink.href = HOME_FAV; } return; }
+  const g = favCv.getContext('2d'); g.clearRect(0, 0, 64, 64);
+  g.fillStyle = '#0b0d14'; g.beginPath(); g.roundRect ? g.roundRect(0, 0, 64, 64, 14) : g.rect(0, 0, 64, 64); g.fill();
+  if (MODE === 'dj') {
+    favAng += (A.playing || B.playing) ? 0.55 : 0.16;
+    g.save(); g.translate(30, 34); g.rotate(favAng);
+    g.fillStyle = '#141824'; g.strokeStyle = '#22d3ee'; g.lineWidth = 3.5; g.beginPath(); g.arc(0, 0, 22, 0, Math.PI * 2); g.fill(); g.stroke();
+    g.strokeStyle = '#2b3350'; g.lineWidth = 1.5; g.beginPath(); g.arc(0, 0, 15, 0, Math.PI * 2); g.stroke();
+    g.fillStyle = '#f472b6'; g.beginPath(); g.arc(0, 0, 7.5, 0, Math.PI * 2); g.fill();
+    g.strokeStyle = '#ffffff'; g.lineWidth = 3; g.lineCap = 'round'; g.beginPath(); g.moveTo(0, -11); g.lineTo(0, -19); g.stroke();
+    g.restore();
+    g.strokeStyle = '#e2e8f0'; g.lineWidth = 4; g.lineCap = 'round'; g.lineJoin = 'round'; g.beginPath(); g.moveTo(53, 7); g.lineTo(53, 30); g.lineTo(46, 37); g.stroke();
+  } else {
+    favT++;
+    const lit = new Set(); const auto = Math.floor(favT / 3) % 4; lit.add(auto);
+    for (let i = 0; i < 4; i++) {
+      const on = lit.has(i); g.fillStyle = on ? '#a78bfa' : '#f4f6fb';
+      g.beginPath(); g.roundRect ? g.roundRect(5 + i * 14, on ? 11 : 8, 12.5, 48, 3) : g.rect(5 + i * 14, on ? 11 : 8, 12.5, 48); g.fill();
+    }
+    g.fillStyle = '#0b0d14'; [1, 2, 3].forEach(i => g.fillRect(5 + i * 14 - 5, 8, 9, 28));
+  }
+  favLink.type = 'image/png'; favLink.href = favCv.toDataURL('image/png');
+}
+setInterval(drawFav, 150);
 window.addEventListener('orientationchange', () => setTimeout(() => { if (MODE === 'create') renderKeys(); }, 300));
 
 /* ---------------- download the whole app as one offline HTML file ---------------- */
@@ -2265,8 +2455,8 @@ $('#helpClose').addEventListener('click', () => $('#help').close());
 /* ---------------- keyboard ---------------- */
 document.addEventListener('keydown', e => {
   const t = e.target, tag = t && t.tagName;
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!document.querySelector('dialog[open]')) saveProject(); return; }
-  if (MODE === 'create') return;
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (MODE !== 'home' && !document.querySelector('dialog[open]')) saveProject(); return; }
+  if (MODE !== 'dj') return;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || document.querySelector('dialog[open]')) return;
   const d = activeDeck || A, mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
   if (mod) {
@@ -2298,7 +2488,7 @@ let freq = null, lastT = {};
 function frame() {
   if (MODE === 'create') crFrame();
   decks.forEach(d => {
-    if (MODE === 'create') return;
+    if (MODE !== 'dj') return;
     if (d === B && !dual) return;
     if (d.selStop) { if (!d.playing || d.loop.on) d.selStop = null; else if (d.pos() >= d.selStop.b - 0.01) { const a = d.selStop.a; d.selStop = null; d.pause(); d.seek(a); } }
     drawDeck(d);
@@ -2335,7 +2525,7 @@ function frame() {
 setupDeck(A); setupDeck(B);
 setActive(A); decks.forEach(renderDeckUI);
 crUI(); crInfo();
-try { if (localStorage.getItem('spinlab-mode') === 'create') setMode('create', false); } catch (e) {}
+renderHome(); drawFav();
 requestAnimationFrame(frame);
 </script>
 </body>
