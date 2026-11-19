@@ -278,18 +278,24 @@ body.mode-create .statusbar{flex:none}
 .kn.inline{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:0;flex:none}
 .kn.inline .knob{width:32px;height:32px}
 canvas.roll{width:100%;display:block;border-radius:10px;background:#070910;border:1px solid var(--line);cursor:pointer}
-.pkeys{flex:1 1 auto;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.pkeys{flex:1 1 auto;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
+.pkeys *{-webkit-tap-highlight-color:transparent;outline:none}
 .pkb{position:relative;height:100%;display:flex}
 .pk-w{flex:1 1 0;position:relative;margin:0 1px;border-radius:0 0 8px 8px;background:linear-gradient(#ffffff 45%,color-mix(in srgb,var(--oc,#d5dae5) 24%,#f4f6fb));box-shadow:inset 0 -7px 0 color-mix(in srgb,var(--oc,#bcc3d2) 75%,#8a93a6),0 2px 3px rgba(0,0,0,.55);cursor:pointer;transition:background .05s}
-.pk-w.pb{background:linear-gradient(#f5efff,#ddd0fb)}
-.pk-w.on{background:linear-gradient(#e6fcff,#9eeefa);box-shadow:inset 0 -2px 0 #5fcfdf,0 1px 2px rgba(0,0,0,.5)}
+.pk-w.pb{background:linear-gradient(color-mix(in srgb,var(--oc) 18%,#fff),color-mix(in srgb,var(--oc) 45%,#fff))}
+.pk-w.on{background:linear-gradient(#e9ecf2 40%,color-mix(in srgb,var(--oc) 45%,#e9ecf2));box-shadow:inset 0 -2px 0 color-mix(in srgb,var(--oc) 80%,#5b6379),inset 0 4px 6px rgba(0,0,0,.18);transform:translateY(2px)}
 .pk-b{position:absolute;top:0;height:61%;z-index:2;border-radius:0 0 6px 6px;background:linear-gradient(#3b4461,color-mix(in srgb,var(--oc,#0d1018) 30%,#0d1018) 80%);box-shadow:inset 0 -5px 0 #000,0 3px 6px rgba(0,0,0,.65);cursor:pointer}
-.pk-b.pb{background:linear-gradient(#a78bfa,#4c1d95 72%)}
-.pk-b.on{background:linear-gradient(#22d3ee,#0e7490 72%);box-shadow:inset 0 -2px 0 #000}
+.pk-b.pb{background:linear-gradient(#3b4461,color-mix(in srgb,var(--oc) 60%,#0d1018) 80%)}
+.pk-b.on{background:linear-gradient(#262c40,color-mix(in srgb,var(--oc) 70%,#0d1018) 85%);box-shadow:inset 0 -1px 0 #000,inset 0 3px 5px rgba(0,0,0,.5);transform:translateY(2px)}
 .pk .nm{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 11px var(--mono);color:#8a93a6;pointer-events:none}
 .pk .nm.c{color:color-mix(in srgb,var(--oc,#4b5574) 70%,#0b0d14);font-weight:800}
 .pk .hk{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:700 10px var(--mono);color:#6b7489;pointer-events:none;text-transform:uppercase}
-.pk-b .hk{bottom:9px;color:#8b93a9}
+.pk-b .hk{bottom:auto;top:calc(100% - 64px);color:#8b93a9}
+.pk-b .nm{bottom:24px;color:color-mix(in srgb,var(--oc) 55%,#e6e9f2);font-size:10.5px;letter-spacing:-.02em}
+.pk-b .fl{position:absolute;left:0;right:0;bottom:9px;text-align:center;font:600 9.5px var(--mono);color:#7b8496;pointer-events:none;letter-spacing:-.02em}
+.pkeys.nolabels .fl{display:none}
+html.phone .pk-b .fl{display:none}
+html.phone .pk-b .nm{bottom:10px;font-size:9.5px}
 .pkeys{overflow:hidden}
 .pkb.slide-l{animation:slideL .32s cubic-bezier(.2,.8,.2,1)}
 .pkb.slide-r{animation:slideR .32s cubic-bezier(.2,.8,.2,1)}
@@ -719,7 +725,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.12'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.13'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2078,6 +2084,7 @@ const KEYMAP = "awsedftgyhujkolp;'";
 // one color per octave, low (warm) to high (cool, then pink)
 const OCT_COLORS = ['#ef4444', '#f97316', '#f59e0b', '#a3e635', '#34d399', '#22d3ee', '#60a5fa', '#a78bfa', '#f472b6', '#e879f9'];
 const octOf = m => Math.floor(m / 12) - 1;
+const FLATS = { 1: 'D♭', 3: 'E♭', 6: 'G♭', 8: 'A♭', 10: 'B♭' };
 const octColor = m => OCT_COLORS[clamp(octOf(m), 0, OCT_COLORS.length - 1)];
 
 /* keyboard drawing */
@@ -2091,7 +2098,7 @@ function renderKeys() {
   const ww = 100 / nW, bw = ww * 0.62;
   const hk = mm => { const i = mm - CR.base; return i >= 0 && i < KEYMAP.length ? `<span class="hk">${KEYMAP[i]}</span>` : ''; };
   kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}" style="--oc:${octColor(k.m)}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
-    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}</div>`).join('');
+    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}<span class="nm">${noteName(k.m).replace(/\d+$/, '')}</span><span class="fl">${FLATS[k.m % 12]}</span></div>`).join('');
   CR.keyEls = new Map([...kb.querySelectorAll('.pk')].map(el => [+el.dataset.m, el]));
   CR.down.forEach(mm => keyOn(mm, true));
   const lbl = $('#crOctLbl'); lbl.textContent = noteName(CR.base) + '–' + noteName(CR.top);
