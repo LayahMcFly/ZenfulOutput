@@ -402,6 +402,74 @@ body.mode-home .statusbar{margin-top:auto}
 .hlist .libempty{padding:18px 10px;font-size:13px}
 @media (max-width:520px){ .hitem{flex-wrap:wrap} .hopen{flex-basis:100%} .hitem .btn.icon{flex:1;justify-content:center} }
 
+/* ===== online music ===== */
+.hcols{grid-template-columns:repeat(3,1fr)}
+.hcol.rd .hbtn{background:radial-gradient(120% 90% at 50% 0%,rgba(52,211,153,.22),transparent 60%),linear-gradient(#152420,#10161a);border-color:color-mix(in srgb,#34d399 40%,var(--line2))}
+.hcol.rd .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(52,211,153,.55);border-color:#34d399}
+.hcol.rd .hitem.cur{border-color:#34d399}
+.i-rd .waves path{animation:rwave 1.6s ease-in-out infinite}
+.i-rd .waves .w2{animation-delay:.25s}
+@keyframes rwave{0%,100%{opacity:.25}50%{opacity:1}}
+@media (max-width:760px){ .hcols{grid-template-columns:1fr 1fr} .hcol.rd{grid-column:1 / -1} .hcol.rd .hbtn{flex-direction:row;justify-content:center;gap:16px;padding:14px} .hcol.rd .hbtn svg{width:64px;height:64px} .hcol.rd .hbtn small{min-height:0;text-align:left} .hcol.rd .hbtn .rdtext{display:flex;flex-direction:column;align-items:flex-start;gap:4px} }
+#radioView{display:none}
+body.mode-radio #radioView{display:flex}
+body.mode-radio header.top,body.mode-radio main{display:none!important}
+body.mode-radio{padding-bottom:96px}
+#radioView{flex-direction:column;gap:12px;padding:14px clamp(10px,3vw,30px);max-width:1100px;margin:0 auto;width:100%}
+.rtop{display:flex;align-items:center;gap:12px}
+.rtitle{display:flex;align-items:center;gap:8px;font-size:clamp(18px,3vw,24px)}
+.rtitle svg{width:26px;height:26px;color:#34d399}
+.rnet{margin-left:auto;font:700 11px var(--mono);padding:4px 10px;border-radius:999px;background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.4)}
+.rnet.off{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.45)}
+.rnote{padding:12px 14px;border-radius:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#fecaca;font-size:14px}
+.rnote[hidden]{display:none}
+.rsearch{display:flex;gap:8px;flex-wrap:wrap}
+.rsearch input[type=search]{flex:1 1 240px;min-width:0;width:auto;appearance:none;-webkit-appearance:none;background:#0e1220;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font:600 15px var(--sans);color:var(--ink)}
+.rsearch input[type=search]::placeholder{color:var(--dim)}
+.rsearch input[type=search]:focus{border-color:#34d399;outline:none;box-shadow:0 0 0 2px rgba(52,211,153,.35)}
+.rsearch input[type=search]::-webkit-search-cancel-button{-webkit-appearance:none;appearance:none;height:14px;width:14px;background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3E%3Cpath d='m4 4 8 8M12 4l-8 8' stroke='%238b93a9' stroke-width='2' stroke-linecap='round'/%3E%3C/svg%3E") center/14px no-repeat;cursor:pointer}
+.rsearch select{padding:10px 30px 10px 12px;font-size:14px}
+.rsearch .btn.primary{background:linear-gradient(#34d399,#059669);color:#04150f}
+.rchips{display:flex;gap:6px;flex-wrap:wrap}
+.rchip{appearance:none;-webkit-appearance:none;border:1px solid var(--line2);background:#121725;color:var(--soft);border-radius:999px;padding:7px 13px;font:700 12.5px var(--sans);cursor:pointer;touch-action:manipulation}
+.rchip:hover{color:var(--ink);border-color:#4a5575}
+.rchip.on{background:linear-gradient(#34d399,#059669);color:#04150f;border-color:transparent}
+.rchip:focus-visible,.rtab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.rtabs{display:flex;gap:6px;border-bottom:1px solid var(--line);padding-bottom:0}
+.rtab{appearance:none;-webkit-appearance:none;border:0;border-bottom:2px solid transparent;background:none;color:var(--soft);padding:8px 12px;font:700 13.5px var(--sans);cursor:pointer;margin-bottom:-1px}
+.rtab[aria-selected="true"]{color:var(--ink);border-bottom-color:#34d399}
+.rlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
+.rstation{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line2);border-radius:14px;background:#121725;cursor:pointer;min-width:0}
+.rstation:hover{border-color:#4a5575}
+.rstation.playing{border-color:#34d399;box-shadow:0 0 0 1px #34d399 inset,0 0 18px -6px #34d399}
+.rlogo{width:48px;height:48px;border-radius:10px;object-fit:cover;background:#0b0d14 url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Ccircle cx='12' cy='12' r='2.5' fill='%2334d399'/%3E%3Cpath d='M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4' fill='none' stroke='%2334d399' stroke-width='1.7' stroke-linecap='round'/%3E%3C/svg%3E") center/24px no-repeat;flex:none;border:1px solid var(--line)}
+.rinfo{flex:1;min-width:0}
+.rinfo b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-size:14.5px}
+.rinfo small{display:block;color:var(--soft);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rstation .btn{flex:none;padding:8px 10px;min-width:38px;justify-content:center}
+.rfav{font-size:16px;line-height:1}
+.rfav[aria-pressed="true"]{color:#fbbf24;border-color:rgba(251,191,36,.5)}
+.rmsg{grid-column:1 / -1;color:var(--soft);text-align:center;padding:26px 10px;border:1px dashed var(--line2);border-radius:14px}
+.rmore{display:flex;justify-content:center}
+.rmore .btn[hidden]{display:none}
+.rcredit{color:var(--dim);font-size:12px;text-align:center;margin:4px 0 0}
+.rcredit a{color:var(--soft)}
+.rplayer{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:35;width:min(760px,calc(100% - 20px));display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;background:linear-gradient(#1a2a26,#111a18);border:1px solid rgba(52,211,153,.45);box-shadow:0 18px 40px -14px #000,0 0 24px -12px #34d399}
+.rplayer[hidden]{display:none}
+body.radio-on.mode-radio .toast,body.radio-on.mode-home .toast{bottom:calc(92px + env(safe-area-inset-bottom))}
+body:not(.mode-radio):not(.mode-home) .rplayer{display:none}
+body.mode-home.radio-on{padding-bottom:96px}
+.rplayer .rlogo{width:44px;height:44px}
+.rpinfo{flex:1;min-width:0}
+.rpinfo b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rpinfo small{display:block;color:var(--soft);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rlive{font:800 10.5px var(--mono);letter-spacing:.1em;padding:3px 7px;border-radius:6px;background:#ef4444;color:#fff;flex:none}
+.rlive.wait{background:#475569}
+.rpbtn{flex:none;padding:9px 11px;min-width:40px;justify-content:center}
+#rpVol{width:110px;flex:none}
+@media (max-width:600px){ #rpVol{display:none} .rlist{grid-template-columns:1fr} .rlive{display:none} }
+@media (prefers-reduced-motion:reduce){ .i-rd .waves path{animation:none;opacity:1} }
+
 /* ===== piano mode: just the piano and the instruments ===== */
 body.mode-create header.top,body.mode-create .statusbar{display:none!important}
 .ptop{display:flex;align-items:center;gap:8px;flex:none;overflow-x:auto;scrollbar-width:none;padding:2px}
@@ -676,12 +744,47 @@ html.phone body.mode-create .btn{min-height:38px}
       <button class="hbtn" id="goPiano"><svg class="i-pn" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="14" width="88" height="68" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="keys"><rect class="k k1" x="12" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k2" x="31" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k3" x="50" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k4" x="69" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/></g><rect x="24" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="43" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="62" y="24" width="11" height="30" rx="2" fill="#0b0d14"/></svg><span class="hname">Piano</span><small>Play, record and make songs</small></button>
       <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
     </div>
+    <div class="hcol rd">
+      <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><span class="hname">Online Music</span><small>Live radio from around the world. Needs internet.</small></button>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">Favorite stations</span></div><ul class="hlist" id="homeRadio"></ul></div>
+    </div>
   </div>
 </section>
+<section id="radioView" aria-label="Online Music">
+  <div class="rtop">
+    <button class="btn" id="rHome"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>Home</button>
+    <div class="rtitle"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><b>Online Music</b></div>
+    <span class="rnet" id="rNet" aria-live="polite"></span>
+  </div>
+  <div class="rnote" id="rOffline" hidden><b>You’re offline.</b> Online Music plays live radio over the internet, so it needs WiFi or mobile data. DJ and Piano still work without a connection.</div>
+  <form class="rsearch" id="rForm" role="search">
+    <input type="search" id="rQuery" placeholder="Search stations, like Hot 97, BBC or jazz" aria-label="Search radio stations" autocomplete="off" spellcheck="false" enterkeyhint="search">
+    <select id="rCountry" aria-label="Country"><option value="">Any country</option><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="NG">Nigeria</option><option value="GH">Ghana</option><option value="JM">Jamaica</option><option value="ZA">South Africa</option><option value="KE">Kenya</option><option value="IN">India</option><option value="PH">Philippines</option><option value="AU">Australia</option><option value="FR">France</option><option value="DE">Germany</option><option value="ES">Spain</option><option value="MX">Mexico</option><option value="BR">Brazil</option><option value="JP">Japan</option><option value="KR">South Korea</option></select>
+    <button class="btn primary" type="submit">Search</button>
+  </form>
+  <div class="rchips" id="rChips" role="group" aria-label="Genres"><button type="button" class="rchip on" data-tag="" aria-pressed="true">Top</button><button type="button" class="rchip" data-tag="pop" aria-pressed="false">Pop</button><button type="button" class="rchip" data-tag="hip hop" aria-pressed="false">Hip hop</button><button type="button" class="rchip" data-tag="rnb" aria-pressed="false">R&B</button><button type="button" class="rchip" data-tag="gospel" aria-pressed="false">Gospel</button><button type="button" class="rchip" data-tag="jazz" aria-pressed="false">Jazz</button><button type="button" class="rchip" data-tag="afrobeat" aria-pressed="false">Afrobeats</button><button type="button" class="rchip" data-tag="reggae" aria-pressed="false">Reggae</button><button type="button" class="rchip" data-tag="rock" aria-pressed="false">Rock</button><button type="button" class="rchip" data-tag="country" aria-pressed="false">Country</button><button type="button" class="rchip" data-tag="classical" aria-pressed="false">Classical</button><button type="button" class="rchip" data-tag="lofi" aria-pressed="false">Lo-fi</button><button type="button" class="rchip" data-tag="electronic" aria-pressed="false">Electronic</button><button type="button" class="rchip" data-tag="latin" aria-pressed="false">Latin</button><button type="button" class="rchip" data-tag="kids" aria-pressed="false">Kids</button><button type="button" class="rchip" data-tag="news" aria-pressed="false">Talk and news</button></div>
+  <div class="rtabs" role="tablist">
+    <button type="button" role="tab" class="rtab" data-tab="results" aria-selected="true">Stations</button>
+    <button type="button" role="tab" class="rtab" data-tab="favs" aria-selected="false">★ Favorites <span id="rFavCount"></span></button>
+  </div>
+  <ul class="rlist" id="rList" aria-live="polite"></ul>
+  <div class="rmore"><button class="btn" id="rMore" hidden>Show more stations</button></div>
+  <p class="rcredit">Stations come from the free <a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a> directory. Each station plays its own live broadcast, which can include the station’s own ads.</p>
+</section>
+<div class="rplayer" id="rPlayer" hidden>
+  <img class="rlogo" id="rpLogo" alt="" referrerpolicy="no-referrer">
+  <div class="rpinfo"><b id="rpName"></b><small id="rpMeta"></small></div>
+  <span class="rlive" id="rpState">LIVE</span>
+  <button class="btn rpbtn" id="rpPlay" aria-label="Pause"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/><rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/></svg></button>
+  <button class="btn rpbtn" id="rpStop" aria-label="Stop the radio"><svg viewBox="0 0 16 16"><rect x="3.5" y="3.5" width="9" height="9" rx="1.5" fill="currentColor"/></svg></button>
+  <button class="btn rpbtn rfav" id="rpFav" aria-label="Add to favorites" aria-pressed="false">☆</button>
+  <input type="range" id="rpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Radio volume">
+</div>
+<audio id="rAudio" preload="none"></audio>
 <div class="statusbar">
 <section class="panel offline" id="offline">
   <svg class="big" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#121725" stroke="#323a52"/><path d="M16 8v11M11 14.5l5 5 5-5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23.5h14" stroke="#f472b6" stroke-width="2.4" stroke-linecap="round"/></svg>
-  <div><b>Use SpinLab without internet</b><p id="offlineText">Download the whole app as one HTML file. Open it from your computer any time, even with no connection. Saved projects stay with the browser you save them in, so the downloaded copy starts with its own empty library.</p></div>
+  <div><b>Use SpinLab without internet</b><p id="offlineText">Download the whole app as one HTML file. DJ and Piano work any time, even with no connection. Online Music always needs internet. Saved projects stay with the browser you save them in, so the downloaded copy starts with its own empty library.</p></div>
   <button class="btn big" id="offlineBtn"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download SpinLab (HTML)</button>
 </section>
 <footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
@@ -705,9 +808,16 @@ html.phone body.mode-create .btn{min-height:38px}
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
   <h3>Home: DJ and Piano</h3>
   <ul>
-    <li>The home screen has two buttons. <b>DJ</b> (left) is for mixing songs. <b>Piano</b> (right) is for playing and making your own music. On a phone, Piano turns sideways.</li>
+    <li>The home screen has three buttons. <b>DJ</b> is for mixing songs, <b>Piano</b> is for playing and making your own music (on a phone it turns sideways), and <b>Online Music</b> plays live radio.</li>
     <li>Each one has its own library under its button. Tap a saved item to open it, or use the pencil to rename and the bin to delete.</li>
     <li>Saving in DJ goes to the DJ library. Saving in Piano goes to the Piano library.</li>
+  </ul>
+  <h3>Online Music</h3>
+  <ul>
+    <li>Live radio from thousands of free stations around the world, from the Radio Browser directory. Search by name, pick a genre or choose a country.</li>
+    <li>It keeps playing when you lock your phone or switch apps, and the lock screen shows the station with play and pause.</li>
+    <li>Tap ☆ to save a station to your favorites. Favorites show on the home screen under Online Music.</li>
+    <li>Online Music needs WiFi or mobile data. It’s the only part of SpinLab that goes online. Stations are live broadcasts, so some air their own ads.</li>
   </ul>
   <h3>Piano</h3>
   <ul>
@@ -767,7 +877,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.16'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.17'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -1872,7 +1982,7 @@ const titleEl = () => MODE === 'create' ? $('#crTitle') : $('#projTitle');
 const stateEl = () => MODE === 'create' ? $('#crState') : $('#projState');
 let project = { id: null, created: null }, dirty = false, saving = false, dbP = null;
 const STORE = () => MODE === 'create' ? 'creations' : 'projects';
-const hasContent = () => MODE === 'create' ? CR.notes.length > 0 : MODE === 'dj' ? !!(A.buffer || B.buffer) : false;
+const hasContent = () => MODE === 'radio' || MODE === 'home' ? false : MODE === 'create' ? CR.notes.length > 0 : MODE === 'dj' ? !!(A.buffer || B.buffer) : false;
 function touch() { if (!dirty) { dirty = true; showState(); } }
 function showState() {
   const el = stateEl(); if (!el) return;
@@ -1992,7 +2102,7 @@ async function renderLibrary() {
   await fillList($('#libList'), STORE(), false);
   try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
 }
-function renderHome() { fillList($('#homeDJ'), 'projects', true); fillList($('#homePiano'), 'creations', true); }
+function renderHome() { fillList($('#homeDJ'), 'projects', true); fillList($('#homePiano'), 'creations', true); renderHomeRadio(); }
 const rerender = ul => ul.id === 'libList' ? renderLibrary() : renderHome();
 async function listClick(e) {
   const b = e.target.closest('[data-l]'); if (!b) return;
@@ -2758,15 +2868,17 @@ let wentFullscreen = false;
 async function setMode(m, fromTap) {
   if (m === MODE) return;
   const prev = MODE;
-  if (prev !== 'home') modeState[prev] = { project, dirty };
+  if (prev === 'dj' || prev === 'create') modeState[prev] = { project, dirty };
   if (prev === 'create') { if (CR.playing) crStop(); releaseAllInput(); closeMenu(); }
   MODE = m;
-  if (m !== 'home') ({ project, dirty } = modeState[m]);
+  if (m === 'dj' || m === 'create') ({ project, dirty } = modeState[m]);
   document.body.classList.toggle('mode-create', m === 'create');
   document.body.classList.toggle('mode-home', m === 'home');
+  document.body.classList.toggle('mode-radio', m === 'radio');
   if ($('#lib').open) $('#lib').close();
   showState(); drawFav();
   if (m === 'home') { renderHome(); window.scrollTo(0, 0); }
+  if (m === 'radio') { radioEnter(); window.scrollTo(0, 0); }
   if (m === 'dj') decks.forEach(d => { d.waveKey = d.ovKey = null; });
   if (m === 'create') {
     requestAnimationFrame(() => { renderKeys(); crUI(); crInfo(); });
@@ -2786,8 +2898,171 @@ async function setMode(m, fromTap) {
 }
 $('#goDJ').addEventListener('click', () => setMode('dj', true));
 $('#goPiano').addEventListener('click', () => setMode('create', true));
+$('#goRadio').addEventListener('click', () => setMode('radio', true));
+$('#rHome').addEventListener('click', () => setMode('home'));
 $('#homeBtn').addEventListener('click', () => setMode('home'));
 document.getElementById('ver3').textContent = 'v' + APP_VERSION;
+
+/* ---------------- Online Music: live radio from the Radio Browser directory ----------------
+   Uses a plain <audio> element (not the mixer), so the browser keeps it playing with the screen off,
+   and the Media Session API puts the station on the lock screen. */
+const RADIO = { audio: $('#rAudio'), servers: ['https://de1.api.radio-browser.info', 'https://nl1.api.radio-browser.info', 'https://at1.api.radio-browser.info', 'https://de2.api.radio-browser.info'],
+  tag: '', country: '', query: '', offset: 0, results: [], tab: 'results', station: null, favs: [], loading: false };
+try { RADIO.favs = JSON.parse(localStorage.getItem('spinlab-radio-favs') || '[]'); } catch (e) { RADIO.favs = []; }
+try { RADIO.audio.volume = +(localStorage.getItem('spinlab-radio-vol') || 0.9); $('#rpVol').value = RADIO.audio.volume; } catch (e) {}
+RADIO.servers.sort(() => Math.random() - 0.5);
+const saveFavs = () => { try { localStorage.setItem('spinlab-radio-favs', JSON.stringify(RADIO.favs)); } catch (e) {} };
+const isFav = id => RADIO.favs.some(f => f.stationuuid === id);
+const slim = st => ({ stationuuid: st.stationuuid, name: (st.name || 'Radio station').trim(), url_resolved: st.url_resolved || st.url, favicon: st.favicon || '', country: st.country || '', countrycode: st.countrycode || '', tags: st.tags || '', bitrate: st.bitrate || 0, codec: st.codec || '' });
+async function radioApi(path) {
+  let lastErr;
+  for (const base of RADIO.servers) {
+    try {
+      const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 9000);
+      const r = await fetch(base + path, { signal: ctl.signal }); clearTimeout(tm);
+      if (!r.ok) throw new Error(r.status);
+      return await r.json();
+    } catch (e) { lastErr = e; }
+  }
+  throw lastErr || new Error('radio');
+}
+function netUI() {
+  const on = navigator.onLine !== false;
+  $('#rNet').textContent = on ? 'Online' : 'Offline'; $('#rNet').classList.toggle('off', !on); $('#rOffline').hidden = on;
+}
+window.addEventListener('online', () => { netUI(); if (MODE === 'radio' && RADIO.tab === 'results' && !RADIO.results.length) radioSearch(true); });
+window.addEventListener('offline', netUI);
+function stationMeta(st) {
+  const tags = (st.tags || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 3).join(', ');
+  return [st.country, tags, st.bitrate ? st.bitrate + ' kbps' : ''].filter(Boolean).join(' · ');
+}
+function stationLi(st) {
+  const playing = RADIO.station && RADIO.station.stationuuid === st.stationuuid, fav = isFav(st.stationuuid);
+  return `<li class="rstation${playing ? ' playing' : ''}" data-id="${escapeHTML(st.stationuuid)}">
+    <img class="rlogo" alt="" loading="lazy" referrerpolicy="no-referrer" ${st.favicon && /^https:/i.test(st.favicon) ? `src="${escapeHTML(st.favicon)}"` : ''} onerror="this.removeAttribute('src')">
+    <div class="rinfo"><b>${escapeHTML(st.name)}</b><small>${escapeHTML(stationMeta(st))}</small></div>
+    <button class="btn sm rgo" data-r="play" aria-label="${playing ? 'Playing' : 'Play'} ${escapeHTML(st.name)}">${playing && !RADIO.audio.paused ? I.pause : I.play}</button>
+    <button class="btn sm rfav" data-r="fav" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Add to'} favorites">${fav ? '★' : '☆'}</button></li>`;
+}
+function renderRadio() {
+  const ul = $('#rList'), list = RADIO.tab === 'favs' ? RADIO.favs : RADIO.results;
+  $('#rFavCount').textContent = RADIO.favs.length ? '(' + RADIO.favs.length + ')' : '';
+  document.querySelectorAll('.rtab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === RADIO.tab)));
+  if (RADIO.loading && RADIO.tab === 'results' && !RADIO.results.length) { ul.innerHTML = '<li class="rmsg">Finding stations…</li>'; $('#rMore').hidden = true; return; }
+  if (!list.length) {
+    ul.innerHTML = '<li class="rmsg">' + (RADIO.tab === 'favs' ? 'No favorites yet. Tap ☆ on any station to save it here.' : navigator.onLine === false ? 'You’re offline, so stations can’t load. Connect to WiFi or mobile data and try again.' : RADIO.error ? 'Stations couldn’t load right now. Check your connection and press Search to try again.' : 'No stations found. Try another search, genre or country.') + '</li>';
+    $('#rMore').hidden = true; return;
+  }
+  ul.innerHTML = list.map(stationLi).join('');
+  $('#rMore').hidden = RADIO.tab !== 'results' || RADIO.results.length < RADIO.offset || RADIO.loading;
+}
+async function radioSearch(fresh) {
+  if (fresh) { RADIO.offset = 0; RADIO.results = []; }
+  RADIO.loading = true; RADIO.error = false; RADIO.tab = 'results'; renderRadio();
+  const q = new URLSearchParams({ hidebroken: 'true', is_https: 'true', order: 'clickcount', reverse: 'true', limit: '40', offset: String(RADIO.offset) });
+  if (RADIO.query) q.set('name', RADIO.query);
+  if (RADIO.tag) q.set('tag', RADIO.tag);
+  if (RADIO.country) q.set('countrycode', RADIO.country);
+  try {
+    const rows = await radioApi('/json/stations/search?' + q.toString());
+    const seen = new Set(RADIO.results.map(x => x.stationuuid));
+    rows.filter(st => /^https:/i.test(st.url_resolved || '') && !seen.has(st.stationuuid)).forEach(st => RADIO.results.push(slim(st)));
+    RADIO.offset += 40;
+  } catch (e) { RADIO.error = true; }
+  RADIO.loading = false; renderRadio();
+}
+function playStation(st) {
+  if (navigator.onLine === false) return toast('You’re offline. Online Music needs WiFi or mobile data.');
+  if (A.playing) A.pause(); if (B.playing) B.pause(); if (typeof CR !== 'undefined' && CR.playing) crStop();
+  RADIO.station = st; const a = RADIO.audio;
+  a.src = st.url_resolved; setRadioState('wait');
+  a.play().catch(() => { setRadioState('err'); toast('“' + st.name + '” won’t play right now. Try another station.'); });
+  radioApi('/json/url/' + encodeURIComponent(st.stationuuid)).catch(() => {}); // counts the play for the directory, as its rules ask
+  playerUI(); renderRadio(); mediaSession();
+}
+function setRadioState(s) { RADIO.state = s; playerUI(); }
+function playerUI() {
+  const st = RADIO.station, bar = $('#rPlayer'); bar.hidden = !st; document.body.classList.toggle('radio-on', !!st); if (!st) return;
+  const logo = $('#rpLogo'); if (st.favicon && /^https:/i.test(st.favicon)) { logo.src = st.favicon; logo.onerror = () => logo.removeAttribute('src'); } else logo.removeAttribute('src');
+  $('#rpName').textContent = st.name; $('#rpMeta').textContent = stationMeta(st);
+  const paused = RADIO.audio.paused, lv = $('#rpState');
+  lv.textContent = RADIO.state === 'wait' ? 'TUNING…' : RADIO.state === 'err' ? 'OFF AIR' : paused ? 'PAUSED' : 'LIVE';
+  lv.classList.toggle('wait', RADIO.state !== 'live' || paused);
+  $('#rpPlay').innerHTML = paused ? I.play : I.pause; $('#rpPlay').setAttribute('aria-label', paused ? 'Play' : 'Pause');
+  const fav = isFav(st.stationuuid); $('#rpFav').textContent = fav ? '★' : '☆'; $('#rpFav').setAttribute('aria-pressed', String(fav)); $('#rpFav').setAttribute('aria-label', (fav ? 'Remove from' : 'Add to') + ' favorites');
+  document.querySelectorAll('.rstation').forEach(li => { const on = li.dataset.id === st.stationuuid; li.classList.toggle('playing', on); const b = li.querySelector('[data-r="play"]'); if (b) b.innerHTML = on && !paused ? I.pause : I.play; });
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = paused ? 'paused' : 'playing';
+}
+function mediaSession() {
+  if (!('mediaSession' in navigator) || !RADIO.station) return;
+  const st = RADIO.station;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: st.name, artist: 'Live radio' + (st.country ? ' · ' + st.country : ''), album: 'SpinLab Online Music',
+      artwork: st.favicon && /^https:/i.test(st.favicon) ? [{ src: st.favicon, sizes: '256x256' }] : [] });
+    const list = RADIO.favs.length > 1 ? RADIO.favs : RADIO.results;
+    const step = dir => { const i = list.findIndex(x => x.stationuuid === st.stationuuid); if (list.length) playStation(list[(i + dir + list.length) % list.length]); };
+    navigator.mediaSession.setActionHandler('play', () => RADIO.audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => RADIO.audio.pause());
+    navigator.mediaSession.setActionHandler('stop', stopRadio);
+    navigator.mediaSession.setActionHandler('previoustrack', () => step(-1));
+    navigator.mediaSession.setActionHandler('nexttrack', () => step(1));
+  } catch (e) {}
+}
+function stopRadio() { const a = RADIO.audio; a.pause(); a.removeAttribute('src'); a.load(); RADIO.station = null; playerUI(); renderRadio(); renderHomeRadio(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; }
+function toggleFav(st) {
+  const i = RADIO.favs.findIndex(f => f.stationuuid === st.stationuuid);
+  if (i >= 0) { RADIO.favs.splice(i, 1); toast('Removed “' + st.name + '” from favorites'); } else { RADIO.favs.unshift(slim(st)); toast('Saved “' + st.name + '” to favorites'); }
+  saveFavs(); renderRadio(); playerUI(); renderHomeRadio();
+}
+function renderHomeRadio() {
+  const ul = $('#homeRadio'); if (!ul) return;
+  if (!RADIO.favs.length) { ul.innerHTML = '<li class="libempty">No favorite stations yet. Open Online Music and tap ☆ on a station.</li>'; return; }
+  ul.innerHTML = RADIO.favs.map(st => `<li class="hitem${RADIO.station && RADIO.station.stationuuid === st.stationuuid ? ' cur' : ''}" data-id="${escapeHTML(st.stationuuid)}"><button class="hopen" data-r="play" title="Play"><b>${escapeHTML(st.name)}</b><small>${escapeHTML(stationMeta(st))}</small></button><button class="btn sm icon danger" data-r="unfav" aria-label="Remove ${escapeHTML(st.name)} from favorites" title="Remove">${BIN}</button></li>`).join('');
+}
+const findStation = id => RADIO.results.find(x => x.stationuuid === id) || RADIO.favs.find(x => x.stationuuid === id);
+$('#rList').addEventListener('click', e => {
+  const li = e.target.closest('.rstation'); if (!li) return; const st = findStation(li.dataset.id); if (!st) return;
+  const b = e.target.closest('[data-r]');
+  if (b && b.dataset.r === 'fav') return toggleFav(st);
+  if (RADIO.station && RADIO.station.stationuuid === st.stationuuid && RADIO.state !== 'err') { RADIO.audio.paused ? RADIO.audio.play() : RADIO.audio.pause(); return; }
+  playStation(st);
+});
+$('#homeRadio').addEventListener('click', e => {
+  const li = e.target.closest('li[data-id]'), b = e.target.closest('[data-r]'); if (!li || !b) return;
+  const st = RADIO.favs.find(x => x.stationuuid === li.dataset.id); if (!st) return;
+  if (b.dataset.r === 'unfav') toggleFav(st); else { playStation(st); renderHomeRadio(); }
+});
+$('#rForm').addEventListener('submit', e => { e.preventDefault(); RADIO.query = $('#rQuery').value.trim(); RADIO.country = $('#rCountry').value; $('#rQuery').blur(); radioSearch(true); });
+$('#rCountry').addEventListener('change', () => { RADIO.country = $('#rCountry').value; try { localStorage.setItem('spinlab-radio-country', RADIO.country); } catch (e) {} radioSearch(true); });
+$('#rChips').addEventListener('click', e => {
+  const c = e.target.closest('.rchip'); if (!c) return;
+  document.querySelectorAll('.rchip').forEach(x => { x.classList.toggle('on', x === c); x.setAttribute('aria-pressed', String(x === c)); });
+  RADIO.tag = c.dataset.tag; radioSearch(true);
+});
+document.querySelectorAll('.rtab').forEach(t => t.addEventListener('click', () => { RADIO.tab = t.dataset.tab; renderRadio(); }));
+$('#rMore').addEventListener('click', () => radioSearch(false));
+$('#rpPlay').addEventListener('click', () => { const a = RADIO.audio; if (!RADIO.station) return; if (RADIO.state === 'err') return playStation(RADIO.station); a.paused ? a.play().catch(() => {}) : a.pause(); });
+$('#rpStop').addEventListener('click', stopRadio);
+$('#rpFav').addEventListener('click', () => RADIO.station && toggleFav(RADIO.station));
+$('#rpVol').addEventListener('input', () => { RADIO.audio.volume = +$('#rpVol').value; try { localStorage.setItem('spinlab-radio-vol', $('#rpVol').value); } catch (e) {} });
+['playing', 'pause', 'waiting', 'stalled', 'error'].forEach(ev => RADIO.audio.addEventListener(ev, () => {
+  if (!RADIO.station) return;
+  if (ev === 'playing') setRadioState('live');
+  else if (ev === 'waiting' || ev === 'stalled') setRadioState('wait');
+  else if (ev === 'error') { setRadioState('err'); toast('“' + RADIO.station.name + '” went off the air. Try another station.'); }
+  else playerUI();
+}));
+function radioEnter() {
+  netUI();
+  if (!RADIO.inited) {
+    RADIO.inited = true;
+    let cc = ''; try { cc = localStorage.getItem('spinlab-radio-country'); } catch (e) {}
+    if (cc == null) { const m = /-([A-Z]{2})$/.exec(navigator.language || ''); cc = m && [...$('#rCountry').options].some(o => o.value === m[1]) ? m[1] : ''; }
+    RADIO.country = cc || ''; $('#rCountry').value = RADIO.country;
+    radioSearch(true);
+  } else renderRadio();
+}
+renderHomeRadio();
 
 /* animated favicon: a spinning record in DJ, keys being played in Piano */
 const favLink = $('#favicon'), HOME_FAV = favLink.href, favCv = document.createElement('canvas'); favCv.width = favCv.height = 64;
@@ -2796,7 +3071,16 @@ function drawFav() {
   if (MODE === 'home') { if (favLink.getAttribute('href') !== HOME_FAV) { favLink.type = 'image/svg+xml'; favLink.href = HOME_FAV; } return; }
   const g = favCv.getContext('2d'); g.clearRect(0, 0, 64, 64);
   g.fillStyle = '#0b0d14'; g.beginPath(); g.roundRect ? g.roundRect(0, 0, 64, 64, 14) : g.rect(0, 0, 64, 64); g.fill();
-  if (MODE === 'dj') {
+  if (MODE === 'radio') {
+    favT++; const ph = (favT % 8) / 8, on = RADIO.audio && !RADIO.audio.paused;
+    g.fillStyle = '#34d399'; g.beginPath(); g.arc(32, 32, 6, 0, Math.PI * 2); g.fill();
+    g.lineCap = 'round'; g.lineWidth = 4.5;
+    [14, 23].forEach((r, i) => {
+      const a = on ? 0.25 + 0.75 * Math.abs(Math.sin((ph + i * 0.25) * Math.PI)) : 0.45;
+      g.strokeStyle = `rgba(52,211,153,${a.toFixed(2)})`;
+      g.beginPath(); g.arc(32, 32, r, -0.75, 0.75); g.stroke(); g.beginPath(); g.arc(32, 32, r, Math.PI - 0.75, Math.PI + 0.75); g.stroke();
+    });
+  } else if (MODE === 'dj') {
     favAng += (A.playing || B.playing) ? 0.55 : 0.16;
     g.save(); g.translate(30, 34); g.rotate(favAng);
     g.fillStyle = '#141824'; g.strokeStyle = '#22d3ee'; g.lineWidth = 3.5; g.beginPath(); g.arc(0, 0, 22, 0, Math.PI * 2); g.fill(); g.stroke();
@@ -2828,6 +3112,8 @@ if (IS_OFFLINE_COPY) {
   $('#offlineBtn').onclick = () => window.open(SITE + 'spinlab/', '_blank', 'noopener');
 } else {
   $('#offlineBtn').addEventListener('click', async () => {
+    const go = await askConfirm('Before you download: the downloaded SpinLab works without internet for DJ and Piano. Online Music streams live radio from the internet, so it needs WiFi or mobile data. If the WiFi goes out, online stations won’t play.', 'Download');
+    if (!go) return;
     try {
       toast('Packing SpinLab into one file…');
       const get = u => fetch(u, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
@@ -2854,7 +3140,7 @@ $('#helpClose').addEventListener('click', () => $('#help').close());
 /* ---------------- keyboard ---------------- */
 document.addEventListener('keydown', e => {
   const t = e.target, tag = t && t.tagName;
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (MODE !== 'home' && !document.querySelector('dialog[open]')) saveProject(); return; }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if ((MODE === 'dj' || MODE === 'create') && !document.querySelector('dialog[open]')) saveProject(); return; }
   if (MODE !== 'dj') return;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || document.querySelector('dialog[open]')) return;
   const d = activeDeck || A, mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
