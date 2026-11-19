@@ -404,9 +404,15 @@ body.mode-home .statusbar{margin-top:auto}
 
 /* ===== online music ===== */
 .hcols{grid-template-columns:repeat(3,1fr)}
-.hcol.rd .hbtn{background:radial-gradient(120% 90% at 50% 0%,rgba(52,211,153,.22),transparent 60%),linear-gradient(#152420,#10161a);border-color:color-mix(in srgb,#34d399 40%,var(--line2))}
-.hcol.rd .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(52,211,153,.55);border-color:#34d399}
-.hcol.rd .hitem.cur{border-color:#34d399}
+.hcol.rd .hbtn{background:radial-gradient(120% 90% at 50% 0%,color-mix(in srgb,var(--acc) 22%,transparent),transparent 60%),linear-gradient(color-mix(in srgb,var(--acc) 10%,#141a20),#10141a);border-color:color-mix(in srgb,var(--acc) 40%,var(--line2))}
+.hcol.rd .hbtn svg.i-mu{display:none}
+body.pane-music .hcol.rd .hbtn svg.i-rd{display:none}
+body.pane-music .hcol.rd .hbtn svg.i-mu{display:block}
+.i-mu .mnotes path{animation:mnote 2.6s ease-in-out infinite;transform-box:fill-box;transform-origin:50% 100%}
+.i-mu .mnotes .n2{animation-delay:1.1s}
+@keyframes mnote{0%,100%{transform:translateY(0);opacity:.35}50%{transform:translateY(-6px) rotate(8deg);opacity:1}}
+.hcol.rd .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px color-mix(in srgb,var(--acc) 55%,transparent);border-color:var(--acc)}
+.hcol.rd .hitem.cur{border-color:var(--acc)}
 .i-rd .waves path{animation:rwave 1.6s ease-in-out infinite}
 .i-rd .waves .w2{animation-delay:.25s}
 @keyframes rwave{0%,100%{opacity:.25}50%{opacity:1}}
@@ -432,10 +438,21 @@ body.mode-radio #radioView{display:flex}
 body.mode-radio header.top,body.mode-radio main{display:none!important}
 body.mode-radio{padding-bottom:96px}
 #radioView{flex-direction:column;gap:12px;padding:14px clamp(10px,3vw,30px);max-width:1100px;margin:0 auto;width:100%}
+@property --acc{syntax:'<color>';inherits:true;initial-value:#34d399}
+@property --acc2{syntax:'<color>';inherits:true;initial-value:#059669}
+body{--acc:#34d399;--acc2:#059669;transition:--acc .55s ease,--acc2 .55s ease}
+body.pane-music{--acc:#f472b6;--acc2:#be185d}
 .rtop{display:flex;align-items:center;gap:12px}
 .rtitle{display:flex;align-items:center;gap:8px;font-size:clamp(18px,3vw,24px)}
-.rtitle svg{width:26px;height:26px;color:#34d399}
-.rnet{margin-left:auto;font:700 11px var(--mono);padding:4px 10px;border-radius:999px;background:rgba(52,211,153,.15);color:#34d399;border:1px solid rgba(52,211,153,.4)}
+.rtitle .rtico{position:relative;width:26px;height:26px;flex:none;color:var(--acc)}
+.rtitle .rtico svg{position:absolute;inset:0;width:26px;height:26px;transition:opacity .35s,transform .45s cubic-bezier(.3,1.4,.5,1)}
+.rtitle .ico-music{opacity:0;transform:scale(.4) rotate(-40deg)}
+body.pane-music .rtitle .ico-radio{opacity:0;transform:scale(.4) rotate(40deg)}
+body.pane-music .rtitle .ico-music{opacity:1;transform:none}
+.rtitle b{display:inline-block}
+.rtitle b.swap{animation:titleSwap .42s ease}
+@keyframes titleSwap{0%{opacity:0;transform:translateY(8px);filter:blur(3px)}100%{opacity:1;transform:none;filter:none}}
+.rnet{margin-left:auto;font:700 11px var(--mono);padding:4px 10px;border-radius:999px;background:color-mix(in srgb,var(--acc) 15%,transparent);color:var(--acc);border:1px solid color-mix(in srgb,var(--acc) 40%,transparent)}
 .rnet.off{background:rgba(239,68,68,.15);color:#fca5a5;border-color:rgba(239,68,68,.45)}
 .rnote{padding:12px 14px;border-radius:12px;background:rgba(239,68,68,.1);border:1px solid rgba(239,68,68,.4);color:#fecaca;font-size:14px}
 .rnote[hidden]{display:none}
@@ -493,12 +510,24 @@ body.mode-radio{padding-bottom:96px}
 .rmenu .mh{font:800 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);padding:8px 12px 4px}
 .rmenu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 .rmenu .ck{width:18px;color:#34d399;font-weight:800}
-.rswitch{display:inline-flex;align-self:flex-start;border:1px solid var(--line2);border-radius:12px;padding:3px;background:#0e1220;gap:2px}
-.rswitch button{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--soft);font:700 14px var(--sans);padding:9px 16px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;touch-action:manipulation}
-.rswitch button svg{width:18px;height:18px}
+.rswitch{position:relative;display:inline-grid;grid-template-columns:1fr 1fr;align-self:flex-start;border:1px solid color-mix(in srgb,var(--acc) 35%,var(--line2));border-radius:12px;padding:3px;background:#0e1220;gap:0;isolation:isolate;box-shadow:0 0 22px -10px var(--acc)}
+.rsw-pill{position:absolute;z-index:-1;top:3px;bottom:3px;left:3px;width:calc(50% - 3px);border-radius:9px;background:linear-gradient(var(--acc),var(--acc2));box-shadow:0 6px 18px -6px var(--acc);transition:transform .45s cubic-bezier(.5,1.5,.45,.9)}
+body.pane-music .rsw-pill{transform:translateX(100%)}
+.rswitch button{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--soft);font:700 14px var(--sans);padding:9px 16px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;justify-content:center;gap:8px;touch-action:manipulation;transition:color .35s}
+.rswitch button svg{width:18px;height:18px;transition:transform .45s cubic-bezier(.3,1.5,.5,1)}
 .rswitch button:hover{color:var(--ink)}
-.rswitch button[aria-pressed="true"][data-pane="radio"]{background:linear-gradient(#34d399,#059669);color:#04150f}
-.rswitch button[aria-pressed="true"][data-pane="music"]{background:linear-gradient(#f472b6,#be185d);color:#fff}
+.rswitch button[aria-pressed="true"][data-pane="radio"]{color:#04150f}
+.rswitch button[aria-pressed="true"][data-pane="music"]{color:#fff}
+.rswitch button[aria-pressed="true"] svg{transform:scale(1.15) rotate(-8deg)}
+#radioView{position:relative;isolation:isolate}
+#radioView::before{content:"";position:absolute;z-index:-1;left:-10%;right:-10%;top:-60px;height:340px;pointer-events:none;background:radial-gradient(60% 70% at 30% 0%,color-mix(in srgb,var(--acc) 22%,transparent),transparent 70%)}
+.pane-in-l{animation:paneL .38s cubic-bezier(.2,.8,.2,1)}
+.pane-in-r{animation:paneR .38s cubic-bezier(.2,.8,.2,1)}
+@keyframes paneL{from{opacity:0;transform:translateX(-28px)}to{opacity:1;transform:none}}
+@keyframes paneR{from{opacity:0;transform:translateX(28px)}to{opacity:1;transform:none}}
+.rswitch.flash::after{content:"";position:absolute;inset:-2px;border-radius:14px;pointer-events:none;box-shadow:0 0 0 2px var(--acc);animation:swFlash .55s ease-out forwards}
+@keyframes swFlash{from{opacity:.9;transform:scale(1)}to{opacity:0;transform:scale(1.08)}}
+@media (prefers-reduced-motion:reduce){ .rsw-pill,.rtitle .rtico svg,.rswitch button svg{transition:none} .pane-in-l,.pane-in-r,.rtitle b.swap,.rswitch.flash::after{animation:none} body{transition:none} }
 .rswitch button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
 #radioPane,#musicPane{display:flex;flex-direction:column;gap:12px}
 #radioPane[hidden],#musicPane[hidden]{display:none}
@@ -594,13 +623,20 @@ body.mode-radio{padding-bottom:96px}
 .npnext .rmsg{cursor:default;opacity:.75;font-size:14px}
 .npnext li>div{min-width:0}
 @media (min-width:900px) and (min-height:560px){
-  .npmain{grid-template-columns:minmax(0,1fr) minmax(0,1fr);align-items:center;min-height:calc(100vh - 150px)}
+  .npmain{grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important;align-items:center;min-height:calc(100vh - 150px)}
   .npart{width:min(100%,64vh,520px);margin:0 0 0 auto}
   .npctl{margin:0 auto 0 0;max-width:460px}
-  .npcards{grid-template-columns:3fr 2fr;align-items:start}
+  .npcards{grid-template-columns:minmax(0,3fr) minmax(0,2fr)!important;align-items:start}
   .nplyrics{grid-row:span 2}
 }
 body.np-open{overflow:hidden}
+.npscroll{overflow-x:hidden}
+.npmain,.npcards{grid-template-columns:minmax(0,1fr)}
+.npcards>*,.npmain>*{min-width:0}
+.npnext{grid-template-columns:minmax(0,1fr)}
+.npnext li>div{flex:1;min-width:0}
+.nplyr,.nplyr p,.npinfo dd,.nptt h2{overflow-wrap:anywhere;word-break:normal}
+.npinfo{grid-template-columns:auto minmax(0,1fr)}
 .npartist{display:flex;align-items:center;gap:14px}
 .npartist img{width:64px;height:64px;border-radius:50%;object-fit:cover;background:#191c27;flex:none}
 .npartist b{display:block;font:800 18px var(--sans)}
@@ -883,7 +919,7 @@ html.phone body.mode-create .btn{min-height:38px}
     </div>
     <div class="dsec">
       <span class="lbl">Metronome</span>
-      <div class="row" style="flex-wrap:nowrap"><button class="btn" id="crMetro" title="Click along with the beat while playing and recording"><svg viewBox="0 0 16 16"><path d="M5.5 1.5h5l2.5 13h-10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11 11.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Metronome</button><input type="number" id="crBpm" min="40" max="240" step="1" value="100" aria-label="Metronome speed in BPM"><span class="lbl">BPM</span></div>
+      <div class="row" style="flex-wrap:nowrap"><button class="btn" id="crMetro" title="Turn on a click at your BPM. It keeps time while you play, record and play back."><svg viewBox="0 0 16 16"><path d="M5.5 1.5h5l2.5 13h-10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11 11.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Metronome</button><input type="number" id="crBpm" min="40" max="240" step="1" value="100" aria-label="Metronome speed in BPM"><span class="lbl">BPM</span></div>
     </div>
     <div class="dsec">
       <span class="lbl">Sound</span>
@@ -924,7 +960,7 @@ html.phone body.mode-create .btn{min-height:38px}
       <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
     </div>
     <div class="hcol rd">
-      <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><span class="rdtext"><span class="hname">Online Music</span><small>Online radio and official music. Needs internet.</small></span></button>
+      <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><svg class="i-mu" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="12" width="88" height="72" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><g fill="none" stroke="#f472b6" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"><path d="M38 64V28l30-6v36"/></g><circle cx="31" cy="64" r="8" fill="#f472b6"/><circle cx="61" cy="58" r="8" fill="#f472b6"/><g class="mnotes" fill="#f9a8d4"><path class="n1" d="M76 20v11a3.6 3.6 0 1 1-2-3.2V20z"/><path class="n2" d="M20 30v9a3 3 0 1 1-1.8-2.7V30z"/></g></svg><span class="rdtext"><span class="hname" id="goRadioName">Online Radio</span><small id="goRadioSub">Live stations from around the world. Needs internet.</small></span></button>
       <div class="hlib"><div class="hlibhead"><span class="lbl">Playlists</span></div><ul class="hlist" id="homeRadio"></ul></div>
     </div>
   </div>
@@ -932,10 +968,11 @@ html.phone body.mode-create .btn{min-height:38px}
 <section id="radioView" aria-label="Online Music">
   <div class="rtop">
     <button class="btn" id="rHome"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>Home</button>
-    <div class="rtitle"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><b>Online Music</b></div>
+    <div class="rtitle"><span class="rtico"><svg class="ico-radio" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><svg class="ico-music" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="16" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg></span><b id="rTitleText">Online Radio</b></div>
     <span class="rnet" id="rNet" aria-live="polite"></span>
   </div>
   <div class="rswitch" role="group" aria-label="Online Radio or Music">
+    <span class="rsw-pill" aria-hidden="true"></span>
     <button type="button" data-pane="radio" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Online Radio</button>
     <button type="button" data-pane="music" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="16" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Music</button>
   </div>
@@ -1082,7 +1119,7 @@ html.phone body.mode-create .btn{min-height:38px}
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
   <h3>Home: DJ and Piano</h3>
   <ul>
-    <li>The home screen has three buttons. <b>DJ</b> is for mixing songs, <b>Piano</b> is for playing and making your own music (on a phone it turns sideways), and <b>Online Music</b> plays live radio.</li>
+    <li>The home screen has three buttons. <b>DJ</b> is for mixing songs, <b>Piano</b> is for playing and making your own music (on a phone it turns sideways), and the third button opens <b>Online Radio</b> and <b>Online Music</b>. It shows the name of whichever side you used last.</li>
     <li>Each one has its own library under its button. Tap a saved item to open it, or use the pencil to rename and the bin to delete.</li>
     <li>Saving in DJ goes to the DJ library. Saving in Piano goes to the Piano library.</li>
   </ul>
@@ -1160,7 +1197,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.20'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.21'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2918,7 +2955,7 @@ function crStop() {
     if (!CR.notes.some(n => n.take === CR.takeId)) CR.takeStack.pop();
   }
   CR.playing = false; CR.pos = p;
-  CR.scheduled.forEach(v => v.stopNow()); CR.scheduled = []; stopMetro(); crUI(); crInfo();
+  CR.scheduled.forEach(v => v.stopNow()); CR.scheduled = []; stopMetro(); if (CR.metro && MODE === 'create') startMetro(); crUI(); crInfo();
 }
 function crRecord() {
   if (CR.recording) { crStop(); return; }
@@ -2926,13 +2963,16 @@ function crRecord() {
   CR.takeId = Date.now(); CR.takeStack.push(CR.takeId); CR.recording = true;
   closeMenu(); crPlay(); toast(CR.notes.length ? 'Recording a new layer. Your earlier takes play along.' : 'Recording. Play the piano.');
 }
+/* the metronome ticks whenever it's on: in time with Play/Record, and on its own the rest of the time */
 function startMetro() {
-  stopMetro(); const beat = 60 / CR.bpm; let k = Math.ceil(CR.pos0 / beat - 1e-6);
+  stopMetro(); crInit(); if (ctx.state === 'suspended') ctx.resume();
+  const beat = 60 / CR.bpm, t0 = CR.playing ? CR.t0 : ctx.currentTime + 0.05, p0 = CR.playing ? CR.pos0 : 0;
+  let k = Math.ceil(p0 / beat - 1e-6);
   const tick = () => {
     const ahead = ctx.currentTime + 0.15;
-    for (;;) { const when = CR.t0 + (k * beat - CR.pos0); if (when > ahead) break; if (when >= ctx.currentTime - 0.01) metroClick(when, k % 4 === 0); k++; }
+    for (;;) { const when = t0 + (k * beat - p0); if (when > ahead) break; if (when >= ctx.currentTime - 0.01) metroClick(when, k % 4 === 0); k++; }
   };
-  tick(); CR.metroTimer = setInterval(tick, 30);
+  tick(); CR.metroTimer = setInterval(tick, 25);
 }
 function stopMetro() { if (CR.metroTimer) { clearInterval(CR.metroTimer); CR.metroTimer = null; } }
 function metroClick(when, accent) {
@@ -3063,6 +3103,7 @@ function crApply(p) {
   CR.bpm = p ? p.bpm || 100 : 100; CR.metro = p ? !!p.metro : false; CR.sound = p ? p.sound || 'piano' : 'piano';
   CR.octave = p && p.octave != null ? p.octave : CR.octave; CR.base = 12 * (CR.octave + 1); CR.pos = 0;
   crK.vol.set(p && p.vol != null ? p.vol : 0.85); crK.rev.set(p && p.rev != null ? p.rev : 0.25);
+  stopMetro(); if (CR.metro && MODE === 'create' && ctx) startMetro();
   renderKeys(); crUI(); crInfo();
 }
 
@@ -3070,8 +3111,8 @@ function crApply(p) {
 $('#crRec').addEventListener('click', crRecord);
 $('#crPlay').addEventListener('click', () => { if (CR.recording) crStop(); else crPlay(); });
 $('#crBack').addEventListener('click', () => { const was = CR.playing && !CR.recording; if (CR.playing) crStop(); CR.pos = 0; if (was) crPlay(); });
-$('#crMetro').addEventListener('click', () => { CR.metro = !CR.metro; if (CR.playing) CR.metro ? startMetro() : stopMetro(); crUI(); touch(); });
-$('#crBpm').addEventListener('change', () => { const v = Math.round(+$('#crBpm').value); if (v >= 40 && v <= 240) { CR.bpm = v; if (CR.playing && CR.metro) { const p = crNow(); CR.pos0 = p; CR.t0 = ctx.currentTime; startMetro(); } touch(); } crUI(); });
+$('#crMetro').addEventListener('click', () => { CR.metro = !CR.metro; CR.metro ? startMetro() : stopMetro(); toast(CR.metro ? 'Metronome on at ' + CR.bpm + ' BPM' : 'Metronome off'); crUI(); touch(); });
+$('#crBpm').addEventListener('change', () => { const v = Math.round(+$('#crBpm').value); if (v >= 40 && v <= 240) { CR.bpm = v; if (CR.metro) { if (CR.playing) { const p = crNow(); CR.pos0 = p; CR.t0 = ctx.currentTime; } startMetro(); } touch(); } crUI(); });
 $('#crBpm').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#crBpm').blur(); } });
 $('#crUndo').addEventListener('click', crUndoTake);
 $('#crClear').addEventListener('click', async () => { if (!CR.notes.length) return; if (await askConfirm('Clear every recorded note? You can’t undo this.', 'Clear')) { if (CR.playing) crStop(); CR.notes = []; CR.takeStack = []; CR.pos = 0; touch(); crInfo(); } });
@@ -3152,7 +3193,7 @@ async function setMode(m, fromTap) {
   if (m === MODE) return;
   const prev = MODE;
   if (prev === 'dj' || prev === 'create') modeState[prev] = { project, dirty };
-  if (prev === 'create') { if (CR.playing) crStop(); releaseAllInput(); closeMenu(); }
+  if (prev === 'create') { MODE = 'switching'; if (CR.playing) crStop(); stopMetro(); releaseAllInput(); closeMenu(); }
   MODE = m;
   if (m === 'dj' || m === 'create') ({ project, dirty } = modeState[m]);
   document.body.classList.toggle('mode-create', m === 'create');
@@ -3164,6 +3205,7 @@ async function setMode(m, fromTap) {
   if (m === 'radio') { radioEnter(); window.scrollTo(0, 0); }
   if (m === 'dj') decks.forEach(d => { d.waveKey = d.ovKey = null; });
   if (m === 'create') {
+    if (CR.metro && ctx) startMetro();
     requestAnimationFrame(() => { renderKeys(); crUI(); crInfo(); });
     if (IS_PHONE && fromTap) {
       // phones: go full screen and lock sideways where the browser allows it (iPhones turn the app sideways with CSS instead)
@@ -3524,13 +3566,29 @@ $('#rpVol').addEventListener('input', () => { RADIO.audio.volume = +$('#rpVol').
   else if (ev === 'error') { const st = RADIO.station; setRadioState('err'); if (!skipAfterFail(st)) toast('“' + st.name + '” went off the air. Try another station.'); }
   else playerUI();
 }));
+function paneLabels(p) {
+  document.body.classList.toggle('pane-music', p === 'music');
+  const name = p === 'music' ? 'Online Music' : 'Online Radio';
+  $('#goRadioName').textContent = name;
+  $('#goRadioSub').textContent = p === 'music' ? 'Official songs, playlists and artists. Needs internet.' : 'Live stations from around the world. Needs internet.';
+  $('#goRadio').setAttribute('aria-label', name + '. You can switch between Online Radio and Online Music inside.');
+  const tt = $('#rTitleText'); if (tt.textContent !== name) { tt.textContent = name; tt.classList.remove('swap'); void tt.offsetWidth; tt.classList.add('swap'); }
+}
 function setPane(p) {
+  const was = RADIO.pane;
   RADIO.pane = p; try { localStorage.setItem('spinlab-online-pane', p); } catch (e) {}
   document.querySelectorAll('.rswitch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pane === p)));
   $('#radioPane').hidden = p !== 'radio'; $('#musicPane').hidden = p !== 'music'; closeRMenu();
+  paneLabels(p);
+  if (was && was !== p) {
+    const pane = p === 'music' ? $('#musicPane') : $('#radioPane'), sw = $('.rswitch');
+    pane.classList.remove('pane-in-l', 'pane-in-r'); void pane.offsetWidth; pane.classList.add(p === 'music' ? 'pane-in-r' : 'pane-in-l');
+    sw.classList.remove('flash'); void sw.offsetWidth; sw.classList.add('flash');
+  }
   if (p === 'music') musicEnter(); else radioEnter();
 }
 document.querySelectorAll('.rswitch button').forEach(b => b.addEventListener('click', () => setPane(b.dataset.pane)));
+{ let p0 = 'radio'; try { p0 = localStorage.getItem('spinlab-online-pane') || 'radio'; } catch (e) {} paneLabels(p0); }
 function radioEnter() {
   netUI();
   if (!RADIO.pane) { let p = 'radio'; try { p = localStorage.getItem('spinlab-online-pane') || 'radio'; } catch (e) {} return setPane(p); }
