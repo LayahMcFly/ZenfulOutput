@@ -1197,7 +1197,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.21'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.22'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -3461,7 +3461,7 @@ async function removeFromPlaylist(pl, st) {
 let menuFor = null, menuBtn = null;
 function closeRMenu() { const m = $('#rMenu'); if (m.hidden) return; m.hidden = true; if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false'); menuFor = null; }
 function openRMenu(st, btn, view = 'main') {
-  const m = $('#rMenu'); menuFor = st; menuBtn = btn; btn.setAttribute('aria-expanded', 'true');
+  const m = $('#rMenu'); menuFor = st; menuBtn = btn; btn.setAttribute('aria-expanded', 'true'); window.menuY0 = scrollY;
   if (view === 'main') m.innerHTML = `<div class="mh">${escapeHTML(st.name)}</div>
       <button data-m="play">${I.play} Play now</button><button data-m="next">⏭ Play next</button><button data-m="queue">＋ Add to queue</button><hr>
       <button data-m="pls">♫ Add to playlist…</button>`;
@@ -3485,7 +3485,7 @@ $('#rMenu').addEventListener('click', e => {
 });
 document.addEventListener('pointerdown', e => { if (!$('#rMenu').hidden && !e.target.closest('#rMenu') && !e.target.closest('[data-r="more"]')) closeRMenu(); }, true);
 document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#rMenu').hidden) { e.stopPropagation(); const b = menuBtn; closeRMenu(); if (b) b.focus(); } }, true);
-window.addEventListener('scroll', closeRMenu, { passive: true });
+window.addEventListener('scroll', () => { if (!$('#rMenu').hidden && Math.abs(scrollY - (window.menuY0 ?? scrollY)) > 40) closeRMenu(); }, { passive: true });
 
 function renderHomeRadio() {
   const ul = $('#homeRadio'); if (!ul) return;
@@ -3866,13 +3866,13 @@ async function mRemoveFromPlaylist(pl, t) {
 /* a general ⋯ menu (the Music side uses this one) */
 let gItems = [];
 function openGMenu(btn, title, items) {
-  const m = $('#rMenu'); menuFor = null; menuBtn = btn; gItems = items; btn.setAttribute('aria-expanded', 'true');
+  const m = $('#rMenu'); menuFor = null; menuBtn = btn; gItems = items; btn.setAttribute('aria-expanded', 'true'); window.menuY0 = scrollY;
   m.innerHTML = `<div class="mh">${escapeHTML(title)}</div>` + items.map((it, i) => it === '-' ? '<hr>' : it.head ? `<div class="mh">${escapeHTML(it.head)}</div>` : `<button data-g="${i}"><span class="ck">${it.check ? '✓' : ''}</span>${it.html || escapeHTML(it.label)}</button>`).join('');
   m.hidden = false;
   const r = btn.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
   m.style.left = clamp(r.right - mw, 8, innerWidth - mw - 8) + 'px';
   m.style.top = (r.bottom + mh + 8 > innerHeight ? Math.max(8, r.top - mh - 6) : r.bottom + 6) + 'px';
-  const f = m.querySelector('button'); if (f) f.focus();
+  const f = m.querySelector('button'); if (f) f.focus({ preventScroll: true });
 }
 $('#rMenu').addEventListener('click', e => { const b = e.target.closest('button[data-g]'); if (!b) return; const it = gItems[+b.dataset.g]; if (!it) return; if (!it.keep) closeRMenu(); it.fn(); });
 function songMenu(t, btn, view = 'main') {
