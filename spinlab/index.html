@@ -682,6 +682,13 @@ body.np-open{overflow:hidden}
 .rcredit a{color:var(--soft)}
 .rplayer{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:35;width:min(760px,calc(100% - 20px));display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;background:linear-gradient(#1a2a26,#111a18);border:1px solid rgba(52,211,153,.45);box-shadow:0 18px 40px -14px #000,0 0 24px -12px #34d399}
 .rplayer[hidden]{display:none}
+.rplayer{transform:translateX(calc(-50% + var(--dx,0px))) translateY(var(--dy,0px));touch-action:none;user-select:none;-webkit-user-select:none}
+.rplayer.dragging{transition:none;cursor:grabbing}
+.rplayer.snap{transition:transform .25s cubic-bezier(.3,1.3,.5,1),opacity .25s}
+.rplayer.gone{transition:transform .26s ease-in,opacity .26s ease-in;opacity:0}
+.rplayer input[type=range]{touch-action:pan-x}
+.rplayer::before{content:"";position:absolute;left:50%;top:4px;width:34px;height:4px;margin-left:-17px;border-radius:4px;background:rgba(255,255,255,.18);pointer-events:none}
+@media (hover:hover) and (pointer:fine){ .rplayer::before{display:none} }
 body.radio-on.mode-radio .toast,body.radio-on.mode-home .toast{bottom:calc(92px + env(safe-area-inset-bottom))}
 body:not(.mode-radio):not(.mode-home) .rplayer{display:none}
 body.mode-home.radio-on{padding-bottom:96px}
@@ -1145,6 +1152,7 @@ html.phone body.mode-create .btn{min-height:38px}
     <li>Online Music has two parts, switched at the top: <b>Online Radio</b> (live stations) and <b>Music</b> (official songs).</li>
     <li><b>Music</b> searches Apple’s music catalog, so you can find artists like Taylor Swift. For now songs play as 30-second previews. ⋯ → <b>Open in Apple Music</b> plays a whole song there. Music has its own queue, playlists and a built-in <b>Liked songs</b> playlist (♡) that can’t be deleted. When a song ends, the next one in the queue starts.</li>
     <li>Tap the song’s picture in the player bar to open the full player. Scroll down for the lyrics, song info and what’s next in the queue. Swipe down or tap ⌄ to close it.</li>
+    <li>Swipe the bottom player sideways or down to pause and hide it. Press play on any song to bring it back where you left off. Swiping the radio player away stops the station.</li>
     <li><b>Follow</b> an artist from the full player, from ⋯ on any song, or from the artist card at the top of a search. Artists you follow are in the <b>Artists</b> tab and at the front of the name row, so one tap opens their songs.</li>
   </ul>
   <h3>Online Radio</h3>
@@ -1214,7 +1222,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.23'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.24'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
@@ -3779,6 +3787,7 @@ function renderMusic() {
   ul.innerHTML = top + MUS.results.map(t => songLi(t, 'songs')).join('');
 }
 function playTrack(t, qIndex, dir = 1) {
+  MUS.barHidden = false;
   if (navigator.onLine === false) return toast('You’re offline. Music needs WiFi or mobile data.');
   MUS.dir = dir;
   if (qIndex != null) MUS.qi = qIndex; else { const i = MUS.queue.findIndex(x => x.id === t.id); if (i >= 0) MUS.qi = i; }
@@ -3805,7 +3814,7 @@ function mSkipAfterFail(t) {
 }
 function stopMusic() { closeNP(true); const a = MUS.audio; a.pause(); a.removeAttribute('src'); a.load(); MUS.track = null; mPlayerUI(); renderMusic(); if ('mediaSession' in navigator && !RADIO.station) navigator.mediaSession.playbackState = 'none'; }
 function mPlayerUI() {
-  const t = MUS.track, bar = $('#mPlayer'); bar.hidden = !t; document.body.classList.toggle('radio-on', !!(t || RADIO.station)); if (!t) return;
+  const t = MUS.track, bar = $('#mPlayer'); bar.hidden = !t || !!MUS.barHidden; document.body.classList.toggle('radio-on', !!((t && !MUS.barHidden) || RADIO.station)); if (!t) return;
   const art = $('#mpArt'); if (t.art && /^https:/i.test(t.art)) { art.src = t.art; art.onerror = () => { art.onerror = null; art.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else art.removeAttribute('src');
   $('#mpTitle').textContent = t.title; $('#mpArtist').textContent = t.artist + (MUS.state === 'wait' ? ' · loading…' : MUS.state === 'err' ? ' · won’t play' : ' · preview');
   const paused = MUS.audio.paused; $('#mpPlay').innerHTML = paused ? I.play : I.pause; $('#mpPlay').setAttribute('aria-label', paused ? 'Play' : 'Pause');
@@ -3829,7 +3838,7 @@ function musicSession() {
 }
 ['playing', 'pause', 'waiting', 'error', 'ended', 'loadedmetadata'].forEach(ev => MUS.audio.addEventListener(ev, () => {
   const t = MUS.track; if (!t) return;
-  if (ev === 'playing') MUS.state = 'live';
+  if (ev === 'playing') { MUS.state = 'live'; if (MUS.barHidden) { MUS.barHidden = false; const b = $('#mPlayer'); b.classList.remove('gone', 'snap', 'dragging'); b.style.removeProperty('--dx'); b.style.removeProperty('--dy'); } }
   else if (ev === 'waiting') MUS.state = 'wait';
   else if (ev === 'error') { MUS.state = 'err'; if (!mSkipAfterFail(t)) toast('“' + t.title + '” won’t play right now.'); }
   else if (ev === 'ended') { if (!mStep(1, true)) { MUS.audio.currentTime = 0; } }
@@ -4067,6 +4076,38 @@ function npLyrics(t) {
     .then(res => { NP.lyr.set(t.id, res); show(res); }, () => show('err'));
 }
 $('#mpArtBtn').addEventListener('click', openNP);
+/* swipe the bottom player away: music pauses (and comes back when you press play again); radio stops */
+function swipeAway(bar, onGone) {
+  let id = null, x0 = 0, y0 = 0, dx = 0, dy = 0, moved = false;
+  const set = () => { bar.style.setProperty('--dx', dx + 'px'); bar.style.setProperty('--dy', Math.max(0, dy) + 'px'); bar.style.opacity = String(Math.max(.25, 1 - Math.max(Math.abs(dx) / 260, Math.max(0, dy) / 160))); };
+  bar.addEventListener('pointerdown', e => {
+    if (e.button > 0 || e.target.closest('input[type=range]')) return;
+    id = e.pointerId; x0 = e.clientX; y0 = e.clientY; dx = dy = 0; moved = false; bar.classList.remove('snap', 'gone');
+  });
+  bar.addEventListener('pointermove', e => {
+    if (e.pointerId !== id) return;
+    dx = e.clientX - x0; dy = e.clientY - y0;
+    if (!moved && Math.hypot(dx, dy) > 10) { moved = true; bar.classList.add('dragging'); try { bar.setPointerCapture(id); } catch (er) {} }
+    if (moved) set();
+  });
+  const end = e => {
+    if (e.pointerId !== id) return; id = null; bar.classList.remove('dragging');
+    if (!moved) return;
+    bar.addEventListener('click', ev => { ev.stopPropagation(); ev.preventDefault(); }, { capture: true, once: true });
+    const away = Math.abs(dx) > 90 || dy > 60;
+    if (away) {
+      if (dy > 60 && Math.abs(dx) < dy) { dx = 0; dy = 160; } else { dx = Math.sign(dx) * (innerWidth + 40); dy = Math.max(0, dy); }
+      bar.classList.add('gone'); set(); bar.style.opacity = '';
+      setTimeout(() => { onGone(); bar.classList.remove('gone'); bar.style.removeProperty('--dx'); bar.style.removeProperty('--dy'); bar.style.opacity = ''; }, 260);
+    } else { bar.classList.add('snap'); dx = dy = 0; set(); bar.style.opacity = ''; setTimeout(() => bar.classList.remove('snap'), 260); }
+  };
+  bar.addEventListener('pointerup', end); bar.addEventListener('pointercancel', end);
+}
+swipeAway($('#mPlayer'), () => {
+  if (!MUS.track) return; MUS.audio.pause(); MUS.barHidden = true; mPlayerUI();
+  toast('Paused. Press play on a song to bring the player back.');
+});
+swipeAway($('#rPlayer'), () => { if (RADIO.station) { stopRadio(); toast('Radio stopped. Tap a station to play again.'); } });
 $('#mpTitle').addEventListener('click', openNP); $('#mpTitle').style.cursor = 'pointer';
 $('#npClose').addEventListener('click', () => closeNP());
 $('#npFollow').addEventListener('click', () => MUS.track && toggleFollow(followed(arKey(MUS.track)) || artistOf(MUS.track)));
