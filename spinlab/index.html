@@ -250,6 +250,67 @@ footer.foot a{color:var(--soft)}
   canvas.wave{height:96px}
   .selinfo{margin-left:0;width:100%}
 }
+/* ===== modes ===== */
+.modesw{display:inline-flex;border:1px solid var(--line2);border-radius:10px;padding:3px;background:#0e1220;gap:2px;flex:none}
+.modesw button{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--soft);font:700 12.5px var(--sans);letter-spacing:.02em;padding:6px 13px;border-radius:7px;cursor:pointer;display:inline-flex;align-items:center;gap:6px;touch-action:manipulation}
+.modesw button:hover{color:var(--ink)}
+.modesw button svg{width:14px;height:14px}
+.modesw button[aria-pressed="true"][data-mode="dj"]{background:linear-gradient(var(--a),#0e7490);color:#071017}
+.modesw button[aria-pressed="true"][data-mode="create"]{background:linear-gradient(#a78bfa,#6d28d9);color:#fff}
+.modesw button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+body:not(.mode-create) #createView{display:none}
+body.mode-create main,body.mode-create #recBtn,body.mode-create .rectime{display:none!important}
+body.mode-create{min-height:0;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;--v:#a78bfa}
+body.mode-create header.top{position:static;flex:none}
+body.mode-create .statusbar{flex:none}
+#createView{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px 12px;width:100%}
+.cbar,.pbar{display:flex;align-items:center;gap:8px;flex:none;overflow-x:auto;padding:8px 10px;scrollbar-width:none}
+.cbar::-webkit-scrollbar,.pbar::-webkit-scrollbar{display:none}
+.cbar .sep,.pbar .sep{width:1px;height:22px;background:var(--line2);flex:none}
+.cbar .btn,.pbar .btn,.pbar select{flex:none}
+.btn.crrec.on{--c:var(--rec);animation:blink 1.1s steps(2) infinite}
+.btn.crplay.on{--c:#a78bfa;background:linear-gradient(#a78bfa,#6d28d9);color:#fff}
+.ctime{font:700 15px var(--mono);min-width:118px;text-align:center;color:var(--ink);flex:none}
+.ctime small{color:var(--dim);font-weight:600}
+.cinfo{font:600 12px var(--mono);color:var(--soft);margin-left:auto;white-space:nowrap;padding-left:8px}
+#crBpm{width:62px;text-align:center;flex:none}
+.poct{font:700 13px var(--mono);min-width:76px;text-align:center;color:var(--ink);flex:none}
+.kn.inline{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:0;flex:none}
+.kn.inline .knob{width:32px;height:32px}
+canvas.roll{flex:1 1 0;height:0;min-height:44px;max-height:220px;width:100%;display:block;border-radius:10px;background:#070910;border:1px solid var(--line);cursor:pointer}
+.pkeys{flex:2.6 1 0;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none}
+.pkb{position:relative;height:100%;display:flex}
+.pk-w{flex:1 1 0;position:relative;margin:0 1px;border-radius:0 0 8px 8px;background:linear-gradient(#ffffff,#eef0f5 80%,#d5dae5);box-shadow:inset 0 -6px 0 #bcc3d2,0 2px 3px rgba(0,0,0,.55);cursor:pointer;transition:background .05s}
+.pk-w.pb{background:linear-gradient(#f5efff,#ddd0fb)}
+.pk-w.on{background:linear-gradient(#e6fcff,#9eeefa);box-shadow:inset 0 -2px 0 #5fcfdf,0 1px 2px rgba(0,0,0,.5)}
+.pk-b{position:absolute;top:0;height:61%;z-index:2;border-radius:0 0 6px 6px;background:linear-gradient(#3b4461,#0d1018 72%);box-shadow:inset 0 -5px 0 #000,0 3px 6px rgba(0,0,0,.65);cursor:pointer}
+.pk-b.pb{background:linear-gradient(#a78bfa,#4c1d95 72%)}
+.pk-b.on{background:linear-gradient(#22d3ee,#0e7490 72%);box-shadow:inset 0 -2px 0 #000}
+.pk .nm{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 11px var(--mono);color:#8a93a6;pointer-events:none}
+.pk .nm.c{color:#4b5574}
+.pk .hk{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:700 10px var(--mono);color:#6b7489;pointer-events:none;text-transform:uppercase}
+.pk-b .hk{bottom:9px;color:#8b93a9}
+.pkeys.nolabels .nm,.pkeys.nolabels .hk{display:none}
+html.phone .pk .hk{display:none}
+/* phones: Create mode is landscape. If the phone can't be locked sideways, the whole app turns sideways. */
+html.phone body.mode-create header.top{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:6px 10px;scrollbar-width:none}
+html.phone body.mode-create header.top::-webkit-scrollbar{display:none}
+html.phone body.mode-create .brand b,html.phone body.mode-create .brand .ver{display:none}
+html.phone body.mode-create .brand svg{width:28px;height:28px}
+html.phone body.mode-create .proj{flex:1 1 150px;order:0;max-width:260px}
+html.phone body.mode-create .proj input{padding:6px 9px;font-size:16px}
+html.phone body.mode-create .master{display:flex;width:auto;order:0;flex-wrap:nowrap;gap:6px}
+html.phone body.mode-create .master .kn{display:none}
+html.phone body.mode-create .master .btn{min-height:36px;padding:6px 10px}
+html.phone body.mode-create .master .home{position:static;min-height:36px}
+html.phone body.mode-create .statusbar{display:none}
+html.phone body.mode-create #createView{padding:6px 8px max(6px,env(safe-area-inset-bottom));gap:6px}
+html.phone body.mode-create .cbar,html.phone body.mode-create .pbar{padding:5px 8px}
+html.phone body.mode-create .btn{min-height:36px}
+@media (orientation:portrait){
+  html.phone body.mode-create{position:fixed;top:0;left:0;min-height:0;width:100vh;height:100vw;width:100dvh;height:100dvw;transform-origin:top left;transform:rotate(90deg) translateY(-100%)}
+}
+
 /* ===== desktop: looks and behaves like an app window ===== */
 @media (min-width:1101px){
   header.top{padding:8px 14px;gap:14px;flex-wrap:nowrap}
@@ -373,6 +434,10 @@ footer.foot a{color:var(--soft)}
     <b>Spin<span>Lab</span></b>
     <span class="ver" id="ver"></span>
   </a>
+  <div class="modesw" role="group" aria-label="Mode">
+    <button type="button" data-mode="dj" aria-pressed="true" title="DJ mode: decks, mixer and the DJ library"><svg viewBox="0 0 16 16" aria-hidden="true"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.6"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>DJ</button>
+    <button type="button" data-mode="create" aria-pressed="false" title="Create mode: play the piano, record and save creations"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="3" width="13" height="10" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M5.5 3v6M10.5 3v6M8 9v4M5.5 9v4M10.5 9v4" stroke="currentColor" stroke-width="1.3"/></svg>Create</button>
+  </div>
   <div class="proj">
     <input type="text" id="projTitle" placeholder="Untitled project" maxlength="80" aria-label="Project name" autocomplete="off" spellcheck="false">
     <span class="pstate" id="projState" aria-live="polite"></span>
@@ -407,6 +472,41 @@ footer.foot a{color:var(--soft)}
     <div class="panel deck b" id="dB" aria-label="Deck B controls"></div>
   </section>
 </main>
+<section id="createView" aria-label="Create mode">
+  <div class="cbar panel">
+    <button class="btn crrec" id="crRec" title="Record what you play (R). Your earlier takes play along so you can layer parts."><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record</span></button>
+    <button class="btn crplay" id="crPlay" title="Play or stop (Space)"><svg viewBox="0 0 16 16"><path d="M4 2.5v11l9-5.5z" fill="currentColor"/></svg><span>Play</span></button>
+    <button class="btn" id="crBack" title="Back to the start"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button>
+    <span class="ctime" id="crTime">0:00.0 <small>/ 0:00.0</small></span>
+    <span class="sep"></span>
+    <button class="btn" id="crMetro" title="Click along with the beat while playing and recording"><svg viewBox="0 0 16 16"><path d="M5.5 1.5h5l2.5 13h-10z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/><path d="M8 11 11.5 3.5" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>Metronome</button>
+    <input type="number" id="crBpm" min="40" max="240" step="1" value="100" aria-label="Metronome speed in BPM"><span class="lbl">BPM</span>
+    <span class="sep"></span>
+    <button class="btn" id="crUndo" title="Remove the last recording you made (Ctrl/⌘ Z)"><svg viewBox="0 0 16 16"><path d="M5 3 2 6l3 3M2 6h7.5a4 4 0 0 1 0 8H6" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg>Undo take</button>
+    <button class="btn danger" id="crClear" title="Remove every recorded note"><svg viewBox="0 0 16 16"><path d="M3 4.5h10M6 4.5V3h4v1.5M4.5 4.5l.7 9h5.6l.7-9" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg>Clear</button>
+    <span class="sep"></span>
+    <button class="btn" id="crWav" title="Save your creation as a WAV file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save WAV</button>
+    <button class="btn" id="crMp3" title="Save your creation as an MP3 file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Save MP3</button>
+    <button class="btn" id="crSend" title="Put your creation on a DJ deck so you can mix it"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>Send to DJ</button>
+    <span class="cinfo" id="crInfo"></span>
+  </div>
+  <canvas class="roll" id="crRoll" aria-label="Your recorded notes. Click to move the playhead."></canvas>
+  <div class="pbar panel">
+    <span class="lbl">Sound</span>
+    <select id="crSound" aria-label="Piano sound"><option value="piano">Grand piano</option><option value="epiano">Electric piano</option><option value="synth">Synth</option><option value="organ">Organ</option><option value="bass">Bass</option></select>
+    <span class="sep"></span>
+    <button class="btn sm" id="crOctDn" title="Move the keyboard down an octave (Z)">− Octave</button>
+    <span class="poct" id="crOctLbl">C3</span>
+    <button class="btn sm" id="crOctUp" title="Move the keyboard up an octave (X)">Octave +</button>
+    <span class="sep"></span>
+    <button class="btn sm" id="crSus" title="Let notes ring after you let go. On a computer, hold Shift.">Sustain</button>
+    <button class="btn sm on" id="crLabels" title="Show note names on the keys">Note names</button>
+    <span class="sep"></span>
+    <div class="kn inline" style="--kc:#a78bfa"><div class="knob" id="crVol" role="slider" tabindex="0" aria-label="Piano volume"></div><span>Volume</span></div>
+    <div class="kn inline" style="--kc:#a78bfa"><div class="knob" id="crRev" role="slider" tabindex="0" aria-label="Piano reverb"></div><span>Reverb</span></div>
+  </div>
+  <div class="pkeys" id="pKeys"><div class="pkb" id="pKb"></div></div>
+</section>
 <div class="statusbar">
 <section class="panel offline" id="offline">
   <svg class="big" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#121725" stroke="#323a52"/><path d="M16 8v11M11 14.5l5 5 5-5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23.5h14" stroke="#f472b6" stroke-width="2.4" stroke-linecap="round"/></svg>
@@ -421,7 +521,7 @@ footer.foot a{color:var(--soft)}
 <dialog id="lib" aria-labelledby="libTitle">
   <div class="libhead"><h2 id="libTitle" style="margin:0">Your library</h2>
     <div class="row"><button class="btn" id="libNew" title="Start an empty project">+ New project</button><button class="btn" id="libClose">Close</button></div></div>
-  <p class="libintro">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
+  <p class="libintro" id="libIntro">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
   <ul class="liblist" id="libList"></ul>
   <p id="libSpace"></p>
 </dialog>
@@ -432,6 +532,19 @@ footer.foot a{color:var(--soft)}
 <dialog id="help">
   <h2>How to use SpinLab</h2>
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
+  <h3>Two modes</h3>
+  <ul>
+    <li><b>DJ</b> is for mixing songs: decks, mixer, waveform editing and Record live.</li>
+    <li><b>Create</b> is for making your own music on the piano. On a phone it turns sideways.</li>
+    <li>Each mode has its own library. Saving in DJ mode goes to the DJ library, and saving in Create mode goes to the Create library.</li>
+  </ul>
+  <h3>Create mode</h3>
+  <ul>
+    <li>Play the keys with your fingers or mouse. Slide across them to glide. On a computer, the keys <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> play notes, <kbd>Z</kbd> / <kbd>X</kbd> change octave, and holding <kbd>Shift</kbd> is the sustain pedal.</li>
+    <li><b>Record</b> (<kbd>R</kbd>) captures what you play. Record again to add another layer on top while the earlier takes play. <b>Undo take</b> removes the last layer.</li>
+    <li><b>Metronome</b> clicks along at the BPM you set. <kbd>Space</kbd> plays and stops.</li>
+    <li><b>Save WAV</b> / <b>Save MP3</b> make a file. <b>Send to DJ</b> puts your creation on a deck so you can mix it.</li>
+  </ul>
   <h3>Projects and the library</h3>
   <ul>
     <li>Type a name in the box at the top, then press <b>Save</b> (<kbd>Ctrl</kbd>/<kbd>⌘</kbd> + <kbd>S</kbd>). If you leave it blank, the project is named Untitled 1, Untitled 2 and so on.</li>
@@ -480,7 +593,7 @@ footer.foot a{color:var(--soft)}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.9'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.10'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -1578,52 +1691,65 @@ $('#recBtn').addEventListener('click', async () => {
   toast('Recording everything you hear. Press Stop recording to save.');
 });
 
-/* ---------------- projects + library (IndexedDB, on this device) ---------------- */
+/* ---------------- projects + library (IndexedDB, on this device) ----------------
+   DJ projects and Create creations are kept in separate stores, so each mode has its own library. */
+let MODE = 'dj';
 let project = { id: null, created: null }, dirty = false, saving = false, dbP = null;
+const STORE = () => MODE === 'create' ? 'creations' : 'projects';
+const hasContent = () => MODE === 'create' ? CR.notes.length > 0 : !!(A.buffer || B.buffer);
 function touch() { if (!dirty) { dirty = true; showState(); } }
 function showState() {
   const el = $('#projState'); if (!el) return;
-  el.textContent = dirty && (A.buffer || B.buffer) ? 'Not saved' : project.id ? 'Saved' : '';
-  el.classList.toggle('dirty', dirty && !!(A.buffer || B.buffer));
+  const d = dirty && hasContent();
+  el.textContent = d ? 'Not saved' : project.id ? 'Saved' : '';
+  el.classList.toggle('dirty', d);
 }
 function setClean() { dirty = false; showState(); }
 function openDB() {
   if (!dbP) dbP = new Promise((res, rej) => {
     if (!window.indexedDB) return rej(new Error('noidb'));
-    const r = indexedDB.open('spinlab', 1);
-    r.onupgradeneeded = () => r.result.createObjectStore('projects', { keyPath: 'id' });
+    const r = indexedDB.open('spinlab', 2);
+    r.onupgradeneeded = () => {
+      const db = r.result;
+      if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('creations')) db.createObjectStore('creations', { keyPath: 'id' });
+    };
     r.onsuccess = () => res(r.result); r.onerror = () => { dbP = null; rej(r.error); };
   });
   return dbP;
 }
-function idb(mode, fn) {
+function idb(store, mode, fn) {
   return openDB().then(db => new Promise((res, rej) => {
-    const t = db.transaction('projects', mode), req = fn(t.objectStore('projects')); let out;
+    const t = db.transaction(store, mode), req = fn(t.objectStore(store)); let out;
     if (req) req.onsuccess = () => out = req.result;
     t.oncomplete = () => res(out); t.onerror = t.onabort = () => rej(t.error);
   }));
 }
-const idbPut = r => idb('readwrite', s => s.put(r)), idbGet = id => idb('readonly', s => s.get(id)), idbAll = () => idb('readonly', s => s.getAll()), idbDel = id => idb('readwrite', s => s.delete(id));
+const idbPut = (r, st = STORE()) => idb(st, 'readwrite', s => s.put(r)), idbGet = (id, st = STORE()) => idb(st, 'readonly', s => s.get(id)),
+      idbAll = (st = STORE()) => idb(st, 'readonly', s => s.getAll()), idbDel = (id, st = STORE()) => idb(st, 'readwrite', s => s.delete(id));
 async function nextUntitled() {
   let n = 0; try { (await idbAll()).forEach(p => { const m = /^Untitled (\d+)$/.exec(p.title || ''); if (m) n = Math.max(n, +m[1]); }); } catch (e) {}
   return 'Untitled ' + (n + 1);
 }
 async function saveProject() {
-  if (!A.buffer && !B.buffer) return toast('Load a song first, then save the project.');
-  if (saving) return; saving = true; toast('Saving project…');
+  const creating = MODE === 'create';
+  if (!hasContent()) return toast(creating ? 'Record something on the piano first, then save it.' : 'Load a song first, then save the project.');
+  if (saving) return; saving = true; toast(creating ? 'Saving creation…' : 'Saving project…');
   try {
     let title = $('#projTitle').value.trim();
     if (!title) { title = await nextUntitled(); $('#projTitle').value = title; }
-    const now = Date.now(), id = project.id || 'p' + now.toString(36) + Math.random().toString(36).slice(2, 6);
-    const recd = { id, title, created: project.created || now, updated: now, dual, xfader: +xf.value, master: knobs.master.value,
-      length: Math.max(A.dur, B.buffer ? B.dur : 0), decks: { A: A.state(), B: B.buffer ? B.state() : null } };
+    const now = Date.now(), id = project.id || (creating ? 'c' : 'p') + now.toString(36) + Math.random().toString(36).slice(2, 6);
+    const recd = creating
+      ? Object.assign({ id, title, created: project.created || now, updated: now }, crSnapshot())
+      : { id, title, created: project.created || now, updated: now, dual, xfader: +xf.value, master: knobs.master.value,
+          length: Math.max(A.dur, B.buffer ? B.dur : 0), decks: { A: A.state(), B: B.buffer ? B.state() : null } };
     await idbPut(recd);
     project = { id, created: recd.created }; setClean();
     if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
-    toast('Saved “' + title + '” to your library');
+    toast('Saved “' + title + '” to your ' + (creating ? 'Create' : 'DJ') + ' library');
     if ($('#lib').open) renderLibrary();
   } catch (e) {
-    toast(e && e.name === 'QuotaExceededError' ? 'There isn’t enough storage space on this device to save this project.' : 'The project could not be saved in this browser.');
+    toast(e && e.name === 'QuotaExceededError' ? 'There isn’t enough storage space on this device to save this.' : 'This could not be saved in this browser.');
   }
   saving = false;
 }
@@ -1635,35 +1761,49 @@ function askConfirm(msg, yes = 'OK') {
     d.showModal(); $('#confirmNo').focus();
   });
 }
-const unsaved = () => dirty && (A.buffer || B.buffer);
+const unsaved = () => dirty && hasContent();
 async function openProject(id) {
-  if (unsaved() && !(await askConfirm('Open this project? The changes you haven’t saved in the current one will be lost.', 'Open'))) return;
-  ac(); toast('Opening project…');
+  const word = MODE === 'create' ? 'creation' : 'project';
+  if (unsaved() && !(await askConfirm('Open this ' + word + '? The changes you haven’t saved in the current one will be lost.', 'Open'))) return;
   try {
-    const p = await idbGet(id); if (!p) return toast('That project could not be found.');
-    if (rec) rec.stop();
-    await A.applyState(p.decks.A); await B.applyState(p.decks.B);
-    setDual(!!p.dual && !!p.decks.B); xf.value = p.xfader ?? 0.5; applyXfader(); knobs.master.set(p.master ?? 0.9);
-    project = { id: p.id, created: p.created }; $('#projTitle').value = p.title || ''; setClean(); setActive(A);
+    const p = await idbGet(id); if (!p) return toast('That ' + word + ' could not be found.');
+    if (MODE === 'create') crApply(p);
+    else {
+      ac(); toast('Opening project…');
+      if (rec) rec.stop();
+      await A.applyState(p.decks.A); await B.applyState(p.decks.B);
+      setDual(!!p.dual && !!p.decks.B); xf.value = p.xfader ?? 0.5; applyXfader(); knobs.master.set(p.master ?? 0.9);
+      setActive(A);
+    }
+    project = { id: p.id, created: p.created }; $('#projTitle').value = p.title || ''; setClean();
     $('#lib').close(); toast('Opened “' + (p.title || 'Untitled') + '”');
-  } catch (e) { toast('That project could not be opened.'); }
+  } catch (e) { toast('That ' + word + ' could not be opened.'); }
 }
 async function newProject() {
-  if (unsaved() && !(await askConfirm('Start a new project? The changes you haven’t saved in the current one will be lost.', 'Start new'))) return;
-  if (rec) rec.stop();
-  A.reset(); B.reset(); setDual(false); xf.value = 0.5; applyXfader(); knobs.master.set(0.9);
+  const word = MODE === 'create' ? 'creation' : 'project';
+  if (unsaved() && !(await askConfirm('Start a new ' + word + '? The changes you haven’t saved in the current one will be lost.', 'Start new'))) return;
+  if (MODE === 'create') crApply(null);
+  else { if (rec) rec.stop(); A.reset(); B.reset(); setDual(false); xf.value = 0.5; applyXfader(); knobs.master.set(0.9); }
   project = { id: null, created: null }; $('#projTitle').value = ''; setClean(); $('#lib').close();
 }
 async function renderLibrary() {
-  const ul = $('#libList');
+  const ul = $('#libList'), creating = MODE === 'create';
+  $('#libTitle').textContent = creating ? 'Create library' : 'DJ library';
+  $('#libNew').textContent = creating ? '+ New creation' : '+ New project';
+  $('#libIntro').textContent = creating
+    ? 'Your piano creations, saved in this browser on this device with every note, the sound, metronome speed and knob settings. Nothing is uploaded. DJ projects are kept in the DJ library.'
+    : 'DJ projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded. Piano creations are kept in the Create library.';
   let list = [];
   try { list = (await idbAll()).sort((a, b) => b.updated - a.updated); }
-  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save projects here. Private or incognito windows often block it.</li>'; return; }
-  if (!list.length) { ul.innerHTML = '<li class="libempty">No saved projects yet. Load a song, give it a name at the top, and press Save.</li>'; }
+  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save here. Private or incognito windows often block it.</li>'; return; }
+  if (!list.length) ul.innerHTML = '<li class="libempty">' + (creating ? 'No saved creations yet. Press Record, play the piano, give it a name at the top, and press Save.' : 'No saved projects yet. Load a song, give it a name at the top, and press Save.') + '</li>';
   else ul.innerHTML = list.map(p => {
     const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' });
-    const n = p.decks && p.decks.B ? 2 : 1;
-    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info" data-l="open" role="button" tabindex="0" title="Open this project"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${n} deck${n > 1 ? 's' : ''} · ${fmt(p.length || 0).replace(/\.\d$/, '')} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
+    const len = fmt(p.length || 0).replace(/\.\d$/, '');
+    let meta;
+    if (creating) { const n = (p.notes || []).length; meta = `${n} note${n === 1 ? '' : 's'} · ${SOUNDS[p.sound] || 'Piano'} · ${len}`; }
+    else { const n = p.decks && p.decks.B ? 2 : 1; meta = `${n} deck${n > 1 ? 's' : ''} · ${len}`; }
+    return `<li class="libitem${p.id === project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info" data-l="open" role="button" tabindex="0" title="Open this"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${meta} · saved ${when}${p.id === project.id ? ' · open now' : ''}</small></div>
       <div class="row"><button class="btn sm primary" data-l="open">Open</button><button class="btn sm" data-l="rename">Rename</button><button class="btn sm danger" data-l="delete">Delete</button></div></li>`;
   }).join('');
   try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
@@ -1705,12 +1845,390 @@ $('#libNew').addEventListener('click', newProject);
 $('#saveBtn').addEventListener('click', saveProject);
 $('#projTitle').addEventListener('input', touch);
 $('#projTitle').addEventListener('change', async () => {
-  // renaming an already-saved project updates its library entry right away
+  // renaming something already saved updates its library entry right away
   const v = $('#projTitle').value.trim(); if (!project.id || !v) return;
   const p = await idbGet(project.id).catch(() => null); if (p && p.title !== v) { p.title = v; await idbPut(p).catch(() => {}); }
 });
 $('#projTitle').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#projTitle').blur(); } });
-window.addEventListener('beforeunload', e => { if (unsaved()) { e.preventDefault(); e.returnValue = ''; } });
+window.addEventListener('beforeunload', e => {
+  const other = modeState[MODE === 'dj' ? 'create' : 'dj'];
+  const otherUnsaved = other.dirty && (MODE === 'dj' ? CR.notes.length > 0 : !!(A.buffer || B.buffer));
+  if (unsaved() || otherUnsaved) { e.preventDefault(); e.returnValue = ''; }
+});
+
+/* ===================== CREATE MODE: piano, recorder, library ===================== */
+const SOUNDS = { piano: 'Grand piano', epiano: 'Electric piano', synth: 'Synth', organ: 'Organ', bass: 'Bass' };
+const SOUND_COLORS = { piano: '#a78bfa', epiano: '#22d3ee', synth: '#f472b6', organ: '#fbbf24', bass: '#34d399' };
+const waveCache = new WeakMap();
+function wavesFor(c) {
+  let w = waveCache.get(c); if (w) return w;
+  const mk = arr => { const re = new Float32Array(arr.length + 1), im = new Float32Array(arr.length + 1); arr.forEach((a, i) => im[i + 1] = a); return c.createPeriodicWave(re, im); };
+  w = { piano: mk([1, .6, .35, .25, .16, .1, .07, .05, .035, .025, .018]), epiano: mk([1, .18, .06, .03]), organ: mk([1, .75, .05, .45, .02, .3, .02, .22]) };
+  waveCache.set(c, w); return w;
+}
+// One note of the built-in instruments. Works in the live context and in an OfflineAudioContext (for Save WAV/MP3).
+function startVoice(c, dest, sound, m, vel, t) {
+  const f = 440 * Math.pow(2, (m - 69) / 12), g = c.createGain(), fl = c.createBiquadFilter(), W = wavesFor(c), oscs = [];
+  g.gain.setValueAtTime(0, t); fl.type = 'lowpass'; fl.connect(g); g.connect(dest);
+  const osc = (type, det = 0, lvl = 1) => {
+    const o = c.createOscillator(); if (W[type]) o.setPeriodicWave(W[type]); else o.type = type;
+    o.frequency.value = f; o.detune.value = det;
+    if (lvl !== 1) { const gg = c.createGain(); gg.gain.value = lvl; o.connect(gg); gg.connect(fl); } else o.connect(fl);
+    o.start(t); oscs.push(o);
+  };
+  let rel = 0.25, end = null;
+  if (sound === 'epiano') {
+    osc('epiano'); osc('sine', 1200, 0.08); fl.frequency.value = Math.min(12000, f * 6);
+    g.gain.linearRampToValueAtTime(vel * 0.45, t + 0.005); g.gain.exponentialRampToValueAtTime(vel * 0.18, t + 1.2); g.gain.exponentialRampToValueAtTime(0.0001, t + 6); end = t + 6; rel = 0.35;
+  } else if (sound === 'synth') {
+    osc('sawtooth', -7, 0.6); osc('sawtooth', 7, 0.6); fl.Q.value = 5;
+    fl.frequency.setValueAtTime(Math.min(15000, f * 14), t); fl.frequency.exponentialRampToValueAtTime(Math.max(f * 3, 400), t + 0.5);
+    g.gain.linearRampToValueAtTime(vel * 0.3, t + 0.01); g.gain.setTargetAtTime(vel * 0.22, t + 0.01, 0.2); rel = 0.3;
+  } else if (sound === 'organ') {
+    osc('organ'); fl.frequency.value = 9000; g.gain.linearRampToValueAtTime(vel * 0.28, t + 0.015); rel = 0.08;
+  } else if (sound === 'bass') {
+    osc('sawtooth', 0, 0.7); osc('sine', -1200, 1); fl.Q.value = 3;
+    fl.frequency.setValueAtTime(f * 8, t); fl.frequency.exponentialRampToValueAtTime(Math.max(f * 2, 120), t + 0.35);
+    g.gain.linearRampToValueAtTime(vel * 0.45, t + 0.006); g.gain.setTargetAtTime(vel * 0.3, t + 0.01, 0.25); rel = 0.12;
+  } else { // grand piano
+    osc('piano', -3); osc('piano', 4, 0.6);
+    const dl = clamp(5 - (m - 36) * 0.07, 0.9, 5.5);
+    fl.frequency.setValueAtTime(Math.min(16000, f * (6 + vel * 8)), t); fl.frequency.exponentialRampToValueAtTime(Math.max(f * 1.5, 250), t + dl);
+    g.gain.linearRampToValueAtTime(vel * 0.42, t + 0.004); g.gain.exponentialRampToValueAtTime(vel * 0.15, t + 0.3); g.gain.exponentialRampToValueAtTime(0.0001, t + dl);
+    end = t + dl; rel = 0.22;
+  }
+  if (end) oscs.forEach(o => o.stop(end + 0.05));
+  let released = false;
+  return {
+    release(t2) {
+      if (released) return; released = true; t2 = Math.max(t2, t + 0.01); if (end && t2 >= end) return;
+      const gp = g.gain; if (gp.cancelAndHoldAtTime) gp.cancelAndHoldAtTime(t2); else gp.cancelScheduledValues(t2);
+      gp.setTargetAtTime(0, t2, rel / 3); oscs.forEach(o => { try { o.stop(t2 + rel * 2.5); } catch (e) {} });
+    },
+    stopNow() { released = true; const n = c.currentTime; g.gain.cancelScheduledValues(n); g.gain.setTargetAtTime(0, n, 0.01); oscs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); }
+  };
+}
+
+const CR = { sound: 'piano', octave: 3, base: 48, top: 72, notes: [], takeStack: [], takeId: 0, bpm: 100, metro: false, playing: false, recording: false,
+  pos: 0, pos0: 0, t0: 0, scheduled: [], live: new Map(), down: new Set(), susBtn: false, susKey: false, labels: true, out: null, keyEls: new Map(), metroTimer: null };
+const crK = {};
+crK.vol = makeKnob($('#crVol'), { min: 0, max: 1.2, value: 0.85, def: 0.85, fmt: v => Math.round(v * 100) + '%', onChange: v => CR.out && CR.out.gain.setTargetAtTime(v, ctx.currentTime, 0.01) });
+crK.rev = makeKnob($('#crRev'), { min: 0, max: 1, value: 0.25, def: 0.25, fmt: v => Math.round(v * 100) + '%', onChange: v => CR.rev && CR.rev.gain.setTargetAtTime(v, ctx.currentTime, 0.02) });
+const crSus = () => CR.susBtn || CR.susKey;
+const crLen = () => CR.notes.reduce((mx, n) => Math.max(mx, n.t + n.d), 0);
+function crInit() {
+  ac(); if (CR.out) return;
+  CR.out = ctx.createGain(); CR.out.gain.value = crK.vol.value;
+  CR.rev = ctx.createGain(); CR.rev.gain.value = crK.rev.value;
+  const cv = ctx.createConvolver(); cv.buffer = IR;
+  CR.out.connect(master.gain); CR.out.connect(CR.rev); CR.rev.connect(cv); cv.connect(master.gain);
+}
+function crNow() { return CR.playing && ctx ? CR.pos0 + Math.max(0, ctx.currentTime - CR.t0) : CR.pos; }
+const noteName = m => ['C', 'C♯', 'D', 'D♯', 'E', 'F', 'F♯', 'G', 'G♯', 'A', 'A♯', 'B'][((m % 12) + 12) % 12] + (Math.floor(m / 12) - 1);
+const isBlack = m => [1, 3, 6, 8, 10].includes(((m % 12) + 12) % 12);
+const KEYMAP = "awsedftgyhujkolp;'";
+
+/* keyboard drawing */
+function renderKeys() {
+  const kb = $('#pKb'), w = kb.clientWidth; if (!w) return;
+  const coarse = matchMedia('(pointer:coarse)').matches;
+  const nW = clamp(Math.floor(w / (coarse ? 42 : 36)), 8, 36);
+  const whites = [], blacks = []; let m = CR.base, wi = 0;
+  while (wi < nW) { if (!isBlack(m)) { whites.push({ m, wi }); wi++; } else blacks.push({ m, wi }); m++; }
+  CR.top = m - 1;
+  const ww = 100 / nW, bw = ww * 0.62;
+  const hk = mm => { const i = mm - CR.base; return i >= 0 && i < KEYMAP.length ? `<span class="hk">${KEYMAP[i]}</span>` : ''; };
+  kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
+    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}</div>`).join('');
+  CR.keyEls = new Map([...kb.querySelectorAll('.pk')].map(el => [+el.dataset.m, el]));
+  CR.down.forEach(mm => keyOn(mm, true));
+  $('#crOctLbl').textContent = noteName(CR.base) + '–' + noteName(CR.top);
+  $('#pKeys').classList.toggle('nolabels', !CR.labels);
+}
+function keyOn(m, on) { const el = CR.keyEls.get(m); if (el) el.classList.toggle('on', on); }
+function crOct(dir) {
+  const nb = clamp(CR.octave + dir, 0, 7); if (nb === CR.octave) return;
+  releaseAllInput(); CR.octave = nb; CR.base = 12 * (nb + 1); renderKeys(); touch();
+}
+
+/* playing notes live */
+function pressNote(m) {
+  crInit(); if (CR.down.has(m)) return;
+  CR.down.add(m); keyOn(m, true);
+  if (CR.live.has(m)) endLive(m);
+  const voice = startVoice(ctx, CR.out, CR.sound, m, 0.8, ctx.currentTime);
+  const note = CR.recording ? { m, t: crNow(), d: 0, v: 0.8, s: CR.sound, take: CR.takeId } : null;
+  CR.live.set(m, { voice, note });
+}
+function releaseNote(m) { if (!CR.down.has(m)) return; CR.down.delete(m); keyOn(m, false); if (!crSus()) endLive(m); }
+function endLive(m) {
+  const L = CR.live.get(m); if (!L) return; CR.live.delete(m);
+  L.voice.release(ctx.currentTime);
+  if (L.note) { L.note.d = Math.max(0.03, crNow() - L.note.t); CR.notes.push(L.note); touch(); crInfo(); }
+}
+function crSetSus() { $('#crSus').classList.toggle('on', crSus()); if (!crSus()) [...CR.live.keys()].forEach(m => { if (!CR.down.has(m)) endLive(m); }); }
+const keyNotes = new Map(), ptrNotes = new Map();
+function releaseAllInput() { [...CR.down].forEach(releaseNote); keyNotes.clear(); ptrNotes.clear(); if (CR.susKey) { CR.susKey = false; crSetSus(); } }
+
+/* touch / mouse on the keys, with sliding between keys */
+(() => {
+  const kb = $('#pKeys');
+  const noteAt = (x, y) => { const el = document.elementFromPoint(x, y), k = el && el.closest && el.closest('.pk'); return k ? +k.dataset.m : null; };
+  kb.addEventListener('pointerdown', e => {
+    const k = e.target.closest('.pk'); if (!k) return;
+    e.preventDefault(); try { kb.setPointerCapture(e.pointerId); } catch (er) {}
+    const m = +k.dataset.m; ptrNotes.set(e.pointerId, m); pressNote(m);
+  });
+  kb.addEventListener('pointermove', e => {
+    if (!ptrNotes.has(e.pointerId)) return;
+    const m = noteAt(e.clientX, e.clientY), old = ptrNotes.get(e.pointerId);
+    if (m !== old) { if (old != null) releaseNote(old); if (m != null) pressNote(m); ptrNotes.set(e.pointerId, m); }
+  });
+  const up = e => { if (!ptrNotes.has(e.pointerId)) return; const old = ptrNotes.get(e.pointerId); ptrNotes.delete(e.pointerId); if (old != null) releaseNote(old); };
+  kb.addEventListener('pointerup', up); kb.addEventListener('pointercancel', up);
+  kb.addEventListener('contextmenu', e => e.preventDefault());
+  new ResizeObserver(() => { if (MODE === 'create') renderKeys(); }).observe($('#pKb'));
+})();
+
+/* transport: play, record (layers), metronome */
+function crPlay() {
+  crInit();
+  if (CR.playing) return crStop();
+  if (!CR.recording && !CR.notes.length) return toast('Nothing recorded yet. Press Record and play the piano.');
+  if (!CR.recording && CR.pos >= crLen() - 0.01) CR.pos = 0;
+  CR.pos0 = CR.pos; CR.t0 = ctx.currentTime + 0.06; CR.playing = true;
+  for (const n of CR.notes) {
+    if (n.t < CR.pos0 - 0.001) continue;
+    const when = CR.t0 + (n.t - CR.pos0), v = startVoice(ctx, CR.out, n.s, n.m, n.v, when);
+    v.release(when + n.d); CR.scheduled.push(v);
+  }
+  if (CR.metro) startMetro();
+  crUI();
+}
+function crStop() {
+  if (!CR.playing) return;
+  const p = crNow();
+  if (CR.recording) {
+    [...CR.live.keys()].forEach(m => { const L = CR.live.get(m); if (L.note) endLive(m); });
+    CR.recording = false;
+    if (!CR.notes.some(n => n.take === CR.takeId)) CR.takeStack.pop();
+  }
+  CR.playing = false; CR.pos = p;
+  CR.scheduled.forEach(v => v.stopNow()); CR.scheduled = []; stopMetro(); crUI(); crInfo();
+}
+function crRecord() {
+  if (CR.recording) { crStop(); return; }
+  crInit(); if (CR.playing) crStop();
+  CR.takeId = Date.now(); CR.takeStack.push(CR.takeId); CR.recording = true;
+  crPlay(); toast(CR.notes.length ? 'Recording a new layer. Your earlier takes play along.' : 'Recording. Play the piano.');
+}
+function startMetro() {
+  stopMetro(); const beat = 60 / CR.bpm; let k = Math.ceil(CR.pos0 / beat - 1e-6);
+  const tick = () => {
+    const ahead = ctx.currentTime + 0.15;
+    for (;;) { const when = CR.t0 + (k * beat - CR.pos0); if (when > ahead) break; if (when >= ctx.currentTime - 0.01) metroClick(when, k % 4 === 0); k++; }
+  };
+  tick(); CR.metroTimer = setInterval(tick, 30);
+}
+function stopMetro() { if (CR.metroTimer) { clearInterval(CR.metroTimer); CR.metroTimer = null; } }
+function metroClick(when, accent) {
+  const o = ctx.createOscillator(), g = ctx.createGain(); o.type = 'square'; o.frequency.value = accent ? 1760 : 1175;
+  g.gain.setValueAtTime(0.0001, when); g.gain.exponentialRampToValueAtTime(accent ? 0.2 : 0.12, when + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, when + 0.05);
+  o.connect(g); g.connect(master.gain); o.start(when); o.stop(when + 0.06);
+}
+function crUI() {
+  $('#crRec').classList.toggle('on', CR.recording); $('#crRec span').textContent = CR.recording ? 'Stop recording' : 'Record';
+  $('#crPlay').classList.toggle('on', CR.playing && !CR.recording);
+  $('#crPlay').innerHTML = (CR.playing && !CR.recording ? I.pause + '<span>Stop</span>' : I.play + '<span>Play</span>');
+  $('#crMetro').classList.toggle('on', CR.metro); $('#crMetro').style.setProperty('--c', '#a78bfa');
+  $('#crSus').classList.toggle('on', crSus()); $('#crLabels').classList.toggle('on', CR.labels);
+  $('#crSound').value = CR.sound; if (document.activeElement !== $('#crBpm')) $('#crBpm').value = CR.bpm;
+}
+function crInfo() {
+  const n = CR.notes.length, takes = new Set(CR.notes.map(x => x.take)).size;
+  $('#crInfo').textContent = n ? `${n} note${n === 1 ? '' : 's'} · ${takes} layer${takes === 1 ? '' : 's'}` : 'Nothing recorded yet';
+  $('#crUndo').disabled = !CR.takeStack.length || CR.recording; $('#crClear').disabled = !n;
+  ['#crWav', '#crMp3', '#crSend'].forEach(id => $(id).disabled = !n);
+}
+function crUndoTake() {
+  if (CR.recording) return;
+  const id = CR.takeStack.pop(); if (id == null) return toast('Nothing to undo.');
+  if (CR.playing) crStop();
+  const before = CR.notes.length; CR.notes = CR.notes.filter(n => n.take !== id);
+  CR.pos = Math.min(CR.pos, crLen());
+  touch(); crInfo(); toast('Removed the last take (' + (before - CR.notes.length) + ' notes)');
+}
+
+/* note view (piano roll) */
+function crFrame() {
+  if (CR.playing && !CR.recording && crNow() > crLen() + 0.4) { crStop(); CR.pos = 0; }
+  const now = crNow();
+  const tl = fmt(now) + ' <small>/ ' + fmt(Math.max(crLen(), CR.recording ? now : 0)) + '</small>';
+  if (crFrame.last !== tl) { $('#crTime').innerHTML = tl; crFrame.last = tl; }
+  // playback lights up the keys
+  const pb = new Set(); if (CR.playing) for (const n of CR.notes) if (n.t <= now && now < n.t + n.d) pb.add(n.m);
+  CR.keyEls.forEach((el, m) => el.classList.toggle('pb', pb.has(m)));
+  const cv = $('#crRoll'); if (!cv.clientWidth) return; sizeCanvas(cv);
+  const g = cv.getContext('2d'), W = cv.width, H = cv.height, dpr = W / cv.clientWidth; g.clearRect(0, 0, W, H);
+  const live = [...CR.live.values()].filter(L => L.note);
+  if (!CR.notes.length && !live.length) {
+    g.fillStyle = '#5b6379'; g.font = `600 ${12 * dpr}px Inter, system-ui, sans-serif`; g.textAlign = 'center'; g.textBaseline = 'middle';
+    g.fillText(CR.recording ? 'Recording… play the piano' : 'Press Record, then play the piano. Your notes show up here.', W / 2, H / 2);
+  }
+  const span = Math.max(8, crLen() + 2, now + 2);
+  let lo = CR.base, hi = CR.top;
+  CR.notes.forEach(n => { if (n.m < lo) lo = n.m; if (n.m > hi) hi = n.m; });
+  const rows = hi - lo + 1, rh = H / rows, X = t => t / span * W;
+  // beat and bar lines from the metronome speed
+  const beat = 60 / CR.bpm;
+  for (let k = 0, t = 0; t < span; k++, t = k * beat) { g.fillStyle = k % 4 === 0 ? 'rgba(255,255,255,.09)' : 'rgba(255,255,255,.035)'; g.fillRect(X(t), 0, dpr, H); }
+  // octave guide lines at each C
+  for (let m = lo; m <= hi; m++) if (m % 12 === 0) { g.fillStyle = 'rgba(167,139,250,.10)'; g.fillRect(0, (hi - m + 1) * rh, W, dpr); }
+  const bar = (m, t, d, col) => { g.fillStyle = col; g.fillRect(X(t), (hi - m) * rh + 0.5, Math.max(2 * dpr, X(d)), Math.max(1.5 * dpr, rh - 1)); };
+  CR.notes.forEach(n => bar(n.m, n.t, n.d, SOUND_COLORS[n.s] || '#a78bfa'));
+  live.forEach(L => bar(L.note.m, L.note.t, Math.max(0.03, now - L.note.t), '#ef4444'));
+  // playhead
+  g.fillStyle = CR.recording ? '#ef4444' : '#fff'; g.fillRect(X(now) - dpr, 0, 2 * dpr, H);
+}
+$('#crRoll').addEventListener('pointerdown', e => {
+  if (CR.recording) return;
+  const r = e.currentTarget.getBoundingClientRect(), span = Math.max(8, crLen() + 2, crNow() + 2);
+  // the roll may be turned sideways on phones, so measure along its own width
+  const rot = document.body.style.transform || getComputedStyle(document.body).transform !== 'none';
+  const frac = rot && r.height > r.width ? (e.clientY - r.top) / r.height : (e.clientX - r.left) / r.width;
+  const t = clamp(frac, 0, 1) * span, was = CR.playing;
+  if (was) crStop(); CR.pos = Math.min(t, crLen()); if (was) crPlay();
+});
+
+/* export */
+async function crRender() {
+  if (!CR.notes.length) { toast('Record something first.'); return null; }
+  ac();
+  const sr = ctx.sampleRate, len = crLen() + 2.5, off = new OfflineAudioContext(2, Math.ceil(len * sr), sr);
+  const out = off.createGain(); out.gain.value = crK.vol.value;
+  const lim = off.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.2;
+  out.connect(lim); lim.connect(off.destination);
+  if (crK.rev.value > 0.001) { const rg = off.createGain(), cv = off.createConvolver(); rg.gain.value = crK.rev.value; cv.buffer = IR; out.connect(rg); rg.connect(cv); cv.connect(lim); }
+  for (const n of CR.notes) startVoice(off, out, n.s, n.m, n.v, n.t + 0.05).release(n.t + 0.05 + n.d);
+  return off.startRendering();
+}
+const crName = () => ($('#projTitle').value.trim() || 'My creation');
+async function crSave(kind) {
+  if (crSave.busy) return; crSave.busy = true;
+  try {
+    toast('Making your ' + kind.toUpperCase() + '…');
+    const buf = await crRender(); if (!buf) return;
+    const blob = kind === 'mp3' ? await encodeMP3(buf, f => toast('Making MP3… ' + Math.round(f * 100) + '%')) : encodeWAV(buf);
+    download(blob, crName() + '.' + kind); toast(kind.toUpperCase() + ' saved to Downloads');
+  } catch (e) { toast('The file could not be made.'); }
+  finally { crSave.busy = false; }
+}
+async function crSend() {
+  try {
+    if (CR.playing) crStop();
+    const buf = await crRender(); if (!buf) return;
+    const name = crName(), file = new File([encodeWAV(buf)], name + '.wav', { type: 'audio/wav' });
+    let d = A;
+    if (A.buffer) {
+      if (B.buffer && !(await askConfirm('Deck A and deck B both have songs. Put your creation on deck B instead of its song?', 'Replace'))) return;
+      d = B;
+    }
+    setMode('dj');
+    if (d === B) setDual(true);
+    await d.load(file); setActive(d);
+    toast('“' + name + '” is on deck ' + d.id + '. Your creation is still in Create mode.');
+  } catch (e) { toast('Your creation could not be sent to a deck.'); }
+}
+
+/* library hooks */
+function crSnapshot() {
+  return { kind: 'create', notes: CR.notes.map(n => ({ m: n.m, t: +n.t.toFixed(4), d: +n.d.toFixed(4), v: n.v, s: n.s, take: n.take })),
+    bpm: CR.bpm, metro: CR.metro, sound: CR.sound, octave: CR.octave, vol: crK.vol.value, rev: crK.rev.value, length: crLen() };
+}
+function crApply(p) {
+  if (CR.playing) crStop(); releaseAllInput();
+  CR.notes = p ? (p.notes || []).map(n => Object.assign({}, n)) : [];
+  CR.takeStack = [...new Set(CR.notes.map(n => n.take))];
+  CR.bpm = p ? p.bpm || 100 : 100; CR.metro = p ? !!p.metro : false; CR.sound = p ? p.sound || 'piano' : 'piano';
+  CR.octave = p && p.octave != null ? p.octave : CR.octave; CR.base = 12 * (CR.octave + 1); CR.pos = 0;
+  crK.vol.set(p && p.vol != null ? p.vol : 0.85); crK.rev.set(p && p.rev != null ? p.rev : 0.25);
+  renderKeys(); crUI(); crInfo();
+}
+
+/* controls */
+$('#crRec').addEventListener('click', crRecord);
+$('#crPlay').addEventListener('click', () => { if (CR.recording) crStop(); else crPlay(); });
+$('#crBack').addEventListener('click', () => { const was = CR.playing && !CR.recording; if (CR.playing) crStop(); CR.pos = 0; if (was) crPlay(); });
+$('#crMetro').addEventListener('click', () => { CR.metro = !CR.metro; if (CR.playing) CR.metro ? startMetro() : stopMetro(); crUI(); touch(); });
+$('#crBpm').addEventListener('change', () => { const v = Math.round(+$('#crBpm').value); if (v >= 40 && v <= 240) { CR.bpm = v; if (CR.playing && CR.metro) { const p = crNow(); CR.pos0 = p; CR.t0 = ctx.currentTime; startMetro(); } touch(); } crUI(); });
+$('#crBpm').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#crBpm').blur(); } });
+$('#crUndo').addEventListener('click', crUndoTake);
+$('#crClear').addEventListener('click', async () => { if (!CR.notes.length) return; if (await askConfirm('Clear every recorded note? You can’t undo this.', 'Clear')) { if (CR.playing) crStop(); CR.notes = []; CR.takeStack = []; CR.pos = 0; touch(); crInfo(); } });
+$('#crWav').addEventListener('click', () => crSave('wav'));
+$('#crMp3').addEventListener('click', () => crSave('mp3'));
+$('#crSend').addEventListener('click', crSend);
+$('#crSound').addEventListener('change', () => { CR.sound = $('#crSound').value; touch(); });
+$('#crOctDn').addEventListener('click', () => crOct(-1));
+$('#crOctUp').addEventListener('click', () => crOct(1));
+$('#crSus').addEventListener('click', () => { CR.susBtn = !CR.susBtn; crSetSus(); });
+$('#crLabels').addEventListener('click', () => { CR.labels = !CR.labels; renderKeys(); crUI(); });
+
+/* computer keyboard in Create mode */
+document.addEventListener('keydown', e => {
+  if (MODE !== 'create' || document.querySelector('dialog[open]')) return;
+  const t = e.target, tag = t && t.tagName;
+  if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (e.ctrlKey || e.metaKey) { if (e.key.toLowerCase() === 'z') { e.preventDefault(); crUndoTake(); } return; }
+  if (e.altKey) return;
+  if (e.key === 'Shift') { if (!e.repeat) { CR.susKey = true; crSetSus(); } return; }
+  const k = e.key.toLowerCase();
+  if (e.key === ' ') { e.preventDefault(); if (!e.repeat) { if (CR.recording) crStop(); else crPlay(); } return; }
+  if (k === 'r') { if (!e.repeat) crRecord(); return; }
+  if (k === 'z') { crOct(-1); return; } if (k === 'x') { crOct(1); return; }
+  const i = KEYMAP.indexOf(k); if (i < 0) return;
+  e.preventDefault(); if (e.repeat || keyNotes.has(k)) return;
+  const m = CR.base + i; keyNotes.set(k, m); pressNote(m);
+});
+document.addEventListener('keyup', e => {
+  if (e.key === 'Shift') { if (CR.susKey) { CR.susKey = false; crSetSus(); } return; }
+  const k = e.key.toLowerCase(); if (keyNotes.has(k)) { const m = keyNotes.get(k); keyNotes.delete(k); releaseNote(m); }
+});
+window.addEventListener('blur', () => releaseAllInput());
+
+/* ---------------- switching modes ---------------- */
+const IS_PHONE = matchMedia('(pointer:coarse)').matches && Math.min(screen.width, screen.height) < 820;
+if (IS_PHONE) document.documentElement.classList.add('phone');
+const modeState = { dj: { project: { id: null, created: null }, dirty: false, title: '' }, create: { project: { id: null, created: null }, dirty: false, title: '' } };
+let wentFullscreen = false;
+async function setMode(m, fromTap) {
+  if (m === MODE) return;
+  modeState[MODE] = { project, dirty, title: $('#projTitle').value };
+  if (MODE === 'create') { if (CR.playing) crStop(); releaseAllInput(); }
+  MODE = m; ({ project, dirty } = modeState[m]); $('#projTitle').value = modeState[m].title;
+  $('#projTitle').placeholder = m === 'create' ? 'Untitled creation' : 'Untitled project';
+  document.body.classList.toggle('mode-create', m === 'create');
+  document.querySelectorAll('.modesw button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.mode === m)));
+  if ($('#lib').open) $('#lib').close();
+  showState(); try { localStorage.setItem('spinlab-mode', m); } catch (e) {}
+  if (m === 'create') {
+    requestAnimationFrame(() => { renderKeys(); crUI(); crInfo(); });
+    if (IS_PHONE && fromTap) {
+      // phones: go full screen and lock sideways where the browser allows it (iPhones turn the app sideways with CSS instead)
+      try {
+        if (!document.fullscreenElement && document.documentElement.requestFullscreen) { await document.documentElement.requestFullscreen({ navigationUI: 'hide' }); wentFullscreen = true; }
+        if (screen.orientation && screen.orientation.lock) await screen.orientation.lock('landscape');
+      } catch (e) {}
+      requestAnimationFrame(renderKeys);
+    }
+  } else {
+    try { if (screen.orientation && screen.orientation.unlock) screen.orientation.unlock(); } catch (e) {}
+    if (wentFullscreen && document.fullscreenElement) { document.exitFullscreen().catch(() => {}); }
+    wentFullscreen = false;
+    decks.forEach(d => { d.waveKey = d.ovKey = null; });
+  }
+}
+document.querySelectorAll('.modesw button').forEach(b => b.addEventListener('click', () => setMode(b.dataset.mode, true)));
+window.addEventListener('orientationchange', () => setTimeout(() => { if (MODE === 'create') renderKeys(); }, 300));
 
 /* ---------------- download the whole app as one offline HTML file ---------------- */
 const IS_OFFLINE_COPY = !!document.querySelector('meta[name="spinlab-offline"]');
@@ -1748,6 +2266,7 @@ $('#helpClose').addEventListener('click', () => $('#help').close());
 document.addEventListener('keydown', e => {
   const t = e.target, tag = t && t.tagName;
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (!document.querySelector('dialog[open]')) saveProject(); return; }
+  if (MODE === 'create') return;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || document.querySelector('dialog[open]')) return;
   const d = activeDeck || A, mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
   if (mod) {
@@ -1777,7 +2296,9 @@ document.addEventListener('keydown', e => {
 const spec = $('#spec');
 let freq = null, lastT = {};
 function frame() {
+  if (MODE === 'create') crFrame();
   decks.forEach(d => {
+    if (MODE === 'create') return;
     if (d === B && !dual) return;
     if (d.selStop) { if (!d.playing || d.loop.on) d.selStop = null; else if (d.pos() >= d.selStop.b - 0.01) { const a = d.selStop.a; d.selStop = null; d.pause(); d.seek(a); } }
     drawDeck(d);
@@ -1813,6 +2334,8 @@ function frame() {
 /* ---------------- start ---------------- */
 setupDeck(A); setupDeck(B);
 setActive(A); decks.forEach(renderDeckUI);
+crUI(); crInfo();
+try { if (localStorage.getItem('spinlab-mode') === 'create') setMode('create', false); } catch (e) {}
 requestAnimationFrame(frame);
 </script>
 </body>
