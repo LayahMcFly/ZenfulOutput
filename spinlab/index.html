@@ -315,6 +315,11 @@ canvas.roll{width:100%;display:block;border-radius:10px;background:#070910;borde
 .pk-b.pb{background:linear-gradient(#3b4461,color-mix(in srgb,var(--oc) 60%,#0d1018) 80%)}
 .pk-b.on{background:linear-gradient(#262c40,color-mix(in srgb,var(--oc) 70%,#0d1018) 85%);box-shadow:inset 0 -1px 0 #000,inset 0 3px 5px rgba(0,0,0,.5);transform:translateY(2px)}
 .pk .nm{position:absolute;left:0;right:0;bottom:12px;text-align:center;font:700 11px var(--mono);color:#8a93a6;pointer-events:none}
+.pk-w .nm{word-break:break-word;line-height:1.15;padding:0 2px}
+.pkeys.dr .pk-b .nm{writing-mode:vertical-rl;transform:rotate(180deg);bottom:10px;left:0;right:0;margin:0 auto;width:1.25em;text-align:left;white-space:nowrap;font-size:10px;line-height:1.25em}
+.pkeys.dr .pk-w .nm{writing-mode:vertical-rl;transform:rotate(180deg);bottom:14px;left:0;right:0;margin:0 auto;width:1.3em;text-align:left;white-space:nowrap;font-size:11px;line-height:1.3em;word-break:normal;padding:0}
+.pkeys.dr .pk-w .hk{bottom:auto;top:calc(61% + 10px)}
+.pkeys.dr .pk-b .hk{top:10px}
 .pk .nm.c{color:color-mix(in srgb,var(--oc,#4b5574) 70%,#0b0d14);font-weight:800}
 .pk .hk{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:700 10px var(--mono);color:#6b7489;pointer-events:none;text-transform:uppercase}
 .pk-b .hk{bottom:auto;top:calc(100% - 64px);color:#8b93a9}
@@ -704,8 +709,8 @@ html.phone body.mode-create .btn{min-height:38px}
   </ul>
   <h3>Piano</h3>
   <ul>
-    <li>Tap the instrument button at the top to see the numbered list of 36 instruments: keys, strings (violin, cello and more), guitars, woodwinds, brass, mallets and bells, choir, synths and a drum kit. The small arrows beside it step to the previous or next instrument (<kbd>[</kbd> <kbd>]</kbd> on a computer). Picking one plays a short sample.</li>
-    <li>With the <b>Drum kit</b>, each key is a drum and is labeled with its name.</li>
+    <li>Tap the instrument button at the top to see the numbered list of instruments: keys, strings (violin, cello and more), guitars, woodwinds, brass, mallets and bells, choir, synths and a drum kit. The small arrows beside it step to the previous or next instrument (<kbd>[</kbd> <kbd>]</kbd> on a computer). Picking one plays a short sample.</li>
+    <li>Every family has at least six instruments. The <b>Drums</b> family has six kits (acoustic, 808, dance, hand percussion, lo-fi and orchestral). With a kit, each key is a drum and is labeled with its name.</li>
     <li>The arrows on the right move the keyboard up or down an octave.</li>
     <li>Play with your fingers or mouse, and slide across the keys to glide. On a computer, <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> play notes, <kbd>Z</kbd> / <kbd>X</kbd> change octave, and holding <kbd>Shift</kbd> is the sustain pedal.</li>
     <li>Everything else is in <b>Menu</b>: Record, Play, the note view, Undo take, Clear, metronome, sustain, volume, reverb, Save, Library, Save WAV/MP3 and Send to DJ.</li>
@@ -760,7 +765,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.14'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.15'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2066,6 +2071,8 @@ const INSTRUMENTS = [
   { id: 'harpsichord', name: 'Harpsichord', fam: 'keys', kind: 'ks', S: 0.12, t60: 2.4, soft: 0, dur: 3, lp: 9000, gain: 0.75, r: 0.12, body: [[1800, 1, 4]] },
   { id: 'organ', name: 'Organ', fam: 'keys', kind: 'legacy' },
   { id: 'accordion', name: 'Accordion', fam: 'keys', kind: 'tone', osc: [{ w: 'square', g: 0.5 }, { w: 'sawtooth', det: 14, g: 0.5 }], lp: { mul: 7, max: 7000 }, form: [[1200, 1.5, 4]], env: { a: 0.04, d: 0.1, s: 0.95, r: 0.09 }, trem: [6, 0.18], gain: 0.3 },
+  { id: 'clavinet', name: 'Clavinet', fam: 'keys', kind: 'ks', S: 0.15, t60: 0.9, soft: 0, dur: 1.6, lp: 5200, gain: 1.0, r: 0.05, body: [[1200, 2, 6], [300, 1, -3]] },
+  { id: 'toypiano', name: 'Toy piano', fam: 'keys', kind: 'mallet', parts: [[1, 1, 1], [3.9, 0.4, 0.4], [9.1, 0.15, 0.15]], dec: 1.1, gain: 0.5, ring: true, shift: 12 },
   { id: 'violin', name: 'Violin', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: 7, g: 0.45 }], lp: { mul: 10, max: 9000, q: 0.6 }, form: [[450, 2, 4], [2500, 1.4, 4], [3600, 2, -5]], env: { a: 0.09, d: 0.25, s: 0.85, r: 0.28 }, vib: [5.6, 15, 0.25], noise: { g: 0.05, hz: 3200, q: 0.8, att: 0.12, sus: 0.015 }, gain: 0.28 },
   { id: 'viola', name: 'Viola', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: -6, g: 0.45 }], lp: { mul: 8, max: 6500, q: 0.6 }, form: [[350, 2, 5], [1900, 1.4, 4]], env: { a: 0.1, d: 0.25, s: 0.85, r: 0.3 }, vib: [5.3, 13, 0.25], noise: { g: 0.04, hz: 2500, q: 0.8, att: 0.12, sus: 0.012 }, gain: 0.3 },
   { id: 'cello', name: 'Cello', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: 5, g: 0.4 }], lp: { mul: 7, max: 4500, q: 0.6 }, form: [[250, 2, 5], [1100, 1.4, 4]], env: { a: 0.12, d: 0.3, s: 0.85, r: 0.32 }, vib: [5.0, 12, 0.3], noise: { g: 0.035, hz: 1800, q: 0.8, att: 0.14, sus: 0.01 }, gain: 0.34 },
@@ -2077,32 +2084,68 @@ const INSTRUMENTS = [
   { id: 'eguitar', name: 'Electric guitar', fam: 'guitars', kind: 'ks', S: 0.35, t60: 4, soft: 0, dur: 4, lp: 3800, gain: 0.45, r: 0.12, drive: 4, body: [[800, 1, 4]] },
   { id: 'bassguitar', name: 'Bass guitar', fam: 'guitars', kind: 'ks', S: 0.48, t60: 2.5, soft: 2, dur: 3, lp: 1600, gain: 0.85, r: 0.1, body: [[90, 1.5, 4]], shift: -12 },
   { id: 'banjo', name: 'Banjo', fam: 'guitars', kind: 'ks', S: 0.2, t60: 1, soft: 0, dur: 2, lp: 8000, gain: 0.75, r: 0.1, body: [[1200, 2, 6]] },
+  { id: 'ukulele', name: 'Ukulele', fam: 'guitars', kind: 'ks', S: 0.38, t60: 1.6, soft: 1, dur: 2.2, lp: 6000, gain: 0.75, r: 0.12, body: [[300, 2, 5], [1500, 1, 3]] },
+  { id: 'mandolin', name: 'Mandolin', fam: 'guitars', kind: 'ks', S: 0.22, t60: 1.3, soft: 0, dur: 1.9, lp: 7000, gain: 0.6, r: 0.1, body: [[600, 2, 5]], layers: [[0, 7, 0.8]] },
+  { id: 'twelvestring', name: '12-string guitar', fam: 'guitars', kind: 'ks', S: 0.38, t60: 3, soft: 1, dur: 4, lp: 7500, gain: 0.5, r: 0.15, body: [[110, 2, 5], [2500, 1, 3]], layers: [[12, 0, 0.45], [0, 5, 0.7]] },
+  { id: 'sitar', name: 'Sitar', fam: 'guitars', kind: 'ks', S: 0.3, t60: 3.5, soft: 0, dur: 4.5, lp: 5000, gain: 0.42, r: 0.2, drive: 2, body: [[1000, 4, 8], [2200, 5, 6]], layers: [[0, 6, 0.5]] },
   { id: 'flute', name: 'Flute', fam: 'winds', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'sine', oct: 1, g: 0.12 }, { w: 'triangle', g: 0.15 }], env: { a: 0.07, d: 0.1, s: 0.9, r: 0.15 }, vib: [4.8, 14, 0.3], noise: { g: 0.1, mul: 2, q: 1.6, att: 0.25, sus: 0.04 }, gain: 0.38 },
   { id: 'recorder', name: 'Recorder', fam: 'winds', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'triangle', g: 0.35 }], env: { a: 0.03, d: 0.08, s: 0.9, r: 0.08 }, vib: [5, 3, 0.4], noise: { g: 0.14, mul: 3, q: 1, att: 0.04, sus: 0.015 }, gain: 0.36 },
   { id: 'clarinet', name: 'Clarinet', fam: 'winds', kind: 'tone', osc: [{ w: [1, 0, 0.6, 0, 0.4, 0, 0.25, 0, 0.15, 0, 0.1, 0, 0.06], g: 1 }], lp: { mul: 6, max: 6000 }, env: { a: 0.05, d: 0.15, s: 0.9, r: 0.12 }, vib: [4.5, 5, 0.4], gain: 0.36 },
   { id: 'oboe', name: 'Oboe', fam: 'winds', kind: 'tone', osc: [{ w: [0.6, 1, 0.9, 0.7, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1], g: 1 }], lp: { mul: 9, max: 7000 }, form: [[1100, 3, 6], [2800, 3, 3]], env: { a: 0.04, d: 0.12, s: 0.88, r: 0.1 }, vib: [5.2, 10, 0.3], gain: 0.34 },
   { id: 'sax', name: 'Saxophone', fam: 'winds', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'square', g: 0.15 }], lp: { mul: 7, max: 6000, env: [2, 7, 0.06] }, form: [[600, 2, 5], [1500, 2, 6], [2700, 3, 3]], env: { a: 0.04, d: 0.15, s: 0.85, r: 0.12 }, vib: [5, 12, 0.25], noise: { g: 0.04, hz: 2200, q: 1, att: 0.1, sus: 0.015 }, gain: 0.26 },
+  { id: 'bassoon', name: 'Bassoon', fam: 'winds', kind: 'tone', osc: [{ w: [1, 0.9, 0.8, 0.6, 0.45, 0.35, 0.25, 0.18, 0.12], g: 1 }], lp: { mul: 5, max: 2600 }, form: [[500, 3, 6], [1150, 3, 3]], env: { a: 0.06, d: 0.15, s: 0.9, r: 0.12 }, vib: [4.5, 6, 0.4], gain: 0.36 },
+  { id: 'panflute', name: 'Pan flute', fam: 'winds', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'sine', oct: 1, g: 0.06 }], env: { a: 0.08, d: 0.12, s: 0.85, r: 0.22 }, vib: [5, 10, 0.3], noise: { g: 0.16, mul: 2, q: 2.5, att: 0.3, sus: 0.06 }, gain: 0.38 },
   { id: 'trumpet', name: 'Trumpet', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }], lp: { mul: 6, max: 8000, env: [1.2, 9, 0.08], q: 1.2 }, form: [[1300, 1.5, 4]], env: { a: 0.025, d: 0.15, s: 0.85, r: 0.12 }, vib: [5.5, 8, 0.3], gain: 0.3 },
   { id: 'horn', name: 'French horn', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'triangle', g: 0.4 }], lp: { mul: 3, max: 2200, env: [1, 3, 0.12] }, env: { a: 0.07, d: 0.2, s: 0.9, r: 0.25 }, vib: [4.8, 5, 0.4], gain: 0.4 },
   { id: 'trombone', name: 'Trombone', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }], lp: { mul: 5, max: 4000, env: [1.3, 6, 0.1], q: 1 }, form: [[500, 1.5, 3]], env: { a: 0.05, d: 0.15, s: 0.88, r: 0.15 }, vib: [5, 6, 0.35], gain: 0.34 },
   { id: 'tuba', name: 'Tuba', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'square', oct: -1, g: 0.25 }], lp: { mul: 3, max: 1200, env: [1, 3, 0.12] }, env: { a: 0.07, d: 0.2, s: 0.9, r: 0.18 }, vib: [4.5, 4, 0.4], gain: 0.5 },
+  { id: 'mutedtrumpet', name: 'Muted trumpet', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }], lp: { mul: 4, max: 3500, env: [1.2, 5, 0.06], q: 2 }, form: [[1800, 4, 10], [700, 3, -6]], env: { a: 0.02, d: 0.12, s: 0.85, r: 0.1 }, vib: [5.5, 6, 0.3], gain: 0.28 },
+  { id: 'brasssection', name: 'Brass section', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', det: -8, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 9, g: 0.6 }], lp: { mul: 6, max: 6000, env: [1.2, 7, 0.1] }, form: [[1200, 1.5, 3]], env: { a: 0.04, d: 0.15, s: 0.88, r: 0.2 }, vib: [5, 6, 0.35], gain: 0.22 },
   { id: 'vibraphone', name: 'Vibraphone', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [4, 0.25, 0.35], [10, 0.05, 0.15]], dec: 3.2, trem: [5, 0.35], gain: 0.4, r: 0.35 },
   { id: 'marimba', name: 'Marimba', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [4, 0.3, 0.25], [9.9, 0.08, 0.1]], dec: 0.9, gain: 0.55, ring: true },
   { id: 'xylophone', name: 'Xylophone', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [3, 0.45, 0.6], [6, 0.15, 0.3]], dec: 0.45, gain: 0.55, ring: true },
   { id: 'musicbox', name: 'Music box', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [2.01, 0.25, 0.6], [5.2, 0.15, 0.3]], dec: 1.6, gain: 0.45, ring: true, shift: 12 },
   { id: 'bells', name: 'Bells', fam: 'mallets', kind: 'mallet', parts: [[0.5, 0.35, 1.3], [1, 1, 1], [2.76, 0.5, 0.6], [5.4, 0.3, 0.4], [8.93, 0.15, 0.25]], dec: 4, gain: 0.35, ring: true },
   { id: 'steeldrum', name: 'Steel drum', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [2, 0.5, 0.7], [3.01, 0.3, 0.5], [4.02, 0.15, 0.3]], dec: 1.1, gain: 0.45, ring: true },
-  { id: 'choir', name: 'Choir', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', det: -9, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 10, g: 0.6 }], lp: { mul: 9, max: 3500 }, form: [[730, 5, 10], [1090, 5, 8], [2440, 5, 6]], env: { a: 0.32, d: 0.3, s: 0.9, r: 0.5 }, vib: [5, 10, 0.4], gain: 0.24 },
+  { id: 'choir', name: 'Choir (aah)', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', det: -9, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 10, g: 0.6 }], lp: { mul: 9, max: 3500 }, form: [[730, 5, 10], [1090, 5, 8], [2440, 5, 6]], env: { a: 0.32, d: 0.3, s: 0.9, r: 0.5 }, vib: [5, 10, 0.4], gain: 0.24 },
+  { id: 'chooh', name: 'Choir (ooh)', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', det: -9, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 10, g: 0.6 }], lp: { mul: 6, max: 2400 }, form: [[300, 5, 10], [870, 5, 8], [2240, 5, 5]], env: { a: 0.32, d: 0.3, s: 0.9, r: 0.5 }, vib: [5, 10, 0.4], gain: 0.3 },
+  { id: 'choh', name: 'Choir (oh)', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', det: -9, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 10, g: 0.6 }], lp: { mul: 7, max: 3000 }, form: [[570, 5, 10], [840, 5, 8], [2410, 5, 5]], env: { a: 0.3, d: 0.3, s: 0.9, r: 0.5 }, vib: [5, 10, 0.4], gain: 0.26 },
+  { id: 'solovoice', name: 'Solo voice', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'triangle', g: 0.5 }], lp: { mul: 8, max: 4000 }, form: [[730, 5, 10], [1090, 5, 8], [2440, 5, 6]], env: { a: 0.12, d: 0.2, s: 0.9, r: 0.3 }, vib: [5.5, 30, 0.3], gain: 0.24 },
+  { id: 'whistle', name: 'Whistle', fam: 'voices', kind: 'tone', osc: [{ w: 'sine', g: 1 }], env: { a: 0.03, d: 0.1, s: 0.9, r: 0.08 }, vib: [6, 15, 0.2], noise: { g: 0.05, mul: 1, q: 6, att: 0.1, sus: 0.02 }, gain: 0.34, shift: 12 },
+  { id: 'humming', name: 'Humming', fam: 'voices', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'sawtooth', g: 0.25 }], lp: { mul: 2, max: 900 }, form: [[250, 4, 6]], env: { a: 0.15, d: 0.2, s: 0.9, r: 0.25 }, vib: [5, 8, 0.3], gain: 0.26 },
   { id: 'synth', name: 'Synth lead', fam: 'synths', kind: 'legacy' },
   { id: 'pad', name: 'Synth pad', fam: 'synths', kind: 'tone', osc: [{ w: 'sawtooth', det: -14, g: 0.5 }, { w: 'sawtooth', det: -5, g: 0.5 }, { w: 'sawtooth', det: 6, g: 0.5 }, { w: 'sawtooth', det: 15, g: 0.5 }], lp: { mul: 4, max: 2400, q: 2 }, env: { a: 0.5, d: 0.4, s: 0.9, r: 1.2 }, vib: [0.4, 6, 0], gain: 0.27 },
   { id: 'bass', name: 'Synth bass', fam: 'synths', kind: 'legacy' },
-  { id: 'drums', name: 'Drum kit', fam: 'drums', kind: 'drum' }
+  { id: 'chiptune', name: 'Chiptune (8-bit)', fam: 'synths', kind: 'tone', osc: [{ w: 'square', g: 1 }], env: { a: 0.002, d: 0.05, s: 0.9, r: 0.03 }, gain: 0.16 },
+  { id: 'supersaw', name: 'Super saw', fam: 'synths', kind: 'tone', osc: [-25, -15, -6, 0, 6, 15, 25].map(det => ({ w: 'sawtooth', det, g: 0.35 })), lp: { mul: 10, max: 9000 }, env: { a: 0.01, d: 0.3, s: 0.85, r: 0.3 }, gain: 0.24 },
+  { id: 'synthpluck', name: 'Synth pluck', fam: 'synths', kind: 'tone', osc: [{ w: 'sawtooth', det: -8, g: 0.6 }, { w: 'sawtooth', det: 8, g: 0.6 }], lp: { mul: 2, max: 9000, env: [12, 2, 0.25], q: 6 }, env: { a: 0.002, d: 0.6, s: 0, r: 0.2 }, gain: 0.45 },
+  { id: 'drums', name: 'Drum kit', fam: 'drums', kind: 'drum', kit: 'acoustic' },
+  { id: 'drums808', name: 'Electronic kit (808)', fam: 'drums', kind: 'drum', kit: '808' },
+  { id: 'dancekit', name: 'Dance kit', fam: 'drums', kind: 'drum', kit: 'dance' },
+  { id: 'percussion', name: 'Hand percussion', fam: 'drums', kind: 'drum', kit: 'perc' },
+  { id: 'lofikit', name: 'Lo-fi kit', fam: 'drums', kind: 'drum', kit: 'lofi' },
+  { id: 'orchperc', name: 'Orchestral percussion', fam: 'drums', kind: 'drum', kit: 'orch' }
 ];
 INSTRUMENTS.forEach((x, i) => x.num = i + 1);
 const INST = Object.fromEntries(INSTRUMENTS.map(x => [x.id, x]));
 const SOUNDS = Object.fromEntries(INSTRUMENTS.map(x => [x.id, x.name]));
 const SOUND_COLORS = Object.fromEntries(INSTRUMENTS.map(x => [x.id, FAMS[x.fam].color]));
-const DRUM_NAMES = ['Kick', 'Rim', 'Snare', 'Clap', 'Snare 2', 'Low tom', 'Hi-hat', 'Mid tom', 'Pedal hat', 'High tom', 'Open hat', 'Crash'];
+// each drum kit: which sound sits on each of the 12 keys of an octave (C, C#, D ... B), and its label
+const KITS = {
+  acoustic: { hits: ['kick', 'rim', 'snare', 'clap', 'snare2', 'tomL', 'hatC', 'tomM', 'hatP', 'tomH', 'hatO', 'crash'],
+              names: ['Kick', 'Rim', 'Snare', 'Clap', 'Snare 2', 'Low tom', 'Hi-hat', 'Mid tom', 'Pedal hat', 'High tom', 'Open hat', 'Crash'] },
+  '808':    { hits: ['kick808', 'rim', 'snare808', 'clap', 'cowbell', 'tom808L', 'hat808C', 'tom808M', 'shaker', 'tom808H', 'hat808O', 'cym808'],
+              names: ['808 kick', 'Rim', '808 snare', 'Clap', 'Cowbell', 'Low tom', 'Hi-hat', 'Mid tom', 'Shaker', 'High tom', 'Open hat', 'Cymbal'] },
+  dance:    { hits: ['kick909', 'rim', 'snare909', 'clap', 'snare2', 'tomL', 'hatC', 'tomM', 'tamb', 'tomH', 'hatO', 'ride'],
+              names: ['Kick', 'Rim', 'Snare', 'Clap', 'Snare 2', 'Low tom', 'Hi-hat', 'Mid tom', 'Tambourine', 'High tom', 'Open hat', 'Ride'] },
+  perc:     { hits: ['congaL', 'claves', 'congaH', 'shaker', 'bongoL', 'bongoH', 'tamb', 'timbale', 'guiro', 'cowbell', 'triangle', 'wood'],
+              names: ['Low conga', 'Claves', 'High conga', 'Shaker', 'Low bongo', 'High bongo', 'Tambourine', 'Timbale', 'Guiro', 'Cowbell', 'Triangle', 'Woodblock'] },
+  lofi:     { hits: ['kick', 'rim', 'snare', 'clap', 'snare2', 'tomL', 'hatC', 'tomM', 'hatP', 'tomH', 'hatO', 'crash'],
+              names: ['Kick', 'Rim', 'Snare', 'Clap', 'Snare 2', 'Low tom', 'Hi-hat', 'Mid tom', 'Pedal hat', 'High tom', 'Open hat', 'Crash'] },
+  orch:     { hits: ['bassdrum', 'triangle', 'timpL', 'tamb', 'timpM', 'timpH', 'cymbal', 'snare', 'sleigh', 'gong', 'wood', 'chimes'],
+              names: ['Bass drum', 'Triangle', 'Timpani low', 'Tambourine', 'Timpani mid', 'Timpani high', 'Cymbals', 'Snare', 'Sleigh bells', 'Gong', 'Woodblock', 'Wind chimes'] }
+};
+const DRUM_NAMES = KITS.acoustic.names;
 const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
 const noiseCache = new Map();
 function noiseBuf(sr) {
@@ -2194,20 +2237,26 @@ function ksBuffer(sr, P, m) {
   hit = { buf, rate }; ksCache.set(key, hit); return hit;
 }
 const driveCurves = new Map();
+function driveCurve(k) {
+  let curve = driveCurves.get(k);
+  if (!curve) { curve = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; curve[i] = Math.tanh(x * k) / Math.tanh(k); } driveCurves.set(k, curve); }
+  return curve;
+}
 function ksVoice(c, dest, P, m, vel, t) {
-  const { buf, rate } = ksBuffer(c.sampleRate, P, m), src = c.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
-  let last = src;
-  if (P.drive) {
-    let curve = driveCurves.get(P.drive);
-    if (!curve) { curve = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; curve[i] = Math.tanh(x * P.drive) / Math.tanh(P.drive); } driveCurves.set(P.drive, curve); }
-    const ws = c.createWaveShaper(); ws.curve = curve; ws.oversample = '2x'; last.connect(ws); last = ws;
-  }
+  const mix = c.createGain(), srcs = []; let end = t;
+  [[0, 0, 1], ...(P.layers || [])].forEach(([semi, cents, lg]) => {
+    const { buf, rate } = ksBuffer(c.sampleRate, P, m + semi), src = c.createBufferSource();
+    src.buffer = buf; src.playbackRate.value = rate * Math.pow(2, cents / 1200);
+    const g = c.createGain(); g.gain.value = lg; src.connect(g); g.connect(mix);
+    src.start(t); const e = t + buf.duration / src.playbackRate.value; src.stop(e + 0.02); end = Math.max(end, e); srcs.push(src);
+  });
+  let last = mix;
+  if (P.drive) { const ws = c.createWaveShaper(); ws.curve = driveCurve(P.drive); ws.oversample = '2x'; last.connect(ws); last = ws; }
   const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = P.lp; last.connect(lp); last = lp;
   (P.body || []).forEach(([fr, q, gdb]) => { const pk = c.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = fr; pk.Q.value = q; pk.gain.value = gdb; last.connect(pk); last = pk; });
   const g = c.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel * P.gain, t + 0.003);
-  last.connect(g); g.connect(dest); src.start(t);
-  const end = t + buf.duration / rate; src.stop(end + 0.02);
-  return releaser(c, g, t, P.r, [src], end);
+  last.connect(g); g.connect(dest);
+  return releaser(c, g, t, P.r, srcs, end);
 }
 // struck instruments: a few sine partials that each fade at their own speed
 function malletVoice(c, dest, P, m, vel, t) {
@@ -2228,32 +2277,71 @@ function malletVoice(c, dest, P, m, vel, t) {
   if (P.ring) return { release() {}, stopNow() { const n = c.currentTime; g.gain.setTargetAtTime(0, n, 0.01); srcs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); } };
   return releaser(c, g, t, P.r || 0.3, srcs, end);
 }
-// drum kit: each key in an octave is a different drum
-function drumVoice(c, dest, m, vel, t) {
-  const kind = ((m % 12) + 12) % 12, tune = clamp(1 + (Math.floor(m / 12) - 5) * 0.12, 0.6, 1.5), srcs = [];
-  const out = c.createGain(); out.gain.value = vel * 0.9; out.connect(dest);
-  const noise = (dur, type, freq, q, level, decay, delay = 0) => {
+// drum kits: each key in an octave is a different drum (see KITS)
+const HAT808 = [205.3, 304.4, 369.6, 522.7, 540, 800];
+function drumVoice(c, dest, m, vel, t, kit = 'acoustic') {
+  const K = KITS[kit] || KITS.acoustic, hit = K.hits[((m % 12) + 12) % 12];
+  const tune = clamp(1 + (Math.floor(m / 12) - 5) * 0.12, 0.6, 1.5), srcs = [];
+  const out = c.createGain(); out.gain.value = vel * 0.9;
+  if (kit === 'lofi') {
+    const ws = c.createWaveShaper(); ws.curve = driveCurve(2.2); const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = 3800; lp.Q.value = 0.9;
+    out.gain.value = vel * 0.75; out.connect(ws); ws.connect(lp); lp.connect(dest);
+  } else out.connect(dest);
+  const noise = (dur, type, freq, q, level, decay, delay = 0, attack = 0.001) => {
     const n = c.createBufferSource(); n.buffer = noiseBuf(c.sampleRate);
     const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q || 0.7;
-    const g = c.createGain(); const s0 = t + delay; g.gain.setValueAtTime(0, s0); g.gain.linearRampToValueAtTime(level, s0 + 0.001); g.gain.exponentialRampToValueAtTime(0.0001, s0 + decay);
-    n.connect(fl); fl.connect(g); g.connect(out); n.start(s0, Math.random()); n.stop(s0 + dur); srcs.push(n);
+    const g = c.createGain(), s0 = t + delay; g.gain.setValueAtTime(0, s0); g.gain.linearRampToValueAtTime(level, s0 + attack); g.gain.exponentialRampToValueAtTime(0.0001, s0 + attack + decay);
+    n.connect(fl); fl.connect(g); g.connect(out); n.start(s0, Math.random()); n.stop(s0 + Math.max(dur, attack + decay) + 0.02); srcs.push(n);
   };
-  const tone = (type, f0, f1, sweep, level, decay) => {
-    const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + sweep);
+  const tone = (type, f0, f1, sweep, level, decay, delay = 0) => {
+    const s0 = t + delay, o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, s0); o.frequency.exponentialRampToValueAtTime(f1, s0 + sweep);
+    const g = c.createGain(); g.gain.setValueAtTime(0, s0); g.gain.linearRampToValueAtTime(level, s0 + 0.002); g.gain.exponentialRampToValueAtTime(0.0001, s0 + decay);
+    o.connect(g); g.connect(out); o.start(s0); o.stop(s0 + decay + 0.02); srcs.push(o);
+  };
+  const metal = (freqs, hp, level, decay) => {
     const g = c.createGain(); g.gain.setValueAtTime(level, t); g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
-    o.connect(g); g.connect(out); o.start(t); o.stop(t + decay + 0.02); srcs.push(o);
+    const f = c.createBiquadFilter(); f.type = 'highpass'; f.frequency.value = hp; f.connect(g); g.connect(out);
+    freqs.forEach(fr => { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = fr; o.connect(f); o.start(t); o.stop(t + decay + 0.05); srcs.push(o); });
   };
-  switch (kind) {
-    case 0: tone('sine', 150 * tune, 42 * tune, 0.12, 1, 0.45); noise(0.01, 'highpass', 3000, 0.7, 0.25, 0.008); break;
-    case 1: tone('square', 820 * tune, 800 * tune, 0.01, 0.25, 0.035); noise(0.03, 'bandpass', 2500, 2, 0.3, 0.03); break;
-    case 2: noise(0.25, 'highpass', 1400, 0.7, 0.7, 0.2); tone('triangle', 190 * tune, 160 * tune, 0.05, 0.5, 0.11); break;
-    case 3: [0, 0.011, 0.022].forEach(dl => noise(0.02, 'bandpass', 1300, 1.3, 0.8, 0.012, dl)); noise(0.2, 'bandpass', 1200, 1.1, 0.55, 0.16, 0.03); break;
-    case 4: noise(0.14, 'bandpass', 3500, 0.9, 0.7, 0.11); tone('triangle', 240 * tune, 200 * tune, 0.04, 0.4, 0.07); break;
-    case 5: case 7: case 9: { const base = { 5: 95, 7: 140, 9: 200 }[kind] * tune; tone('sine', base * 1.4, base, 0.18, 0.9, 0.42); noise(0.03, 'bandpass', 1500, 1, 0.1, 0.03); break; }
-    case 6: noise(0.08, 'highpass', 7500, 0.7, 0.4, 0.05); break;
-    case 8: noise(0.12, 'highpass', 6500, 0.7, 0.3, 0.08); break;
-    case 10: noise(0.5, 'highpass', 7000, 0.7, 0.35, 0.38); break;
-    case 11: noise(2, 'highpass', 4500, 0.5, 0.45, 1.6); noise(1.2, 'bandpass', 8000, 0.8, 0.2, 0.9); break;
+  const sines = list => list.forEach(([fr, level, decay, delay = 0, attack = 0.002]) => tone('sine', fr, fr * 0.995, decay, level, decay, delay));
+  switch (hit) {
+    case 'kick': tone('sine', 150 * tune, 42 * tune, 0.12, 1, 0.45); noise(0.01, 'highpass', 3000, 0.7, 0.25, 0.008); break;
+    case 'kick808': tone('sine', 110 * tune, 48 * tune, 0.06, 1, 1.1); noise(0.01, 'highpass', 2500, 0.7, 0.15, 0.006); break;
+    case 'kick909': tone('sine', 190 * tune, 52 * tune, 0.07, 1, 0.5); noise(0.02, 'highpass', 4000, 0.7, 0.4, 0.015); break;
+    case 'rim': tone('square', 820 * tune, 800 * tune, 0.01, 0.4, 0.035); noise(0.03, 'bandpass', 2500, 2, 0.55, 0.03); break;
+    case 'snare': noise(0.25, 'highpass', 1400, 0.7, 0.7, 0.2); tone('triangle', 190 * tune, 160 * tune, 0.05, 0.5, 0.11); break;
+    case 'snare2': noise(0.14, 'bandpass', 3500, 0.9, 0.7, 0.11); tone('triangle', 240 * tune, 200 * tune, 0.04, 0.4, 0.07); break;
+    case 'snare808': tone('triangle', 238 * tune, 230 * tune, 0.05, 0.5, 0.12); tone('triangle', 476 * tune, 460 * tune, 0.05, 0.3, 0.08); noise(0.2, 'highpass', 1800, 0.7, 0.55, 0.17); break;
+    case 'snare909': noise(0.28, 'highpass', 2000, 0.7, 0.55, 0.22); tone('triangle', 200 * tune, 180 * tune, 0.04, 0.5, 0.1); break;
+    case 'clap': [0, 0.011, 0.022].forEach(dl => noise(0.02, 'bandpass', 1300, 1.3, 1.6, 0.012, dl)); noise(0.2, 'bandpass', 1200, 1.1, 1.1, 0.16, 0.03); break;
+    case 'tomL': case 'tomM': case 'tomH': { const base = { tomL: 95, tomM: 140, tomH: 200 }[hit] * tune; tone('sine', base * 1.4, base, 0.18, 0.9, 0.42); noise(0.03, 'bandpass', 1500, 1, 0.1, 0.03); break; }
+    case 'tom808L': case 'tom808M': case 'tom808H': { const base = { tom808L: 80, tom808M: 120, tom808H: 170 }[hit] * tune; tone('sine', base * 1.15, base, 0.1, 0.9, 0.7); break; }
+    case 'hatC': noise(0.08, 'highpass', 7500, 0.7, 0.4, 0.05); break;
+    case 'hatP': noise(0.12, 'highpass', 6500, 0.7, 0.3, 0.08); break;
+    case 'hatO': noise(0.5, 'highpass', 7000, 0.7, 0.35, 0.38); break;
+    case 'hat808C': metal(HAT808, 7500, 0.2, 0.05); break;
+    case 'hat808O': metal(HAT808, 7500, 0.18, 0.45); break;
+    case 'cym808': metal(HAT808, 3500, 0.17, 1.3); break;
+    case 'crash': noise(2, 'highpass', 4500, 0.5, 0.45, 1.6); noise(1.2, 'bandpass', 8000, 0.8, 0.2, 0.9); break;
+    case 'ride': noise(1.6, 'bandpass', 6500, 0.8, 0.28, 1.4); metal([3200, 4300, 5100], 3000, 0.04, 1.2); break;
+    case 'cowbell': { const g = c.createGain(), bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = 2640 * tune; bp.Q.value = 0.7; g.gain.setValueAtTime(0.5, t); g.gain.exponentialRampToValueAtTime(0.0001, t + 0.35); bp.connect(g); g.connect(out);
+      [540, 800].forEach(fr => { const o = c.createOscillator(); o.type = 'square'; o.frequency.value = fr * tune; o.connect(bp); o.start(t); o.stop(t + 0.4); srcs.push(o); }); break; }
+    case 'shaker': noise(0.12, 'highpass', 5500, 0.7, 0.35, 0.07, 0, 0.015); break;
+    case 'tamb': noise(0.3, 'bandpass', 8000, 1, 0.35, 0.25); metal([4800, 6200, 7400], 5000, 0.07, 0.22); break;
+    case 'congaL': case 'congaH': { const f = (hit === 'congaL' ? 180 : 260) * tune; tone('sine', f * 1.15, f, 0.03, 0.85, 0.35); noise(0.02, 'bandpass', 2000, 1, 0.12, 0.015); break; }
+    case 'bongoL': case 'bongoH': { const f = (hit === 'bongoL' ? 300 : 420) * tune; tone('sine', f * 1.06, f, 0.02, 0.8, 0.16); break; }
+    case 'timbale': tone('triangle', 620 * tune, 600 * tune, 0.03, 0.5, 0.35); noise(0.12, 'bandpass', 3000, 1, 0.2, 0.1); break;
+    case 'guiro': for (let i = 0; i < 9; i++) noise(0.02, 'bandpass', 2500, 3, 1.2, 0.012, i * 0.018); break;
+    case 'claves': tone('sine', 2500 * tune, 2480 * tune, 0.02, 0.5, 0.06); break;
+    case 'wood': tone('sine', 1150 * tune, 1100 * tune, 0.03, 0.6, 0.07); noise(0.02, 'bandpass', 2000, 1.5, 0.15, 0.01); break;
+    case 'triangle': sines([[1250 * tune, 0.3, 1.6], [3480 * tune, 0.13, 1], [5600 * tune, 0.07, 0.6]]); break;
+    case 'bassdrum': tone('sine', 75 * tune, 55 * tune, 0.2, 0.9, 1.6); noise(0.6, 'lowpass', 200, 0.7, 0.3, 0.5); break;
+    case 'timpL': case 'timpM': case 'timpH': { const f = { timpL: 87, timpM: 110, timpH: 147 }[hit] * tune;
+      sines([[f, 0.8, 2.2], [f * 1.5, 0.3, 1.5], [f * 1.98, 0.2, 1.1], [f * 2.44, 0.1, 0.8]]); noise(0.15, 'lowpass', 400, 0.7, 0.2, 0.1); break; }
+    case 'cymbal': noise(3, 'highpass', 3000, 0.5, 0.4, 2.4); noise(1.6, 'bandpass', 9000, 0.8, 0.2, 1.4); break;
+    case 'gong': sines([[90 * tune, 0.5, 4], [146 * tune, 0.3, 3.5], [213 * tune, 0.25, 3], [319 * tune, 0.15, 2.5], [441 * tune, 0.1, 2]]); noise(2.2, 'lowpass', 1500, 0.7, 0.15, 2, 0, 0.05); break;
+    case 'sleigh': for (let i = 0; i < 6; i++) noise(0.08, 'bandpass', 9000, 2, 0.25, 0.05, i * 0.03); metal([6000, 7200, 8100], 5000, 0.05, 0.4); break;
+    case 'chimes': for (let i = 0; i < 8; i++) sines([[2500 + Math.random() * 3500, 0.12, 1.2, i * 0.07]]); break;
   }
   return { release() {}, stopNow() { const n = c.currentTime; out.gain.setTargetAtTime(0, n, 0.01); srcs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); } };
 }
@@ -2263,7 +2351,7 @@ function startVoice(c, dest, sound, m, vel, t) {
   if (P.kind === 'tone') return toneVoice(c, dest, P, mm, vel, t);
   if (P.kind === 'ks') return ksVoice(c, dest, P, mm, vel, t);
   if (P.kind === 'mallet') return malletVoice(c, dest, P, mm, vel, t);
-  if (P.kind === 'drum') return drumVoice(c, dest, m, vel, t);
+  if (P.kind === 'drum') return drumVoice(c, dest, m, vel, t, P.kit);
   return legacyVoice(c, dest, sound, m, vel, t);
 }
 const waveCache = new WeakMap();
@@ -2349,10 +2437,11 @@ function renderKeys() {
   CR.top = m - 1;
   const ww = 100 / nW, bw = ww * 0.62;
   const hk = mm => { const i = mm - CR.base; return i >= 0 && i < KEYMAP.length ? `<span class="hk">${KEYMAP[i]}</span>` : ''; };
-  const drums = CR.sound === 'drums', dn = mm => DRUM_NAMES[((mm % 12) + 12) % 12];
+  const PI = INST[CR.sound] || INST.piano, drums = PI.kind === 'drum', kitNames = drums ? (KITS[PI.kit] || KITS.acoustic).names : null, dn = mm => kitNames[((mm % 12) + 12) % 12];
   kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}" style="--oc:${octColor(k.m)}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${drums ? dn(k.m) : k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
     blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}<span class="nm">${drums ? dn(k.m) : noteName(k.m).replace(/\d+$/, '')}</span><span class="fl">${drums ? '' : FLATS[k.m % 12]}</span></div>`).join('');
-  CR.keysFor = CR.sound;
+  CR.keysFor = drums ? PI.kit : 'notes';
+  $('#pKeys').classList.toggle('dr', drums);
   CR.keyEls = new Map([...kb.querySelectorAll('.pk')].map(el => [+el.dataset.m, el]));
   CR.down.forEach(mm => keyOn(mm, true));
   const lbl = $('#crOctLbl'); lbl.textContent = noteName(CR.base) + '–' + noteName(CR.top);
@@ -2466,7 +2555,7 @@ function crUI() {
   pick.style.setProperty('--fc', F1.color); $('#crInstNum').textContent = I1.num; $('#crInstName').textContent = I1.name; $('#crInstIco').innerHTML = F1.icon;
   pick.setAttribute('aria-label', 'Instrument ' + I1.num + ', ' + I1.name + '. Choose another');
   document.querySelectorAll('.iitem').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sound === CR.sound)));
-  if (CR.keysFor !== undefined && (CR.keysFor === 'drums') !== (CR.sound === 'drums')) renderKeys();
+  if (CR.keysFor !== undefined && CR.keysFor !== (I1.kind === 'drum' ? I1.kit : 'notes')) renderKeys();
   if (document.activeElement !== $('#crBpm')) $('#crBpm').value = CR.bpm;
   const pill = $('#crPill'); pill.hidden = !CR.playing; pill.classList.toggle('playing', CR.playing && !CR.recording);
 }
@@ -2607,7 +2696,7 @@ $('#crSend').addEventListener('click', crSend);
 function setInstrument(id, preview) {
   if (!INST[id]) return;
   CR.sound = id; crUI(); touch();
-  if (preview) { crInit(); const P = INST[id], m = id === 'drums' ? 60 : (P.fam === 'brass' && id === 'tuba') || id === 'contrabass' ? 48 : 60; const v = startVoice(ctx, CR.out, id, m, 0.75, ctx.currentTime); v.release(ctx.currentTime + 0.45); }
+  if (preview) { crInit(); const P = INST[id], m = P.kind === 'drum' ? 60 : ['tuba', 'contrabass', 'bassoon'].includes(id) ? 48 : 60; const v = startVoice(ctx, CR.out, id, m, 0.75, ctx.currentTime); v.release(ctx.currentTime + 0.45); }
 }
 function stepInstrument(dir) { const i = INSTRUMENTS.findIndex(x => x.id === CR.sound); setInstrument(INSTRUMENTS[(i + dir + INSTRUMENTS.length) % INSTRUMENTS.length].id, true); }
 function openInst() { const p = $('#crInstPanel'); p.hidden = false; $('#crInstBtn').setAttribute('aria-expanded', 'true'); const sel = p.querySelector('.iitem[aria-selected="true"]'); if (sel) { sel.scrollIntoView({ block: 'center' }); sel.focus(); } }
