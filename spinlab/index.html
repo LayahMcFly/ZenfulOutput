@@ -263,7 +263,34 @@ body.mode-create main,body.mode-create #recBtn,body.mode-create .rectime{display
 body.mode-create{min-height:0;height:100vh;height:100dvh;display:flex;flex-direction:column;overflow:hidden;padding-bottom:0;--v:#a78bfa}
 body.mode-create header.top{position:static;flex:none}
 body.mode-create .statusbar{flex:none}
-#createView{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px 12px;width:100%}
+#createView{flex:1 1 auto;min-height:0;display:flex;flex-direction:column;gap:8px;padding:8px 12px;width:100%;position:relative}
+.ipick-wrap{display:flex;align-items:center;gap:4px}
+.btn.icirc{padding:8px 9px}
+.ipick{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:9px;padding:5px 12px 5px 6px;border-radius:12px;border:1px solid color-mix(in srgb,var(--fc,#a78bfa) 55%,var(--line2));background:linear-gradient(color-mix(in srgb,var(--fc,#a78bfa) 22%,#1d2335),#151a28);color:var(--ink);cursor:pointer;font:700 14px var(--sans);min-width:210px;box-shadow:0 0 18px -8px var(--fc,#a78bfa);touch-action:manipulation}
+.ipick:hover{border-color:var(--fc,#a78bfa)}
+.ipick:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.ipick .inum{min-width:28px;height:28px;border-radius:8px;display:grid;place-items:center;background:var(--fc,#a78bfa);color:#0b0d14;font:800 13px var(--mono)}
+.ipick .iico svg{width:22px;height:22px;display:block;color:var(--fc,#a78bfa)}
+.ipick .iname{flex:1;text-align:left;white-space:nowrap}
+.ipick .chev{width:12px;height:8px;color:var(--soft)}
+.ipanel{position:absolute;left:12px;right:12px;top:58px;bottom:10px;z-index:30;display:flex;flex-direction:column;background:linear-gradient(var(--panel2),var(--panel));border:1px solid var(--line2);border-radius:16px;box-shadow:0 24px 60px -20px #000;overflow:hidden}
+.ipanel[hidden]{display:none}
+.iphead{display:flex;align-items:center;gap:12px;padding:10px 12px 10px 16px;border-bottom:1px solid var(--line)}
+.iphead b{font-size:16px}
+.iphead .btn{margin-left:auto}
+.ipbody{flex:1;overflow-y:auto;padding:6px 14px 16px;overscroll-behavior:contain}
+.ipbody h4{margin:12px 2px 8px;font:800 11px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--fc)}
+.igrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(178px,1fr));gap:8px}
+.iitem{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:12px;border:1px solid var(--line2);background:#121725;color:var(--ink);font:600 13.5px var(--sans);cursor:pointer;text-align:left;touch-action:manipulation;min-height:44px}
+.iitem:hover{border-color:var(--fc)}
+.iitem:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.iitem .inum{min-width:26px;height:26px;border-radius:7px;display:grid;place-items:center;background:color-mix(in srgb,var(--fc) 22%,#1d2335);color:var(--fc);font:800 12px var(--mono);flex:none}
+.iitem svg{width:20px;height:20px;color:var(--fc);flex:none}
+.iitem[aria-selected="true"]{border-color:var(--fc);background:linear-gradient(color-mix(in srgb,var(--fc) 26%,#1d2335),#151a28);box-shadow:0 0 0 1px var(--fc) inset}
+.iitem[aria-selected="true"] .inum{background:var(--fc);color:#0b0d14}
+html.phone .ipick{min-width:0;padding:4px 10px 4px 5px;font-size:13px}
+html.phone .ipanel{top:52px;left:6px;right:6px;bottom:6px}
+html.phone .igrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 .cbar,.pbar{display:flex;align-items:center;gap:8px;flex:none;overflow-x:auto;padding:8px 10px;scrollbar-width:none}
 .cbar::-webkit-scrollbar,.pbar::-webkit-scrollbar{display:none}
 .cbar .sep,.pbar .sep{width:1px;height:22px;background:var(--line2);flex:none}
@@ -403,10 +430,8 @@ body.mode-create header.top,body.mode-create .statusbar{display:none!important}
 #crTitle{flex:1;width:auto;min-width:0;font:600 14px var(--sans);padding:8px 10px}
 #crSend{width:100%;margin-top:0}
 html.phone body.mode-create #createView{padding:6px 8px max(6px,env(safe-area-inset-bottom))}
-html.phone .ibtn span{display:none}
 html.phone .ibtn{padding:8px 11px}
 html.phone body.mode-create .btn{min-height:38px}
-@media (max-width:900px){ .ibtn span{display:none} }
 @media (prefers-reduced-motion:reduce){ .i-dj .spin,.i-pn .k{animation:none} .drawer{transition:none} }
 
 /* ===== desktop: looks and behaves like an app window ===== */
@@ -570,13 +595,21 @@ html.phone body.mode-create .btn{min-height:38px}
 <section id="createView" aria-label="Piano">
   <div class="ptop">
     <button class="btn" id="crMenuBtn" aria-controls="crMenu" aria-expanded="false" title="Menu: record, play back, metronome, save and more"><svg viewBox="0 0 16 16"><path d="M2.5 4h11M2.5 8h11M2.5 12h11" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg><span>Menu</span></button>
-    <div class="instr" role="radiogroup" aria-label="Instrument"><button type="button" class="ibtn" role="radio" aria-checked="true" data-sound="piano" style="--ic:#a78bfa" title="Grand piano"><svg viewBox="0 0 24 24"><path d="M4 18V9a5 5 0 0 1 5-5h3c2 0 3 1.5 3 3.5S16.5 11 19 11a1.5 1.5 0 0 1 1 1.5V18z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M4 15h16M8 15v3M12 15v3M16 15v3" stroke="currentColor" stroke-width="1.4"/><path d="M6 18v2.5M18 18v2.5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Grand piano</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="epiano" style="--ic:#22d3ee" title="Electric piano"><svg viewBox="0 0 24 24"><rect x="2.5" y="8" width="19" height="9" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 12v5M11 12v5M15 12v5M19 12v5" stroke="currentColor" stroke-width="1.3"/><path d="M13 2 9.5 6.5h3L10 10" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Electric piano</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="synth" style="--ic:#f472b6" title="Synth"><svg viewBox="0 0 24 24"><path d="M2.5 12h3l2-6 3 12 3-12 3 12 2-6h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Synth</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="organ" style="--ic:#fbbf24" title="Organ"><svg viewBox="0 0 24 24"><path d="M4 20V10M8 20V6M12 20V3M16 20V6M20 20V10" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/><path d="M2.5 20.5h19" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg><span>Organ</span></button><button type="button" class="ibtn" role="radio" aria-checked="false" data-sound="bass" style="--ic:#34d399" title="Bass"><svg viewBox="0 0 24 24"><path d="M9 15.5a3.6 3.6 0 1 1-4-5.5c1.2-.4 2.2-.2 3 .4L17.5 2.5l2.2 2.2-8 9.4c.4.8.3 1.6-.2 2.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="6" cy="14.5" r="1.2" fill="currentColor"/></svg><span>Bass</span></button></div>
+    <div class="ipick-wrap">
+      <button type="button" class="btn icirc" id="crInstPrev" aria-label="Previous instrument" title="Previous instrument ([)"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <button type="button" class="ipick" id="crInstBtn" aria-haspopup="dialog" aria-expanded="false" aria-controls="crInstPanel" title="Choose an instrument"><span class="inum" id="crInstNum">1</span><span class="iico" id="crInstIco"></span><span class="iname" id="crInstName">Grand piano</span><svg class="chev" viewBox="0 0 12 8"><path d="M1 1.5 6 6.5l5-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button>
+      <button type="button" class="btn icirc" id="crInstNext" aria-label="Next instrument" title="Next instrument (])"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
     <button type="button" class="recpill" id="crPill" hidden></button>
     <div class="octv">
       <button class="btn" id="crOctDn" title="Move the keyboard down an octave (Z)" aria-label="Octave down"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
       <span class="poct" id="crOctLbl" aria-live="polite">C3</span>
       <button class="btn" id="crOctUp" title="Move the keyboard up an octave (X)" aria-label="Octave up"><svg viewBox="0 0 16 16"><path d="m6 3 5 5-5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
     </div>
+  </div>
+  <div class="ipanel" id="crInstPanel" role="dialog" aria-label="Choose an instrument" hidden>
+    <div class="iphead"><b>Instruments</b><span class="lbl" id="crInstCount"></span><button class="btn sm" id="crInstClose" aria-label="Close the instrument list"><svg viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></button></div>
+    <div class="ipbody" id="crInstList"></div>
   </div>
   <div class="pkeys" id="pKeys"><div class="pkb" id="pKb"></div><div class="octflash" id="octFlash" aria-hidden="true"></div></div>
   <div class="drawer-bg" id="crMenuBg" hidden></div>
@@ -671,7 +704,9 @@ html.phone body.mode-create .btn{min-height:38px}
   </ul>
   <h3>Piano</h3>
   <ul>
-    <li>Pick an instrument at the top: Grand piano, Electric piano, Synth, Organ or Bass. The arrows move the keyboard up or down an octave.</li>
+    <li>Tap the instrument button at the top to see the numbered list of 36 instruments: keys, strings (violin, cello and more), guitars, woodwinds, brass, mallets and bells, choir, synths and a drum kit. The small arrows beside it step to the previous or next instrument (<kbd>[</kbd> <kbd>]</kbd> on a computer). Picking one plays a short sample.</li>
+    <li>With the <b>Drum kit</b>, each key is a drum and is labeled with its name.</li>
+    <li>The arrows on the right move the keyboard up or down an octave.</li>
     <li>Play with your fingers or mouse, and slide across the keys to glide. On a computer, <kbd>A</kbd> <kbd>W</kbd> <kbd>S</kbd> <kbd>E</kbd> <kbd>D</kbd> <kbd>F</kbd> <kbd>T</kbd> <kbd>G</kbd> <kbd>Y</kbd> <kbd>H</kbd> <kbd>U</kbd> <kbd>J</kbd> <kbd>K</kbd> <kbd>O</kbd> <kbd>L</kbd> <kbd>P</kbd> play notes, <kbd>Z</kbd> / <kbd>X</kbd> change octave, and holding <kbd>Shift</kbd> is the sustain pedal.</li>
     <li>Everything else is in <b>Menu</b>: Record, Play, the note view, Undo take, Clear, metronome, sustain, volume, reverb, Save, Library, Save WAV/MP3 and Send to DJ.</li>
     <li>While recording or playing back, a small pill at the top shows the time. Tap it to stop. <kbd>R</kbd> records, <kbd>Space</kbd> plays and stops.</li>
@@ -725,7 +760,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.13'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.14'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2011,8 +2046,226 @@ window.addEventListener('beforeunload', e => {
 });
 
 /* ===================== CREATE MODE: piano, recorder, library ===================== */
-const SOUNDS = { piano: 'Grand piano', epiano: 'Electric piano', synth: 'Synth', organ: 'Organ', bass: 'Bass' };
-const SOUND_COLORS = { piano: '#a78bfa', epiano: '#22d3ee', synth: '#f472b6', organ: '#fbbf24', bass: '#34d399' };
+/* ---------- instruments: every sound is made right here in the browser ---------- */
+const FAMS = {
+  keys:    { name: 'Keys',              color: '#a78bfa', icon: '<svg viewBox="0 0 24 24"><rect x="2.5" y="6" width="19" height="12" rx="2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M7 6v7M12 6v7M17 6v7M7 13v5M12 13v5M17 13v5" stroke="currentColor" stroke-width="1.4"/></svg>' },
+  strings: { name: 'Strings',           color: '#f59e0b', icon: '<svg viewBox="0 0 24 24"><path d="M14.5 3.5c-1.6 0-2.4 1.3-2.4 2.6 0 .9-.9 1.3-1.7 1.3-2.2 0-3.8 1.7-3.8 3.7 0 1.1.5 1.8.5 2.6 0 1-1.6 1.6-1.6 3.6A3.2 3.2 0 0 0 8.7 20.5c2 0 2.6-1.6 3.6-1.6.8 0 1.5.5 2.6.5 2 0 3.7-1.6 3.7-3.8 0-.8.4-1.7 1.3-1.7" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><path d="M21 3 9.5 14.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' },
+  guitars: { name: 'Guitars',           color: '#f97316', icon: '<svg viewBox="0 0 24 24"><path d="M9 15.5a3.6 3.6 0 1 1-4-5.5c1.2-.4 2.2-.2 3 .4L17.5 2.5l2.2 2.2-8 9.4c.4.8.3 1.6-.2 2.2" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><circle cx="6" cy="14.5" r="1.2" fill="currentColor"/></svg>' },
+  winds:   { name: 'Woodwinds',         color: '#34d399', icon: '<svg viewBox="0 0 24 24"><path d="M3.5 20.5 20.5 3.5" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><circle cx="9" cy="15" r="1" fill="#0b0d14"/><circle cx="12" cy="12" r="1" fill="#0b0d14"/><circle cx="15" cy="9" r="1" fill="#0b0d14"/></svg>' },
+  brass:   { name: 'Brass',             color: '#fbbf24', icon: '<svg viewBox="0 0 24 24"><path d="M2.5 11h11l6-5v12l-6-5h-11z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M6 11V8M9 11V8M12 11V8" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>' },
+  mallets: { name: 'Mallets and bells', color: '#22d3ee', icon: '<svg viewBox="0 0 24 24"><path d="M12 3a5 5 0 0 0-5 5v5l-2 3h14l-2-3V8a5 5 0 0 0-5-5z" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/><path d="M10 19a2 2 0 0 0 4 0" fill="none" stroke="currentColor" stroke-width="1.6"/></svg>' },
+  voices:  { name: 'Voices',            color: '#f472b6', icon: '<svg viewBox="0 0 24 24"><rect x="8.5" y="3" width="7" height="11" rx="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' },
+  synths:  { name: 'Synths',            color: '#e879f9', icon: '<svg viewBox="0 0 24 24"><path d="M2.5 12h3l2-6 3 12 3-12 3 12 2-6h3" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>' },
+  drums:   { name: 'Drums',             color: '#ef4444', icon: '<svg viewBox="0 0 24 24"><ellipse cx="12" cy="9" rx="8.5" ry="3.5" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M3.5 9v6c0 1.9 3.8 3.5 8.5 3.5s8.5-1.6 8.5-3.5V9" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="m6 3 4 5M18 3l-4 5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>' }
+};
+const saw = n => Array.from({ length: n }, (_, i) => 1 / (i + 1));
+// kind: legacy (the original five), tone (oscillators + filters), ks (plucked string), mallet (struck partials), drum
+const INSTRUMENTS = [
+  { id: 'piano', name: 'Grand piano', fam: 'keys', kind: 'legacy' },
+  { id: 'epiano', name: 'Electric piano', fam: 'keys', kind: 'legacy' },
+  { id: 'harpsichord', name: 'Harpsichord', fam: 'keys', kind: 'ks', S: 0.12, t60: 2.4, soft: 0, dur: 3, lp: 9000, gain: 0.75, r: 0.12, body: [[1800, 1, 4]] },
+  { id: 'organ', name: 'Organ', fam: 'keys', kind: 'legacy' },
+  { id: 'accordion', name: 'Accordion', fam: 'keys', kind: 'tone', osc: [{ w: 'square', g: 0.5 }, { w: 'sawtooth', det: 14, g: 0.5 }], lp: { mul: 7, max: 7000 }, form: [[1200, 1.5, 4]], env: { a: 0.04, d: 0.1, s: 0.95, r: 0.09 }, trem: [6, 0.18], gain: 0.3 },
+  { id: 'violin', name: 'Violin', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: 7, g: 0.45 }], lp: { mul: 10, max: 9000, q: 0.6 }, form: [[450, 2, 4], [2500, 1.4, 4], [3600, 2, -5]], env: { a: 0.09, d: 0.25, s: 0.85, r: 0.28 }, vib: [5.6, 15, 0.25], noise: { g: 0.05, hz: 3200, q: 0.8, att: 0.12, sus: 0.015 }, gain: 0.28 },
+  { id: 'viola', name: 'Viola', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: -6, g: 0.45 }], lp: { mul: 8, max: 6500, q: 0.6 }, form: [[350, 2, 5], [1900, 1.4, 4]], env: { a: 0.1, d: 0.25, s: 0.85, r: 0.3 }, vib: [5.3, 13, 0.25], noise: { g: 0.04, hz: 2500, q: 0.8, att: 0.12, sus: 0.012 }, gain: 0.3 },
+  { id: 'cello', name: 'Cello', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'sawtooth', det: 5, g: 0.4 }], lp: { mul: 7, max: 4500, q: 0.6 }, form: [[250, 2, 5], [1100, 1.4, 4]], env: { a: 0.12, d: 0.3, s: 0.85, r: 0.32 }, vib: [5.0, 12, 0.3], noise: { g: 0.035, hz: 1800, q: 0.8, att: 0.14, sus: 0.01 }, gain: 0.34 },
+  { id: 'contrabass', name: 'Double bass', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'triangle', g: 0.5 }], lp: { mul: 6, max: 2200, q: 0.6 }, form: [[140, 2, 5], [700, 1.4, 3]], env: { a: 0.12, d: 0.3, s: 0.8, r: 0.3 }, vib: [4.8, 9, 0.35], gain: 0.42 },
+  { id: 'strings', name: 'String ensemble', fam: 'strings', kind: 'tone', osc: [{ w: 'sawtooth', det: -10, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 11, g: 0.6 }], lp: { mul: 8, max: 6000 }, form: [[400, 1.5, 3], [2400, 1.2, 2]], env: { a: 0.28, d: 0.3, s: 0.9, r: 0.6 }, vib: [5, 8, 0.3], gain: 0.3 },
+  { id: 'pizzicato', name: 'Pizzicato strings', fam: 'strings', kind: 'ks', S: 0.5, t60: 0.7, soft: 2, dur: 1.4, lp: 4000, gain: 0.85, r: 0.25, body: [[400, 1.5, 5]] },
+  { id: 'harp', name: 'Harp', fam: 'strings', kind: 'ks', S: 0.45, t60: 4, soft: 3, dur: 5, lp: 6000, gain: 0.6, r: 1.2, body: [[300, 1, 3]] },
+  { id: 'guitar', name: 'Acoustic guitar', fam: 'guitars', kind: 'ks', S: 0.4, t60: 3, soft: 1, dur: 4, lp: 7000, gain: 0.72, r: 0.15, body: [[110, 2, 6], [220, 1.5, 4], [2500, 1, 3]] },
+  { id: 'eguitar', name: 'Electric guitar', fam: 'guitars', kind: 'ks', S: 0.35, t60: 4, soft: 0, dur: 4, lp: 3800, gain: 0.45, r: 0.12, drive: 4, body: [[800, 1, 4]] },
+  { id: 'bassguitar', name: 'Bass guitar', fam: 'guitars', kind: 'ks', S: 0.48, t60: 2.5, soft: 2, dur: 3, lp: 1600, gain: 0.85, r: 0.1, body: [[90, 1.5, 4]], shift: -12 },
+  { id: 'banjo', name: 'Banjo', fam: 'guitars', kind: 'ks', S: 0.2, t60: 1, soft: 0, dur: 2, lp: 8000, gain: 0.75, r: 0.1, body: [[1200, 2, 6]] },
+  { id: 'flute', name: 'Flute', fam: 'winds', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'sine', oct: 1, g: 0.12 }, { w: 'triangle', g: 0.15 }], env: { a: 0.07, d: 0.1, s: 0.9, r: 0.15 }, vib: [4.8, 14, 0.3], noise: { g: 0.1, mul: 2, q: 1.6, att: 0.25, sus: 0.04 }, gain: 0.38 },
+  { id: 'recorder', name: 'Recorder', fam: 'winds', kind: 'tone', osc: [{ w: 'sine', g: 1 }, { w: 'triangle', g: 0.35 }], env: { a: 0.03, d: 0.08, s: 0.9, r: 0.08 }, vib: [5, 3, 0.4], noise: { g: 0.14, mul: 3, q: 1, att: 0.04, sus: 0.015 }, gain: 0.36 },
+  { id: 'clarinet', name: 'Clarinet', fam: 'winds', kind: 'tone', osc: [{ w: [1, 0, 0.6, 0, 0.4, 0, 0.25, 0, 0.15, 0, 0.1, 0, 0.06], g: 1 }], lp: { mul: 6, max: 6000 }, env: { a: 0.05, d: 0.15, s: 0.9, r: 0.12 }, vib: [4.5, 5, 0.4], gain: 0.36 },
+  { id: 'oboe', name: 'Oboe', fam: 'winds', kind: 'tone', osc: [{ w: [0.6, 1, 0.9, 0.7, 0.5, 0.4, 0.3, 0.2, 0.15, 0.1], g: 1 }], lp: { mul: 9, max: 7000 }, form: [[1100, 3, 6], [2800, 3, 3]], env: { a: 0.04, d: 0.12, s: 0.88, r: 0.1 }, vib: [5.2, 10, 0.3], gain: 0.34 },
+  { id: 'sax', name: 'Saxophone', fam: 'winds', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'square', g: 0.15 }], lp: { mul: 7, max: 6000, env: [2, 7, 0.06] }, form: [[600, 2, 5], [1500, 2, 6], [2700, 3, 3]], env: { a: 0.04, d: 0.15, s: 0.85, r: 0.12 }, vib: [5, 12, 0.25], noise: { g: 0.04, hz: 2200, q: 1, att: 0.1, sus: 0.015 }, gain: 0.26 },
+  { id: 'trumpet', name: 'Trumpet', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }], lp: { mul: 6, max: 8000, env: [1.2, 9, 0.08], q: 1.2 }, form: [[1300, 1.5, 4]], env: { a: 0.025, d: 0.15, s: 0.85, r: 0.12 }, vib: [5.5, 8, 0.3], gain: 0.3 },
+  { id: 'horn', name: 'French horn', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'triangle', g: 0.4 }], lp: { mul: 3, max: 2200, env: [1, 3, 0.12] }, env: { a: 0.07, d: 0.2, s: 0.9, r: 0.25 }, vib: [4.8, 5, 0.4], gain: 0.4 },
+  { id: 'trombone', name: 'Trombone', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }], lp: { mul: 5, max: 4000, env: [1.3, 6, 0.1], q: 1 }, form: [[500, 1.5, 3]], env: { a: 0.05, d: 0.15, s: 0.88, r: 0.15 }, vib: [5, 6, 0.35], gain: 0.34 },
+  { id: 'tuba', name: 'Tuba', fam: 'brass', kind: 'tone', osc: [{ w: 'sawtooth', g: 1 }, { w: 'square', oct: -1, g: 0.25 }], lp: { mul: 3, max: 1200, env: [1, 3, 0.12] }, env: { a: 0.07, d: 0.2, s: 0.9, r: 0.18 }, vib: [4.5, 4, 0.4], gain: 0.5 },
+  { id: 'vibraphone', name: 'Vibraphone', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [4, 0.25, 0.35], [10, 0.05, 0.15]], dec: 3.2, trem: [5, 0.35], gain: 0.4, r: 0.35 },
+  { id: 'marimba', name: 'Marimba', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [4, 0.3, 0.25], [9.9, 0.08, 0.1]], dec: 0.9, gain: 0.55, ring: true },
+  { id: 'xylophone', name: 'Xylophone', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [3, 0.45, 0.6], [6, 0.15, 0.3]], dec: 0.45, gain: 0.55, ring: true },
+  { id: 'musicbox', name: 'Music box', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [2.01, 0.25, 0.6], [5.2, 0.15, 0.3]], dec: 1.6, gain: 0.45, ring: true, shift: 12 },
+  { id: 'bells', name: 'Bells', fam: 'mallets', kind: 'mallet', parts: [[0.5, 0.35, 1.3], [1, 1, 1], [2.76, 0.5, 0.6], [5.4, 0.3, 0.4], [8.93, 0.15, 0.25]], dec: 4, gain: 0.35, ring: true },
+  { id: 'steeldrum', name: 'Steel drum', fam: 'mallets', kind: 'mallet', parts: [[1, 1, 1], [2, 0.5, 0.7], [3.01, 0.3, 0.5], [4.02, 0.15, 0.3]], dec: 1.1, gain: 0.45, ring: true },
+  { id: 'choir', name: 'Choir', fam: 'voices', kind: 'tone', osc: [{ w: 'sawtooth', det: -9, g: 0.6 }, { w: 'sawtooth', g: 0.6 }, { w: 'sawtooth', det: 10, g: 0.6 }], lp: { mul: 9, max: 3500 }, form: [[730, 5, 10], [1090, 5, 8], [2440, 5, 6]], env: { a: 0.32, d: 0.3, s: 0.9, r: 0.5 }, vib: [5, 10, 0.4], gain: 0.24 },
+  { id: 'synth', name: 'Synth lead', fam: 'synths', kind: 'legacy' },
+  { id: 'pad', name: 'Synth pad', fam: 'synths', kind: 'tone', osc: [{ w: 'sawtooth', det: -14, g: 0.5 }, { w: 'sawtooth', det: -5, g: 0.5 }, { w: 'sawtooth', det: 6, g: 0.5 }, { w: 'sawtooth', det: 15, g: 0.5 }], lp: { mul: 4, max: 2400, q: 2 }, env: { a: 0.5, d: 0.4, s: 0.9, r: 1.2 }, vib: [0.4, 6, 0], gain: 0.27 },
+  { id: 'bass', name: 'Synth bass', fam: 'synths', kind: 'legacy' },
+  { id: 'drums', name: 'Drum kit', fam: 'drums', kind: 'drum' }
+];
+INSTRUMENTS.forEach((x, i) => x.num = i + 1);
+const INST = Object.fromEntries(INSTRUMENTS.map(x => [x.id, x]));
+const SOUNDS = Object.fromEntries(INSTRUMENTS.map(x => [x.id, x.name]));
+const SOUND_COLORS = Object.fromEntries(INSTRUMENTS.map(x => [x.id, FAMS[x.fam].color]));
+const DRUM_NAMES = ['Kick', 'Rim', 'Snare', 'Clap', 'Snare 2', 'Low tom', 'Hi-hat', 'Mid tom', 'Pedal hat', 'High tom', 'Open hat', 'Crash'];
+const mtof = m => 440 * Math.pow(2, (m - 69) / 12);
+const noiseCache = new Map();
+function noiseBuf(sr) {
+  let b = noiseCache.get(sr); if (b) return b;
+  b = new AudioBuffer({ length: sr * 2, sampleRate: sr, numberOfChannels: 1 }); const d = b.getChannelData(0);
+  for (let i = 0; i < d.length; i++) d[i] = Math.random() * 2 - 1;
+  noiseCache.set(sr, b); return b;
+}
+const pwCache = new WeakMap();
+function waveFrom(c, arr) {
+  let m = pwCache.get(c); if (!m) { m = new Map(); pwCache.set(c, m); }
+  const k = arr.join(','); let w = m.get(k); if (w) return w;
+  const re = new Float32Array(arr.length + 1), im = new Float32Array(arr.length + 1); arr.forEach((a, i) => im[i + 1] = a);
+  w = c.createPeriodicWave(re, im); m.set(k, w); return w;
+}
+function releaser(c, g, t, rel, srcs, end) {
+  let released = false;
+  return {
+    release(t2) {
+      if (released) return; released = true; t2 = Math.max(t2, t + 0.01); if (end && t2 >= end) return;
+      const gp = g.gain; if (gp.cancelAndHoldAtTime) gp.cancelAndHoldAtTime(t2); else gp.cancelScheduledValues(t2);
+      gp.setTargetAtTime(0, t2, rel / 3); srcs.forEach(o => { try { o.stop(t2 + rel * 2.5 + 0.05); } catch (e) {} });
+    },
+    stopNow() { released = true; const n = c.currentTime; g.gain.cancelScheduledValues(n); g.gain.setTargetAtTime(0, n, 0.01); srcs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); }
+  };
+}
+// sustained instruments: oscillators, a filter, body resonances, vibrato, breath or bow noise
+function toneVoice(c, dest, P, m, vel, t) {
+  const f = mtof(m), out = c.createGain(), mix = c.createGain(), srcs = [];
+  out.gain.setValueAtTime(0, t);
+  let last = mix;
+  if (P.lp) {
+    const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.Q.value = P.lp.q || 0.7;
+    const cut = v => Math.min(P.lp.max || 16000, Math.max(80, v));
+    if (P.lp.env) { lp.frequency.setValueAtTime(cut(f * P.lp.env[0]), t); lp.frequency.exponentialRampToValueAtTime(cut(f * P.lp.env[1]), t + P.lp.env[2]); lp.frequency.setTargetAtTime(cut(f * P.lp.mul), t + P.lp.env[2], 0.2); }
+    else lp.frequency.value = cut(f * (P.lp.mul || 8));
+    last.connect(lp); last = lp;
+  }
+  (P.form || []).forEach(([fr, q, gdb]) => { const pk = c.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = fr; pk.Q.value = q; pk.gain.value = gdb; last.connect(pk); last = pk; });
+  last.connect(out);
+  let tail = out;
+  if (P.trem) {
+    const tg = c.createGain(); tg.gain.value = 1 - P.trem[1] / 2;
+    const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = P.trem[0]; lg.gain.value = P.trem[1] / 2;
+    lfo.connect(lg); lg.connect(tg.gain); lfo.start(t); srcs.push(lfo); out.connect(tg); tail = tg;
+  }
+  tail.connect(dest);
+  let vibG = null;
+  if (P.vib) {
+    const lfo = c.createOscillator(); lfo.frequency.value = P.vib[0]; vibG = c.createGain();
+    vibG.gain.setValueAtTime(0, t); vibG.gain.linearRampToValueAtTime(P.vib[1], t + (P.vib[2] || 0) + 0.35);
+    lfo.connect(vibG); lfo.start(t); srcs.push(lfo);
+  }
+  P.osc.forEach(o => {
+    const osc = c.createOscillator();
+    if (Array.isArray(o.w)) osc.setPeriodicWave(waveFrom(c, o.w)); else osc.type = o.w;
+    osc.frequency.value = f * Math.pow(2, o.oct || 0); osc.detune.value = o.det || 0;
+    if (vibG) vibG.connect(osc.detune);
+    const g = c.createGain(); g.gain.value = o.g; osc.connect(g); g.connect(mix); osc.start(t); srcs.push(osc);
+  });
+  if (P.noise) {
+    const N = P.noise, ns = c.createBufferSource(); ns.buffer = noiseBuf(c.sampleRate); ns.loop = true;
+    const bp = c.createBiquadFilter(); bp.type = 'bandpass'; bp.frequency.value = N.mul ? Math.min(12000, f * N.mul) : N.hz; bp.Q.value = N.q || 1;
+    const ng = c.createGain(); ng.gain.setValueAtTime(0, t); ng.gain.linearRampToValueAtTime(N.g * vel * 4, t + 0.015); ng.gain.setTargetAtTime(N.sus * vel * 4, t + 0.02, N.att);
+    ns.connect(bp); bp.connect(ng); ng.connect(out); ns.start(t, Math.random()); srcs.push(ns);
+  }
+  const E = P.env, peak = vel * P.gain;
+  out.gain.linearRampToValueAtTime(peak, t + E.a); out.gain.setTargetAtTime(peak * E.s, t + E.a, Math.max(0.01, E.d / 3));
+  return releaser(c, out, t, E.r, srcs, null);
+}
+// plucked strings: Karplus-Strong, worked out once per note and kept
+const ksCache = new Map();
+function ksBuffer(sr, P, m) {
+  const key = sr + '|' + P.id + '|' + m; let hit = ksCache.get(key); if (hit) return hit;
+  const f = mtof(m), S = P.S, N = Math.max(2, Math.floor(sr / f - S)), rate = f * (N + S) / sr;
+  const dur = clamp(P.dur * Math.pow(0.5, (m - 48) / 30), 0.35, P.dur * 1.6), len = Math.ceil(dur * sr);
+  const ring = new Float32Array(N); for (let i = 0; i < N; i++) ring[i] = Math.random() * 2 - 1;
+  for (let k = 0; k < (P.soft || 0); k++) for (let i = 1; i < N; i++) ring[i] = (ring[i] + ring[i - 1]) / 2;
+  const rho = Math.pow(0.001, 1 / (P.t60 * f)), out = new Float32Array(len);
+  let idx = 0, peak = 0;
+  for (let i = 0; i < len; i++) {
+    const cur = ring[idx], nxt = ring[idx + 1 === N ? 0 : idx + 1];
+    out[i] = cur; ring[idx] = rho * ((1 - S) * cur + S * nxt);
+    idx = idx + 1 === N ? 0 : idx + 1; const a = cur < 0 ? -cur : cur; if (a > peak) peak = a;
+  }
+  const norm = peak > 0 ? 0.8 / peak : 1, fade = Math.min(len, Math.floor(sr * 0.03));
+  for (let i = 0; i < len; i++) out[i] *= norm * (i >= len - fade ? (len - i) / fade : 1);
+  const buf = new AudioBuffer({ length: len, sampleRate: sr, numberOfChannels: 1 }); buf.copyToChannel(out, 0);
+  hit = { buf, rate }; ksCache.set(key, hit); return hit;
+}
+const driveCurves = new Map();
+function ksVoice(c, dest, P, m, vel, t) {
+  const { buf, rate } = ksBuffer(c.sampleRate, P, m), src = c.createBufferSource(); src.buffer = buf; src.playbackRate.value = rate;
+  let last = src;
+  if (P.drive) {
+    let curve = driveCurves.get(P.drive);
+    if (!curve) { curve = new Float32Array(1024); for (let i = 0; i < 1024; i++) { const x = i / 511.5 - 1; curve[i] = Math.tanh(x * P.drive) / Math.tanh(P.drive); } driveCurves.set(P.drive, curve); }
+    const ws = c.createWaveShaper(); ws.curve = curve; ws.oversample = '2x'; last.connect(ws); last = ws;
+  }
+  const lp = c.createBiquadFilter(); lp.type = 'lowpass'; lp.frequency.value = P.lp; last.connect(lp); last = lp;
+  (P.body || []).forEach(([fr, q, gdb]) => { const pk = c.createBiquadFilter(); pk.type = 'peaking'; pk.frequency.value = fr; pk.Q.value = q; pk.gain.value = gdb; last.connect(pk); last = pk; });
+  const g = c.createGain(); g.gain.setValueAtTime(0, t); g.gain.linearRampToValueAtTime(vel * P.gain, t + 0.003);
+  last.connect(g); g.connect(dest); src.start(t);
+  const end = t + buf.duration / rate; src.stop(end + 0.02);
+  return releaser(c, g, t, P.r, [src], end);
+}
+// struck instruments: a few sine partials that each fade at their own speed
+function malletVoice(c, dest, P, m, vel, t) {
+  const f = mtof(m), g = c.createGain(), srcs = [], nyq = c.sampleRate / 2 * 0.9;
+  const T = clamp(P.dec * Math.pow(0.5, (m - 60) / 24), 0.15, P.dec * 2.5);
+  g.gain.value = vel * P.gain;
+  let tail = g;
+  if (P.trem) { const tg = c.createGain(); tg.gain.value = 1 - P.trem[1] / 2; const lfo = c.createOscillator(), lg = c.createGain(); lfo.frequency.value = P.trem[0]; lg.gain.value = P.trem[1] / 2; lfo.connect(lg); lg.connect(tg.gain); lfo.start(t); srcs.push(lfo); g.connect(tg); tail = tg; }
+  tail.connect(dest);
+  let end = t;
+  P.parts.forEach(([ratio, pg, dm]) => {
+    const fr = f * ratio; if (fr > nyq) return;
+    const o = c.createOscillator(), og = c.createGain(); o.frequency.value = fr;
+    const d = T * dm; og.gain.setValueAtTime(0, t); og.gain.linearRampToValueAtTime(pg, t + 0.002); og.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(og); og.connect(g); o.start(t); o.stop(t + d + 0.05); srcs.push(o); end = Math.max(end, t + d);
+  });
+  srcs.filter(s => s.frequency && s.frequency.value < 20).forEach(l => l.stop(end + 0.05));
+  if (P.ring) return { release() {}, stopNow() { const n = c.currentTime; g.gain.setTargetAtTime(0, n, 0.01); srcs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); } };
+  return releaser(c, g, t, P.r || 0.3, srcs, end);
+}
+// drum kit: each key in an octave is a different drum
+function drumVoice(c, dest, m, vel, t) {
+  const kind = ((m % 12) + 12) % 12, tune = clamp(1 + (Math.floor(m / 12) - 5) * 0.12, 0.6, 1.5), srcs = [];
+  const out = c.createGain(); out.gain.value = vel * 0.9; out.connect(dest);
+  const noise = (dur, type, freq, q, level, decay, delay = 0) => {
+    const n = c.createBufferSource(); n.buffer = noiseBuf(c.sampleRate);
+    const fl = c.createBiquadFilter(); fl.type = type; fl.frequency.value = freq; fl.Q.value = q || 0.7;
+    const g = c.createGain(); const s0 = t + delay; g.gain.setValueAtTime(0, s0); g.gain.linearRampToValueAtTime(level, s0 + 0.001); g.gain.exponentialRampToValueAtTime(0.0001, s0 + decay);
+    n.connect(fl); fl.connect(g); g.connect(out); n.start(s0, Math.random()); n.stop(s0 + dur); srcs.push(n);
+  };
+  const tone = (type, f0, f1, sweep, level, decay) => {
+    const o = c.createOscillator(); o.type = type; o.frequency.setValueAtTime(f0, t); o.frequency.exponentialRampToValueAtTime(f1, t + sweep);
+    const g = c.createGain(); g.gain.setValueAtTime(level, t); g.gain.exponentialRampToValueAtTime(0.0001, t + decay);
+    o.connect(g); g.connect(out); o.start(t); o.stop(t + decay + 0.02); srcs.push(o);
+  };
+  switch (kind) {
+    case 0: tone('sine', 150 * tune, 42 * tune, 0.12, 1, 0.45); noise(0.01, 'highpass', 3000, 0.7, 0.25, 0.008); break;
+    case 1: tone('square', 820 * tune, 800 * tune, 0.01, 0.25, 0.035); noise(0.03, 'bandpass', 2500, 2, 0.3, 0.03); break;
+    case 2: noise(0.25, 'highpass', 1400, 0.7, 0.7, 0.2); tone('triangle', 190 * tune, 160 * tune, 0.05, 0.5, 0.11); break;
+    case 3: [0, 0.011, 0.022].forEach(dl => noise(0.02, 'bandpass', 1300, 1.3, 0.8, 0.012, dl)); noise(0.2, 'bandpass', 1200, 1.1, 0.55, 0.16, 0.03); break;
+    case 4: noise(0.14, 'bandpass', 3500, 0.9, 0.7, 0.11); tone('triangle', 240 * tune, 200 * tune, 0.04, 0.4, 0.07); break;
+    case 5: case 7: case 9: { const base = { 5: 95, 7: 140, 9: 200 }[kind] * tune; tone('sine', base * 1.4, base, 0.18, 0.9, 0.42); noise(0.03, 'bandpass', 1500, 1, 0.1, 0.03); break; }
+    case 6: noise(0.08, 'highpass', 7500, 0.7, 0.4, 0.05); break;
+    case 8: noise(0.12, 'highpass', 6500, 0.7, 0.3, 0.08); break;
+    case 10: noise(0.5, 'highpass', 7000, 0.7, 0.35, 0.38); break;
+    case 11: noise(2, 'highpass', 4500, 0.5, 0.45, 1.6); noise(1.2, 'bandpass', 8000, 0.8, 0.2, 0.9); break;
+  }
+  return { release() {}, stopNow() { const n = c.currentTime; out.gain.setTargetAtTime(0, n, 0.01); srcs.forEach(o => { try { o.stop(n + 0.06); } catch (e) {} }); } };
+}
+function startVoice(c, dest, sound, m, vel, t) {
+  const P = INST[sound] || INST.piano;
+  const mm = m + (P.shift || 0);
+  if (P.kind === 'tone') return toneVoice(c, dest, P, mm, vel, t);
+  if (P.kind === 'ks') return ksVoice(c, dest, P, mm, vel, t);
+  if (P.kind === 'mallet') return malletVoice(c, dest, P, mm, vel, t);
+  if (P.kind === 'drum') return drumVoice(c, dest, m, vel, t);
+  return legacyVoice(c, dest, sound, m, vel, t);
+}
 const waveCache = new WeakMap();
 function wavesFor(c) {
   let w = waveCache.get(c); if (w) return w;
@@ -2020,8 +2273,7 @@ function wavesFor(c) {
   w = { piano: mk([1, .6, .35, .25, .16, .1, .07, .05, .035, .025, .018]), epiano: mk([1, .18, .06, .03]), organ: mk([1, .75, .05, .45, .02, .3, .02, .22]) };
   waveCache.set(c, w); return w;
 }
-// One note of the built-in instruments. Works in the live context and in an OfflineAudioContext (for Save WAV/MP3).
-function startVoice(c, dest, sound, m, vel, t) {
+function legacyVoice(c, dest, sound, m, vel, t) {
   const f = 440 * Math.pow(2, (m - 69) / 12), g = c.createGain(), fl = c.createBiquadFilter(), W = wavesFor(c), oscs = [];
   g.gain.setValueAtTime(0, t); fl.type = 'lowpass'; fl.connect(g); g.connect(dest);
   const osc = (type, det = 0, lvl = 1) => {
@@ -2097,8 +2349,10 @@ function renderKeys() {
   CR.top = m - 1;
   const ww = 100 / nW, bw = ww * 0.62;
   const hk = mm => { const i = mm - CR.base; return i >= 0 && i < KEYMAP.length ? `<span class="hk">${KEYMAP[i]}</span>` : ''; };
-  kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}" style="--oc:${octColor(k.m)}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
-    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}<span class="nm">${noteName(k.m).replace(/\d+$/, '')}</span><span class="fl">${FLATS[k.m % 12]}</span></div>`).join('');
+  const drums = CR.sound === 'drums', dn = mm => DRUM_NAMES[((mm % 12) + 12) % 12];
+  kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}" style="--oc:${octColor(k.m)}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${drums ? dn(k.m) : k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
+    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}<span class="nm">${drums ? dn(k.m) : noteName(k.m).replace(/\d+$/, '')}</span><span class="fl">${drums ? '' : FLATS[k.m % 12]}</span></div>`).join('');
+  CR.keysFor = CR.sound;
   CR.keyEls = new Map([...kb.querySelectorAll('.pk')].map(el => [+el.dataset.m, el]));
   CR.down.forEach(mm => keyOn(mm, true));
   const lbl = $('#crOctLbl'); lbl.textContent = noteName(CR.base) + '–' + noteName(CR.top);
@@ -2208,7 +2462,11 @@ function crUI() {
   $('#crPlay').innerHTML = (CR.playing && !CR.recording ? I.pause + '<span>Stop</span>' : I.play + '<span>Play</span>');
   $('#crMetro').classList.toggle('on', CR.metro); $('#crMetro').style.setProperty('--c', '#a78bfa');
   $('#crSus').classList.toggle('on', crSus()); $('#crLabels').classList.toggle('on', CR.labels);
-  document.querySelectorAll('.ibtn').forEach(b => b.setAttribute('aria-checked', String(b.dataset.sound === CR.sound)));
+  const I1 = INST[CR.sound] || INST.piano, F1 = FAMS[I1.fam], pick = $('#crInstBtn');
+  pick.style.setProperty('--fc', F1.color); $('#crInstNum').textContent = I1.num; $('#crInstName').textContent = I1.name; $('#crInstIco').innerHTML = F1.icon;
+  pick.setAttribute('aria-label', 'Instrument ' + I1.num + ', ' + I1.name + '. Choose another');
+  document.querySelectorAll('.iitem').forEach(b => b.setAttribute('aria-selected', String(b.dataset.sound === CR.sound)));
+  if (CR.keysFor !== undefined && (CR.keysFor === 'drums') !== (CR.sound === 'drums')) renderKeys();
   if (document.activeElement !== $('#crBpm')) $('#crBpm').value = CR.bpm;
   const pill = $('#crPill'); pill.hidden = !CR.playing; pill.classList.toggle('playing', CR.playing && !CR.recording);
 }
@@ -2336,14 +2594,32 @@ $('#crClear').addEventListener('click', async () => { if (!CR.notes.length) retu
 $('#crWav').addEventListener('click', () => crSave('wav'));
 $('#crMp3').addEventListener('click', () => crSave('mp3'));
 $('#crSend').addEventListener('click', crSend);
-document.querySelectorAll('.ibtn').forEach(b => b.addEventListener('click', () => { CR.sound = b.dataset.sound; crUI(); touch(); }));
-$('.instr').addEventListener('keydown', e => {
-  if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return; e.preventDefault(); e.stopPropagation();
-  const ks = Object.keys(SOUNDS), i = (ks.indexOf(CR.sound) + (e.key === 'ArrowRight' ? 1 : -1) + ks.length) % ks.length;
-  CR.sound = ks[i]; crUI(); touch(); document.querySelector(`.ibtn[data-sound="${CR.sound}"]`).focus();
-});
+/* instrument list */
+(() => {
+  const fams = Object.keys(FAMS);
+  $('#crInstList').innerHTML = fams.map(fk => {
+    const F = FAMS[fk], items = INSTRUMENTS.filter(x => x.fam === fk);
+    return `<h4 style="--fc:${F.color}">${F.name}</h4><div class="igrid" role="listbox" aria-label="${F.name}">` +
+      items.map(x => `<button type="button" class="iitem" role="option" data-sound="${x.id}" style="--fc:${F.color}" aria-selected="false"><span class="inum">${x.num}</span>${F.icon}<span>${x.name}</span></button>`).join('') + '</div>';
+  }).join('');
+  $('#crInstCount').textContent = INSTRUMENTS.length + ' to choose from';
+})();
+function setInstrument(id, preview) {
+  if (!INST[id]) return;
+  CR.sound = id; crUI(); touch();
+  if (preview) { crInit(); const P = INST[id], m = id === 'drums' ? 60 : (P.fam === 'brass' && id === 'tuba') || id === 'contrabass' ? 48 : 60; const v = startVoice(ctx, CR.out, id, m, 0.75, ctx.currentTime); v.release(ctx.currentTime + 0.45); }
+}
+function stepInstrument(dir) { const i = INSTRUMENTS.findIndex(x => x.id === CR.sound); setInstrument(INSTRUMENTS[(i + dir + INSTRUMENTS.length) % INSTRUMENTS.length].id, true); }
+function openInst() { const p = $('#crInstPanel'); p.hidden = false; $('#crInstBtn').setAttribute('aria-expanded', 'true'); const sel = p.querySelector('.iitem[aria-selected="true"]'); if (sel) { sel.scrollIntoView({ block: 'center' }); sel.focus(); } }
+function closeInst() { const p = $('#crInstPanel'); if (p.hidden) return; p.hidden = true; $('#crInstBtn').setAttribute('aria-expanded', 'false'); }
+$('#crInstBtn').addEventListener('click', () => $('#crInstPanel').hidden ? openInst() : closeInst());
+$('#crInstClose').addEventListener('click', () => { closeInst(); $('#crInstBtn').focus(); });
+$('#crInstPrev').addEventListener('click', () => stepInstrument(-1));
+$('#crInstNext').addEventListener('click', () => stepInstrument(1));
+$('#crInstList').addEventListener('click', e => { const b = e.target.closest('.iitem'); if (!b) return; setInstrument(b.dataset.sound, true); closeInst(); });
+$('#pKeys').addEventListener('pointerdown', () => closeInst(), true);
 $('#crPill').addEventListener('click', () => crStop());
-function openMenu() { const d = $('#crMenu'); d.inert = false; d.classList.add('open'); $('#crMenuBg').hidden = false; $('#crMenuBtn').setAttribute('aria-expanded', 'true'); setTimeout(() => $('#crMenuClose').focus(), 60); }
+function openMenu() { closeInst(); const d = $('#crMenu'); d.inert = false; d.classList.add('open'); $('#crMenuBg').hidden = false; $('#crMenuBtn').setAttribute('aria-expanded', 'true'); setTimeout(() => $('#crMenuClose').focus(), 60); }
 function closeMenu() { const d = $('#crMenu'); if (!d.classList.contains('open')) return; d.classList.remove('open'); d.inert = true; $('#crMenuBg').hidden = true; $('#crMenuBtn').setAttribute('aria-expanded', 'false'); }
 $('#crMenuBtn').addEventListener('click', openMenu);
 $('#crMenuClose').addEventListener('click', () => { closeMenu(); $('#crMenuBtn').focus(); });
@@ -2361,6 +2637,8 @@ $('#crLabels').addEventListener('click', () => { CR.labels = !CR.labels; renderK
 document.addEventListener('keydown', e => {
   if (MODE !== 'create' || document.querySelector('dialog[open]')) return;
   if (e.key === 'Escape' && $('#crMenu').classList.contains('open')) { closeMenu(); $('#crMenuBtn').focus(); return; }
+  if (e.key === 'Escape' && !$('#crInstPanel').hidden) { closeInst(); $('#crInstBtn').focus(); return; }
+  if (!$('#crInstPanel').hidden && (e.key === 'Enter' || e.key === ' ' || e.key.startsWith('Arrow') || e.key === 'Tab')) return;
   const t = e.target, tag = t && t.tagName;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA') return;
   if (e.ctrlKey || e.metaKey) { if (e.key.toLowerCase() === 'z') { e.preventDefault(); crUndoTake(); } return; }
@@ -2370,6 +2648,7 @@ document.addEventListener('keydown', e => {
   if (e.key === ' ') { e.preventDefault(); if (!e.repeat) { if (CR.recording) crStop(); else crPlay(); } return; }
   if (k === 'r') { if (!e.repeat) crRecord(); return; }
   if (k === 'z') { crOct(-1); return; } if (k === 'x') { crOct(1); return; }
+  if (e.key === '[') { stepInstrument(-1); return; } if (e.key === ']') { stepInstrument(1); return; }
   const i = KEYMAP.indexOf(k); if (i < 0) return;
   e.preventDefault(); if (e.repeat || keyNotes.has(k)) return;
   const m = CR.base + i; keyNotes.set(k, m); pressNote(m);
