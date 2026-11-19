@@ -532,6 +532,17 @@ body.pane-music .rsw-pill{transform:translateX(100%)}
 #radioPane,#musicPane{display:flex;flex-direction:column;gap:12px}
 #radioPane[hidden],#musicPane[hidden]{display:none}
 .mnote{padding:12px 14px;border-radius:12px;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.35);color:#fbcfe8;font-size:13.5px}
+.msupport{display:grid;gap:8px;padding:14px 16px;background:linear-gradient(135deg,rgba(244,114,182,.14),rgba(190,24,93,.06));border-color:rgba(244,114,182,.5)}
+.msupport p{margin:0;line-height:1.5}
+.msupport .msmall{opacity:.8;font-size:12.5px}
+.mshead{display:flex;align-items:center;gap:10px;color:#fff;font-size:15px}
+.msico{flex:none;font:800 11px var(--mono);padding:4px 7px;border-radius:8px;background:#f472b6;color:#1a0710}
+.mcash,.npcash{justify-self:start;display:inline-flex;align-items:center;gap:8px;text-decoration:none;font-weight:800;border-radius:999px;padding:9px 18px}
+.mcash{background:#00d64f;border-color:#00d64f;color:#03210f}
+.mcash:hover{filter:brightness(1.08)}
+.mcash svg{width:16px;height:16px}
+.mcash[hidden],.npcash[hidden]{display:none}
+.npcash{margin:0 8px 8px 0;background:#00d64f;border-color:#00d64f;color:#03210f}
 #musicPane .btn.primary{background:linear-gradient(#f472b6,#be185d);color:#fff}
 #musicPane .rsearch input[type=search]:focus{border-color:#f472b6;box-shadow:0 0 0 2px rgba(244,114,182,.35)}
 #musicPane .rchip.on{background:linear-gradient(#f472b6,#be185d);color:#fff}
@@ -612,7 +623,7 @@ body.pane-music .rsw-pill{transform:translateX(100%)}
 .npinfo dt{opacity:.65;font-weight:600}
 .npinfo dd{margin:0;font-weight:700;overflow-wrap:anywhere}
 .npnote{margin:16px 0 12px;opacity:.75;font-size:13.5px}
-.npapple{display:inline-flex;text-decoration:none;background:#fff;color:#0b0d14;border-color:#fff;font-weight:800;border-radius:999px;padding:10px 18px}
+.npapple{margin:0 8px 8px 0;display:inline-flex;text-decoration:none;background:#fff;color:#0b0d14;border-color:#fff;font-weight:800;border-radius:999px;padding:10px 18px}
 .npapple[hidden]{display:none}
 .npnext{list-style:none;margin:0;padding:0;display:grid;gap:6px}
 .npnext li{display:flex;align-items:center;gap:12px;padding:6px;border-radius:10px;cursor:pointer}
@@ -995,7 +1006,12 @@ html.phone body.mode-create .btn{min-height:38px}
   <p class="rcredit">Stations come from the free <a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a> directory. Each station plays its own live broadcast, which can include the station’s own ads.</p>
   </div>
   <div id="musicPane" hidden>
-    <div class="mnote"><b>Official songs, 30-second previews for now.</b> Search Apple’s music catalog for any artist or song, like Taylor Swift. Full songs need a music service hookup, which we’ll add next. Until then, ⋯ → <b>Open in Apple Music</b> plays the whole song there.</div>
+    <div class="mnote msupport">
+      <div class="mshead"><span class="msico" aria-hidden="true">30s</span><b>Heads up: songs here are 30-second previews</b></div>
+      <p>SpinLab plays Apple’s free 30-second previews right now. To play whole songs, SpinLab needs an Apple Developer membership, which costs <b>$99 a year</b>. If you enjoy SpinLab, a small tip helps us get there. Once it’s covered, anyone with an Apple Music subscription will be able to play full songs right here.</p>
+      <p class="msmall">Want the whole song now? Tap ⋯ on any song and pick <b>Open in Apple Music</b>.</p>
+      <a class="btn mcash supportlink" target="_blank" rel="noopener" hidden><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s-7.5-4.6-9.3-9.2C1.4 8.4 3.6 5 7 5c2 0 3.6 1.1 5 2.8C13.4 6.1 15 5 17 5c3.4 0 5.6 3.4 4.3 6.8C19.5 16.4 12 21 12 21z" fill="currentColor"/></svg>Support SpinLab on Cash App</a>
+    </div>
     <form class="rsearch" id="mForm" role="search">
       <input type="search" id="mQuery" placeholder="Search songs or artists, like Taylor Swift" aria-label="Search songs and artists" autocomplete="off" spellcheck="false" enterkeyhint="search">
       <button class="btn primary" type="submit">Search</button>
@@ -1069,7 +1085,8 @@ html.phone body.mode-create .btn{min-height:38px}
       <article class="npcard">
         <h3>About this song</h3>
         <dl class="npinfo" id="npInfo"></dl>
-        <p class="npnote">You’re hearing Apple’s 30-second preview. Open the song in Apple Music to hear all of it.</p>
+        <p class="npnote">You’re hearing Apple’s 30-second preview. Open the song in Apple Music to hear all of it. Full songs in SpinLab need a $99-a-year Apple membership, and tips help us get there.</p>
+        <a class="btn npcash supportlink" target="_blank" rel="noopener" hidden>Help unlock full songs</a>
         <a class="btn npapple" id="npApple" target="_blank" rel="noopener">Open in Apple Music</a>
       </article>
       <article class="npcard">
@@ -1197,7 +1214,9 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.22'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.23'; // bump on every update: 1.0.1, 1.0.2 ...
+/* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
+const SUPPORT_CASHTAG = '$LayahMcFly';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -3605,6 +3624,8 @@ renderHomeRadio();
 
 /* ---------------- Music: official songs from Apple's iTunes Search (30-second previews for now) ----------------
    Search, queue, Liked songs (built-in, can't be deleted) and playlists. Full songs come later through a music service. */
+(() => { const tag = (SUPPORT_CASHTAG || '').trim().replace(/^\$?/, ''); if (!tag) return;
+  document.querySelectorAll('.supportlink').forEach(a => { a.href = 'https://cash.app/$' + encodeURIComponent(tag); a.hidden = false; a.title = 'Opens Cash App to $' + tag; }); })();
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 var MUS = { audio: $('#mAudio'), results: [], tab: 'songs', track: null, state: '', dir: 1, cache: new Map(), loading: false, searched: false };
 const mLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch (e) { return d; } };
