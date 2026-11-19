@@ -410,7 +410,23 @@ body.mode-home .statusbar{margin-top:auto}
 .i-rd .waves path{animation:rwave 1.6s ease-in-out infinite}
 .i-rd .waves .w2{animation-delay:.25s}
 @keyframes rwave{0%,100%{opacity:.25}50%{opacity:1}}
-@media (max-width:760px){ .hcols{grid-template-columns:1fr 1fr} .hcol.rd{grid-column:1 / -1} .hcol.rd .hbtn{flex-direction:row;justify-content:center;gap:16px;padding:14px} .hcol.rd .hbtn svg{width:64px;height:64px} .hcol.rd .hbtn small{min-height:0;text-align:left} .hcol.rd .hbtn .rdtext{display:flex;flex-direction:column;align-items:flex-start;gap:4px} }
+.hbtn .rdtext{display:flex;flex-direction:column;align-items:center;gap:8px}
+.hlib{display:grid;gap:8px}
+@media (max-width:760px){
+  .hcols{grid-template-columns:1fr 1fr;row-gap:26px}
+  .hcol{gap:14px}
+  .hbtn{gap:12px;padding:22px 14px 20px}
+  .hbtn small{line-height:1.45;padding:0 6px}
+  .hcol.rd{grid-column:1 / -1}
+  .hcol.rd .hbtn{flex-direction:row;justify-content:flex-start;gap:20px;padding:20px 22px}
+  .hcol.rd .hbtn svg{width:60px;height:60px;flex:none}
+  .hcol.rd .hbtn .rdtext{align-items:flex-start;gap:6px;flex:1;min-width:0;text-align:left}
+  .hcol.rd .hbtn .hname{white-space:nowrap;font-size:clamp(22px,6vw,30px)}
+  .hcol.rd .hbtn small{min-height:0;text-align:left;justify-content:flex-start;padding:0}
+  .hlist{gap:10px}
+  .hopen{padding:8px 10px}
+  .hopen small{margin-top:2px}
+}
 #radioView{display:none}
 body.mode-radio #radioView{display:flex}
 body.mode-radio header.top,body.mode-radio main{display:none!important}
@@ -434,10 +450,10 @@ body.mode-radio{padding-bottom:96px}
 .rchip{appearance:none;-webkit-appearance:none;border:1px solid var(--line2);background:#121725;color:var(--soft);border-radius:999px;padding:7px 13px;font:700 12.5px var(--sans);cursor:pointer;touch-action:manipulation}
 .rchip:hover{color:var(--ink);border-color:#4a5575}
 .rchip.on{background:linear-gradient(#34d399,#059669);color:#04150f;border-color:transparent}
-.rchip:focus-visible,.rtab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
+.rchip:focus-visible,.rtab:focus-visible,.mtab:focus-visible{outline:2px solid var(--gold);outline-offset:2px}
 .rtabs{display:flex;gap:6px;border-bottom:1px solid var(--line);padding-bottom:0}
-.rtab{appearance:none;-webkit-appearance:none;border:0;border-bottom:2px solid transparent;background:none;color:var(--soft);padding:8px 12px;font:700 13.5px var(--sans);cursor:pointer;margin-bottom:-1px}
-.rtab[aria-selected="true"]{color:var(--ink);border-bottom-color:#34d399}
+.rtab,.mtab{appearance:none;-webkit-appearance:none;border:0;border-bottom:2px solid transparent;background:none;color:var(--soft);padding:8px 12px;font:700 13.5px var(--sans);cursor:pointer;margin-bottom:-1px}
+.rtab[aria-selected="true"],.mtab[aria-selected="true"]{color:var(--ink);border-bottom-color:#34d399}
 .rlist{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:8px}
 .rstation{display:flex;align-items:center;gap:10px;padding:8px;border:1px solid var(--line2);border-radius:14px;background:#121725;cursor:pointer;min-width:0}
 .rstation:hover{border-color:#4a5575}
@@ -477,6 +493,40 @@ body.mode-radio{padding-bottom:96px}
 .rmenu .mh{font:800 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);padding:8px 12px 4px}
 .rmenu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
 .rmenu .ck{width:18px;color:#34d399;font-weight:800}
+.rswitch{display:inline-flex;align-self:flex-start;border:1px solid var(--line2);border-radius:12px;padding:3px;background:#0e1220;gap:2px}
+.rswitch button{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--soft);font:700 14px var(--sans);padding:9px 16px;border-radius:9px;cursor:pointer;display:inline-flex;align-items:center;gap:8px;touch-action:manipulation}
+.rswitch button svg{width:18px;height:18px}
+.rswitch button:hover{color:var(--ink)}
+.rswitch button[aria-pressed="true"][data-pane="radio"]{background:linear-gradient(#34d399,#059669);color:#04150f}
+.rswitch button[aria-pressed="true"][data-pane="music"]{background:linear-gradient(#f472b6,#be185d);color:#fff}
+.rswitch button:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+#radioPane,#musicPane{display:flex;flex-direction:column;gap:12px}
+#radioPane[hidden],#musicPane[hidden]{display:none}
+.mnote{padding:12px 14px;border-radius:12px;background:rgba(244,114,182,.08);border:1px solid rgba(244,114,182,.35);color:#fbcfe8;font-size:13.5px}
+#musicPane .btn.primary{background:linear-gradient(#f472b6,#be185d);color:#fff}
+#musicPane .rsearch input[type=search]:focus{border-color:#f472b6;box-shadow:0 0 0 2px rgba(244,114,182,.35)}
+#musicPane .rchip.on{background:linear-gradient(#f472b6,#be185d);color:#fff}
+#musicPane .mtab[aria-selected="true"]{border-bottom-color:#f472b6}
+.msong .rlogo,.mplayer .rlogo{border-radius:8px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M9 18V5l11-2v13' fill='none' stroke='%23f472b6' stroke-width='1.8' stroke-linejoin='round'/%3E%3Ccircle cx='6.5' cy='18' r='2.8' fill='none' stroke='%23f472b6' stroke-width='1.8'/%3E%3Ccircle cx='17.5' cy='16' r='2.8' fill='none' stroke='%23f472b6' stroke-width='1.8'/%3E%3C/svg%3E")}
+@media (max-width:600px){ .rstation.inq .rinfo b{white-space:normal;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden} }
+.msong.playing{border-color:#f472b6;box-shadow:0 0 0 1px #f472b6 inset,0 0 18px -6px #f472b6}
+.msong.qcur{border-color:#f472b6}
+.mexp{display:inline-block;font:800 9px var(--mono);padding:1px 4px;border-radius:3px;background:#475569;color:#e2e8f0;margin-left:5px;vertical-align:2px}
+.mlike{font-size:16px;line-height:1}
+.mlike[aria-pressed="true"]{color:#f472b6;border-color:rgba(244,114,182,.55)}
+.rpl.liked .pic{background:linear-gradient(#3a1530,#1d0a17);color:#f472b6;border-color:rgba(244,114,182,.45)}
+#musicPane .rpl .pic{background:linear-gradient(#3a1530,#1d0a17);color:#f472b6;border-color:rgba(244,114,182,.35)}
+#musicPane .rpl.new{color:#f472b6}
+#musicPane .rbar .btn.primary{background:linear-gradient(#f472b6,#be185d);color:#fff}
+.mplayer{background:linear-gradient(#2a1a26,#18111a);border-color:rgba(244,114,182,.45);box-shadow:0 18px 40px -14px #000,0 0 24px -12px #f472b6}
+.mprog{display:flex;align-items:center;gap:8px;font:600 11px var(--mono);color:var(--soft);margin-top:2px}
+.mprog input{height:16px;flex:1}
+.mprog input::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;border-radius:50%}
+.mprog input::-moz-range-thumb{width:12px;height:12px;border-radius:50%}
+.mprog input::-webkit-slider-runnable-track{height:4px}
+.mprog input::-moz-range-track{height:4px}
+#mpVol{width:100px;flex:none}
+@media (max-width:600px){ #mpVol{display:none} }
 .rmenu button svg{width:16px;height:16px;flex:none}
 .rlist.one{grid-template-columns:1fr;max-width:760px}
 .rmore .btn[hidden]{display:none}
@@ -773,7 +823,7 @@ html.phone body.mode-create .btn{min-height:38px}
       <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
     </div>
     <div class="hcol rd">
-      <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><span class="hname">Online Music</span><small>Live radio from around the world. Needs internet.</small></button>
+      <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><span class="rdtext"><span class="hname">Online Music</span><small>Online radio and official music. Needs internet.</small></span></button>
       <div class="hlib"><div class="hlibhead"><span class="lbl">Playlists</span></div><ul class="hlist" id="homeRadio"></ul></div>
     </div>
   </div>
@@ -784,7 +834,12 @@ html.phone body.mode-create .btn{min-height:38px}
     <div class="rtitle"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg><b>Online Music</b></div>
     <span class="rnet" id="rNet" aria-live="polite"></span>
   </div>
-  <div class="rnote" id="rOffline" hidden><b>You’re offline.</b> Online Music plays live radio over the internet, so it needs WiFi or mobile data. DJ and Piano still work without a connection.</div>
+  <div class="rswitch" role="group" aria-label="Online Radio or Music">
+    <button type="button" data-pane="radio" aria-pressed="true"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="2.5" fill="currentColor"/><path d="M7.8 7.8a6 6 0 0 0 0 8.4M16.2 7.8a6 6 0 0 1 0 8.4M4.9 4.9a10 10 0 0 0 0 14.2M19.1 4.9a10 10 0 0 1 0 14.2" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"/></svg>Online Radio</button>
+    <button type="button" data-pane="music" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18V5l11-2v13" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><circle cx="6.5" cy="18" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/><circle cx="17.5" cy="16" r="2.8" fill="none" stroke="currentColor" stroke-width="1.8"/></svg>Music</button>
+  </div>
+  <div class="rnote" id="rOffline" hidden><b>You’re offline.</b> Online Radio and Music play over the internet, so they need WiFi or mobile data. DJ and Piano still work without a connection.</div>
+  <div id="radioPane">
   <form class="rsearch" id="rForm" role="search">
     <input type="search" id="rQuery" placeholder="Search stations, like Hot 97, BBC or jazz" aria-label="Search radio stations" autocomplete="off" spellcheck="false" enterkeyhint="search">
     <select id="rCountry" aria-label="Country"><option value="">Any country</option><option value="US">United States</option><option value="GB">United Kingdom</option><option value="CA">Canada</option><option value="NG">Nigeria</option><option value="GH">Ghana</option><option value="JM">Jamaica</option><option value="ZA">South Africa</option><option value="KE">Kenya</option><option value="IN">India</option><option value="PH">Philippines</option><option value="AU">Australia</option><option value="FR">France</option><option value="DE">Germany</option><option value="ES">Spain</option><option value="MX">Mexico</option><option value="BR">Brazil</option><option value="JP">Japan</option><option value="KR">South Korea</option></select>
@@ -800,6 +855,23 @@ html.phone body.mode-create .btn{min-height:38px}
   <ul class="rlist" id="rList" aria-live="polite"></ul>
   <div class="rmore"><button class="btn" id="rMore" hidden>Show more stations</button></div>
   <p class="rcredit">Stations come from the free <a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a> directory. Each station plays its own live broadcast, which can include the station’s own ads.</p>
+  </div>
+  <div id="musicPane" hidden>
+    <div class="mnote"><b>Official songs, 30-second previews for now.</b> Search Apple’s music catalog for any artist or song, like Taylor Swift. Full songs need a music service hookup, which we’ll add next. Until then, ⋯ → <b>Open in Apple Music</b> plays the whole song there.</div>
+    <form class="rsearch" id="mForm" role="search">
+      <input type="search" id="mQuery" placeholder="Search songs or artists, like Taylor Swift" aria-label="Search songs and artists" autocomplete="off" spellcheck="false" enterkeyhint="search">
+      <button class="btn primary" type="submit">Search</button>
+    </form>
+    <div class="rchips" id="mChips" role="group" aria-label="Try an artist"></div>
+    <div class="rtabs" role="tablist">
+      <button type="button" role="tab" class="mtab" data-tab="songs" aria-selected="true">Songs</button>
+      <button type="button" role="tab" class="mtab" data-tab="queue" aria-selected="false">Queue <span id="mQCount"></span></button>
+      <button type="button" role="tab" class="mtab" data-tab="playlists" aria-selected="false">Playlists <span id="mPlCount"></span></button>
+    </div>
+    <div class="rbar" id="mBar" hidden></div>
+    <ul class="rlist" id="mList" aria-live="polite"></ul>
+    <p class="rcredit">Song search and 30-second previews come from Apple’s free iTunes Search service.</p>
+  </div>
 </section>
 <div class="rplayer" id="rPlayer" hidden>
   <img class="rlogo" id="rpLogo" alt="" referrerpolicy="no-referrer">
@@ -812,7 +884,18 @@ html.phone body.mode-create .btn{min-height:38px}
   <button class="btn rpbtn rfav" id="rpFav" aria-label="Add to favorites" aria-pressed="false">☆</button>
   <input type="range" id="rpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Radio volume">
 </div>
+<div class="rplayer mplayer" id="mPlayer" hidden>
+  <img class="rlogo" id="mpArt" alt="" referrerpolicy="no-referrer">
+  <div class="rpinfo"><b id="mpTitle"></b><small id="mpArtist"></small>
+    <div class="mprog"><span id="mpCur">0:00</span><input type="range" id="mpSeek" min="0" max="30" step="0.1" value="0" aria-label="Position in the song"><span id="mpDur">0:30</span></div></div>
+  <button class="btn rpbtn" id="mpPrev" aria-label="Previous song" title="Previous"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button>
+  <button class="btn rpbtn" id="mpPlay" aria-label="Pause"></button>
+  <button class="btn rpbtn" id="mpNext" aria-label="Next song" title="Next"><svg viewBox="0 0 16 16"><path d="M12.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 3v10l7.5-5z" fill="currentColor"/></svg></button>
+  <button class="btn rpbtn mlike" id="mpLike" aria-label="Add to Liked songs" aria-pressed="false">♡</button>
+  <input type="range" id="mpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Music volume">
+</div>
 <audio id="rAudio" preload="none"></audio>
+<audio id="mAudio" preload="none"></audio>
 <div class="rmenu" id="rMenu" role="menu" hidden></div>
 <div class="statusbar">
 <section class="panel offline" id="offline">
@@ -853,6 +936,11 @@ html.phone body.mode-create .btn{min-height:38px}
     <li>Saving in DJ goes to the DJ library. Saving in Piano goes to the Piano library.</li>
   </ul>
   <h3>Online Music</h3>
+  <ul>
+    <li>Online Music has two parts, switched at the top: <b>Online Radio</b> (live stations) and <b>Music</b> (official songs).</li>
+    <li><b>Music</b> searches Apple’s music catalog, so you can find artists like Taylor Swift. For now songs play as 30-second previews. ⋯ → <b>Open in Apple Music</b> plays a whole song there. Music has its own queue, playlists and a built-in <b>Liked songs</b> playlist (♡) that can’t be deleted. When a song ends, the next one in the queue starts.</li>
+  </ul>
+  <h3>Online Radio</h3>
   <ul>
     <li>Live radio from thousands of free stations around the world, from the Radio Browser directory. Search by name, pick a genre or choose a country.</li>
     <li>It keeps playing when you lock your phone or switch apps, and the lock screen shows the station with play and pause.</li>
@@ -919,7 +1007,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.18'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.19'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2981,6 +3069,7 @@ function netUI() {
 }
 window.addEventListener('online', () => { netUI(); if (MODE === 'radio' && RADIO.tab === 'results' && !RADIO.results.length) radioSearch(true); });
 window.addEventListener('offline', netUI);
+window.addEventListener('online', () => { if (MODE === 'radio' && RADIO.pane === 'music') renderMusic(); });
 function stationMeta(st) {
   const tags = (st.tags || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 3).join(', ');
   return [st.country, tags, st.bitrate ? st.bitrate + ' kbps' : ''].filter(Boolean).join(' · ');
@@ -2998,7 +3087,7 @@ function stationLi(st, ctx = 'results', idx = 0) {
   else if (ctx === 'pl') extra = `<button class="btn sm rmini" data-r="more" aria-label="More for ${nm}">${MORE}</button><button class="btn sm rmini danger" data-r="pldel" aria-label="Remove ${nm} from this playlist">${BIN}</button>`;
   else extra = `<button class="btn sm rfav" data-r="fav" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Add to'} favorites">${fav ? '★' : '☆'}</button><button class="btn sm rmini" data-r="more" aria-label="More for ${nm}: queue and playlists">${MORE}</button>`;
   return `<li class="rstation${playing ? ' playing' : ''}${ctx === 'queue' ? ' inq' : ''}${qcur ? ' qcur' : ''}" data-id="${escapeHTML(st.stationuuid)}" data-i="${idx}">
-    <img class="rlogo" alt="" loading="lazy" referrerpolicy="no-referrer" ${st.favicon && /^https:/i.test(st.favicon) ? `src="${escapeHTML(st.favicon)}"` : ''} onerror="this.removeAttribute('src')">
+    <img class="rlogo" alt="" loading="lazy" referrerpolicy="no-referrer" ${st.favicon && /^https:/i.test(st.favicon) ? `src="${escapeHTML(st.favicon)}"` : ''} onerror="this.onerror=null;this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
     <div class="rinfo"><b${ctx === 'queue' ? ` data-n="${idx + 1}"` : ''}>${nm}</b><small>${escapeHTML(stationMeta(st))}</small></div>
     <button class="btn sm rgo" data-r="play" aria-label="${playing ? 'Playing' : 'Play'} ${nm}">${playing && !RADIO.audio.paused ? I.pause : I.play}</button>${extra}</li>`;
 }
@@ -3058,6 +3147,7 @@ async function radioSearch(fresh) {
 }
 function playStation(st, qIndex, dir = 1) {
   RADIO.dir = dir;
+  if (typeof MUS !== 'undefined' && MUS.track) stopMusic();
   if (navigator.onLine === false) return toast('You’re offline. Online Music needs WiFi or mobile data.');
   if (qIndex != null) RADIO.qi = qIndex; else { const i = RADIO.queue.findIndex(x => x.stationuuid === st.stationuuid); if (i >= 0) RADIO.qi = i; }
   saveQ();
@@ -3204,7 +3294,8 @@ window.addEventListener('scroll', closeRMenu, { passive: true });
 
 function renderHomeRadio() {
   const ul = $('#homeRadio'); if (!ul) return;
-  ul.innerHTML = allPl().map(pl => `<li class="hitem${pl.builtIn ? '' : ''}" data-pl="${escapeHTML(pl.id)}"><button class="hopen" data-h="play" title="${pl.stations.length ? 'Play this playlist' : 'Open Online Music'}"><b>${pl.builtIn ? '★ ' : ''}${escapeHTML(pl.name)}</b><small>${pl.stations.length} station${pl.stations.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></button>${pl.builtIn ? '' : `<button class="btn sm icon danger" data-h="del" aria-label="Delete the playlist ${escapeHTML(pl.name)}" title="Delete playlist">${BIN}</button>`}</li>`).join('');
+  const music = typeof MUS === 'undefined' ? '' : allMPl().map(pl => `<li class="hitem" data-mpl="${escapeHTML(pl.id)}"><button class="hopen" data-h="mplay" title="${pl.tracks.length ? 'Play this playlist' : 'Open Music'}"><b>${pl.builtIn ? '♥ ' : '♫ '}${escapeHTML(pl.name)}</b><small>Music · ${pl.tracks.length} song${pl.tracks.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></button>${pl.builtIn ? '' : `<button class="btn sm icon danger" data-h="mdel" aria-label="Delete the playlist ${escapeHTML(pl.name)}" title="Delete playlist">${BIN}</button>`}</li>`).join('');
+  ul.innerHTML = music + allPl().map(pl => `<li class="hitem${pl.builtIn ? '' : ''}" data-pl="${escapeHTML(pl.id)}"><button class="hopen" data-h="play" title="${pl.stations.length ? 'Play this playlist' : 'Open Online Music'}"><b>${pl.builtIn ? '★ ' : ''}${escapeHTML(pl.name)}</b><small>Radio · ${pl.stations.length} station${pl.stations.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></button>${pl.builtIn ? '' : `<button class="btn sm icon danger" data-h="del" aria-label="Delete the playlist ${escapeHTML(pl.name)}" title="Delete playlist">${BIN}</button>`}</li>`).join('');
 }
 const listStation = (li) => {
   const id = li.dataset.id, tab = RADIO.tab;
@@ -3246,10 +3337,17 @@ $('#rBar').addEventListener('click', async e => {
   }
 });
 $('#homeRadio').addEventListener('click', e => {
+  const ml = e.target.closest('li[data-mpl]'), mb = e.target.closest('[data-h]');
+  if (ml && mb) {
+    const pl = mplById(ml.dataset.mpl); if (!pl) return;
+    if (mb.dataset.h === 'mdel') return mDeletePlaylist(pl);
+    if (pl.tracks.length) mPlayList(pl.tracks); else { setMode('radio', true); setPane('music'); MUS.tab = 'pl:' + pl.id; renderMusic(); }
+    return;
+  }
   const li = e.target.closest('li[data-pl]'), b = e.target.closest('[data-h]'); if (!li || !b) return;
   const pl = plById(li.dataset.pl); if (!pl) return;
   if (b.dataset.h === 'del') return deletePlaylist(pl);
-  if (pl.stations.length) playList(pl.stations); else { setMode('radio', true); RADIO.tab = 'pl:' + pl.id; renderRadio(); }
+  if (pl.stations.length) playList(pl.stations); else { setMode('radio', true); setPane('radio'); RADIO.tab = 'pl:' + pl.id; renderRadio(); }
 });
 $('#rpPrev').addEventListener('click', () => queueStep(-1));
 $('#rpNext').addEventListener('click', () => queueStep(1));
@@ -3273,8 +3371,17 @@ $('#rpVol').addEventListener('input', () => { RADIO.audio.volume = +$('#rpVol').
   else if (ev === 'error') { const st = RADIO.station; setRadioState('err'); if (!skipAfterFail(st)) toast('“' + st.name + '” went off the air. Try another station.'); }
   else playerUI();
 }));
+function setPane(p) {
+  RADIO.pane = p; try { localStorage.setItem('spinlab-online-pane', p); } catch (e) {}
+  document.querySelectorAll('.rswitch button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pane === p)));
+  $('#radioPane').hidden = p !== 'radio'; $('#musicPane').hidden = p !== 'music'; closeRMenu();
+  if (p === 'music') musicEnter(); else radioEnter();
+}
+document.querySelectorAll('.rswitch button').forEach(b => b.addEventListener('click', () => setPane(b.dataset.pane)));
 function radioEnter() {
   netUI();
+  if (!RADIO.pane) { let p = 'radio'; try { p = localStorage.getItem('spinlab-online-pane') || 'radio'; } catch (e) {} return setPane(p); }
+  if (RADIO.pane === 'music') return musicEnter();
   if (!RADIO.inited) {
     RADIO.inited = true;
     let cc = ''; try { cc = localStorage.getItem('spinlab-radio-country'); } catch (e) {}
@@ -3284,6 +3391,256 @@ function radioEnter() {
   } else renderRadio();
 }
 renderHomeRadio();
+
+/* ---------------- Music: official songs from Apple's iTunes Search (30-second previews for now) ----------------
+   Search, queue, Liked songs (built-in, can't be deleted) and playlists. Full songs come later through a music service. */
+var MUS = { audio: $('#mAudio'), results: [], tab: 'songs', track: null, state: '', dir: 1, cache: new Map(), loading: false, searched: false };
+const mLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch (e) { return d; } };
+const mSave = (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) {} };
+MUS.liked = mLoad('spinlab-music-liked', []); MUS.playlists = mLoad('spinlab-music-playlists', []);
+{ const q = mLoad('spinlab-music-queue', {}); MUS.queue = q.list || []; MUS.qi = q.i ?? -1; }
+try { MUS.audio.volume = +(localStorage.getItem('spinlab-music-vol') || 0.9); $('#mpVol').value = MUS.audio.volume; } catch (e) {}
+const saveLiked = () => mSave('spinlab-music-liked', MUS.liked), saveMPl = () => mSave('spinlab-music-playlists', MUS.playlists),
+      saveMQ = () => mSave('spinlab-music-queue', { list: MUS.queue.map(({ skipping, ...x }) => x), i: MUS.qi });
+const mplById = id => id === 'liked' ? { id: 'liked', name: 'Liked songs', tracks: MUS.liked, builtIn: true } : MUS.playlists.find(p => p.id === id);
+const allMPl = () => [mplById('liked'), ...MUS.playlists];
+const isLiked = id => MUS.liked.some(t => t.id === id);
+const tslim = r => ({ id: String(r.trackId || r.id), title: r.trackName || r.title, artist: r.artistName || r.artist, album: r.collectionName || r.album || '',
+  art: (r.artworkUrl100 || r.art || '').replace(/\/\d+x\d+bb\./, '/300x300bb.'), preview: r.previewUrl || r.preview, url: r.trackViewUrl || r.url || '', ms: r.trackTimeMillis || r.ms || 0, explicit: r.trackExplicitness === 'explicit' || !!r.explicit });
+const mmss = sec => { sec = Math.max(0, Math.floor(sec || 0)); return Math.floor(sec / 60) + ':' + String(sec % 60).padStart(2, '0'); };
+const SUGGEST = ['Taylor Swift', 'Beyoncé', 'SZA', 'Drake', 'Adele', 'Bruno Mars', 'Burna Boy', 'Kirk Franklin', 'Olivia Rodrigo', 'Michael Jackson'];
+$('#mChips').innerHTML = SUGGEST.map(n => `<button type="button" class="rchip" data-q="${escapeHTML(n)}" aria-pressed="false">${escapeHTML(n)}</button>`).join('');
+const storeCountry = () => { const c = RADIO.country || (/-([A-Z]{2})$/.exec(navigator.language || '') || [])[1] || 'US'; return c.toLowerCase(); };
+async function musicSearch(term) {
+  term = term.trim(); if (!term) return;
+  MUS.query = term; MUS.tab = 'songs'; MUS.searched = true;
+  const key = storeCountry() + '|' + term.toLowerCase();
+  if (MUS.cache.has(key)) { MUS.results = MUS.cache.get(key); return renderMusic(); }
+  if (navigator.onLine === false) { MUS.results = []; MUS.error = false; return renderMusic(); }
+  MUS.loading = true; MUS.error = false; MUS.results = []; renderMusic();
+  try {
+    const ctl = new AbortController(), tm = setTimeout(() => ctl.abort(), 10000);
+    const r = await fetch('https://itunes.apple.com/search?' + new URLSearchParams({ term, media: 'music', entity: 'song', limit: '50', country: storeCountry() }), { signal: ctl.signal });
+    clearTimeout(tm); if (!r.ok) throw new Error(r.status);
+    const data = await r.json(), seen = new Set();
+    MUS.results = (data.results || []).filter(x => x.previewUrl && /^https:/i.test(x.previewUrl) && !seen.has(x.trackId) && seen.add(x.trackId)).map(tslim);
+    MUS.cache.set(key, MUS.results);
+  } catch (e) { MUS.error = true; }
+  MUS.loading = false; renderMusic();
+}
+function songLi(t, ctx = 'songs', idx = 0) {
+  const playing = MUS.track && MUS.track.id === t.id, liked = isLiked(t.id), nm = escapeHTML(t.title);
+  let extra;
+  if (ctx === 'queue') extra = `<button class="btn sm rmini" data-r="up" aria-label="Move ${nm} up" ${idx === 0 ? 'disabled' : ''}>${UP}</button><button class="btn sm rmini" data-r="down" aria-label="Move ${nm} down" ${idx === MUS.queue.length - 1 ? 'disabled' : ''}>${DOWN}</button><button class="btn sm rmini danger" data-r="qdel" aria-label="Take ${nm} out of the queue">${XMARK}</button>`;
+  else if (ctx === 'pl') extra = `<button class="btn sm rmini" data-r="more" aria-label="More for ${nm}">${MORE}</button><button class="btn sm rmini danger" data-r="pldel" aria-label="Remove ${nm} from this playlist">${BIN}</button>`;
+  else extra = `<button class="btn sm mlike" data-r="like" aria-pressed="${liked}" aria-label="${liked ? 'Remove from' : 'Add to'} Liked songs">${liked ? '♥' : '♡'}</button><button class="btn sm rmini" data-r="more" aria-label="More for ${nm}: queue and playlists">${MORE}</button>`;
+  return `<li class="rstation msong${playing ? ' playing' : ''}${ctx === 'queue' ? ' inq' : ''}${ctx === 'queue' && idx === MUS.qi ? ' qcur' : ''}" data-id="${escapeHTML(t.id)}" data-i="${idx}">
+    <img class="rlogo" alt="" loading="lazy" referrerpolicy="no-referrer" ${t.art && /^https:/i.test(t.art) ? `src="${escapeHTML(t.art)}"` : ''} onerror="this.onerror=null;this.src='data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'">
+    <div class="rinfo"><b${ctx === 'queue' ? ` data-n="${idx + 1}"` : ''}>${nm}${t.explicit ? '<span class="mexp" title="Explicit">E</span>' : ''}</b><small>${escapeHTML([t.artist, t.album].filter(Boolean).join(' · '))}</small></div>
+    <button class="btn sm rgo" data-r="play" aria-label="${playing ? 'Playing' : 'Play'} ${nm}">${playing && !MUS.audio.paused ? I.pause : I.play}</button>${extra}</li>`;
+}
+function renderMusic() {
+  const ul = $('#mList'), bar = $('#mBar'), tab = MUS.tab;
+  ul.classList.toggle('one', tab === 'queue');
+  $('#mQCount').textContent = MUS.queue.length ? '(' + MUS.queue.length + ')' : '';
+  $('#mPlCount').textContent = '(' + (1 + MUS.playlists.length) + ')';
+  document.querySelectorAll('.mtab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab || (t.dataset.tab === 'playlists' && tab.startsWith('pl:')))));
+  document.querySelectorAll('#mChips .rchip').forEach(c => { const on = MUS.query && c.dataset.q.toLowerCase() === MUS.query.toLowerCase(); c.classList.toggle('on', !!on); c.setAttribute('aria-pressed', String(!!on)); });
+  bar.hidden = true; bar.innerHTML = '';
+  if (tab === 'queue') {
+    bar.hidden = false;
+    bar.innerHTML = `<span class="lbl">Up next</span><span class="sp"></span><button class="btn sm" data-b="shuffleq" ${MUS.queue.length < 2 ? 'disabled' : ''}>Shuffle</button><button class="btn sm danger" data-b="clearq" ${MUS.queue.length ? '' : 'disabled'}>Clear queue</button>`;
+    ul.innerHTML = MUS.queue.length ? MUS.queue.map((t, i) => songLi(t, 'queue', i)).join('') : '<li class="rmsg">The queue is empty. Use ⋯ on a song to add it, or play a playlist.</li>';
+    return;
+  }
+  if (tab === 'playlists') {
+    ul.innerHTML = allMPl().map(pl => `<li class="rpl${pl.builtIn ? ' liked' : ''}" data-pl="${escapeHTML(pl.id)}"><span class="pic">${pl.builtIn ? '♥' : '♫'}</span><div class="rinfo"><b>${escapeHTML(pl.name)}</b><small>${pl.tracks.length} song${pl.tracks.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></div><button class="btn sm rgo" data-r="plplay" aria-label="Play ${escapeHTML(pl.name)}" ${pl.tracks.length ? '' : 'disabled'}>${I.play}</button></li>`).join('') +
+      '<li class="rpl new" data-r="plnew" role="button" tabindex="0">+ New playlist</li>';
+    return;
+  }
+  if (tab.startsWith('pl:')) {
+    const pl = mplById(tab.slice(3)); if (!pl) { MUS.tab = 'playlists'; return renderMusic(); }
+    bar.hidden = false;
+    bar.innerHTML = `<button class="btn sm" data-b="back" aria-label="Back to playlists"><svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+      <h3>${pl.builtIn ? '♥ ' : ''}<span>${escapeHTML(pl.name)}</span></h3>${pl.builtIn ? '<span class="rbadge" title="Liked songs is built in, so it can’t be deleted">Built-in · can’t be deleted</span>' : ''}
+      <span class="lbl">${pl.tracks.length} song${pl.tracks.length === 1 ? '' : 's'}</span><span class="sp"></span>
+      <button class="btn sm primary" data-b="playall" ${pl.tracks.length ? '' : 'disabled'}>${I.play}Play all</button>
+      <button class="btn sm" data-b="shuffle" ${pl.tracks.length > 1 ? '' : 'disabled'}>Shuffle</button>
+      <button class="btn sm" data-b="qall" ${pl.tracks.length ? '' : 'disabled'}>Add to queue</button>
+      ${pl.builtIn ? '' : '<button class="btn sm" data-b="rename">Rename</button><button class="btn sm danger" data-b="delpl">Delete playlist</button>'}`;
+    ul.innerHTML = pl.tracks.length ? pl.tracks.map((t, i) => songLi(t, 'pl', i)).join('') : `<li class="rmsg">${pl.builtIn ? 'No liked songs yet. Tap ♡ on any song to add it here.' : 'This playlist is empty. Use ⋯ on any song and choose “Add to playlist”.'}</li>`;
+    return;
+  }
+  if (MUS.loading) { ul.innerHTML = '<li class="rmsg">Searching…</li>'; return; }
+  if (!MUS.results.length) {
+    ul.innerHTML = '<li class="rmsg">' + (navigator.onLine === false ? 'You’re offline, so songs can’t load. Connect to WiFi or mobile data and try again.' : MUS.error ? 'Songs couldn’t load right now. Wait a moment and press Search again.' : MUS.searched ? 'No songs found. Try another artist or song name.' : 'Search for an artist or song, or tap a name above to start.') + '</li>';
+    return;
+  }
+  ul.innerHTML = MUS.results.map(t => songLi(t, 'songs')).join('');
+}
+function playTrack(t, qIndex, dir = 1) {
+  if (navigator.onLine === false) return toast('You’re offline. Music needs WiFi or mobile data.');
+  MUS.dir = dir;
+  if (qIndex != null) MUS.qi = qIndex; else { const i = MUS.queue.findIndex(x => x.id === t.id); if (i >= 0) MUS.qi = i; }
+  saveMQ();
+  if (RADIO.station) stopRadio();
+  if (A.playing) A.pause(); if (B.playing) B.pause(); if (typeof CR !== 'undefined' && CR.playing) crStop();
+  MUS.track = t; MUS.state = 'wait'; const a = MUS.audio; a.src = t.preview;
+  a.play().catch(() => { if (MUS.track !== t) return; MUS.state = 'err'; mPlayerUI(); if (!mSkipAfterFail(t)) toast('“' + t.title + '” won’t play right now.'); });
+  mPlayerUI(); renderMusic(); musicSession();
+}
+function mStep(dir, auto) {
+  const q = MUS.queue; if (!q.length) { if (!auto) toast('The queue is empty. Use ⋯ on a song to add it.'); return false; }
+  let i = MUS.qi + dir; if (MUS.qi < 0) i = dir > 0 ? 0 : q.length - 1;
+  if (i < 0 || i >= q.length) { if (!auto) toast(dir > 0 ? 'That was the last song in the queue.' : 'This is the first song in the queue.'); return false; }
+  playTrack(q[i], i, dir); return true;
+}
+function mSkipAfterFail(t) {
+  if (t.skipping) return true;
+  const i = MUS.queue.findIndex(x => x.id === t.id), dir = MUS.dir || 1, j = i + dir;
+  if (i < 0 || j < 0 || j >= MUS.queue.length) return false;
+  t.skipping = true; toast('“' + t.title + '” won’t play. Skipping to the ' + (dir > 0 ? 'next' : 'previous') + ' song.');
+  setTimeout(() => { t.skipping = false; if (MUS.track !== t || MUS.state !== 'err') return; const k = MUS.queue.findIndex(x => x.id === t.id) + dir, n = MUS.queue[k]; if (n) playTrack(n, k, dir); }, 600);
+  return true;
+}
+function stopMusic() { const a = MUS.audio; a.pause(); a.removeAttribute('src'); a.load(); MUS.track = null; mPlayerUI(); renderMusic(); if ('mediaSession' in navigator && !RADIO.station) navigator.mediaSession.playbackState = 'none'; }
+function mPlayerUI() {
+  const t = MUS.track, bar = $('#mPlayer'); bar.hidden = !t; document.body.classList.toggle('radio-on', !!(t || RADIO.station)); if (!t) return;
+  const art = $('#mpArt'); if (t.art && /^https:/i.test(t.art)) { art.src = t.art; art.onerror = () => { art.onerror = null; art.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'; }; } else art.removeAttribute('src');
+  $('#mpTitle').textContent = t.title; $('#mpArtist').textContent = t.artist + (MUS.state === 'wait' ? ' · loading…' : MUS.state === 'err' ? ' · won’t play' : ' · preview');
+  const paused = MUS.audio.paused; $('#mpPlay').innerHTML = paused ? I.play : I.pause; $('#mpPlay').setAttribute('aria-label', paused ? 'Play' : 'Pause');
+  const liked = isLiked(t.id); $('#mpLike').textContent = liked ? '♥' : '♡'; $('#mpLike').setAttribute('aria-pressed', String(liked)); $('#mpLike').setAttribute('aria-label', (liked ? 'Remove from' : 'Add to') + ' Liked songs');
+  $('#mpPrev').disabled = !MUS.queue.length || MUS.qi <= 0; $('#mpNext').disabled = !MUS.queue.length || MUS.qi >= MUS.queue.length - 1;
+  document.querySelectorAll('.msong').forEach(li => { const on = li.dataset.id === t.id; li.classList.toggle('playing', on); const b = li.querySelector('[data-r="play"]'); if (b) b.innerHTML = on && !paused ? I.pause : I.play; });
+  if ('mediaSession' in navigator) navigator.mediaSession.playbackState = paused ? 'paused' : 'playing';
+}
+function musicSession() {
+  if (!('mediaSession' in navigator) || !MUS.track) return; const t = MUS.track;
+  try {
+    navigator.mediaSession.metadata = new MediaMetadata({ title: t.title, artist: t.artist, album: t.album || 'SpinLab Music', artwork: t.art ? [{ src: t.art, sizes: '300x300', type: 'image/jpeg' }] : [] });
+    navigator.mediaSession.setActionHandler('play', () => MUS.audio.play());
+    navigator.mediaSession.setActionHandler('pause', () => MUS.audio.pause());
+    navigator.mediaSession.setActionHandler('stop', stopMusic);
+    navigator.mediaSession.setActionHandler('previoustrack', () => mStep(-1));
+    navigator.mediaSession.setActionHandler('nexttrack', () => mStep(1));
+    navigator.mediaSession.setActionHandler('seekto', d => { if (d.seekTime != null) MUS.audio.currentTime = d.seekTime; });
+  } catch (e) {}
+}
+['playing', 'pause', 'waiting', 'error', 'ended', 'loadedmetadata'].forEach(ev => MUS.audio.addEventListener(ev, () => {
+  const t = MUS.track; if (!t) return;
+  if (ev === 'playing') MUS.state = 'live';
+  else if (ev === 'waiting') MUS.state = 'wait';
+  else if (ev === 'error') { MUS.state = 'err'; if (!mSkipAfterFail(t)) toast('“' + t.title + '” won’t play right now.'); }
+  else if (ev === 'ended') { if (!mStep(1, true)) { MUS.audio.currentTime = 0; } }
+  else if (ev === 'loadedmetadata') { $('#mpSeek').max = MUS.audio.duration || 30; $('#mpDur').textContent = mmss(MUS.audio.duration); }
+  mPlayerUI();
+}));
+MUS.audio.addEventListener('timeupdate', () => { if (document.activeElement !== $('#mpSeek')) $('#mpSeek').value = MUS.audio.currentTime; $('#mpCur').textContent = mmss(MUS.audio.currentTime); });
+$('#mpSeek').addEventListener('input', () => { MUS.audio.currentTime = +$('#mpSeek').value; });
+$('#mpPlay').addEventListener('click', () => { const a = MUS.audio; if (!MUS.track) return; if (MUS.state === 'err') return playTrack(MUS.track); a.paused ? a.play().catch(() => {}) : a.pause(); });
+$('#mpPrev').addEventListener('click', () => mStep(-1));
+$('#mpNext').addEventListener('click', () => mStep(1));
+$('#mpLike').addEventListener('click', () => MUS.track && toggleLike(MUS.track));
+$('#mpVol').addEventListener('input', () => { MUS.audio.volume = +$('#mpVol').value; try { localStorage.setItem('spinlab-music-vol', $('#mpVol').value); } catch (e) {} });
+
+function toggleLike(t) {
+  const i = MUS.liked.findIndex(x => x.id === t.id);
+  if (i >= 0) { MUS.liked.splice(i, 1); toast('Removed “' + t.title + '” from Liked songs'); } else { MUS.liked.unshift(tslim(t)); toast('Added “' + t.title + '” to Liked songs'); }
+  saveLiked(); renderMusic(); mPlayerUI(); renderHomeRadio();
+}
+function mAddToPlaylist(pl, t) {
+  if (pl.tracks.some(x => x.id === t.id)) return toast('“' + t.title + '” is already in ' + pl.name);
+  pl.tracks.push(tslim(t)); pl.builtIn ? saveLiked() : saveMPl(); toast('Added “' + t.title + '” to ' + pl.name); renderMusic(); renderHomeRadio(); mPlayerUI();
+}
+function mAddToQueue(t, next) {
+  const x = tslim(t); if (next) MUS.queue.splice(MUS.qi >= 0 ? MUS.qi + 1 : 0, 0, x); else MUS.queue.push(x);
+  saveMQ(); renderMusic(); mPlayerUI(); toast((next ? 'Plays next: “' : 'Added to the queue: “') + t.title + '”');
+}
+function mPlayList(tracks, shuffle) {
+  if (!tracks.length) return;
+  MUS.queue = tracks.map(tslim); if (shuffle) for (let i = MUS.queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [MUS.queue[i], MUS.queue[j]] = [MUS.queue[j], MUS.queue[i]]; }
+  MUS.qi = -1; saveMQ(); playTrack(MUS.queue[0], 0);
+}
+async function mNewPlaylist(withTrack) {
+  const name = await askText('Name your new playlist', 'My mix ' + (MUS.playlists.length + 1), 'Create'); if (!name) return;
+  const pl = { id: 'mp' + Date.now().toString(36), name, tracks: [], created: Date.now() };
+  MUS.playlists.push(pl); saveMPl(); toast('Created the playlist “' + name + '”');
+  if (withTrack) mAddToPlaylist(pl, withTrack); else { renderMusic(); renderHomeRadio(); }
+}
+async function mDeletePlaylist(pl) {
+  if (!pl || pl.builtIn) return toast('Liked songs is built in, so it can’t be deleted.');
+  if (!(await askConfirm('Are you sure you want to delete the playlist “' + pl.name + '”? This can’t be undone. The songs stay in your other playlists.', 'Delete'))) return;
+  MUS.playlists = MUS.playlists.filter(x => x !== pl); saveMPl();
+  if (MUS.tab === 'pl:' + pl.id) MUS.tab = 'playlists';
+  renderMusic(); renderHomeRadio(); toast('Deleted the playlist “' + pl.name + '”');
+}
+async function mRemoveFromPlaylist(pl, t) {
+  if (!(await askConfirm('Are you sure you want to remove “' + t.title + '” from ' + pl.name + '?', 'Remove'))) return;
+  const i = pl.tracks.findIndex(x => x.id === t.id); if (i < 0) return;
+  pl.tracks.splice(i, 1); pl.builtIn ? saveLiked() : saveMPl(); renderMusic(); renderHomeRadio(); mPlayerUI(); toast('Removed “' + t.title + '” from ' + pl.name);
+}
+/* a general ⋯ menu (the Music side uses this one) */
+let gItems = [];
+function openGMenu(btn, title, items) {
+  const m = $('#rMenu'); menuFor = null; menuBtn = btn; gItems = items; btn.setAttribute('aria-expanded', 'true');
+  m.innerHTML = `<div class="mh">${escapeHTML(title)}</div>` + items.map((it, i) => it === '-' ? '<hr>' : it.head ? `<div class="mh">${escapeHTML(it.head)}</div>` : `<button data-g="${i}"><span class="ck">${it.check ? '✓' : ''}</span>${it.html || escapeHTML(it.label)}</button>`).join('');
+  m.hidden = false;
+  const r = btn.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
+  m.style.left = clamp(r.right - mw, 8, innerWidth - mw - 8) + 'px';
+  m.style.top = (r.bottom + mh + 8 > innerHeight ? Math.max(8, r.top - mh - 6) : r.bottom + 6) + 'px';
+  const f = m.querySelector('button'); if (f) f.focus();
+}
+$('#rMenu').addEventListener('click', e => { const b = e.target.closest('button[data-g]'); if (!b) return; const it = gItems[+b.dataset.g]; if (!it) return; if (!it.keep) closeRMenu(); it.fn(); });
+function songMenu(t, btn, view = 'main') {
+  if (view === 'main') openGMenu(btn, t.title + ' · ' + t.artist, [
+    { label: 'Play now', fn: () => playTrack(t) }, { label: 'Play next', fn: () => mAddToQueue(t, true) }, { label: 'Add to queue', fn: () => mAddToQueue(t, false) }, '-',
+    { label: 'Add to playlist…', keep: true, fn: () => songMenu(t, btn, 'pls') },
+    ...(t.url ? [{ label: 'Open in Apple Music (full song)', fn: () => window.open(t.url, '_blank', 'noopener') }] : [])]);
+  else openGMenu(btn, 'Add to playlist', [...allMPl().map(pl => { const has = pl.tracks.some(x => x.id === t.id); return { label: (pl.builtIn ? '♥ ' : '') + pl.name, check: has, fn: () => has ? mRemoveFromPlaylist(pl, t) : mAddToPlaylist(pl, t) }; }), '-', { label: '＋ New playlist…', fn: () => mNewPlaylist(t) }]);
+}
+const mListTrack = li => {
+  const tab = MUS.tab, i = +li.dataset.i;
+  if (tab === 'queue') return MUS.queue[i];
+  if (tab.startsWith('pl:')) { const pl = mplById(tab.slice(3)); return pl && pl.tracks[i]; }
+  return MUS.results.find(x => x.id === li.dataset.id);
+};
+$('#mList').addEventListener('click', e => {
+  const plLi = e.target.closest('.rpl');
+  if (plLi) {
+    if (plLi.dataset.r === 'plnew') return mNewPlaylist();
+    const pl = mplById(plLi.dataset.pl); if (!pl) return;
+    if (e.target.closest('[data-r="plplay"]')) return mPlayList(pl.tracks);
+    MUS.tab = 'pl:' + pl.id; renderMusic(); return;
+  }
+  const li = e.target.closest('.msong'); if (!li) return; const t = mListTrack(li); if (!t) return;
+  const b = e.target.closest('[data-r]'), r = b && b.dataset.r, i = +li.dataset.i;
+  if (r === 'like') return toggleLike(t);
+  if (r === 'more') return $('#rMenu').hidden || menuBtn !== b ? songMenu(t, b) : closeRMenu();
+  if (r === 'up' || r === 'down') { const j = r === 'up' ? i - 1 : i + 1, q = MUS.queue; [q[i], q[j]] = [q[j], q[i]]; if (MUS.qi === i) MUS.qi = j; else if (MUS.qi === j) MUS.qi = i; saveMQ(); renderMusic(); mPlayerUI(); return; }
+  if (r === 'qdel') { MUS.queue.splice(i, 1); if (MUS.qi > i) MUS.qi--; else if (MUS.qi === i) MUS.qi = -1; saveMQ(); renderMusic(); mPlayerUI(); return; }
+  if (r === 'pldel') { const pl = mplById(MUS.tab.slice(3)); if (pl) mRemoveFromPlaylist(pl, t); return; }
+  if (MUS.track && MUS.track.id === t.id && MUS.state !== 'err') { MUS.audio.paused ? MUS.audio.play() : MUS.audio.pause(); return; }
+  if (MUS.tab === 'queue') return playTrack(t, i);
+  playTrack(t);
+});
+$('#mList').addEventListener('keydown', e => { const n = e.target.closest('.rpl.new'); if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); mNewPlaylist(); } });
+$('#mBar').addEventListener('click', async e => {
+  const b = e.target.closest('[data-b]'); if (!b) return; const pl = MUS.tab.startsWith('pl:') ? mplById(MUS.tab.slice(3)) : null;
+  switch (b.dataset.b) {
+    case 'back': MUS.tab = 'playlists'; renderMusic(); break;
+    case 'playall': if (pl) mPlayList(pl.tracks); break;
+    case 'shuffle': if (pl) mPlayList(pl.tracks, true); break;
+    case 'qall': if (pl) { pl.tracks.forEach(x => MUS.queue.push(tslim(x))); saveMQ(); renderMusic(); mPlayerUI(); toast('Added ' + pl.tracks.length + ' songs to the queue'); } break;
+    case 'rename': if (pl && !pl.builtIn) { const n = await askText('Rename the playlist', pl.name); if (n) { pl.name = n; saveMPl(); renderMusic(); renderHomeRadio(); toast('Renamed to “' + n + '”'); } } break;
+    case 'delpl': mDeletePlaylist(pl); break;
+    case 'shuffleq': { const cur = MUS.queue[MUS.qi], q = MUS.queue; for (let i = q.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [q[i], q[j]] = [q[j], q[i]]; } MUS.qi = cur ? q.indexOf(cur) : -1; saveMQ(); renderMusic(); mPlayerUI(); break; }
+    case 'clearq': if (await askConfirm('Are you sure you want to clear the queue? The song playing now keeps playing.', 'Clear')) { MUS.queue = []; MUS.qi = -1; saveMQ(); renderMusic(); mPlayerUI(); } break;
+  }
+});
+document.querySelectorAll('.mtab').forEach(t => t.addEventListener('click', () => { closeRMenu(); MUS.tab = t.dataset.tab; renderMusic(); }));
+$('#mForm').addEventListener('submit', e => { e.preventDefault(); $('#mQuery').blur(); musicSearch($('#mQuery').value); });
+$('#mChips').addEventListener('click', e => { const c = e.target.closest('.rchip'); if (!c) return; $('#mQuery').value = c.dataset.q; musicSearch(c.dataset.q); });
+function musicEnter() { netUI(); renderMusic(); mPlayerUI(); }
 
 /* animated favicon: a spinning record in DJ, keys being played in Piano */
 const favLink = $('#favicon'), HOME_FAV = favLink.href, favCv = document.createElement('canvas'); favCv.width = favCv.height = 64;
@@ -3333,7 +3690,7 @@ if (IS_OFFLINE_COPY) {
   $('#offlineBtn').onclick = () => window.open(SITE + 'spinlab/', '_blank', 'noopener');
 } else {
   $('#offlineBtn').addEventListener('click', async () => {
-    const go = await askConfirm('Before you download: the downloaded SpinLab works without internet for DJ and Piano. Online Music streams live radio from the internet, so it needs WiFi or mobile data. If the WiFi goes out, online stations won’t play.', 'Download');
+    const go = await askConfirm('Before you download: the downloaded SpinLab works without internet for DJ and Piano. Online Music (Online Radio and Music) streams from the internet, so it needs WiFi or mobile data. If the WiFi goes out, online radio and music won’t play.', 'Download');
     if (!go) return;
     try {
       toast('Packing SpinLab into one file…');
