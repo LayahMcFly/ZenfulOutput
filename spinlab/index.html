@@ -451,6 +451,34 @@ body.mode-radio{padding-bottom:96px}
 .rfav[aria-pressed="true"]{color:#fbbf24;border-color:rgba(251,191,36,.5)}
 .rmsg{grid-column:1 / -1;color:var(--soft);text-align:center;padding:26px 10px;border:1px dashed var(--line2);border-radius:14px}
 .rmore{display:flex;justify-content:center}
+#askInput{width:min(420px,78vw);font:600 15px var(--sans);padding:10px 12px}
+#askDlg .btn.primary{background:linear-gradient(#34d399,#059669);color:#04150f}
+.rbar{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.rbar[hidden]{display:none}
+.rbar h3{margin:0;font-size:18px;display:flex;align-items:center;gap:8px;min-width:0}
+.rbar h3 span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.rbar .lbl{white-space:nowrap}
+.rbar .sp{flex:1}
+.rbadge{font:700 10.5px var(--mono);letter-spacing:.06em;padding:3px 8px;border-radius:999px;background:rgba(251,191,36,.14);color:#fbbf24;border:1px solid rgba(251,191,36,.4);white-space:nowrap}
+.rbar .btn.primary{background:linear-gradient(#34d399,#059669);color:#04150f}
+.rstation.inq .rinfo b::before{content:attr(data-n);display:inline-block;min-width:22px;margin-right:6px;padding:0 5px;border-radius:6px;background:#1f2a3d;color:var(--soft);font:700 11px var(--mono);text-align:center}
+.rstation.qcur{border-color:#34d399}
+.rstation .btn.rmini{min-width:34px;padding:7px 8px}
+.rpl{display:flex;align-items:center;gap:12px;padding:12px;border:1px solid var(--line2);border-radius:14px;background:#121725;cursor:pointer;min-width:0}
+.rpl:hover{border-color:#4a5575}
+.rpl .pic{width:48px;height:48px;border-radius:12px;display:grid;place-items:center;font-size:22px;flex:none;background:linear-gradient(#1f3a33,#0f1d1a);color:#34d399;border:1px solid rgba(52,211,153,.35)}
+.rpl.fav .pic{background:linear-gradient(#3a2f12,#1d170a);color:#fbbf24;border-color:rgba(251,191,36,.4)}
+.rpl .rinfo b{font-size:15px}
+.rpl.new{border-style:dashed;color:#34d399;justify-content:center;font-weight:700}
+.rmenu{position:fixed;z-index:60;min-width:220px;max-width:min(300px,92vw);max-height:min(420px,70vh);overflow:auto;padding:6px;border-radius:14px;background:var(--panel2);border:1px solid var(--line2);box-shadow:0 20px 50px -14px #000}
+.rmenu[hidden]{display:none}
+.rmenu button{appearance:none;-webkit-appearance:none;display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border:0;border-radius:9px;background:none;color:var(--ink);font:600 14px var(--sans);text-align:left;cursor:pointer}
+.rmenu button:hover,.rmenu button:focus-visible{background:#1d2335;outline:none}
+.rmenu .mh{font:800 10.5px var(--sans);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);padding:8px 12px 4px}
+.rmenu hr{border:0;border-top:1px solid var(--line);margin:4px 6px}
+.rmenu .ck{width:18px;color:#34d399;font-weight:800}
+.rmenu button svg{width:16px;height:16px;flex:none}
+.rlist.one{grid-template-columns:1fr;max-width:760px}
 .rmore .btn[hidden]{display:none}
 .rcredit{color:var(--dim);font-size:12px;text-align:center;margin:4px 0 0}
 .rcredit a{color:var(--soft)}
@@ -467,7 +495,7 @@ body.mode-home.radio-on{padding-bottom:96px}
 .rlive.wait{background:#475569}
 .rpbtn{flex:none;padding:9px 11px;min-width:40px;justify-content:center}
 #rpVol{width:110px;flex:none}
-@media (max-width:600px){ #rpVol{display:none} .rlist{grid-template-columns:1fr} .rlive{display:none} }
+@media (max-width:600px){ #rpVol{display:none} .rlist{grid-template-columns:1fr} .rlive{display:none} #rpStop{display:none} .rplayer{gap:6px} .rpbtn{padding:9px 9px;min-width:36px} }
 @media (prefers-reduced-motion:reduce){ .i-rd .waves path{animation:none;opacity:1} }
 
 /* ===== piano mode: just the piano and the instruments ===== */
@@ -746,7 +774,7 @@ html.phone body.mode-create .btn{min-height:38px}
     </div>
     <div class="hcol rd">
       <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><span class="hname">Online Music</span><small>Live radio from around the world. Needs internet.</small></button>
-      <div class="hlib"><div class="hlibhead"><span class="lbl">Favorite stations</span></div><ul class="hlist" id="homeRadio"></ul></div>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">Playlists</span></div><ul class="hlist" id="homeRadio"></ul></div>
     </div>
   </div>
 </section>
@@ -765,8 +793,10 @@ html.phone body.mode-create .btn{min-height:38px}
   <div class="rchips" id="rChips" role="group" aria-label="Genres"><button type="button" class="rchip on" data-tag="" aria-pressed="true">Top</button><button type="button" class="rchip" data-tag="pop" aria-pressed="false">Pop</button><button type="button" class="rchip" data-tag="hip hop" aria-pressed="false">Hip hop</button><button type="button" class="rchip" data-tag="rnb" aria-pressed="false">R&B</button><button type="button" class="rchip" data-tag="gospel" aria-pressed="false">Gospel</button><button type="button" class="rchip" data-tag="jazz" aria-pressed="false">Jazz</button><button type="button" class="rchip" data-tag="afrobeat" aria-pressed="false">Afrobeats</button><button type="button" class="rchip" data-tag="reggae" aria-pressed="false">Reggae</button><button type="button" class="rchip" data-tag="rock" aria-pressed="false">Rock</button><button type="button" class="rchip" data-tag="country" aria-pressed="false">Country</button><button type="button" class="rchip" data-tag="classical" aria-pressed="false">Classical</button><button type="button" class="rchip" data-tag="lofi" aria-pressed="false">Lo-fi</button><button type="button" class="rchip" data-tag="electronic" aria-pressed="false">Electronic</button><button type="button" class="rchip" data-tag="latin" aria-pressed="false">Latin</button><button type="button" class="rchip" data-tag="kids" aria-pressed="false">Kids</button><button type="button" class="rchip" data-tag="news" aria-pressed="false">Talk and news</button></div>
   <div class="rtabs" role="tablist">
     <button type="button" role="tab" class="rtab" data-tab="results" aria-selected="true">Stations</button>
-    <button type="button" role="tab" class="rtab" data-tab="favs" aria-selected="false">★ Favorites <span id="rFavCount"></span></button>
+    <button type="button" role="tab" class="rtab" data-tab="queue" aria-selected="false">Queue <span id="rQCount"></span></button>
+    <button type="button" role="tab" class="rtab" data-tab="playlists" aria-selected="false">Playlists <span id="rPlCount"></span></button>
   </div>
+  <div class="rbar" id="rBar" hidden></div>
   <ul class="rlist" id="rList" aria-live="polite"></ul>
   <div class="rmore"><button class="btn" id="rMore" hidden>Show more stations</button></div>
   <p class="rcredit">Stations come from the free <a href="https://www.radio-browser.info/" target="_blank" rel="noopener">Radio Browser</a> directory. Each station plays its own live broadcast, which can include the station’s own ads.</p>
@@ -775,12 +805,15 @@ html.phone body.mode-create .btn{min-height:38px}
   <img class="rlogo" id="rpLogo" alt="" referrerpolicy="no-referrer">
   <div class="rpinfo"><b id="rpName"></b><small id="rpMeta"></small></div>
   <span class="rlive" id="rpState">LIVE</span>
+  <button class="btn rpbtn" id="rpPrev" aria-label="Previous station in the queue" title="Previous in queue"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button>
   <button class="btn rpbtn" id="rpPlay" aria-label="Pause"><svg viewBox="0 0 16 16"><rect x="3.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/><rect x="9.5" y="2.5" width="3" height="11" rx="1" fill="currentColor"/></svg></button>
+  <button class="btn rpbtn" id="rpNext" aria-label="Next station in the queue" title="Next in queue"><svg viewBox="0 0 16 16"><path d="M12.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M3 3v10l7.5-5z" fill="currentColor"/></svg></button>
   <button class="btn rpbtn" id="rpStop" aria-label="Stop the radio"><svg viewBox="0 0 16 16"><rect x="3.5" y="3.5" width="9" height="9" rx="1.5" fill="currentColor"/></svg></button>
   <button class="btn rpbtn rfav" id="rpFav" aria-label="Add to favorites" aria-pressed="false">☆</button>
   <input type="range" id="rpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Radio volume">
 </div>
 <audio id="rAudio" preload="none"></audio>
+<div class="rmenu" id="rMenu" role="menu" hidden></div>
 <div class="statusbar">
 <section class="panel offline" id="offline">
   <svg class="big" viewBox="0 0 32 32" aria-hidden="true"><rect x="2" y="2" width="28" height="28" rx="8" fill="#121725" stroke="#323a52"/><path d="M16 8v11M11 14.5l5 5 5-5" fill="none" stroke="#22d3ee" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"/><path d="M9 23.5h14" stroke="#f472b6" stroke-width="2.4" stroke-linecap="round"/></svg>
@@ -799,6 +832,13 @@ html.phone body.mode-create .btn{min-height:38px}
   <ul class="liblist" id="libList"></ul>
   <p id="libSpace"></p>
 </dialog>
+<dialog id="askDlg" aria-labelledby="askTitle">
+  <form method="dialog" id="askForm">
+    <h2 id="askTitle" style="margin:0 0 12px;font-size:18px"></h2>
+    <input type="text" id="askInput" maxlength="60" autocomplete="off" spellcheck="false" aria-labelledby="askTitle">
+    <div class="row" style="justify-content:flex-end;margin-top:16px"><button type="button" class="btn" id="askNo">Cancel</button><button type="submit" class="btn primary" id="askYes">Save</button></div>
+  </form>
+</dialog>
 <dialog id="confirm" aria-labelledby="confirmMsg">
   <p id="confirmMsg" style="margin:0 0 16px;font-size:15px;max-width:440px"></p>
   <div class="row" style="justify-content:flex-end"><button class="btn" id="confirmNo">Cancel</button><button class="btn warn" id="confirmYes">OK</button></div>
@@ -816,7 +856,9 @@ html.phone body.mode-create .btn{min-height:38px}
   <ul>
     <li>Live radio from thousands of free stations around the world, from the Radio Browser directory. Search by name, pick a genre or choose a country.</li>
     <li>It keeps playing when you lock your phone or switch apps, and the lock screen shows the station with play and pause.</li>
-    <li>Tap ☆ to save a station to your favorites. Favorites show on the home screen under Online Music.</li>
+    <li>Tap ☆ to add a station to <b>Favorites</b>, the built-in playlist. Favorites can’t be deleted.</li>
+    <li>Tap ⋯ on a station to <b>Play next</b>, <b>Add to queue</b> or <b>Add to playlist</b>. The <b>Queue</b> tab lets you reorder, remove, shuffle or clear what’s coming up, and ⏮ ⏭ on the player (and your lock screen) move through it. If a station in the queue goes off the air, the next one starts.</li>
+    <li>The <b>Playlists</b> tab lets you make, rename, play, shuffle and delete playlists. SpinLab always asks before deleting a playlist or removing a station from one. Your playlists also show on the home screen.</li>
     <li>Online Music needs WiFi or mobile data. It’s the only part of SpinLab that goes online. Stations are live broadcasts, so some air their own ads.</li>
   </ul>
   <h3>Piano</h3>
@@ -877,7 +919,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.17'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.18'; // bump on every update: 1.0.1, 1.0.2 ...
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -2909,9 +2951,16 @@ document.getElementById('ver3').textContent = 'v' + APP_VERSION;
 const RADIO = { audio: $('#rAudio'), servers: ['https://de1.api.radio-browser.info', 'https://nl1.api.radio-browser.info', 'https://at1.api.radio-browser.info', 'https://de2.api.radio-browser.info'],
   tag: '', country: '', query: '', offset: 0, results: [], tab: 'results', station: null, favs: [], loading: false };
 try { RADIO.favs = JSON.parse(localStorage.getItem('spinlab-radio-favs') || '[]'); } catch (e) { RADIO.favs = []; }
+// queue and playlists (Favorites is the built-in playlist and can't be deleted)
+try { RADIO.playlists = JSON.parse(localStorage.getItem('spinlab-radio-playlists') || '[]'); } catch (e) { RADIO.playlists = []; }
+try { const q = JSON.parse(localStorage.getItem('spinlab-radio-queue') || '{}'); RADIO.queue = q.list || []; RADIO.qi = q.i ?? -1; } catch (e) { RADIO.queue = []; RADIO.qi = -1; }
 try { RADIO.audio.volume = +(localStorage.getItem('spinlab-radio-vol') || 0.9); $('#rpVol').value = RADIO.audio.volume; } catch (e) {}
 RADIO.servers.sort(() => Math.random() - 0.5);
 const saveFavs = () => { try { localStorage.setItem('spinlab-radio-favs', JSON.stringify(RADIO.favs)); } catch (e) {} };
+const savePl = () => { try { localStorage.setItem('spinlab-radio-playlists', JSON.stringify(RADIO.playlists)); } catch (e) {} };
+const saveQ = () => { try { localStorage.setItem('spinlab-radio-queue', JSON.stringify({ list: RADIO.queue.map(({ skipping, ...x }) => x), i: RADIO.qi })); } catch (e) {} };
+const plById = id => id === 'favs' ? { id: 'favs', name: 'Favorites', stations: RADIO.favs, builtIn: true } : RADIO.playlists.find(p => p.id === id);
+const allPl = () => [plById('favs'), ...RADIO.playlists];
 const isFav = id => RADIO.favs.some(f => f.stationuuid === id);
 const slim = st => ({ stationuuid: st.stationuuid, name: (st.name || 'Radio station').trim(), url_resolved: st.url_resolved || st.url, favicon: st.favicon || '', country: st.country || '', countrycode: st.countrycode || '', tags: st.tags || '', bitrate: st.bitrate || 0, codec: st.codec || '' });
 async function radioApi(path) {
@@ -2936,25 +2985,61 @@ function stationMeta(st) {
   const tags = (st.tags || '').split(',').map(x => x.trim()).filter(Boolean).slice(0, 3).join(', ');
   return [st.country, tags, st.bitrate ? st.bitrate + ' kbps' : ''].filter(Boolean).join(' · ');
 }
-function stationLi(st) {
-  const playing = RADIO.station && RADIO.station.stationuuid === st.stationuuid, fav = isFav(st.stationuuid);
-  return `<li class="rstation${playing ? ' playing' : ''}" data-id="${escapeHTML(st.stationuuid)}">
+const MORE = '<svg viewBox="0 0 16 16"><circle cx="3.5" cy="8" r="1.5" fill="currentColor"/><circle cx="8" cy="8" r="1.5" fill="currentColor"/><circle cx="12.5" cy="8" r="1.5" fill="currentColor"/></svg>';
+const UP = '<svg viewBox="0 0 16 16"><path d="m4 10 4-4 4 4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const DOWN = '<svg viewBox="0 0 16 16"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+const XMARK = '<svg viewBox="0 0 16 16"><path d="m4 4 8 8M12 4l-8 8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>';
+// ctx: results | queue | pl (inside a playlist)
+function stationLi(st, ctx = 'results', idx = 0) {
+  const playing = RADIO.station && RADIO.station.stationuuid === st.stationuuid, fav = isFav(st.stationuuid), nm = escapeHTML(st.name);
+  const qcur = ctx === 'queue' && idx === RADIO.qi;
+  let extra = '';
+  if (ctx === 'queue') extra = `<button class="btn sm rmini" data-r="up" aria-label="Move ${nm} up" ${idx === 0 ? 'disabled' : ''}>${UP}</button><button class="btn sm rmini" data-r="down" aria-label="Move ${nm} down" ${idx === RADIO.queue.length - 1 ? 'disabled' : ''}>${DOWN}</button><button class="btn sm rmini danger" data-r="qdel" aria-label="Take ${nm} out of the queue">${XMARK}</button>`;
+  else if (ctx === 'pl') extra = `<button class="btn sm rmini" data-r="more" aria-label="More for ${nm}">${MORE}</button><button class="btn sm rmini danger" data-r="pldel" aria-label="Remove ${nm} from this playlist">${BIN}</button>`;
+  else extra = `<button class="btn sm rfav" data-r="fav" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Add to'} favorites">${fav ? '★' : '☆'}</button><button class="btn sm rmini" data-r="more" aria-label="More for ${nm}: queue and playlists">${MORE}</button>`;
+  return `<li class="rstation${playing ? ' playing' : ''}${ctx === 'queue' ? ' inq' : ''}${qcur ? ' qcur' : ''}" data-id="${escapeHTML(st.stationuuid)}" data-i="${idx}">
     <img class="rlogo" alt="" loading="lazy" referrerpolicy="no-referrer" ${st.favicon && /^https:/i.test(st.favicon) ? `src="${escapeHTML(st.favicon)}"` : ''} onerror="this.removeAttribute('src')">
-    <div class="rinfo"><b>${escapeHTML(st.name)}</b><small>${escapeHTML(stationMeta(st))}</small></div>
-    <button class="btn sm rgo" data-r="play" aria-label="${playing ? 'Playing' : 'Play'} ${escapeHTML(st.name)}">${playing && !RADIO.audio.paused ? I.pause : I.play}</button>
-    <button class="btn sm rfav" data-r="fav" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Add to'} favorites">${fav ? '★' : '☆'}</button></li>`;
+    <div class="rinfo"><b${ctx === 'queue' ? ` data-n="${idx + 1}"` : ''}>${nm}</b><small>${escapeHTML(stationMeta(st))}</small></div>
+    <button class="btn sm rgo" data-r="play" aria-label="${playing ? 'Playing' : 'Play'} ${nm}">${playing && !RADIO.audio.paused ? I.pause : I.play}</button>${extra}</li>`;
 }
 function renderRadio() {
-  const ul = $('#rList'), list = RADIO.tab === 'favs' ? RADIO.favs : RADIO.results;
-  $('#rFavCount').textContent = RADIO.favs.length ? '(' + RADIO.favs.length + ')' : '';
-  document.querySelectorAll('.rtab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === RADIO.tab)));
-  if (RADIO.loading && RADIO.tab === 'results' && !RADIO.results.length) { ul.innerHTML = '<li class="rmsg">Finding stations…</li>'; $('#rMore').hidden = true; return; }
-  if (!list.length) {
-    ul.innerHTML = '<li class="rmsg">' + (RADIO.tab === 'favs' ? 'No favorites yet. Tap ☆ on any station to save it here.' : navigator.onLine === false ? 'You’re offline, so stations can’t load. Connect to WiFi or mobile data and try again.' : RADIO.error ? 'Stations couldn’t load right now. Check your connection and press Search to try again.' : 'No stations found. Try another search, genre or country.') + '</li>';
-    $('#rMore').hidden = true; return;
+  const ul = $('#rList'), bar = $('#rBar'), tab = RADIO.tab;
+  ul.classList.toggle('one', tab === 'queue');
+  $('#rQCount').textContent = RADIO.queue.length ? '(' + RADIO.queue.length + ')' : '';
+  $('#rPlCount').textContent = '(' + (1 + RADIO.playlists.length) + ')';
+  document.querySelectorAll('.rtab').forEach(t => t.setAttribute('aria-selected', String(t.dataset.tab === tab || (t.dataset.tab === 'playlists' && tab.startsWith('pl:')))));
+  $('#rMore').hidden = true; bar.hidden = true; bar.innerHTML = '';
+  if (tab === 'queue') {
+    bar.hidden = false;
+    bar.innerHTML = `<span class="lbl">Up next</span><span class="sp"></span><button class="btn sm" data-b="shuffleq" ${RADIO.queue.length < 2 ? 'disabled' : ''}>Shuffle</button><button class="btn sm danger" data-b="clearq" ${RADIO.queue.length ? '' : 'disabled'}>Clear queue</button>`;
+    ul.innerHTML = RADIO.queue.length ? RADIO.queue.map((st, i) => stationLi(st, 'queue', i)).join('') : '<li class="rmsg">The queue is empty. Use ⋯ on a station to add it, or play a playlist.</li>';
+    return;
   }
-  ul.innerHTML = list.map(stationLi).join('');
-  $('#rMore').hidden = RADIO.tab !== 'results' || RADIO.results.length < RADIO.offset || RADIO.loading;
+  if (tab === 'playlists') {
+    ul.innerHTML = allPl().map(pl => `<li class="rpl${pl.builtIn ? ' fav' : ''}" data-pl="${escapeHTML(pl.id)}"><span class="pic">${pl.builtIn ? '★' : '♫'}</span><div class="rinfo"><b>${escapeHTML(pl.name)}</b><small>${pl.stations.length} station${pl.stations.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></div><button class="btn sm rgo" data-r="plplay" aria-label="Play ${escapeHTML(pl.name)}" ${pl.stations.length ? '' : 'disabled'}>${I.play}</button></li>`).join('') +
+      '<li class="rpl new" data-r="plnew" role="button" tabindex="0">+ New playlist</li>';
+    return;
+  }
+  if (tab.startsWith('pl:')) {
+    const pl = plById(tab.slice(3)); if (!pl) { RADIO.tab = 'playlists'; return renderRadio(); }
+    bar.hidden = false;
+    bar.innerHTML = `<button class="btn sm" data-b="back" aria-label="Back to playlists">${'<svg viewBox="0 0 16 16"><path d="M10 3 5 8l5 5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>'}</button>
+      <h3>${pl.builtIn ? '★ ' : ''}<span>${escapeHTML(pl.name)}</span></h3>${pl.builtIn ? '<span class="rbadge" title="Favorites is built in, so it can’t be deleted">Built-in · can’t be deleted</span>' : ''}
+      <span class="lbl">${pl.stations.length} station${pl.stations.length === 1 ? '' : 's'}</span><span class="sp"></span>
+      <button class="btn sm primary" data-b="playall" ${pl.stations.length ? '' : 'disabled'}>${I.play}Play all</button>
+      <button class="btn sm" data-b="shuffle" ${pl.stations.length > 1 ? '' : 'disabled'}>Shuffle</button>
+      <button class="btn sm" data-b="qall" ${pl.stations.length ? '' : 'disabled'}>Add to queue</button>
+      ${pl.builtIn ? '' : '<button class="btn sm" data-b="rename">Rename</button><button class="btn sm danger" data-b="delpl">Delete playlist</button>'}`;
+    ul.innerHTML = pl.stations.length ? pl.stations.map((st, i) => stationLi(st, 'pl', i)).join('') : `<li class="rmsg">${pl.builtIn ? 'No favorites yet. Tap ☆ on any station to add it here.' : 'This playlist is empty. Use ⋯ on any station and choose “Add to playlist”.'}</li>`;
+    return;
+  }
+  if (RADIO.loading && !RADIO.results.length) { ul.innerHTML = '<li class="rmsg">Finding stations…</li>'; return; }
+  if (!RADIO.results.length) {
+    ul.innerHTML = '<li class="rmsg">' + (navigator.onLine === false ? 'You’re offline, so stations can’t load. Connect to WiFi or mobile data and try again.' : RADIO.error ? 'Stations couldn’t load right now. Check your connection and press Search to try again.' : 'No stations found. Try another search, genre or country.') + '</li>';
+    return;
+  }
+  ul.innerHTML = RADIO.results.map(st => stationLi(st, 'results')).join('');
+  $('#rMore').hidden = RADIO.results.length < RADIO.offset || RADIO.loading;
 }
 async function radioSearch(fresh) {
   if (fresh) { RADIO.offset = 0; RADIO.results = []; }
@@ -2971,14 +3056,39 @@ async function radioSearch(fresh) {
   } catch (e) { RADIO.error = true; }
   RADIO.loading = false; renderRadio();
 }
-function playStation(st) {
+function playStation(st, qIndex, dir = 1) {
+  RADIO.dir = dir;
   if (navigator.onLine === false) return toast('You’re offline. Online Music needs WiFi or mobile data.');
+  if (qIndex != null) RADIO.qi = qIndex; else { const i = RADIO.queue.findIndex(x => x.stationuuid === st.stationuuid); if (i >= 0) RADIO.qi = i; }
+  saveQ();
   if (A.playing) A.pause(); if (B.playing) B.pause(); if (typeof CR !== 'undefined' && CR.playing) crStop();
   RADIO.station = st; const a = RADIO.audio;
   a.src = st.url_resolved; setRadioState('wait');
-  a.play().catch(() => { setRadioState('err'); toast('“' + st.name + '” won’t play right now. Try another station.'); });
+  a.play().catch(() => { if (RADIO.station !== st) return; setRadioState('err'); if (!skipAfterFail(st)) toast('“' + st.name + '” won’t play right now. Try another station.'); });
   radioApi('/json/url/' + encodeURIComponent(st.stationuuid)).catch(() => {}); // counts the play for the directory, as its rules ask
-  playerUI(); renderRadio(); mediaSession();
+  playerUI(); renderRadio(); renderHomeRadio(); mediaSession();
+}
+function queueStep(dir) {
+  const q = RADIO.queue; if (!q.length) { toast('The queue is empty. Use ⋯ on a station to add it.'); return false; }
+  let i = RADIO.qi + dir;
+  if (RADIO.qi < 0) i = dir > 0 ? 0 : q.length - 1;
+  if (i < 0 || i >= q.length) { toast(dir > 0 ? 'That was the last station in the queue.' : 'This is the first station in the queue.'); return false; }
+  playStation(q[i], i, dir); return true;
+}
+function skipAfterFail(st) {
+  // keep going the way you were moving through the queue (forward, or back after ⏮)
+  if (st.skipping) return true;
+  const i = RADIO.queue.findIndex(x => x.stationuuid === st.stationuuid), dir = RADIO.dir || 1, j = i + dir;
+  if (i < 0 || j < 0 || j >= RADIO.queue.length) return false;
+  st.skipping = true;
+  toast('“' + st.name + '” is off the air. Playing the ' + (dir > 0 ? 'next' : 'previous') + ' station in the queue.');
+  setTimeout(() => {
+    st.skipping = false;
+    if (RADIO.station !== st || RADIO.state !== 'err') return;
+    const k = RADIO.queue.findIndex(x => x.stationuuid === st.stationuuid) + dir, next = RADIO.queue[k];
+    if (next) playStation(next, k, dir);
+  }, 600);
+  return true;
 }
 function setRadioState(s) { RADIO.state = s; playerUI(); }
 function playerUI() {
@@ -2990,6 +3100,7 @@ function playerUI() {
   lv.classList.toggle('wait', RADIO.state !== 'live' || paused);
   $('#rpPlay').innerHTML = paused ? I.play : I.pause; $('#rpPlay').setAttribute('aria-label', paused ? 'Play' : 'Pause');
   const fav = isFav(st.stationuuid); $('#rpFav').textContent = fav ? '★' : '☆'; $('#rpFav').setAttribute('aria-pressed', String(fav)); $('#rpFav').setAttribute('aria-label', (fav ? 'Remove from' : 'Add to') + ' favorites');
+  $('#rpPrev').disabled = !RADIO.queue.length || RADIO.qi <= 0; $('#rpNext').disabled = !RADIO.queue.length || RADIO.qi >= RADIO.queue.length - 1;
   document.querySelectorAll('.rstation').forEach(li => { const on = li.dataset.id === st.stationuuid; li.classList.toggle('playing', on); const b = li.querySelector('[data-r="play"]'); if (b) b.innerHTML = on && !paused ? I.pause : I.play; });
   if ('mediaSession' in navigator) navigator.mediaSession.playbackState = paused ? 'paused' : 'playing';
 }
@@ -2999,8 +3110,11 @@ function mediaSession() {
   try {
     navigator.mediaSession.metadata = new MediaMetadata({ title: st.name, artist: 'Live radio' + (st.country ? ' · ' + st.country : ''), album: 'SpinLab Online Music',
       artwork: st.favicon && /^https:/i.test(st.favicon) ? [{ src: st.favicon, sizes: '256x256' }] : [] });
-    const list = RADIO.favs.length > 1 ? RADIO.favs : RADIO.results;
-    const step = dir => { const i = list.findIndex(x => x.stationuuid === st.stationuuid); if (list.length) playStation(list[(i + dir + list.length) % list.length]); };
+    const step = dir => {
+      if (RADIO.queue.length) return queueStep(dir);
+      const list = RADIO.favs.length > 1 ? RADIO.favs : RADIO.results, i = list.findIndex(x => x.stationuuid === st.stationuuid);
+      if (list.length) playStation(list[(i + dir + list.length) % list.length]);
+    };
     navigator.mediaSession.setActionHandler('play', () => RADIO.audio.play());
     navigator.mediaSession.setActionHandler('pause', () => RADIO.audio.pause());
     navigator.mediaSession.setActionHandler('stop', stopRadio);
@@ -3011,27 +3125,134 @@ function mediaSession() {
 function stopRadio() { const a = RADIO.audio; a.pause(); a.removeAttribute('src'); a.load(); RADIO.station = null; playerUI(); renderRadio(); renderHomeRadio(); if ('mediaSession' in navigator) navigator.mediaSession.playbackState = 'none'; }
 function toggleFav(st) {
   const i = RADIO.favs.findIndex(f => f.stationuuid === st.stationuuid);
-  if (i >= 0) { RADIO.favs.splice(i, 1); toast('Removed “' + st.name + '” from favorites'); } else { RADIO.favs.unshift(slim(st)); toast('Saved “' + st.name + '” to favorites'); }
+  if (i >= 0) { RADIO.favs.splice(i, 1); toast('Removed “' + st.name + '” from Favorites'); } else { RADIO.favs.unshift(slim(st)); toast('Saved “' + st.name + '” to Favorites'); }
   saveFavs(); renderRadio(); playerUI(); renderHomeRadio();
 }
+function addToPlaylist(pl, st) {
+  if (pl.stations.some(x => x.stationuuid === st.stationuuid)) return toast('“' + st.name + '” is already in ' + pl.name);
+  pl.stations.push(slim(st)); pl.builtIn ? saveFavs() : savePl(); toast('Added “' + st.name + '” to ' + pl.name); renderRadio(); renderHomeRadio(); playerUI();
+}
+function addToQueue(st, next) {
+  const s2 = slim(st);
+  if (next) { const at = RADIO.qi >= 0 ? RADIO.qi + 1 : 0; RADIO.queue.splice(at, 0, s2); }
+  else RADIO.queue.push(s2);
+  saveQ(); renderRadio(); playerUI(); toast((next ? 'Plays next: “' : 'Added to the queue: “') + st.name + '”');
+}
+function playList(stations, shuffle) {
+  if (!stations.length) return;
+  RADIO.queue = stations.map(x => slim(x)); if (shuffle) for (let i = RADIO.queue.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [RADIO.queue[i], RADIO.queue[j]] = [RADIO.queue[j], RADIO.queue[i]]; }
+  RADIO.qi = -1; saveQ(); playStation(RADIO.queue[0], 0);
+}
+function askText(title, value = '', yes = 'Save') {
+  const d = $('#askDlg'), inp = $('#askInput'); $('#askTitle').textContent = title; $('#askYes').textContent = yes; inp.value = value;
+  return new Promise(res => {
+    const done = v => { d.close(); $('#askForm').onsubmit = $('#askNo').onclick = d.oncancel = null; res(v); };
+    $('#askForm').onsubmit = e => { e.preventDefault(); const v = inp.value.trim(); if (!v) { inp.focus(); return; } done(v); };
+    $('#askNo').onclick = () => done(null); d.oncancel = e => { e.preventDefault(); done(null); };
+    d.showModal(); inp.focus(); inp.select();
+  });
+}
+async function newPlaylist(withStation) {
+  const name = await askText('Name your new playlist', 'My playlist ' + (RADIO.playlists.length + 1), 'Create'); if (!name) return null;
+  const pl = { id: 'pl' + Date.now().toString(36), name, stations: [], created: Date.now() };
+  RADIO.playlists.push(pl); savePl(); toast('Created the playlist “' + name + '”');
+  if (withStation) addToPlaylist(pl, withStation); else { renderRadio(); renderHomeRadio(); }
+  return pl;
+}
+async function deletePlaylist(pl) {
+  if (!pl || pl.builtIn) return toast('Favorites is built in, so it can’t be deleted.');
+  if (!(await askConfirm('Are you sure you want to delete the playlist “' + pl.name + '”? This can’t be undone. The stations stay in the directory and in your other playlists.', 'Delete'))) return;
+  RADIO.playlists = RADIO.playlists.filter(x => x !== pl); savePl();
+  if (RADIO.tab === 'pl:' + pl.id) RADIO.tab = 'playlists';
+  renderRadio(); renderHomeRadio(); toast('Deleted the playlist “' + pl.name + '”');
+}
+async function removeFromPlaylist(pl, st) {
+  if (!(await askConfirm('Are you sure you want to remove “' + st.name + '” from ' + pl.name + '?', 'Remove'))) return;
+  const i = pl.stations.findIndex(x => x.stationuuid === st.stationuuid); if (i < 0) return;
+  pl.stations.splice(i, 1); pl.builtIn ? saveFavs() : savePl();
+  renderRadio(); renderHomeRadio(); playerUI(); toast('Removed “' + st.name + '” from ' + pl.name);
+}
+/* the ⋯ menu on a station: queue and playlists */
+let menuFor = null, menuBtn = null;
+function closeRMenu() { const m = $('#rMenu'); if (m.hidden) return; m.hidden = true; if (menuBtn) menuBtn.setAttribute('aria-expanded', 'false'); menuFor = null; }
+function openRMenu(st, btn, view = 'main') {
+  const m = $('#rMenu'); menuFor = st; menuBtn = btn; btn.setAttribute('aria-expanded', 'true');
+  if (view === 'main') m.innerHTML = `<div class="mh">${escapeHTML(st.name)}</div>
+      <button data-m="play">${I.play} Play now</button><button data-m="next">⏭ Play next</button><button data-m="queue">＋ Add to queue</button><hr>
+      <button data-m="pls">♫ Add to playlist…</button>`;
+  else m.innerHTML = `<div class="mh">Add to playlist</div>` + allPl().map(pl => { const has = pl.stations.some(x => x.stationuuid === st.stationuuid);
+      return `<button data-m="pl" data-pl="${escapeHTML(pl.id)}"><span class="ck">${has ? '✓' : ''}</span>${pl.builtIn ? '★ ' : ''}${escapeHTML(pl.name)}</button>`; }).join('') + '<hr><button data-m="newpl">＋ New playlist…</button>';
+  m.hidden = false;
+  const r = btn.getBoundingClientRect(), mw = m.offsetWidth, mh = m.offsetHeight;
+  m.style.left = clamp(r.right - mw, 8, innerWidth - mw - 8) + 'px';
+  m.style.top = (r.bottom + mh + 8 > innerHeight ? Math.max(8, r.top - mh - 6) : r.bottom + 6) + 'px';
+  const first = m.querySelector('button'); if (first) first.focus();
+}
+$('#rMenu').addEventListener('click', e => {
+  const b = e.target.closest('button[data-m]'); if (!b || !menuFor) return; const st = menuFor, btn = menuBtn;
+  if (b.dataset.m === 'pls') return openRMenu(st, btn, 'pls');
+  closeRMenu();
+  if (b.dataset.m === 'play') playStation(st);
+  else if (b.dataset.m === 'next') addToQueue(st, true);
+  else if (b.dataset.m === 'queue') addToQueue(st, false);
+  else if (b.dataset.m === 'newpl') newPlaylist(st);
+  else if (b.dataset.m === 'pl') { const pl = plById(b.dataset.pl); if (!pl) return; const has = pl.stations.some(x => x.stationuuid === st.stationuuid); has ? removeFromPlaylist(pl, st) : addToPlaylist(pl, st); }
+});
+document.addEventListener('pointerdown', e => { if (!$('#rMenu').hidden && !e.target.closest('#rMenu') && !e.target.closest('[data-r="more"]')) closeRMenu(); }, true);
+document.addEventListener('keydown', e => { if (e.key === 'Escape' && !$('#rMenu').hidden) { e.stopPropagation(); const b = menuBtn; closeRMenu(); if (b) b.focus(); } }, true);
+window.addEventListener('scroll', closeRMenu, { passive: true });
+
 function renderHomeRadio() {
   const ul = $('#homeRadio'); if (!ul) return;
-  if (!RADIO.favs.length) { ul.innerHTML = '<li class="libempty">No favorite stations yet. Open Online Music and tap ☆ on a station.</li>'; return; }
-  ul.innerHTML = RADIO.favs.map(st => `<li class="hitem${RADIO.station && RADIO.station.stationuuid === st.stationuuid ? ' cur' : ''}" data-id="${escapeHTML(st.stationuuid)}"><button class="hopen" data-r="play" title="Play"><b>${escapeHTML(st.name)}</b><small>${escapeHTML(stationMeta(st))}</small></button><button class="btn sm icon danger" data-r="unfav" aria-label="Remove ${escapeHTML(st.name)} from favorites" title="Remove">${BIN}</button></li>`).join('');
+  ul.innerHTML = allPl().map(pl => `<li class="hitem${pl.builtIn ? '' : ''}" data-pl="${escapeHTML(pl.id)}"><button class="hopen" data-h="play" title="${pl.stations.length ? 'Play this playlist' : 'Open Online Music'}"><b>${pl.builtIn ? '★ ' : ''}${escapeHTML(pl.name)}</b><small>${pl.stations.length} station${pl.stations.length === 1 ? '' : 's'}${pl.builtIn ? ' · built-in' : ''}</small></button>${pl.builtIn ? '' : `<button class="btn sm icon danger" data-h="del" aria-label="Delete the playlist ${escapeHTML(pl.name)}" title="Delete playlist">${BIN}</button>`}</li>`).join('');
 }
-const findStation = id => RADIO.results.find(x => x.stationuuid === id) || RADIO.favs.find(x => x.stationuuid === id);
-$('#rList').addEventListener('click', e => {
-  const li = e.target.closest('.rstation'); if (!li) return; const st = findStation(li.dataset.id); if (!st) return;
-  const b = e.target.closest('[data-r]');
-  if (b && b.dataset.r === 'fav') return toggleFav(st);
+const listStation = (li) => {
+  const id = li.dataset.id, tab = RADIO.tab;
+  if (tab === 'queue') return RADIO.queue[+li.dataset.i];
+  if (tab.startsWith('pl:')) { const pl = plById(tab.slice(3)); return pl && pl.stations[+li.dataset.i]; }
+  return RADIO.results.find(x => x.stationuuid === id) || RADIO.favs.find(x => x.stationuuid === id);
+};
+$('#rList').addEventListener('click', async e => {
+  const plLi = e.target.closest('.rpl');
+  if (plLi) {
+    if (plLi.dataset.r === 'plnew') return newPlaylist();
+    const pl = plById(plLi.dataset.pl); if (!pl) return;
+    if (e.target.closest('[data-r="plplay"]')) return playList(pl.stations);
+    RADIO.tab = 'pl:' + pl.id; renderRadio(); return;
+  }
+  const li = e.target.closest('.rstation'); if (!li) return; const st = listStation(li); if (!st) return;
+  const b = e.target.closest('[data-r]'), r = b && b.dataset.r, i = +li.dataset.i;
+  if (r === 'fav') return toggleFav(st);
+  if (r === 'more') return $('#rMenu').hidden || menuFor !== st ? openRMenu(st, b) : closeRMenu();
+  if (r === 'up' || r === 'down') { const j = r === 'up' ? i - 1 : i + 1; const q = RADIO.queue; [q[i], q[j]] = [q[j], q[i]]; if (RADIO.qi === i) RADIO.qi = j; else if (RADIO.qi === j) RADIO.qi = i; saveQ(); renderRadio(); playerUI(); return; }
+  if (r === 'qdel') { RADIO.queue.splice(i, 1); if (RADIO.qi > i) RADIO.qi--; else if (RADIO.qi === i) RADIO.qi = -1; saveQ(); renderRadio(); playerUI(); return; }
+  if (r === 'pldel') { const pl = plById(RADIO.tab.slice(3)); if (pl) removeFromPlaylist(pl, st); return; }
   if (RADIO.station && RADIO.station.stationuuid === st.stationuuid && RADIO.state !== 'err') { RADIO.audio.paused ? RADIO.audio.play() : RADIO.audio.pause(); return; }
+  if (RADIO.tab === 'queue') return playStation(st, i);
   playStation(st);
 });
-$('#homeRadio').addEventListener('click', e => {
-  const li = e.target.closest('li[data-id]'), b = e.target.closest('[data-r]'); if (!li || !b) return;
-  const st = RADIO.favs.find(x => x.stationuuid === li.dataset.id); if (!st) return;
-  if (b.dataset.r === 'unfav') toggleFav(st); else { playStation(st); renderHomeRadio(); }
+$('#rList').addEventListener('keydown', e => { const n = e.target.closest('.rpl.new'); if (n && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); newPlaylist(); } });
+$('#rBar').addEventListener('click', async e => {
+  const b = e.target.closest('[data-b]'); if (!b) return; const pl = RADIO.tab.startsWith('pl:') ? plById(RADIO.tab.slice(3)) : null;
+  switch (b.dataset.b) {
+    case 'back': RADIO.tab = 'playlists'; renderRadio(); break;
+    case 'playall': if (pl) playList(pl.stations); break;
+    case 'shuffle': if (pl) playList(pl.stations, true); break;
+    case 'qall': if (pl) { pl.stations.forEach(x => RADIO.queue.push(slim(x))); saveQ(); renderRadio(); playerUI(); toast('Added ' + pl.stations.length + ' stations to the queue'); } break;
+    case 'rename': if (pl && !pl.builtIn) { const n = await askText('Rename the playlist', pl.name); if (n) { pl.name = n; savePl(); renderRadio(); renderHomeRadio(); toast('Renamed to “' + n + '”'); } } break;
+    case 'delpl': deletePlaylist(pl); break;
+    case 'shuffleq': { const cur = RADIO.queue[RADIO.qi]; const q = RADIO.queue; for (let i = q.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [q[i], q[j]] = [q[j], q[i]]; } RADIO.qi = cur ? q.indexOf(cur) : -1; saveQ(); renderRadio(); playerUI(); break; }
+    case 'clearq': if (await askConfirm('Are you sure you want to clear the queue? The station playing now keeps playing.', 'Clear')) { RADIO.queue = []; RADIO.qi = -1; saveQ(); renderRadio(); playerUI(); } break;
+  }
 });
+$('#homeRadio').addEventListener('click', e => {
+  const li = e.target.closest('li[data-pl]'), b = e.target.closest('[data-h]'); if (!li || !b) return;
+  const pl = plById(li.dataset.pl); if (!pl) return;
+  if (b.dataset.h === 'del') return deletePlaylist(pl);
+  if (pl.stations.length) playList(pl.stations); else { setMode('radio', true); RADIO.tab = 'pl:' + pl.id; renderRadio(); }
+});
+$('#rpPrev').addEventListener('click', () => queueStep(-1));
+$('#rpNext').addEventListener('click', () => queueStep(1));
 $('#rForm').addEventListener('submit', e => { e.preventDefault(); RADIO.query = $('#rQuery').value.trim(); RADIO.country = $('#rCountry').value; $('#rQuery').blur(); radioSearch(true); });
 $('#rCountry').addEventListener('change', () => { RADIO.country = $('#rCountry').value; try { localStorage.setItem('spinlab-radio-country', RADIO.country); } catch (e) {} radioSearch(true); });
 $('#rChips').addEventListener('click', e => {
@@ -3039,7 +3260,7 @@ $('#rChips').addEventListener('click', e => {
   document.querySelectorAll('.rchip').forEach(x => { x.classList.toggle('on', x === c); x.setAttribute('aria-pressed', String(x === c)); });
   RADIO.tag = c.dataset.tag; radioSearch(true);
 });
-document.querySelectorAll('.rtab').forEach(t => t.addEventListener('click', () => { RADIO.tab = t.dataset.tab; renderRadio(); }));
+document.querySelectorAll('.rtab').forEach(t => t.addEventListener('click', () => { closeRMenu(); RADIO.tab = t.dataset.tab; renderRadio(); }));
 $('#rMore').addEventListener('click', () => radioSearch(false));
 $('#rpPlay').addEventListener('click', () => { const a = RADIO.audio; if (!RADIO.station) return; if (RADIO.state === 'err') return playStation(RADIO.station); a.paused ? a.play().catch(() => {}) : a.pause(); });
 $('#rpStop').addEventListener('click', stopRadio);
@@ -3049,7 +3270,7 @@ $('#rpVol').addEventListener('input', () => { RADIO.audio.volume = +$('#rpVol').
   if (!RADIO.station) return;
   if (ev === 'playing') setRadioState('live');
   else if (ev === 'waiting' || ev === 'stalled') setRadioState('wait');
-  else if (ev === 'error') { setRadioState('err'); toast('“' + RADIO.station.name + '” went off the air. Try another station.'); }
+  else if (ev === 'error') { const st = RADIO.station; setRadioState('err'); if (!skipAfterFail(st)) toast('“' + st.name + '” went off the air. Try another station.'); }
   else playerUI();
 }));
 function radioEnter() {
