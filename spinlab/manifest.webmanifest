@@ -2,7 +2,7 @@
   "id": "./",
   "name": "SpinLab",
   "short_name": "SpinLab",
-  "description": "DJ to mix and remix songs, Piano to play 59 instruments, and Online Music with live radio and official song previews.",
+  "description": "DJ to mix and remix songs, Piano to play dozens of instruments, and Online Music with live radio and official song previews.",
   "start_url": "./?source=app",
   "scope": "./",
   "display": "standalone",
