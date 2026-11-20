@@ -267,9 +267,15 @@ footer.foot a{color:var(--soft)}
 .relnotes table{width:100%;border-collapse:collapse;font-size:12.5px;color:var(--soft)}
 .relnotes th{position:sticky;top:0;background:#171b2a;color:#fff;text-align:left;padding:8px 10px;font-weight:700}
 .relnotes td{padding:7px 10px;border-top:1px solid var(--line2);vertical-align:top;line-height:1.45}
-.relnotes td:first-child{font:700 12px var(--mono);color:#a78bfa;white-space:nowrap}
+.relnotes td:first-child{font:700 12px var(--mono);color:#a78bfa}
 .relnotes td:nth-child(2){white-space:nowrap;color:var(--dim)}
 .relnotes tr.cur td{background:color-mix(in srgb,#a78bfa 10%,transparent)}
+.relnotes tr.newer td{background:color-mix(in srgb,#34d399 10%,transparent)}
+.reltag{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font:700 10.5px var(--sans,inherit);letter-spacing:.02em;background:#a78bfa33;color:#c4b5fd;white-space:nowrap;vertical-align:1px}
+.reltag.new{background:#34d39933;color:#6ee7b7}
+.relnotes tr.relupd td{background:#0f2a22;color:#d1fae5;font-family:inherit;white-space:normal}
+.relnotes tr.relupd td{display:flex;gap:10px;align-items:center;justify-content:space-between;flex-wrap:wrap}
+.relnotes tr.relupd .btn{--c:#34d399}
 @media (max-width:560px){.relnotes td:nth-child(2),.relnotes th:nth-child(2){display:none}}
 
 @media (max-width:1100px){
@@ -1633,7 +1639,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.35'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.36'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
@@ -1643,10 +1649,21 @@ const ADSENSE_CLIENT = '';
 const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
-const RELEASES = [["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
+const RELEASES = [["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
 /* release notes table at the bottom of the page: add a row here with every update */
-(() => { const esc = t => t.replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
-  document.getElementById('relBody').innerHTML = RELEASES.map(([v, d, w]) => `<tr${v === APP_VERSION ? ' class="cur"' : ''}><td>v${v}</td><td>${d}</td><td>${esc(w)}</td></tr>`).join(''); })();
+const verNewer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
+/* the table merges this copy's notes with the newest notes from the website, so versions you don't have yet show up marked New */
+function renderReleases(latest) {
+  const esc = t => String(t).replace(/[&<>]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;' }[c]));
+  const all = new Map(RELEASES.map(r => [r[0], r])); (latest || []).forEach(r => all.set(r[0], r));
+  const rows = [...all.values()].sort((a, b) => verNewer(a[0], b[0]) ? -1 : 1), fresh = rows.filter(r => verNewer(r[0], APP_VERSION));
+  const tag = (v) => verNewer(v, APP_VERSION) ? ' <span class="reltag new">New</span>' : v === APP_VERSION ? ' <span class="reltag">You have this</span>' : '';
+  document.getElementById('relBody').innerHTML = (fresh.length ? `<tr class="relupd"><td colspan="3"><span>A newer version, <b>v${esc(fresh[0][0])}</b>, is out. You're on v${APP_VERSION}.</span><button class="btn sm" type="button" id="relUpd">Update now</button></td></tr>` : '')
+    + rows.map(([v, d, w]) => `<tr class="${verNewer(v, APP_VERSION) ? 'newer' : v === APP_VERSION ? 'cur' : ''}"><td>v${esc(v)}${tag(v)}</td><td>${esc(d)}</td><td>${esc(w)}</td></tr>`).join('');
+  const sm = document.querySelector('#relNotes summary'); sm.innerHTML = 'Release notes' + (fresh.length ? ' <span class="reltag new">Update available</span>' : '');
+  const u = document.getElementById('relUpd'); if (u) u.addEventListener('click', () => location.reload());
+}
+renderReleases();
 
 
 const $ = (s, r = document) => r.querySelector(s);
@@ -1698,10 +1715,12 @@ function verbIR(k) { ac(); return VERB_IRS[k] || (VERB_IRS[k] = k === 'long' ? m
 function makeVerb(c2, ir) {
   const i = c2.createGain(), out = c2.createGain(), lp = c2.createBiquadFilter(), hp = c2.createBiquadFilter();
   lp.type = 'lowpass'; lp.frequency.value = 9000; hp.type = 'highpass'; hp.frequency.value = 90; hp.connect(lp); lp.connect(out);
-  const slots = [ir, verbIR('long'), verbIR('huge')].map((buf, n) => { const cv = c2.createConvolver(), g = c2.createGain(); cv.buffer = buf; g.gain.value = n ? 0 : 1; i.connect(cv); cv.connect(g); g.connect(hp); return g; });
-  return { in: i, out, set(len, tone, set) {
+  /* each reverb space is only created once it is needed, so an unused reverb costs nothing */
+  const slots = [null, null, null], mk = n => { const cv = c2.createConvolver(), g = c2.createGain(); cv.buffer = n === 0 ? ir : verbIR(n === 1 ? 'long' : 'huge'); g.gain.value = 0; i.connect(cv); cv.connect(g); g.connect(hp); return g; };
+  return { in: i, out, set(len, tone, set, active = true) {
     const L = clamp(len, 0, 1) * 2, w = [Math.cos(Math.min(L, 1) * Math.PI / 2), L <= 1 ? Math.sin(L * Math.PI / 2) : Math.cos((L - 1) * Math.PI / 2), L > 1 ? Math.sin((L - 1) * Math.PI / 2) : 0];
-    slots.forEach((g, n) => set(g.gain, w[n] * VERB_LVL[n])); set(lp.frequency, 1200 * Math.pow(14, tone)); } };
+    for (let n = 0; n < 3; n++) { const want = active && w[n] > 0.001; if (want && !slots[n]) slots[n] = mk(n); if (slots[n]) set(slots[n].gain, want ? w[n] * VERB_LVL[n] : 0); }
+    set(lp.frequency, 1200 * Math.pow(14, tone)); } };
 }
 const VERB_LVL = [3, 3, 3];   // the convolver comes out quiet, so the reverb is lifted to sit level with the dry sound
 
@@ -1716,29 +1735,41 @@ function psBuffers(c2) {
   const B = { fade: mk(i => i < fl ? Math.sqrt(i / fl) : i >= n1 - fl ? Math.sqrt(1 - (i - (n1 - fl)) / fl) : 1), down: mk(i => i / n1), up: mk(i => (n1 - i) / n) };
   psBufs.set(sr, B); return B;
 }
+/* the shifter's moving parts are only built while the pitch is changed, so it costs nothing at Normal */
 function makePitchShifter(c2) {
-  const B = psBuffers(c2), G = () => c2.createGain();
-  const inp = G(), out = G(), dry = G(), wet = G(); wet.gain.value = 0; inp.connect(dry); dry.connect(out); wet.connect(out);
-  const src = b => { const x = c2.createBufferSource(); x.buffer = b; x.loop = true; return x; };
-  const m = [src(B.down), src(B.down), src(B.up), src(B.up)], f = [src(B.fade), src(B.fade)], mg = m.map(G), mod = [G(), G()], d = [c2.createDelay(1), c2.createDelay(1)], x = [G(), G()];
-  mg[2].gain.value = mg[3].gain.value = 0;
-  m.forEach((s2, i) => { s2.connect(mg[i]); mg[i].connect(mod[i % 2]); });
-  mod.forEach((g, i) => g.connect(d[i].delayTime));
-  x.forEach((g, i) => { g.gain.value = 0; f[i].connect(g.gain); inp.connect(d[i]); d[i].connect(g); g.connect(wet); });
-  const t = c2.currentTime + 0.05, t2 = t + PS_B - PS_F;
-  m[0].start(t); m[1].start(t2); m[2].start(t); m[3].start(t2); f[0].start(t); f[1].start(t2);
-  let cur = 0;
+  const G = () => c2.createGain(), inp = G(), out = G(), dry = G(); inp.connect(dry); dry.connect(out);
+  const live = !(c2 instanceof (window.OfflineAudioContext || window.webkitOfflineAudioContext || Object));
+  let core = null, cur = 0, gen = 0;
+  const build = () => {
+    const B = psBuffers(c2), wet = G(); wet.gain.value = 0; wet.connect(out);
+    const src = b => { const x = c2.createBufferSource(); x.buffer = b; x.loop = true; return x; };
+    const m = [src(B.down), src(B.down), src(B.up), src(B.up)], f = [src(B.fade), src(B.fade)], mg = m.map(G), mod = [G(), G()], d = [c2.createDelay(1), c2.createDelay(1)], x = [G(), G()];
+    mg[2].gain.value = mg[3].gain.value = 0;
+    m.forEach((s2, i) => { s2.connect(mg[i]); mg[i].connect(mod[i % 2]); });
+    mod.forEach((g, i) => g.connect(d[i].delayTime));
+    x.forEach((g, i) => { g.gain.value = 0; f[i].connect(g.gain); inp.connect(d[i]); d[i].connect(g); g.connect(wet); });
+    const t = c2.currentTime + 0.02, t2 = t + PS_B - PS_F;
+    m[0].start(t); m[1].start(t2); m[2].start(t); m[3].start(t2); f[0].start(t); f[1].start(t2);
+    return { wet, mg, mod, d, stop() { [...m, ...f].forEach(s2 => { try { s2.stop(); } catch (e) {} }); d.forEach(n => { try { inp.disconnect(n); } catch (e) {} }); try { wet.disconnect(); } catch (e) {} } };
+  };
   return {
     in: inp, out,
     set(semis, instant) {
-      cur = semis; const on = Math.abs(semis) > 0.01, r = Math.pow(2, semis / 12), mult = 2 * (r - 1), up = mult > 0, now = c2.currentTime;
+      cur = semis; const on = Math.abs(semis) > 0.01, now = c2.currentTime, my = ++gen;
       const S = (prm, v) => instant ? (prm.value = v) : prm.setTargetAtTime(v, now, 0.012);
-      S(dry.gain, on ? 0 : 1); S(wet.gain, on ? 1 : 0);
-      S(mg[0].gain, up ? 0 : 1); S(mg[1].gain, up ? 0 : 1); S(mg[2].gain, up ? 1 : 0); S(mg[3].gain, up ? 1 : 0);
-      mod.forEach(g => S(g.gain, 0.5 * PS_D * Math.min(2, Math.abs(mult))));
+      if (!on) {
+        S(dry.gain, 1);
+        if (core) { S(core.wet.gain, 0); const c = core; core = null; if (instant || !live) c.stop(); else setTimeout(() => c.stop(), 200); }
+        return;
+      }
+      if (!core) core = build();
+      const r = Math.pow(2, semis / 12), mult = 2 * (r - 1), up = mult > 0;
+      S(dry.gain, 0); S(core.wet.gain, 1);
+      S(core.mg[0].gain, up ? 0 : 1); S(core.mg[1].gain, up ? 0 : 1); S(core.mg[2].gain, up ? 1 : 0); S(core.mg[3].gain, up ? 1 : 0);
+      core.mod.forEach(g => S(g.gain, 0.5 * PS_D * Math.min(2, Math.abs(mult))));
     },
     get semis() { return cur; },
-    stop() { [...m, ...f].forEach(s2 => { try { s2.stop(); } catch (e) {} }); }
+    stop() { if (core) { core.stop(); core = null; } }
   };
 }
 /* render a whole buffer at a new pitch (used when saving) */
@@ -2455,10 +2486,10 @@ function setupDeck(d) {
   /* reverb goes up to 200% for big washes; echoes are sent into the reverb too, so they fade into the space */
   const djVerb = () => { if (!d.built) return; const r = k.reverb ? k.reverb.value : 0, z = k.size ? k.size.value : 0.35, t = ctx.currentTime;
     d.revSend.gain.setTargetAtTime(r * r * 2.2 + r * 0.4, t, 0.02); d.echoVerb.gain.setTargetAtTime(r * 0.9, t, 0.02);
-    d.verb.set(z, 0.25 + 0.5 * (1 - z), (prm, v) => prm.setTargetAtTime(v, t, 0.05)); };
+    d.verb.set(z, 0.25 + 0.5 * (1 - z), (prm, v) => prm.setTargetAtTime(v, t, 0.05), r > 0.001 || (k.echo && k.echo.value > 0.001)); };
   k.reverb = makeKnob(kEl('reverb'), { min: 0, max: 1, value: 0, def: 0, fmt: v => Math.round(v * 200) + '%', onChange: djVerb });
   k.size = makeKnob(kEl('size'), { min: 0, max: 1, value: 0.35, def: 0.35, fmt: v => v < 0.2 ? 'Room' : v < 0.45 ? 'Hall' : v < 0.75 ? 'Arena' : 'Cave', onChange: djVerb });
-  k.echo = makeKnob(kEl('echo'), { min: 0, max: 1, value: 0, def: 0, fmt: v => Math.round(v * 100) + '%', onChange: v => { if (!d.built) return; d.echoSend.gain.setTargetAtTime(v, ctx.currentTime, 0.02); d.fb.gain.setTargetAtTime(0.3 + 0.35 * v, ctx.currentTime, 0.02); } });
+  k.echo = makeKnob(kEl('echo'), { min: 0, max: 1, value: 0, def: 0, fmt: v => Math.round(v * 100) + '%', onChange: v => { if (!d.built) return; d.echoSend.gain.setTargetAtTime(v, ctx.currentTime, 0.02); d.fb.gain.setTargetAtTime(0.3 + 0.35 * v, ctx.currentTime, 0.02); djVerb(); } });
   d.fader = makeFader(d.el.fader, { value: 0.85, def: 0.85, onChange: v => d.built && d.vol.gain.setTargetAtTime(v * v, ctx.currentTime, 0.01) });
 
   // pointer-down anywhere on this deck's areas makes it the active deck
@@ -4200,16 +4231,19 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   if (seen && seen !== APP_VERSION) addEventListener('load', () => setTimeout(() => toast('SpinLab updated to v' + APP_VERSION), 600));
   const newer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
   let lastCheck = 0;
-  const check = async () => {
+  const check = async (force) => {
     if (!/^https?:$/.test(location.protocol) || document.querySelector('meta[name="spinlab-offline"]') || navigator.onLine === false) return;
-    if (Date.now() - lastCheck < 60000) return; lastCheck = Date.now();
+    if (!force && Date.now() - lastCheck < 60000) return; lastCheck = Date.now();
     try {
       const html = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text();
       const m = /const APP_VERSION = '([\d.]+)'/.exec(html);
       if (m && newer(m[1], APP_VERSION)) $('#updBar').hidden = false;
+      const r = /const RELEASES = (\[[\s\S]*?\]\]);/.exec(html); if (r) { try { renderReleases(JSON.parse(r[1])); } catch (e) {} }
     } catch (e) {}
   };
   document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+  addEventListener('load', () => setTimeout(check, 4000));
+  $('#relNotes').addEventListener('toggle', e => { if (e.target.open) check(true); });
   setInterval(check, 30 * 60000);
   $('#updGo').addEventListener('click', () => location.reload());
   $('#updLater').addEventListener('click', () => { $('#updBar').hidden = true; lastCheck = Date.now() + 30 * 60000; });
