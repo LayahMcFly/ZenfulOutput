@@ -210,6 +210,13 @@ canvas.spec{width:100%;height:84px;display:block;border-radius:10px;background:#
 /* ---------- toast / dialog ---------- */
 .toast{position:fixed;left:50%;bottom:22px;transform:translateX(-50%) translateY(20px);background:#1b2133;border:1px solid var(--line2);color:var(--ink);padding:10px 16px;border-radius:12px;font-weight:600;box-shadow:0 12px 30px -10px #000;opacity:0;pointer-events:none;transition:.2s;z-index:70;max-width:min(560px,92vw);text-align:center}
 .toast.show{opacity:1;transform:translateX(-50%)}
+/* no blue tap flashes, blue text highlights or blue focus rings, anywhere */
+*,*::before,*::after{-webkit-tap-highlight-color:transparent}
+::selection{background:#a78bfa55;color:#fff}
+:focus:not(:focus-visible){outline:none}
+button,summary,label,.reqchip,.hlibhead,[role=slider],[role=button],a.card,.hcard,.knob,canvas{-webkit-user-select:none;user-select:none;-webkit-touch-callout:none}
+html.phone footer.foot,html.phone .statusbar{-webkit-user-select:none;user-select:none}
+html.phone input,html.phone textarea{-webkit-user-select:text;user-select:text}
 dialog{background:var(--panel2);color:var(--ink);border:1px solid var(--line2);border-radius:16px;max-width:min(640px,94vw);padding:20px 22px;box-shadow:0 30px 60px -20px #000}
 dialog::backdrop{background:rgba(3,5,10,.7);backdrop-filter:blur(3px)}
 dialog h2{margin:0 0 8px;font-size:20px}
@@ -258,7 +265,37 @@ input[type=text]:focus,input[type=number]:focus{border-color:#4a5575;outline:non
 .offline p{margin:3px 0 0;color:var(--soft);font-size:13px}
 footer.foot{text-align:center;color:var(--dim);font-size:12px;padding:6px 10px}
 footer.foot a{color:var(--soft)}
-.relnotes{max-width:860px;margin:10px auto 4px;text-align:left}
+.footbtns{display:flex;flex-wrap:wrap;justify-content:center;align-items:flex-start;gap:8px;max-width:860px;margin:10px auto 4px}
+.relnotes{margin:0;text-align:left}
+.relnotes[open]{flex-basis:100%;order:2}
+.pillbtn{display:inline-flex;align-items:center;gap:6px;cursor:pointer;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);background:#141826;color:var(--soft);font:700 12.5px var(--sans,inherit)}
+.pillbtn svg{width:13px;height:13px;color:#fbbf24}
+.pillbtn:hover,.relnotes summary:hover{border-color:#4a5575;color:#fff}
+.pillbtn:focus-visible,.relnotes summary:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.45)}
+.reqdlg{width:min(560px,94vw)}
+.reqdlg form{display:flex;flex-direction:column;gap:12px}
+.reqsub{margin:-4px 0 0;color:var(--soft);font-size:13.5px}
+.reqareas{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
+.reqareas legend{padding:0;margin-bottom:8px;font-size:13px;font-weight:700;color:var(--ink)}
+.reqchip{position:relative;cursor:pointer}
+.reqchip input{position:absolute;opacity:0;inset:0;margin:0;cursor:pointer}
+.reqchip span{display:inline-block;padding:7px 13px;border-radius:999px;border:1px solid var(--line2);background:#121725;color:var(--soft);font-size:13px;font-weight:600;transition:background .15s,border-color .15s,color .15s}
+.reqchip:hover span{border-color:#4a5575;color:#fff}
+.reqchip input:checked+span{background:#fbbf2422;border-color:#fbbf24;color:#fff;box-shadow:0 0 12px -3px #fbbf24}
+.reqchip.new input:checked+span{background:#34d39922;border-color:#34d399;box-shadow:0 0 12px -3px #34d399}
+.reqchip input:focus-visible+span{box-shadow:0 0 0 2px rgba(251,191,36,.5)}
+.reqfield{display:flex;flex-direction:column;gap:6px;font-size:13px;font-weight:700}
+.reqfield i{font-style:normal;font-weight:500;color:var(--dim)}
+.reqfield[hidden]{display:none}
+.reqfield input[type=text],.reqfield input[type=email],.reqfield textarea{appearance:none;-webkit-appearance:none;width:100%;box-sizing:border-box;background:#0e1220;border:1px solid var(--line2);border-radius:10px;padding:10px 12px;font:500 14px var(--sans,inherit);color:var(--ink);resize:vertical}
+.reqfield textarea{min-height:110px;line-height:1.45}
+.reqfield input::placeholder,.reqfield textarea::placeholder{color:var(--dim)}
+.reqfield input:focus,.reqfield textarea:focus{border-color:#4a5575;outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.35)}
+.reqfield .bad,.reqfield textarea.bad{border-color:#f87171}
+.reqhoney{position:absolute!important;left:-9999px;width:1px;height:1px;opacity:0}
+.reqmsg{margin:0;min-height:18px;font-size:13px;color:var(--soft)}
+.reqmsg.err{color:#fca5a5}.reqmsg.ok{color:#6ee7b7}
+html.phone .reqfield input,html.phone .reqfield textarea{font-size:16px}
 .relnotes summary{cursor:pointer;list-style:none;width:max-content;margin:0 auto;padding:7px 14px;border-radius:999px;border:1px solid var(--line2);background:#141826;color:var(--soft);font-weight:700;font-size:12.5px}
 .relnotes summary::-webkit-details-marker{display:none}
 .relnotes summary::before{content:'▸ ';color:#a78bfa}
@@ -431,6 +468,11 @@ body.mode-home .statusbar{margin-top:auto}
 .i-pn .k2{animation-delay:.3s}.i-pn .k3{animation-delay:.6s}.i-pn .k4{animation-delay:.9s}
 @keyframes hkey{0%,30%,100%{fill:#f4f6fb;transform:none}12%{fill:#c4b5fd;transform:scaleY(.94)}}
 .hlibhead{display:flex;align-items:center;justify-content:space-between;padding:0 4px}
+.reqmini{display:inline-flex;align-items:center;gap:5px;border:0;background:none;padding:2px 4px;border-radius:6px;cursor:pointer;color:var(--dim);font:700 11px var(--sans,inherit);letter-spacing:.02em}
+.reqmini svg{width:11px;height:11px;color:#fbbf24}
+.reqmini:hover{color:#fff}
+.reqmini:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.45)}
+.btn.reqopen svg{color:#fbbf24}
 .hlist{list-style:none;margin:0;padding:0;display:grid;gap:8px}
 .hitem{display:flex;align-items:center;gap:4px;padding:4px;border:1px solid var(--line2);border-radius:12px;background:#121725;min-width:0}
 .hcol.dj .hitem.cur{border-color:var(--a)} .hcol.pn .hitem.cur{border-color:#a78bfa}
@@ -850,7 +892,10 @@ html.phone body.mode-create .btn{min-height:38px}
   .statusbar footer.foot{flex:1;padding:0;display:flex;align-items:center;justify-content:flex-end;gap:12px;min-width:0}
   .statusbar .foottext{min-width:0;text-align:right}
   /* on computers the release notes open as a panel above the button instead of pushing the page down */
+  .statusbar .footbtns{margin:0;flex:none;flex-wrap:nowrap;align-items:center}
   .statusbar .relnotes{margin:0;position:relative;flex:none}
+  .statusbar .relnotes[open]{flex-basis:auto;order:0}
+  .statusbar .pillbtn{padding:5px 12px}
   .statusbar .relnotes summary{margin:0;padding:5px 12px}
   .statusbar .relwrap{position:absolute;right:0;bottom:calc(100% + 10px);width:min(860px,80vw);max-height:min(520px,70vh);margin:0;z-index:60;box-shadow:0 18px 50px -10px #000c,0 0 0 1px #ffffff10}
 }
@@ -1247,6 +1292,10 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
       </div>
       <button class="btn" id="crSend" title="Put your creation on a DJ deck so you can mix it"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.2" fill="none" stroke="currentColor" stroke-width="1.5"/><circle cx="8" cy="8" r="1.8" fill="currentColor"/></svg>Send to DJ</button>
     </div>
+    <div class="dsec">
+      <span class="lbl">Ideas</span>
+      <button class="btn reqopen" type="button" data-area="Piano" title="Send an idea for SpinLab"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button>
+    </div>
     <div class="dsec dgrid2">
       <button class="btn" id="crHelpBtn">Help</button>
       <button class="btn" id="crHomeBtn"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg>Home</button>
@@ -1261,15 +1310,15 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
   <div class="hcols">
     <div class="hcol st">
       <button class="hbtn" id="goStudio"><svg class="i-st" viewBox="0 0 120 84" aria-hidden="true"><rect x="2" y="2" width="116" height="80" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><rect x="10" y="12" width="100" height="16" rx="4" fill="rgba(167,139,250,.16)" stroke="rgba(167,139,250,.55)"/><rect x="10" y="34" width="100" height="16" rx="4" fill="rgba(239,68,68,.14)" stroke="rgba(239,68,68,.5)"/><rect x="10" y="56" width="100" height="16" rx="4" fill="rgba(251,146,60,.14)" stroke="rgba(251,146,60,.5)"/><g fill="#a78bfa"><rect class="nb" x="14" y="21" width="12" height="4" rx="1.2"/><rect class="nb" x="28" y="17" width="8" height="4" rx="1.2"/><rect class="nb" x="38" y="15" width="16" height="4" rx="1.2"/><rect class="nb" x="58" y="19" width="10" height="4" rx="1.2"/><rect class="nb" x="72" y="16" width="14" height="4" rx="1.2"/><rect class="nb" x="90" y="21" width="12" height="4" rx="1.2"/></g><g fill="#ef4444"><rect class="nb" x="14" y="43" width="5" height="4" rx="1"/><rect class="nb" x="26" y="38" width="5" height="4" rx="1"/><rect class="nb" x="38" y="43" width="5" height="4" rx="1"/><rect class="nb" x="50" y="38" width="5" height="4" rx="1"/><rect class="nb" x="62" y="43" width="5" height="4" rx="1"/><rect class="nb" x="74" y="38" width="5" height="4" rx="1"/><rect class="nb" x="86" y="43" width="5" height="4" rx="1"/><rect class="nb" x="98" y="38" width="5" height="4" rx="1"/></g><path d="M12 64h4l3-5 4 10 4-12 4 13 3-7 4 3h4l3-6 4 9 4-11 4 12 3-6 4 2h4l3-4 4 8 4-10 4 11 3-5 4 1h6" fill="none" stroke="#fb923c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g class="ph"><rect x="34" y="8" width="2.5" height="68" rx="1" fill="#f8fafc"/><path d="M31 6h8.5l-4.25 5z" fill="#f8fafc"/></g></svg><span class="rdtext"><span class="hname">SpinLab</span><small>Make your own songs with tracks, dozens of instruments, drums and your voice. Record notes and shape them as blocks.</small></span></button>
-      <div class="hlib"><div class="hlibhead"><span class="lbl">SpinLab songs</span></div><ul class="hlist" id="homeStudio"></ul></div>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">SpinLab songs</span><button class="reqmini reqopen" type="button" data-area="SpinLab studio" title="Request a feature for SpinLab studio"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button></div><ul class="hlist" id="homeStudio"></ul></div>
     </div>
     <div class="hcol dj">
       <button class="hbtn" id="goDJ"><svg class="i-dj" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="10" width="88" height="76" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="spin"><circle cx="42" cy="48" r="28" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="42" cy="48" r="21" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="14" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="8" fill="#f472b6"/><path d="M42 21v7" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/><circle cx="42" cy="48" r="2.4" fill="#0b0d14"/></g><path d="M80 18v30l-9 9" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="80" cy="18" r="4" fill="#e2e8f0"/></svg><span class="hname">DJ</span><small>Mix, loop and remix songs</small></button>
-      <div class="hlib"><div class="hlibhead"><span class="lbl">DJ library</span></div><ul class="hlist" id="homeDJ" data-store="projects"></ul></div>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">DJ library</span><button class="reqmini reqopen" type="button" data-area="DJ" title="Request a feature for DJ"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button></div><ul class="hlist" id="homeDJ" data-store="projects"></ul></div>
     </div>
     <div class="hcol pn">
       <button class="hbtn" id="goPiano"><svg class="i-pn" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="14" width="88" height="68" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="keys"><rect class="k k1" x="12" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k2" x="31" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k3" x="50" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/><rect class="k k4" x="69" y="24" width="17" height="50" rx="3" fill="#f4f6fb"/></g><rect x="24" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="43" y="24" width="11" height="30" rx="2" fill="#0b0d14"/><rect x="62" y="24" width="11" height="30" rx="2" fill="#0b0d14"/></svg><span class="hname">Piano</span><small>Play, record and make songs</small></button>
-      <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">Piano library</span><button class="reqmini reqopen" type="button" data-area="Piano" title="Request a feature for Piano"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button></div><ul class="hlist" id="homePiano" data-store="creations"></ul></div>
     </div>
     <div class="hcol rd">
       <button class="hbtn" id="goRadio"><svg class="i-rd" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="22" width="88" height="62" rx="12" fill="#141824" stroke="#323a52" stroke-width="2"/><path d="M22 22 62 8" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/><circle cx="30" cy="53" r="17" fill="#0b0d14" stroke="#34d399" stroke-width="3"/><circle cx="30" cy="53" r="6" fill="#34d399"/><rect x="56" y="38" width="26" height="6" rx="3" fill="#34d399"/><rect x="56" y="50" width="26" height="4" rx="2" fill="#323a52"/><rect x="56" y="60" width="26" height="4" rx="2" fill="#323a52"/><g class="waves" fill="none" stroke="#34d399" stroke-width="3" stroke-linecap="round"><path class="w1" d="M74 14a10 10 0 0 1 0 14"/><path class="w2" d="M80 8a18 18 0 0 1 0 26"/></g></svg><svg class="i-mu" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="12" width="88" height="72" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><g fill="none" stroke="#f472b6" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round"><path d="M38 64V28l30-6v36"/></g><circle cx="31" cy="64" r="8" fill="#f472b6"/><circle cx="61" cy="58" r="8" fill="#f472b6"/><g class="mnotes" fill="#f9a8d4"><path class="n1" d="M76 20v11a3.6 3.6 0 1 1-2-3.2V20z"/><path class="n2" d="M20 30v9a3 3 0 1 1-1.8-2.7V30z"/></g></svg><span class="rdtext"><span class="hname" id="goRadioName">Online Radio</span><small id="goRadioSub">Live stations from around the world. Needs internet.</small></span></button>
@@ -1428,7 +1477,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="ipbody" id="stInstList"></div>
   </dialog>
   <dialog id="stLib" class="stlib">
-    <div class="libhead"><h2>SpinLab library</h2><button class="btn sm primary" id="stLibNew">+ New song</button><button class="btn sm" id="stLibClose">Close</button></div>
+    <div class="libhead"><h2>SpinLab library</h2><button class="btn sm primary" id="stLibNew">+ New song</button><button class="btn sm reqopen" type="button" data-area="SpinLab studio" title="Send an idea for SpinLab"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button><button class="btn sm" id="stLibClose">Close</button></div>
     <p class="hint">Your SpinLab songs are saved in this browser on this device, with every track, note and audio clip. Nothing is uploaded.</p>
     <ul class="liblist" id="stLibList"></ul>
   </dialog>
@@ -1517,16 +1566,17 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
   <button class="btn big" id="offlineBtn"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download SpinLab (HTML)</button>
 </section>
 <footer class="foot"><span class="foottext">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="privacy.html">Privacy</a> &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></span>
+  <span class="footbtns"><button type="button" class="pillbtn" id="reqBtn"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button>
   <details class="relnotes" id="relNotes"><summary>Release notes</summary>
     <div class="relwrap"><table><thead><tr><th scope="col">Version</th><th scope="col">Date</th><th scope="col">What changed</th></tr></thead><tbody id="relBody"></tbody></table></div>
-  </details></footer>
+  </details></span></footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
 <dialog id="lib" aria-labelledby="libTitle">
   <div class="libhead"><h2 id="libTitle" style="margin:0">Your library</h2>
-    <div class="row"><button class="btn" id="libNew" title="Start an empty project">+ New project</button><button class="btn" id="libClose">Close</button></div></div>
+    <div class="row"><button class="btn" id="libNew" title="Start an empty project">+ New project</button><button class="btn reqopen" type="button" data-area="DJ" title="Send an idea for SpinLab"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button><button class="btn" id="libClose">Close</button></div></div>
   <p class="libintro" id="libIntro">Projects are saved in this browser on this device, with their songs, edits, cues, loops and knob settings. Nothing is uploaded.</p>
   <ul class="liblist" id="libList"></ul>
   <p id="libSpace"></p>
@@ -1536,6 +1586,27 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <h2 id="askTitle" style="margin:0 0 12px;font-size:18px"></h2>
     <input type="text" id="askInput" maxlength="60" autocomplete="off" spellcheck="false" aria-labelledby="askTitle">
     <div class="row" style="justify-content:flex-end;margin-top:16px"><button type="button" class="btn" id="askNo">Cancel</button><button type="submit" class="btn primary" id="askYes">Save</button></div>
+  </form>
+</dialog>
+<dialog id="reqDlg" class="reqdlg" aria-labelledby="reqTitle">
+  <form id="reqForm" novalidate>
+    <h2 id="reqTitle">Request a feature</h2>
+    <p class="reqsub">Tell us what would make SpinLab better. Your idea goes straight to the SpinLab team.</p>
+    <fieldset class="reqareas"><legend>Which part is it for?</legend>
+      <label class="reqchip"><input type="radio" name="area" value="DJ"><span>DJ</span></label>
+      <label class="reqchip"><input type="radio" name="area" value="Piano"><span>Piano</span></label>
+      <label class="reqchip"><input type="radio" name="area" value="SpinLab studio"><span>SpinLab studio</span></label>
+      <label class="reqchip"><input type="radio" name="area" value="Online Music"><span>Online Music</span></label>
+      <label class="reqchip"><input type="radio" name="area" value="Online Radio"><span>Online Radio</span></label>
+      <label class="reqchip"><input type="radio" name="area" value="Home and libraries"><span>Home &amp; libraries</span></label>
+      <label class="reqchip new"><input type="radio" name="area" value="A new button"><span>+ A new button</span></label>
+    </fieldset>
+    <label class="reqfield" id="reqNewWrap" hidden><span>What would the new button be called?</span><input type="text" id="reqNewName" maxlength="60" placeholder="For example: Karaoke"></label>
+    <label class="reqfield"><span id="reqIdeaLbl">What do you want?</span><textarea id="reqIdea" rows="5" maxlength="3000" placeholder="Describe the feature and how you would use it."></textarea></label>
+    <label class="reqfield"><span>Your email <i>(optional, only if you want a reply)</i></span><input type="email" id="reqEmail" maxlength="120" placeholder="you@example.com" autocomplete="email"></label>
+    <input type="text" id="reqHoney" class="reqhoney" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <p class="reqmsg" id="reqMsg" role="status" aria-live="polite"></p>
+    <div class="row" style="justify-content:flex-end"><button class="btn" type="button" id="reqCancel">Cancel</button><button class="btn primary" type="submit" id="reqSend">Send request</button></div>
   </form>
 </dialog>
 <dialog id="confirm" aria-labelledby="confirmMsg">
@@ -1644,9 +1715,12 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.37'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.38'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
+/* Request a feature: requests are emailed through FormSubmit (formsubmit.co).
+   After you activate it, FormSubmit gives you a random code you can put here instead of the email address. */
+const FEEDBACK_TO = 'Princesslayah404@gmail.com';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
    ADSENSE_CLIENT = your publisher ID ('ca-pub-…'), ADSENSE_SLOT = the ID of a display ad unit.
    Ads only show on wide desktop screens, at the sides of Home and Online Music. Never in DJ, Piano or on phones. */
@@ -1654,7 +1728,7 @@ const ADSENSE_CLIENT = '';
 const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
-const RELEASES = [["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
+const RELEASES = [["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
 /* release notes table at the bottom of the page: add a row here with every update */
 const verNewer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
 /* the table merges this copy's notes with the newest notes from the website, so versions you don't have yet show up marked New */
@@ -1669,6 +1743,15 @@ function renderReleases(latest) {
   const u = document.getElementById('relUpd'); if (u) u.addEventListener('click', () => location.reload());
 }
 renderReleases();
+/* opening the release notes scrolls them into view, so the table is never hidden below the page */
+document.getElementById('relNotes').addEventListener('toggle', e => {
+  if (!e.target.open) return;
+  const w = e.target.querySelector('.relwrap');
+  requestAnimationFrame(() => requestAnimationFrame(() => {
+    const r = w.getBoundingClientRect(), vh = innerHeight;
+    if (r.bottom > vh - 8 || r.top < 0) w.scrollIntoView({ behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'auto' : 'smooth', block: r.height > vh ? 'start' : 'end' });
+  }));
+});
 /* clicking outside the release notes or pressing Escape closes them */
 document.addEventListener('pointerdown', e => { const r = document.getElementById('relNotes'); if (r.open && !r.contains(e.target)) r.open = false; });
 document.addEventListener('keydown', e => { const r = document.getElementById('relNotes'); if (e.key === 'Escape' && r.open) r.open = false; });
@@ -4255,6 +4338,49 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   setInterval(check, 30 * 60000);
   $('#updGo').addEventListener('click', () => location.reload());
   $('#updLater').addEventListener('click', () => { $('#updBar').hidden = true; lastCheck = Date.now() + 30 * 60000; });
+}
+/* ---------- Request a feature ---------- */
+{
+  const dlg = $('#reqDlg'), form = $('#reqForm'), msg = $('#reqMsg'), idea = $('#reqIdea'), email = $('#reqEmail'), newName = $('#reqNewName'), send = $('#reqSend');
+  const say = (t, cls) => { msg.textContent = t; msg.className = 'reqmsg' + (cls ? ' ' + cls : ''); };
+  const area = () => (form.querySelector('input[name=area]:checked') || {}).value || '';
+  const syncArea = () => { const nb = area() === 'A new button'; $('#reqNewWrap').hidden = !nb; $('#reqIdeaLbl').textContent = nb ? 'What should the new button do?' : 'What do you want?'; idea.placeholder = nb ? 'Explain what the new button would do and how you would use it.' : 'Describe the feature and how you would use it.'; };
+  form.addEventListener('change', e => { if (e.target.name === 'area') { syncArea(); say(''); } });
+  /* opened from the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu */
+  const openReq = pick => {
+    const r = $('#relNotes'); if (r) r.open = false;
+    const cur = pick || { dj: 'DJ', create: 'Piano', studio: 'SpinLab studio' }[MODE];
+    if (cur && (pick || !area())) { const x = form.querySelector(`input[value="${cur}"]`); if (x) x.checked = true; }
+    document.querySelectorAll('dialog[open]').forEach(d => { if (d !== dlg) d.close(); });
+    closeMenu();
+    syncArea(); say(''); send.disabled = false; dlg.showModal(); setTimeout(() => (area() ? idea : form.querySelector('input[name=area]')).focus(), 30);
+  };
+  $('#reqBtn').addEventListener('click', () => openReq());
+  document.addEventListener('click', e => { const b = e.target.closest('.reqopen'); if (b) { e.preventDefault(); e.stopPropagation(); openReq(b.dataset.area); } }, true);
+  $('#reqCancel').addEventListener('click', () => dlg.close());
+  form.addEventListener('submit', async e => {
+    e.preventDefault(); [idea, email].forEach(x => x.classList.remove('bad'));
+    if (!area()) return say('Pick which part of SpinLab it is for.', 'err');
+    if (area() === 'A new button' && !newName.value.trim()) { newName.classList.add('bad'); newName.focus(); return say('Give the new button a name.', 'err'); }
+    if (idea.value.trim().length < 8) { idea.classList.add('bad'); idea.focus(); return say('Tell us a little more about your idea.', 'err'); }
+    if (email.value.trim() && !email.checkValidity()) { email.classList.add('bad'); email.focus(); return say('That email doesn\'t look right. Fix it or leave it empty.', 'err'); }
+    if ($('#reqHoney').value) { dlg.close(); return; }
+    if (navigator.onLine === false) return say('You\'re offline. Connect to the internet, then press Send again. Your text is still here.', 'err');
+    const body = { _subject: 'SpinLab feature request: ' + area() + (area() === 'A new button' ? ' (' + newName.value.trim() + ')' : ''), _template: 'table', _captcha: 'false',
+      'Part of SpinLab': area(), ...(area() === 'A new button' ? { 'New button name': newName.value.trim() } : {}), 'Request': idea.value.trim(),
+      'Reply email': email.value.trim() || '(none)', 'SpinLab version': 'v' + APP_VERSION, 'Device': (document.documentElement.classList.contains('phone') ? 'Phone' : 'Computer') + ' · ' + navigator.userAgent };
+    if (email.value.trim()) body._replyto = email.value.trim();
+    send.disabled = true; say('Sending…');
+    try {
+      const res = await fetch('https://formsubmit.co/ajax/' + FEEDBACK_TO.trim(), { method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' }, body: JSON.stringify(body) });
+      const j = await res.json().catch(() => ({}));
+      if (!res.ok || String(j.success) !== 'true') throw new Error(j.message || 'failed');
+      say('Thank you! Your request was sent.', 'ok'); toast('Feature request sent. Thank you!');
+      idea.value = ''; newName.value = ''; form.querySelectorAll('input[name=area]').forEach(x => x.checked = false); syncArea();
+      setTimeout(() => dlg.open && dlg.close(), 1400);
+    } catch (err) { say('It couldn\'t be sent right now. Please try again in a moment. Your text is still here.', 'err'); }
+    send.disabled = false;
+  });
 }
 /* AdSense side ads: only on the real website, only once the IDs are set, only on wide screens */
 (() => {
