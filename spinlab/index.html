@@ -687,6 +687,15 @@ body.np-open{overflow:hidden}
 .rplayer[hidden]{display:none}
 .updbar{position:fixed;left:50%;top:max(10px,env(safe-area-inset-top));transform:translateX(-50%);z-index:75;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap;justify-content:center;width:max-content;max-width:calc(100% - 16px);padding:8px 8px 8px 14px;border-radius:14px;background:linear-gradient(#1d2335,#141824);border:1px solid #22d3ee;box-shadow:0 14px 34px -12px #000,0 0 22px -10px #22d3ee;font:700 13.5px var(--sans);color:var(--ink);animation:updIn .35s cubic-bezier(.2,.9,.3,1.2)}
 .updbar[hidden]{display:none}
+.adrail{position:fixed;top:50%;transform:translateY(-50%);z-index:5;width:160px;display:none;flex-direction:column;gap:6px;align-items:center}
+.adrail small{font:700 10px var(--mono);letter-spacing:.12em;text-transform:uppercase;color:var(--soft);opacity:.7}
+.adrail .adbox{width:160px;min-height:600px;border-radius:10px;overflow:hidden;background:rgba(255,255,255,.02);border:1px solid var(--line)}
+.adrail.left{left:max(16px,calc((100vw - 1100px) / 2 - 190px))}
+.adrail.right{right:max(16px,calc((100vw - 1100px) / 2 - 190px))}
+.adrail[hidden]{display:none!important}
+@media (min-width:1300px) and (min-height:700px){ body.ads-on.mode-home .adrail.right,body.ads-on.mode-radio .adrail.right{display:flex} }
+@media (min-width:1480px) and (min-height:700px){ body.ads-on.mode-home .adrail.left,body.ads-on.mode-radio .adrail.left{display:flex} }
+body.np-open .adrail{display:none!important}
 @keyframes updIn{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
 .rplayer{transform:translateX(calc(-50% + var(--dx,0px))) translateY(var(--dy,0px));touch-action:none;user-select:none;-webkit-user-select:none}
 .rplayer.dragging{transition:none;cursor:grabbing}
@@ -1060,6 +1069,8 @@ html.phone body.mode-create .btn{min-height:38px}
   <input type="range" id="mpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Music volume">
 </div>
 <div class="updbar" id="updBar" hidden role="status"><span>New SpinLab version ready</span><button type="button" class="btn sm primary" id="updGo">Update now</button><button type="button" class="btn sm ghost" id="updLater" aria-label="Later">Later</button></div>
+<aside class="adrail left" id="adLeft" hidden aria-label="Advertisement"><small>Advertisement</small><div class="adbox"></div></aside>
+<aside class="adrail right" id="adRight" hidden aria-label="Advertisement"><small>Advertisement</small><div class="adbox"></div></aside>
 <audio id="rAudio" preload="none"></audio>
 <audio id="mAudio" preload="none"></audio>
 <section class="np" id="np" hidden role="dialog" aria-modal="true" aria-label="Now playing">
@@ -1119,7 +1130,7 @@ html.phone body.mode-create .btn{min-height:38px}
   <div><b>Use SpinLab without internet</b><p id="offlineText">Download the whole app as one HTML file. DJ and Piano work any time, even with no connection. Online Music always needs internet. Saved projects stay with the browser you save them in, so the downloaded copy starts with its own empty library.</p></div>
   <button class="btn big" id="offlineBtn"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Download SpinLab (HTML)</button>
 </section>
-<footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
+<footer class="foot">SpinLab <span id="ver2"></span> &middot; Songs stay on this device and are never uploaded. &middot; &copy; 2026 Leia &middot; <a href="privacy.html">Privacy</a> &middot; <a href="../LICENSE.txt">GPL v3</a> &middot; MP3s made with <a href="Third%20party%20notice.txt">LAME (lamejs)</a></footer>
 </div>
 
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
@@ -1156,6 +1167,7 @@ html.phone body.mode-create .btn{min-height:38px}
     <li>Online Music has two parts, switched at the top: <b>Online Radio</b> (live stations) and <b>Music</b> (official songs).</li>
     <li><b>Music</b> searches Apple’s music catalog, so you can find artists like Taylor Swift. For now songs play as 30-second previews. ⋯ → <b>Open in Apple Music</b> plays a whole song there. Music has its own queue, playlists and a built-in <b>Liked songs</b> playlist (♡) that can’t be deleted. When a song ends, the next one in the queue starts.</li>
     <li>Tap the song’s picture in the player bar to open the full player. Scroll down for the lyrics, song info and what’s next in the queue. Swipe down or tap ⌄ to close it.</li>
+    <li>On wide computer screens, SpinLab may show ads at the sides of Home and Online Music. They help cover the cost of full songs. DJ, Piano and phones never show ads. See the <a href="privacy.html">privacy page</a>.</li>
     <li>Swipe the bottom player sideways or down to pause and hide it. Press play on any song to bring it back where you left off. Swiping the radio player away stops the station.</li>
     <li><b>Follow</b> an artist from the full player, from ⋯ on any song, or from the artist card at the top of a search. Artists you follow are in the <b>Artists</b> tab and at the front of the name row, so one tap opens their songs.</li>
   </ul>
@@ -1226,9 +1238,14 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.26'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.27'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
+/* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
+   ADSENSE_CLIENT = your publisher ID ('ca-pub-…'), ADSENSE_SLOT = the ID of a display ad unit.
+   Ads only show on wide desktop screens, at the sides of Home and Online Music. Never in DJ, Piano or on phones. */
+const ADSENSE_CLIENT = '';
+const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
 
@@ -3662,6 +3679,27 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   $('#updGo').addEventListener('click', () => location.reload());
   $('#updLater').addEventListener('click', () => { $('#updBar').hidden = true; lastCheck = Date.now() + 30 * 60000; });
 }
+/* AdSense side ads: only on the real website, only once the IDs are set, only on wide screens */
+(() => {
+  if (!ADSENSE_CLIENT || !ADSENSE_SLOT || !/^https?:$/.test(location.protocol) || document.querySelector('meta[name="spinlab-offline"]')) return;
+  const wide = matchMedia('(min-width:1300px) and (min-height:700px)'); let loaded = false;
+  const start = () => {
+    if (loaded || !wide.matches) return; loaded = true;
+    document.body.classList.add('ads-on');
+    const sc = document.createElement('script'); sc.async = true; sc.crossOrigin = 'anonymous';
+    sc.src = 'https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=' + encodeURIComponent(ADSENSE_CLIENT);
+    document.head.appendChild(sc);
+    ['#adRight', '#adLeft'].forEach(sel => {
+      const rail = $(sel); rail.hidden = false;
+      const ins = document.createElement('ins'); ins.className = 'adsbygoogle'; ins.style.cssText = 'display:inline-block;width:160px;height:600px';
+      ins.dataset.adClient = ADSENSE_CLIENT; ins.dataset.adSlot = ADSENSE_SLOT;
+      rail.querySelector('.adbox').appendChild(ins);
+      if (sel === '#adLeft' && !matchMedia('(min-width:1480px)').matches) return;
+      (window.adsbygoogle = window.adsbygoogle || []).push({});
+    });
+  };
+  start(); wide.addEventListener('change', start);
+})();
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 var MUS = { audio: $('#mAudio'), results: [], tab: 'songs', track: null, state: '', dir: 1, cache: new Map(), loading: false, searched: false };
 const mLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch (e) { return d; } };
