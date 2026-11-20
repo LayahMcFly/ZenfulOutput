@@ -323,6 +323,9 @@ html.phone .igrid{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
 .poct{font:700 13px var(--mono);min-width:76px;text-align:center;color:var(--ink);flex:none}
 .kn.inline{display:flex;flex-direction:row;align-items:center;gap:6px;min-width:0;flex:none}
 .kn.inline .knob{width:32px;height:32px}
+.pitchrow{justify-content:space-between;gap:10px}
+.pitchrow .kn.inline output{min-width:92px}
+[data-a="keylock"].on{--c:#a78bfa}
 canvas.roll{width:100%;display:block;border-radius:10px;background:#070910;border:1px solid var(--line);cursor:pointer}
 .pkeys{flex:1 1 auto;min-height:110px;position:relative;border-radius:14px;background:linear-gradient(#1a1f2e,#06080d);padding:10px 8px 8px;border:1px solid var(--line);touch-action:none;user-select:none;-webkit-user-select:none;-webkit-touch-callout:none;-webkit-tap-highlight-color:transparent}
 .pkeys *{-webkit-tap-highlight-color:transparent;outline:none}
@@ -911,6 +914,10 @@ body.mode-studio{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding
 .sttime{font:800 15px var(--mono);min-width:76px;text-align:center;color:#fff;letter-spacing:.02em}
 .sttools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
 .stbpm,.stsnap{display:flex;align-items:center;gap:6px}
+.stpitch{display:inline-flex;align-items:center;gap:5px}
+.stpitch b{min-width:28px;text-align:center;font:800 13px var(--mono)}
+.stpitch b.on{color:#a78bfa}
+.stpitch .btn{padding:5px 9px}
 .stbpm input{width:58px;text-align:center;font-size:14px;padding:7px 6px}
 .stsnap select{padding:7px 26px 7px 9px;font-size:13px}
 #stMetro.on{--c:var(--gold)}
@@ -1309,6 +1316,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
       <span class="sttime" id="stTime" aria-live="off">1.1</span>
     </div>
     <div class="sttools">
+      <span class="stpitch" role="group" aria-label="Pitch of the whole song"><span class="lbl">Pitch</span><button class="btn sm" id="stPitchDn" aria-label="Lower the whole song by a semitone" title="Lower the whole song">−</button><b id="stPitchVal" title="Pitch of the whole song in semitones">0</b><button class="btn sm" id="stPitchUp" aria-label="Raise the whole song by a semitone" title="Raise the whole song">+</button></span>
       <label class="stbpm"><span class="lbl">BPM</span><input type="number" id="stBpm" min="40" max="240" step="1" value="100" aria-label="Tempo in beats per minute"></label>
       <button class="btn" id="stMetro" aria-pressed="false" title="Metronome click"><svg viewBox="0 0 16 16"><path d="M5.5 2h5l2.5 12H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 11 11.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Click</span></button>
       <label class="stsnap"><span class="lbl">Snap</span><select id="stSnap" aria-label="Snap notes and clips to"><option value="0">Off</option><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option></select></label>
@@ -1370,6 +1378,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
       <div class="fxtop">
         <div class="kn inline"><div class="knob" id="fxVol" role="slider" tabindex="0" aria-label="Track volume"></div><span>Volume</span><output></output></div>
         <div class="kn inline"><div class="knob" id="fxPan" role="slider" tabindex="0" aria-label="Track pan"></div><span>Pan</span><output></output></div>
+        <div class="kn inline"><div class="knob" id="fxPitch" role="slider" tabindex="0" aria-label="Track pitch"></div><span>Pitch</span><output></output></div>
         <button type="button" class="btn sm primary" id="fxAddBtn"><svg viewBox="0 0 16 16"><path d="M8 3v10M3 8h10" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>Add effect</button>
         <span class="fxhint">Effects run from left to right. Turn the knobs while it plays.</span>
       </div>
@@ -1518,6 +1527,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <li>Each track has <b>M</b> (mute), <b>S</b> (solo), a volume slider and a ⋯ menu to rename, duplicate, pan, move or delete it.</li>
     <li>Click the numbers at the top of the timeline to move the playhead.</li>
     <li><b>Effects:</b> pick a track and tap the <b>Effects</b> tab at the bottom, then <b>Add effect</b>. The effects browser works like BandLab’s: search, or pick a group (Recommended, One Knobs, Polish, Amps &amp; Cabs, Compressor, Limiter, Rhythmic, EQ, Delay, Reverb, Modulation, Distortion, Lo-fi). Each effect you add becomes a card with its own knobs, an on/off switch, arrows to change the order, and an ✕ to remove it. Effects play live and are included when you export.</li>
+    <li><b>Pitch:</b> <b>Pitch − / +</b> in the top bar moves the whole song higher or lower, one semitone at a time (12 semitones is one octave). Each track also has its own <b>Pitch</b> knob in its Effects panel. Instrument tracks change their notes, so they stay perfectly clean. Audio, voice and drum tracks go through a pitch shifter, which keeps the speed the same.</li>
     <li><b>Seeing everything:</b> The <b>Piano</b>, <b>Notes</b> and <b>Effects</b> tabs at the bottom open and close the bottom panel. <b>Fit</b> squeezes the whole song and every track onto the screen. <b>−</b> and <b>+</b> squeeze or stretch the timeline, and the arrows beside <b>Tracks</b> make tracks shorter or taller. On a phone, pinch sideways to squeeze or stretch the song, and pinch up and down to change track height. On a computer, hold <kbd>Ctrl</kbd> and scroll (add <kbd>Shift</kbd> for track height).</li>
     <li><b>Editing parts of a track:</b> click a block of notes or an audio clip to select it, or drag across an empty part of a track with the mouse to select just that stretch. Then use <b>Cut</b>, <b>Copy</b>, <b>Paste</b> or <b>Delete</b> (or <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>X</kbd>, <kbd>C</kbd>, <kbd>V</kbd> and <kbd>Delete</kbd>). Paste goes in at the playhead on the selected track, and pressing it again adds another copy right after, which is handy for repeating a beat. Drag a selected part to move it along the track, or onto another track of the same kind. <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>A</kbd> selects everything on the track. Nothing here makes a new track.</li>
     <li><b>Save</b> keeps the song in your SpinLab library. <b>Export</b> makes an MP3 or WAV file.</li>
@@ -1587,6 +1597,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
   <h3>Decks</h3>
   <ul>
     <li><b>Speed</b> changes tempo and pitch together, the way a turntable does. Pick ±8%, ±16% or ±50% for the slider range.</li>
+    <li><b>Pitch</b> (in Effects) moves the song higher or lower by semitones without changing its speed. Turn on <b>Key lock</b> to keep the song in the same key when you change its speed. Save WAV and Save MP3 include the new pitch.</li>
     <li><b>Sync</b> matches this deck's tempo to the other deck. <b>Tap</b> lets you tap the beat if the detected BPM is off, or type the BPM in the box.</li>
     <li><b>Hot cues</b>: tap an empty pad to save a spot, tap it again to jump there. Right-click or hold a pad to clear it.</li>
     <li><b>Cue</b>: while stopped, it marks the cue spot. While playing, it jumps back to the cue spot and stops.</li>
@@ -1605,7 +1616,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.33'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.34'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
@@ -1655,6 +1666,51 @@ function makeIR(sec, decay) {
   for (let c = 0; c < 2; c++) { const d = b.getChannelData(c); for (let i = 0; i < len; i++) d[i] = (Math.random() * 2 - 1) * Math.pow(1 - i / len, decay); }
   return b;
 }
+
+/* ---------------- pitch shifter: higher or lower without changing speed ----------------
+   Two delay lines whose delay time slides up or down, crossfaded so there are no clicks.
+   Built only from standard audio nodes, so it works while playing and in exported files. */
+const PS_D = 0.1, PS_F = 0.05, PS_B = 0.1, psBufs = new Map();
+function psBuffers(c2) {
+  const sr = c2.sampleRate; if (psBufs.has(sr)) return psBufs.get(sr);
+  const n1 = Math.floor(PS_B * sr), n2 = Math.max(0, Math.floor((PS_B - 2 * PS_F) * sr)), n = n1 + n2, fl = PS_F * sr;
+  const mk = fn => { const b = c2.createBuffer(1, n, sr), d = b.getChannelData(0); for (let i = 0; i < n1; i++) d[i] = fn(i); return b; };
+  const B = { fade: mk(i => i < fl ? Math.sqrt(i / fl) : i >= n1 - fl ? Math.sqrt(1 - (i - (n1 - fl)) / fl) : 1), down: mk(i => i / n1), up: mk(i => (n1 - i) / n) };
+  psBufs.set(sr, B); return B;
+}
+function makePitchShifter(c2) {
+  const B = psBuffers(c2), G = () => c2.createGain();
+  const inp = G(), out = G(), dry = G(), wet = G(); wet.gain.value = 0; inp.connect(dry); dry.connect(out); wet.connect(out);
+  const src = b => { const x = c2.createBufferSource(); x.buffer = b; x.loop = true; return x; };
+  const m = [src(B.down), src(B.down), src(B.up), src(B.up)], f = [src(B.fade), src(B.fade)], mg = m.map(G), mod = [G(), G()], d = [c2.createDelay(1), c2.createDelay(1)], x = [G(), G()];
+  mg[2].gain.value = mg[3].gain.value = 0;
+  m.forEach((s2, i) => { s2.connect(mg[i]); mg[i].connect(mod[i % 2]); });
+  mod.forEach((g, i) => g.connect(d[i].delayTime));
+  x.forEach((g, i) => { g.gain.value = 0; f[i].connect(g.gain); inp.connect(d[i]); d[i].connect(g); g.connect(wet); });
+  const t = c2.currentTime + 0.05, t2 = t + PS_B - PS_F;
+  m[0].start(t); m[1].start(t2); m[2].start(t); m[3].start(t2); f[0].start(t); f[1].start(t2);
+  let cur = 0;
+  return {
+    in: inp, out,
+    set(semis, instant) {
+      cur = semis; const on = Math.abs(semis) > 0.01, r = Math.pow(2, semis / 12), mult = 2 * (r - 1), up = mult > 0, now = c2.currentTime;
+      const S = (prm, v) => instant ? (prm.value = v) : prm.setTargetAtTime(v, now, 0.012);
+      S(dry.gain, on ? 0 : 1); S(wet.gain, on ? 1 : 0);
+      S(mg[0].gain, up ? 0 : 1); S(mg[1].gain, up ? 0 : 1); S(mg[2].gain, up ? 1 : 0); S(mg[3].gain, up ? 1 : 0);
+      mod.forEach(g => S(g.gain, 0.5 * PS_D * Math.min(2, Math.abs(mult))));
+    },
+    get semis() { return cur; },
+    stop() { [...m, ...f].forEach(s2 => { try { s2.stop(); } catch (e) {} }); }
+  };
+}
+/* render a whole buffer at a new pitch (used when saving) */
+async function pitchBuffer(b, semis) {
+  const off = new OfflineAudioContext(b.numberOfChannels, Math.ceil((b.duration + 0.25) * b.sampleRate), b.sampleRate);
+  const ps = makePitchShifter(off), s2 = off.createBufferSource(); s2.buffer = b; ps.set(semis, true);
+  s2.connect(ps.in); ps.out.connect(off.destination); s2.start(0.05);
+  return off.startRendering();
+}
+const semiFmt = v => Math.abs(v) < 0.01 ? 'Normal' : (v > 0 ? '+' : '−') + Math.abs(Math.round(v)) + ' semitone' + (Math.abs(Math.round(v)) === 1 ? '' : 's');
 
 /* ---------------- buffer helpers ---------------- */
 function newBuf(ch, len) { return ctx.createBuffer(ch, Math.max(1, len), ctx.sampleRate); }
@@ -1863,7 +1919,8 @@ class Deck {
     this.echoSend = c.createGain(); this.echoSend.gain.value = 0; this.delay = c.createDelay(5); this.fb = c.createGain(); this.fb.gain.value = 0.4;
     this.echoTone = c.createBiquadFilter(); this.echoTone.type = 'lowpass'; this.echoTone.frequency.value = 4500;
     this.meterAn = c.createAnalyser(); this.meterAn.fftSize = 1024; this.meterBuf = new Float32Array(1024);
-    this.in.connect(this.low); this.low.connect(this.mid); this.mid.connect(this.high); this.high.connect(this.filt); this.filt.connect(this.post);
+    this.ps = makePitchShifter(c);
+    this.in.connect(this.ps.in); this.ps.out.connect(this.low); this.low.connect(this.mid); this.mid.connect(this.high); this.high.connect(this.filt); this.filt.connect(this.post);
     this.post.connect(this.vol);
     this.post.connect(this.revSend); this.revSend.connect(this.conv); this.conv.connect(this.vol);
     this.post.connect(this.echoSend); this.echoSend.connect(this.delay); this.delay.connect(this.echoTone); this.echoTone.connect(this.vol);
@@ -1872,6 +1929,7 @@ class Deck {
     this.built = true;
     // push current knob values into the new nodes
     ['gain', 'hi', 'mid', 'low', 'filter', 'reverb', 'echo'].forEach(n => this.k[n].onChange(this.k[n].value));
+    this.applyPitch(true);
     this.vol.gain.value = this.fader.value * this.fader.value;
     this.updateEcho();
   }
@@ -1912,10 +1970,16 @@ class Deck {
     this.ui();
   }
   rebase() { const p = this.pos(); this.startOffset = p; this.startCtx = ctx ? ctx.currentTime : 0; }
+  /* pitch knob, plus key lock: keeps the song in the same key when you speed it up or slow it down */
+  pitchSemis() { return (this.k && this.k.pitch ? this.k.pitch.value : 0) + (this.keylock ? -12 * Math.log2(this.eff) : 0); }
+  applyPitch(instant) {
+    if (this.built && this.ps) this.ps.set(clamp(this.pitchSemis(), -12, 12), instant);
+    const b = this.el && this.el.keylock; if (b) { b.classList.toggle('on', !!this.keylock); b.setAttribute('aria-pressed', String(!!this.keylock)); }
+  }
   setRate() {
     this.rate = 1 + this.tempo * this.range;
     if (ctx && this.playing && !this.brake) { this.rebase(); this.src && this.src.playbackRate.setValueAtTime(this.eff, ctx.currentTime); }
-    this.updateEcho(); this.ui();
+    this.updateEcho(); this.applyPitch(); this.ui();
   }
   setBend(b) {
     if (this.bend === b) return;
@@ -2038,7 +2102,7 @@ class Deck {
   state() {
     return { name: this.name, audio: this.buffer ? encodeWAV(this.buffer) : null, cues: this.cues.slice(), cuePoint: this.cuePoint,
       loop: { start: this.loop.start, end: this.loop.end }, bpm: this.bpm, range: this.range, tempo: this.tempo, echoBeats: this.echoBeats, follow: this.follow,
-      knobs: Object.fromEntries(Object.entries(this.k).map(([n, k]) => [n, k.value])), fader: this.fader.value, beatOff: this.beatOff, snap: this.snap };
+      knobs: Object.fromEntries(Object.entries(this.k).map(([n, k]) => [n, k.value])), fader: this.fader.value, beatOff: this.beatOff, snap: this.snap, keylock: !!this.keylock };
   }
   async applyState(st) {
     this.reset();
@@ -2050,7 +2114,7 @@ class Deck {
     this.name = st.name || ''; this.cues = (st.cues || [null, null, null, null]).slice(0, 4); this.cuePoint = st.cuePoint || 0;
     this.loop = { on: false, start: st.loop ? st.loop.start : 0, end: st.loop ? st.loop.end : 0 };
     this.bpm = st.bpm || null; this.range = st.range || 0.16; this.tempo = st.tempo || 0; this.echoBeats = st.echoBeats || 0.5; this.follow = st.follow !== false;
-    this.beatOff = st.beatOff || 0; this.snap = st.snap ?? 1; this.el.snap.value = String(this.snap);
+    this.beatOff = st.beatOff || 0; this.snap = st.snap ?? 1; this.el.snap.value = String(this.snap); this.keylock = !!st.keylock;
     this.el.range.value = String(this.range); this.el.tempo.value = this.tempo; this.el.echoT.value = String(this.echoBeats); this.setRate();
     if (st.knobs) for (const [n, v] of Object.entries(st.knobs)) if (this.k[n]) this.k[n].set(v);
     if (st.fader != null) this.fader.set(st.fader);
@@ -2168,17 +2232,24 @@ class Deck {
     this.beatOff = this.pos(); this.ui(); touch();
     toast(this.bpm ? 'Beat grid lined up: beat 1 is at the playhead' : 'Beat 1 set. Add the BPM (Tap or type it) to see the grid.');
   }
-  saveWav() {
+  async exportBuf() {
+    const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer, st = this.k.pitch ? this.k.pitch.value : 0;
+    if (!st) return b;
+    toast('Changing the pitch ' + semiFmt(st).toLowerCase() + '…'); return pitchBuffer(b, st);
+  }
+  async saveWav() {
     if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
-    const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer;
-    download(encodeWAV(b), (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + '.wav');
+    const st = this.k.pitch ? this.k.pitch.value : 0, b = await this.exportBuf();
+    download(encodeWAV(b), (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + (st ? (st > 0 ? '-up' : '-down') + Math.abs(st) : '') + '.wav');
+    if (st) toast('WAV saved with the pitch ' + semiFmt(st).toLowerCase());
   }
   async saveMp3() {
     if (!this.buffer) return toast('Load a song on deck ' + this.id + ' first.');
     if (this.encoding) return toast('Still making the last MP3…');
     this.encoding = true;
-    const b = this.sel ? sliceBuf(this.buffer, this.sel.a, this.sel.b) : this.buffer, name = (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + '.mp3';
+    const st = this.k.pitch ? this.k.pitch.value : 0, name = (this.name || 'deck-' + this.id) + (this.sel ? '-selection' : '-edit') + (st ? (st > 0 ? '-up' : '-down') + Math.abs(st) : '') + '.mp3';
     try {
+      const b = await this.exportBuf();
       toast('Making MP3… 0%');
       const blob = await encodeMP3(b, f => toast('Making MP3… ' + Math.round(f * 100) + '%'));
       download(blob, name); toast('MP3 saved to Downloads');
@@ -2265,6 +2336,8 @@ function deckHTML(d) {
         <div class="row"><button class="btn sm" data-hold="0.94" title="Hold to slow down a little">&lsaquo;&lsaquo; Slow</button><button class="btn sm" data-hold="1.06" title="Hold to speed up a little">Fast &rsaquo;&rsaquo;</button></div>
         <div class="row"><button class="btn sm" data-a="tap" title="Tap along with the beat to set the BPM">Tap</button><input type="number" step="0.1" min="40" max="300" placeholder="BPM" data-r="bpmIn" aria-label="Type the BPM"><button class="btn sm" data-a="treset" title="Back to normal speed">Reset</button></div>
       </div>
+      <div class="row pitchrow"><div class="kn inline"><div class="knob" data-k="pitch" role="slider" tabindex="0" aria-label="Deck ${id} pitch"></div><span>Pitch</span><output></output></div>
+        <button class="btn sm" data-a="keylock" data-r="keylock" aria-pressed="false" title="Keep the song in the same key when you change its speed">Key lock</button></div>
     </div>
     <div class="group"><span class="lbl">Hot cues</span><div class="pads">${[0, 1, 2, 3].map(i => `<button class="pad" data-cue="${i}" style="--pc:${CUE_COLORS[i]}" aria-label="Hot cue ${i + 1}">${i + 1}<small></small></button>`).join('')}</div></div>
     <div class="group"><div class="row" style="justify-content:space-between"><span class="lbl">Loop (beats)</span><span class="lbl" data-r="loopinfo"></span></div>
@@ -2293,7 +2366,7 @@ function setupDeck(d) {
   w.innerHTML = waveHTML(d); dk.innerHTML = '<div class="dk">' + deckHTML(d) + '</div>';
   const r = n => [w, dk, ...mx].map(x => x.querySelector(`[data-r="${n}"]`)).find(Boolean);
   d.el = {};
-  ['title', 'el', 'rem', 'len', 'wrap', 'rl', 'cv', 'ov', 'follow', 'selinfo', 'snap', 'selA', 'selB', 'sellen', 'file', 'bpm', 'play', 'range', 'tval', 'tempo', 'bpmIn', 'loopinfo', 'lexit', 'echoT', 'meter', 'fader'].forEach(n => d.el[n] = r(n));
+  ['title', 'el', 'rem', 'len', 'wrap', 'rl', 'cv', 'ov', 'follow', 'selinfo', 'snap', 'selA', 'selB', 'sellen', 'file', 'bpm', 'play', 'range', 'tval', 'tempo', 'bpmIn', 'loopinfo', 'lexit', 'echoT', 'meter', 'fader', 'keylock'].forEach(n => d.el[n] = r(n));
   d.el.meterI = d.el.meter.querySelector('i');
   d.el.pads = [...dk.querySelectorAll('.pad')];
   d.el.loopBtns = [...dk.querySelectorAll('[data-loop]')];
@@ -2312,6 +2385,7 @@ function setupDeck(d) {
     else if (v < 0) { f.type = 'lowpass'; f.frequency.setTargetAtTime(20000 * Math.pow(10, v * 2.5), t, 0.01); f.Q.setTargetAtTime(6, t, 0.01); }
     else { f.type = 'highpass'; f.frequency.setTargetAtTime(20 * Math.pow(10, v * 2.85), t, 0.01); f.Q.setTargetAtTime(6, t, 0.01); }
   } });
+  k.pitch = makeKnob(kEl('pitch'), { min: -12, max: 12, step: 1, value: 0, def: 0, bip: true, fmt: semiFmt, onChange: () => d.applyPitch() });
   k.reverb = makeKnob(kEl('reverb'), { min: 0, max: 1, value: 0, def: 0, fmt: v => Math.round(v * 100) + '%', onChange: v => d.built && d.revSend.gain.setTargetAtTime(v * 1.1, ctx.currentTime, 0.02) });
   k.echo = makeKnob(kEl('echo'), { min: 0, max: 1, value: 0, def: 0, fmt: v => Math.round(v * 100) + '%', onChange: v => { if (!d.built) return; d.echoSend.gain.setTargetAtTime(v, ctx.currentTime, 0.02); d.fb.gain.setTargetAtTime(0.3 + 0.35 * v, ctx.currentTime, 0.02); } });
   d.fader = makeFader(d.el.fader, { value: 0.85, def: 0.85, onChange: v => d.built && d.vol.gain.setTargetAtTime(v * v, ctx.currentTime, 0.01) });
@@ -2326,6 +2400,7 @@ function setupDeck(d) {
     fin: () => d.fade('in'), fout: () => d.fade('out'), reverse: () => d.reverse(), loopSel: () => d.loopSel(),
     undo: () => d.restore(d.undo, d.redo), redo: () => d.restore(d.redo, d.undo), zin: () => d.zoom(0.5), zout: () => d.zoom(2), fit: () => d.fit(),
     follow: () => { d.follow = !d.follow; d.ui(); },
+    keylock: () => { d.keylock = !d.keylock; d.applyPitch(); touch(); toast(d.keylock ? 'Key lock on: changing the speed keeps deck ' + d.id + ' in the same key' : 'Key lock off'); },
     playSel: () => d.playSel(), zoomSel: () => d.zoomSel(), repeat: () => d.repeatSel(), silence: () => d.silenceSel(), gridHere: () => d.gridHere(), save: () => d.saveWav(), mp3: () => d.saveMp3(), closeB: () => setDual(false),
     cue: () => d.cue(), play: () => d.toggle(), brake: () => d.doBrake(), sync: () => d.sync(), tap: () => d.tap(),
     treset: () => { d.tempo = 0; d.el.tempo.value = 0; d.setRate(); },
@@ -4602,6 +4677,10 @@ const spb = () => 60 / ST.bpm;
 const sUid = () => Math.random().toString(36).slice(2, 9);
 const AUDIO_COLORS = ['#fb923c', '#38bdf8', '#4ade80', '#facc15', '#f87171', '#c084fc'];
 const stTrack = id => ST.tracks.find(t => t.id === id);
+const semisOf = t => (t.pitch || 0) + (ST.pitch || 0);
+/* instruments move their notes (clean sound); drums and audio go through the pitch shifter */
+const transposes = t => t.type === 'inst' && (INST[t.sound] || {}).kind !== 'drum';
+const playM = (t, m) => transposes(t) ? clamp(m + semisOf(t), 0, 127) : m;
 const stSelTrack = () => stTrack(ST.sel);
 const tColor = t => t.type === 'inst' ? FAMS[(INST[t.sound] || INST.piano).fam].color : t.color;
 const isDrumTrack = t => t && t.type === 'inst' && (INST[t.sound] || {}).kind === 'drum';
@@ -4658,13 +4737,13 @@ function stSelect(id, keepDock) {
   ST.sel = id; ST.selClip = null; ST.selNote = null;
   renderStHeads(); renderDock(); ST.need = true;
 }
-function snapshotTracks() { return JSON.stringify({ tracks: ST.tracks, bpm: ST.bpm }); }
+function snapshotTracks() { return JSON.stringify({ tracks: ST.tracks, bpm: ST.bpm, pitch: ST.pitch || 0 }); }
 function stPush() { ST.undo.push(snapshotTracks()); if (ST.undo.length > 80) ST.undo.shift(); ST.redo = []; stDirty(); }
 function stRestore(from, to) {
   if (!from.length) return toast(from === ST.undo ? 'Nothing to undo.' : 'Nothing to redo.');
   if (ST.playing) stStop();
   to.push(snapshotTracks()); const s = JSON.parse(from.pop());
-  ST.tracks = s.tracks; ST.bpm = s.bpm; $('#stBpm').value = ST.bpm;
+  ST.tracks = s.tracks; ST.bpm = s.bpm; ST.pitch = s.pitch || 0; stPitchUI(); $('#stBpm').value = ST.bpm;
   if (!stTrack(ST.sel)) ST.sel = ST.tracks.length ? ST.tracks[ST.tracks.length - 1].id : null;
   ST.selClip = ST.selNote = null; ST.range = null; ST.moving = null; stMix(); renderStudio(); stDirty();
 }
@@ -4677,7 +4756,7 @@ function stSchedule() {
     if (t.type === 'inst') {
       for (const n of t.notes) {
         if (n.t < from - 1e-4) continue;
-        const when = t0 + (n.t - from) * s, v = startVoice(ctx, c.g, t.sound, n.m, n.v || 0.8, when);
+        const when = t0 + (n.t - from) * s, v = startVoice(ctx, c.g, t.sound, playM(t, n.m), n.v || 0.8, when);
         v.release(when + n.d * s); ST.voices.push(v);
       }
     } else {
@@ -4789,7 +4868,7 @@ function stPress(m) {
   stInit(); if (ST.down.has(m)) return;
   ST.down.add(m); stKeyOn(m, true);
   if (ST.live.has(m)) stEndLive(m);
-  const voice = startVoice(ctx, stChan(t).g, t.sound, m, 0.8, ctx.currentTime);
+  const voice = startVoice(ctx, stChan(t).g, t.sound, playM(t, m), 0.8, ctx.currentTime);
   const note = ST.recording && ST.recTrack === t.id ? { m, t: stNow(), d: 0, v: 0.8 } : null;
   ST.live.set(m, { voice, note, track: t.id });
   if (ctx && t) stMix();
@@ -4827,7 +4906,7 @@ function renderStHeads() {
   h.classList.toggle('compact', lh < 56); h.classList.toggle('tiny', lh < 40);
   h.innerHTML = '<div class="sthr"><span>Tracks</span><span class="sthbtns"><button class="btn sm" data-h="shorter" aria-label="Shorter tracks" title="Shorter tracks (squeeze)"><svg viewBox="0 0 16 16"><path d="M8 1.5v4M5.5 3.5 8 6l2.5-2.5M8 14.5v-4M5.5 12.5 8 10l2.5 2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button><button class="btn sm" data-h="taller" aria-label="Taller tracks" title="Taller tracks (stretch)"><svg viewBox="0 0 16 16"><path d="M8 6V1.5M5.5 4 8 1.5 10.5 4M8 10v4.5M5.5 12 8 14.5l2.5-2.5" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/></svg></button></span></div>' + ST.tracks.map(t => {
     const c = tColor(t), I2 = t.type === 'inst' ? FAMS[(INST[t.sound] || INST.piano).fam].icon : '<svg viewBox="0 0 24 24"><path d="M3 12h2l2-5 3 10 3-14 3 12 2-3h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
-    const sub = t.type === 'inst' ? (INST[t.sound] || INST.piano).name + ' · ' + t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : t.clips.length + ' clip' + (t.clips.length === 1 ? '' : 's');
+    const sub = (t.pitch ? (t.pitch > 0 ? '+' : '') + t.pitch + ' st · ' : '') + (t.type === 'inst' ? (INST[t.sound] || INST.piano).name + ' · ' + t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : t.clips.length + ' clip' + (t.clips.length === 1 ? '' : 's'));
     return `<div class="sthead${t.id === ST.sel ? ' sel' : ''}${ST.recording && ST.recTrack === t.id ? ' armed' : ''}" data-id="${t.id}" style="--tc:${c}">
       <span class="bar"></span><div class="in">
       <div class="t1"><b title="${escapeHTML(t.name)}">${escapeHTML(t.name)}</b>
@@ -4868,7 +4947,7 @@ function trackMenu(t, btn) {
     '-',
     { label: 'Delete track', fn: async () => {
       if (!(await askConfirm('Are you sure you want to delete the track “' + t.name + '”? You can undo this right after.', 'Delete'))) return;
-      if (ST.playing) stStop(); stPush(); ST.tracks = ST.tracks.filter(x => x !== t); { const c = ST.ch.get(t.id); if (c) { try { c.p.disconnect(); c.insts.forEach(x => x.stop && x.stop()); } catch (e) {} } } ST.ch.delete(t.id);
+      if (ST.playing) stStop(); stPush(); ST.tracks = ST.tracks.filter(x => x !== t); { const c = ST.ch.get(t.id); if (c) { try { c.p.disconnect(); c.ps.stop(); c.insts.forEach(x => x.stop && x.stop()); } catch (e) {} } } ST.ch.delete(t.id);
       if (ST.sel === t.id) ST.sel = ST.tracks.length ? ST.tracks[0].id : null; renderStudio(); toast('Deleted “' + t.name + '”');
     } }
   ]);
@@ -5379,8 +5458,8 @@ const fxParams = e => { const d = FXBY[e.type]; const p = {}; d.params.forEach(x
 function effectsOf(t) { if (!t.effects) t.effects = t.type === 'inst' ? [{ id: sUid(), type: 'room', on: true, p: { mix: 0.16 } }] : []; return t.effects; }
 const fxSig = t => effectsOf(t).filter(e => e.on && FXBY[e.type]).map(e => e.type + ':' + FXBY[e.type].params.filter(x => x.rebuild).map(x => fxParams(e)[x.k]).join(',')).join('|');
 function buildTrackChain(c2, dest) {
-  const n = { g: c2.createGain(), fxIn: c2.createGain(), p: c2.createStereoPanner ? c2.createStereoPanner() : c2.createGain(), insts: [], sig: null };
-  n.g.connect(n.fxIn); n.p.connect(dest); return n;
+  const n = { g: c2.createGain(), fxIn: c2.createGain(), p: c2.createStereoPanner ? c2.createStereoPanner() : c2.createGain(), insts: [], sig: null, ps: makePitchShifter(c2) };
+  n.g.connect(n.ps.in); n.ps.out.connect(n.fxIn); n.p.connect(dest); return n;
 }
 function wireFx(c2, n, t, instant) {
   try { n.fxIn.disconnect(); } catch (e) {}
@@ -5396,6 +5475,7 @@ function wireFx(c2, n, t, instant) {
 function setChainParams(c2, n, t, instant, on = true) {
   const now = c2.currentTime, set = (prm, v) => instant ? (prm.value = v) : prm.setTargetAtTime(v, now, 0.02), info = { spb: spb() };
   set(n.g.gain, on ? t.vol : 0); if (n.p.pan) set(n.p.pan, t.pan || 0);
+  n.ps.set(transposes(t) ? 0 : clamp(semisOf(t), -12, 12), instant);
   n.insts.forEach(x => x.set(fxParams(x.fx), set, info));
 }
 
@@ -5421,7 +5501,7 @@ function fxPic(kind, col) {
   return `<svg viewBox="0 0 80 60" aria-hidden="true">${body}</svg>`;
 }
 function renderFxRack(t) {
-  fxK.vol.set(t.vol, true); fxK.pan.set(t.pan || 0, true);
+  fxK.vol.set(t.vol, true); fxK.pan.set(t.pan || 0, true); fxK.pitch.set(t.pitch || 0, true);
   const list = effectsOf(t), box = $('#stFxChain');
   if (!list.length) { box.innerHTML = '<p class="fxempty">No effects on this track yet. Tap <b>+ Add effect</b> to browse reverb, echo, EQ, amps and more, like BandLab.</p>'; return; }
   box.innerHTML = list.map((e, i) => {
@@ -5463,6 +5543,7 @@ const fxK = {};
 {
   const upd = (key, v) => { const t = stSelTrack(); if (!t) return; if (key === 'vol') { t.vol = v; const r = document.querySelector(`.sthead[data-id="${t.id}"] input[data-h="vol"]`); if (r) r.value = v; } else t.pan = v; stMix(); stDirty(); };
   fxK.vol = makeKnob($('#fxVol'), { min: 0, max: 1.2, value: 0.8, def: 0.8, fmt: pctF, onChange: v => upd('vol', v) });
+  fxK.pitch = makeKnob($('#fxPitch'), { min: -12, max: 12, step: 1, value: 0, def: 0, bip: true, fmt: semiFmt, onChange: v => { const t = stSelTrack(); if (!t) return; t.pitch = v; stRepitch(); stDirty(); renderStHeads(); } });
   fxK.pan = makeKnob($('#fxPan'), { min: -1, max: 1, value: 0, def: 0, bip: true, fmt: v => Math.abs(v) < 0.03 ? 'Center' : (v < 0 ? 'L ' : 'R ') + Math.round(Math.abs(v) * 100), onChange: v => upd('pan', v) });
 }
 
@@ -5585,7 +5666,7 @@ stRoll.addEventListener('scroll', () => stRollDraw(), { passive: true });
   let drag = null;
   const at = e => { const r = stRollCv.getBoundingClientRect(); const vx = e.clientX - r.left, vy = e.clientY - r.top; return { vx, vy, b: (vx - GUT + stRoll.scrollLeft) / ST.rp, m: HI_NOTE - Math.floor((vy + stRoll.scrollTop) / ST.rowH) }; };
   const hit = (t, p) => { for (let i = t.notes.length - 1; i >= 0; i--) { const n = t.notes[i]; if (n.m === p.m && p.b >= n.t && p.b <= n.t + Math.max(n.d, 6 / ST.rp)) return n; } return null; };
-  const preview = (t, m) => { stInit(); const v = startVoice(ctx, stChan(t).g, t.sound, m, 0.7, ctx.currentTime); v.release(ctx.currentTime + 0.25); stMix(); };
+  const preview = (t, m) => { stInit(); const v = startVoice(ctx, stChan(t).g, t.sound, playM(t, m), 0.7, ctx.currentTime); v.release(ctx.currentTime + 0.25); stMix(); };
   stRollCv.addEventListener('pointerdown', e => {
     if (e.button > 0) return; const t = stSelTrack(); if (!t || t.type !== 'inst') return;
     const p = at(e); stRoll.focus({ preventScroll: true });
@@ -5742,7 +5823,7 @@ function stSnapshot(title) {
   const used = new Set(); ST.tracks.forEach(t => (t.clips || []).forEach(c => used.add(c.key)));
   const audio = {}; used.forEach(k => { if (ST.blobs.has(k)) audio[k] = ST.blobs.get(k); });
   const notes = ST.tracks.reduce((a, t) => a + (t.notes ? t.notes.length : 0), 0);
-  return { kind: 'studio', title, bpm: ST.bpm, snap: ST.snap, metro: ST.metro, tracks: JSON.parse(JSON.stringify(ST.tracks)), audio, length: stEnd() * spb(), trackCount: ST.tracks.length, noteCount: notes };
+  return { kind: 'studio', title, bpm: ST.bpm, snap: ST.snap, metro: ST.metro, pitch: ST.pitch || 0, tracks: JSON.parse(JSON.stringify(ST.tracks)), audio, length: stEnd() * spb(), trackCount: ST.tracks.length, noteCount: notes };
 }
 async function stSave() {
   if (!ST.tracks.length) return toast('Add a track and record something first, then save.');
@@ -5762,7 +5843,7 @@ async function stSave() {
 }
 function stReset() {
   if (ST.playing) stStop(); stReleaseAll();
-  ST.tracks = []; ST.sel = ST.selClip = ST.selNote = null; ST.range = null; ST.moving = null; ST.pos = 0; ST.undo = []; ST.redo = []; ST.ch.forEach(c => { try { c.p.disconnect(); c.insts.forEach(x => x.stop && x.stop()); } catch (e) {} }); ST.ch.clear();
+  ST.tracks = []; ST.sel = ST.selClip = ST.selNote = null; ST.range = null; ST.moving = null; ST.pos = 0; ST.undo = []; ST.redo = []; ST.ch.forEach(c => { try { c.p.disconnect(); c.ps.stop(); c.insts.forEach(x => x.stop && x.stop()); } catch (e) {} }); ST.ch.clear(); ST.pitch = 0; stPitchUI();
   ST.bufs.clear(); ST.blobs.clear(); ST.peaks.clear(); ST.bpm = 100; ST.metro = false; ST.snap = 0.25; ST.project = { id: null, created: null }; ST.dirty = false;
   $('#stTitle').value = ''; $('#stBpm').value = 100; $('#stSnap').value = '0.25'; stRoll.dataset.for = '';
 }
@@ -5776,7 +5857,7 @@ async function stOpen(id) {
   try {
     const p = await idbGet(id, 'studio'); if (!p) return toast('That song could not be found.');
     stInit(); stReset(); toast('Opening “' + (p.title || 'Untitled') + '”…');
-    ST.tracks = p.tracks || []; ST.bpm = p.bpm || 100; ST.snap = p.snap ?? 0.25; ST.metro = !!p.metro;
+    ST.tracks = p.tracks || []; ST.bpm = p.bpm || 100; ST.snap = p.snap ?? 0.25; ST.metro = !!p.metro; ST.pitch = p.pitch || 0; stPitchUI();
     $('#stBpm').value = ST.bpm; $('#stSnap').value = String(ST.snap); $('#stTitle').value = p.title || '';
     for (const [k, blob] of Object.entries(p.audio || {})) {
       try { const buf = await decodeAB(await blob.arrayBuffer()); ST.blobs.set(k, blob); ST.bufs.set(k, buf); ST.peaks.set(k, computePeaks(buf)); } catch (e) {}
@@ -5829,7 +5910,7 @@ async function stRender() {
   for (const t of ST.tracks) {
     if (t.mute || (solo && !t.solo)) continue;
     const ch = buildTrackChain(off, bus); wireFx(off, ch, t, true); const g = ch.g;
-    if (t.type === 'inst') for (const n of t.notes) startVoice(off, g, t.sound, n.m, n.v || 0.8, 0.05 + n.t * s).release(0.05 + (n.t + n.d) * s);
+    if (t.type === 'inst') for (const n of t.notes) startVoice(off, g, t.sound, playM(t, n.m), n.v || 0.8, 0.05 + n.t * s).release(0.05 + (n.t + n.d) * s);
     else for (const c of t.clips) { const b = ST.bufs.get(c.key); if (!b) continue; const src = off.createBufferSource(); src.buffer = b; src.connect(g); src.start(0.05 + c.start * s, c.off, c.len); }
   }
   return off.startRendering();
@@ -5880,6 +5961,12 @@ function stFit() {
   toast('Showing the whole song and all ' + ST.tracks.length + ' track' + (ST.tracks.length === 1 ? '' : 's'));
 }
 $('#stFit').addEventListener('click', stFit);
+/* pitch changes: notes that are already scheduled are restarted so you hear the new pitch right away */
+function stRepitch() { stMix(); if (ST.playing && !ST.recording) { const b = stNow(); stStop(); ST.pos = b; stPlay(); } }
+function stPitchUI() { const v = ST.pitch || 0, el = $('#stPitchVal'); el.textContent = (v > 0 ? '+' : '') + v; el.classList.toggle('on', !!v); el.title = 'Whole song: ' + semiFmt(v).toLowerCase(); }
+const stSongPitch = d => { if (ST.recording) return; ST.pitch = clamp((ST.pitch || 0) + d, -12, 12); stPitchUI(); stRepitch(); stDirty(); toast('Whole song: ' + semiFmt(ST.pitch).toLowerCase() + (ST.pitch ? (ST.pitch > 0 ? ' higher' : ' lower') : '')); };
+$('#stPitchDn').addEventListener('click', () => stSongPitch(-1));
+$('#stPitchUp').addEventListener('click', () => stSongPitch(1));
 stTl.addEventListener('wheel', e => {
   if (!(e.ctrlKey || e.metaKey)) return; e.preventDefault();
   const r = stTl.getBoundingClientRect(), f = Math.exp(-e.deltaY * 0.0025);
