@@ -356,7 +356,6 @@ html.phone body.mode-create .proj input{padding:6px 9px;font-size:16px}
 html.phone body.mode-create .master{display:flex;width:auto;order:0;flex-wrap:nowrap;gap:6px}
 html.phone body.mode-create .master .kn{display:none}
 html.phone body.mode-create .master .btn{min-height:36px;padding:6px 10px}
-html.phone body.mode-create .master .home{position:static;min-height:36px}
 html.phone body.mode-create .statusbar{display:none}
 html.phone body.mode-create #createView{padding:6px 8px max(6px,env(safe-area-inset-bottom));gap:6px}
 html.phone body.mode-create .cbar,html.phone body.mode-create .pbar{padding:5px 8px}
@@ -376,7 +375,6 @@ body.mode-home .statusbar{margin-top:auto}
 .hbrand svg{width:42px;height:42px}
 .hbrand b{font-size:clamp(24px,4vw,32px);letter-spacing:-.02em}
 .hbrand b span{background:linear-gradient(90deg,var(--a),var(--b));-webkit-background-clip:text;background-clip:text;color:transparent}
-.hbrand .home{position:absolute;right:0;top:50%;transform:translateY(-50%)}
 .hcols{display:grid;grid-template-columns:1fr 1fr;gap:clamp(10px,2.5vw,28px)}
 .hcol{display:grid;gap:12px;align-content:start;min-width:0}
 .hbtn{appearance:none;-webkit-appearance:none;width:100%;border-radius:22px;border:1px solid var(--line2);padding:clamp(16px,3.5vw,34px) 12px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;color:var(--ink);transition:transform .15s,box-shadow .15s,border-color .15s;touch-action:manipulation}
@@ -687,6 +685,9 @@ body.np-open{overflow:hidden}
 .rcredit a{color:var(--soft)}
 .rplayer{position:fixed;left:50%;bottom:max(12px,env(safe-area-inset-bottom));transform:translateX(-50%);z-index:35;width:min(760px,calc(100% - 20px));display:flex;align-items:center;gap:10px;padding:8px 10px;border-radius:16px;background:linear-gradient(#1a2a26,#111a18);border:1px solid rgba(52,211,153,.45);box-shadow:0 18px 40px -14px #000,0 0 24px -12px #34d399}
 .rplayer[hidden]{display:none}
+.updbar{position:fixed;left:50%;top:max(10px,env(safe-area-inset-top));transform:translateX(-50%);z-index:75;display:flex;align-items:center;gap:8px;flex-wrap:nowrap;white-space:nowrap;justify-content:center;width:max-content;max-width:calc(100% - 16px);padding:8px 8px 8px 14px;border-radius:14px;background:linear-gradient(#1d2335,#141824);border:1px solid #22d3ee;box-shadow:0 14px 34px -12px #000,0 0 22px -10px #22d3ee;font:700 13.5px var(--sans);color:var(--ink);animation:updIn .35s cubic-bezier(.2,.9,.3,1.2)}
+.updbar[hidden]{display:none}
+@keyframes updIn{from{opacity:0;transform:translate(-50%,-14px)}to{opacity:1;transform:translate(-50%,0)}}
 .rplayer{transform:translateX(calc(-50% + var(--dx,0px))) translateY(var(--dy,0px));touch-action:none;user-select:none;-webkit-user-select:none}
 .rplayer.dragging{transition:none;cursor:grabbing}
 .rplayer.snap{transition:transform .25s cubic-bezier(.3,1.3,.5,1),opacity .25s}
@@ -839,8 +840,7 @@ html.phone body.mode-create .btn{min-height:38px}
   .master .kn{grid-row:span 2}
   .master .btn{justify-content:center;min-height:44px;padding:8px 10px}
   .master .rectime{grid-column:2 / -1;text-align:center}
-  /* phones: Home sits in the top-right corner; the Hub link lives on the SpinLab home screen */
-  header.top .master .home{display:none}
+  /* phones: Home sits in the top-right corner */
   #homeBtn{position:absolute;top:10px;right:12px;min-height:36px}
   .brand + .proj{margin-top:2px}
   dialog#lib{width:100vw;max-width:100vw;height:100vh;height:100dvh;max-height:none;margin:0;border:0;border-radius:0;padding:0;inset:0}
@@ -882,7 +882,6 @@ html.phone body.mode-create .btn{min-height:38px}
     <button class="btn rec" id="recBtn" title="Record everything you hear, live, into an MP3 file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record live</span></button>
     <span class="rectime" id="recTime"></span>
     <button class="btn ghost" id="helpBtn" title="How to use SpinLab and keyboard shortcuts"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 6.2a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.1v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".9" fill="currentColor"/></svg>Help</button>
-    <a class="home" href="../">&larr; Hub</a>
   </div>
 </header>
 
@@ -971,7 +970,6 @@ html.phone body.mode-create .btn{min-height:38px}
   <div class="hbrand">
     <svg viewBox="0 0 64 64" aria-hidden="true"><rect width="64" height="64" rx="14" fill="#141824"/><circle cx="30" cy="34" r="20" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="30" cy="34" r="7" fill="#f472b6"/><circle cx="30" cy="34" r="2" fill="#0b0d14"/><path d="M50 8v22l-6 6" fill="none" stroke="#e2e8f0" stroke-width="3.5" stroke-linecap="round"/></svg>
     <b>Spin<span>Lab</span></b><span class="ver" id="ver3"></span>
-    <a class="home" href="../">&larr; Hub</a>
   </div>
   <div class="hcols">
     <div class="hcol dj">
@@ -1061,6 +1059,7 @@ html.phone body.mode-create .btn{min-height:38px}
   <button class="btn rpbtn mlike" id="mpLike" aria-label="Add to Liked songs" aria-pressed="false">♡</button>
   <input type="range" id="mpVol" min="0" max="1" step="0.01" value="0.9" aria-label="Music volume">
 </div>
+<div class="updbar" id="updBar" hidden role="status"><span>New SpinLab version ready</span><button type="button" class="btn sm primary" id="updGo">Update now</button><button type="button" class="btn sm ghost" id="updLater" aria-label="Later">Later</button></div>
 <audio id="rAudio" preload="none"></audio>
 <audio id="mAudio" preload="none"></audio>
 <section class="np" id="np" hidden role="dialog" aria-modal="true" aria-label="Now playing">
@@ -1227,7 +1226,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.25'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.26'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
@@ -3641,7 +3640,28 @@ renderHomeRadio();
   document.querySelectorAll('.supportlink').forEach(a => { a.href = 'https://cash.app/$' + encodeURIComponent(tag); a.hidden = false; a.title = 'Opens Cash App to $' + tag; }); })();
 /* installable app: register the offline helper (only on the real website, not in a downloaded copy) */
 if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !document.querySelector('meta[name="spinlab-offline"]'))
-  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js', { updateViaCache: 'none' }).then(r => r.update()).catch(() => {}));
+/* Every update reaches the installed app on its own: each launch loads the newest version, a note confirms it,
+   and if the app has been left open, it checks again when you come back to it. */
+{
+  let seen = null; try { seen = localStorage.getItem('spinlab-seen-version'); localStorage.setItem('spinlab-seen-version', APP_VERSION); } catch (e) {}
+  if (seen && seen !== APP_VERSION) addEventListener('load', () => setTimeout(() => toast('SpinLab updated to v' + APP_VERSION), 600));
+  const newer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
+  let lastCheck = 0;
+  const check = async () => {
+    if (!/^https?:$/.test(location.protocol) || document.querySelector('meta[name="spinlab-offline"]') || navigator.onLine === false) return;
+    if (Date.now() - lastCheck < 60000) return; lastCheck = Date.now();
+    try {
+      const html = await (await fetch(location.pathname + '?v=' + Date.now(), { cache: 'no-store' })).text();
+      const m = /const APP_VERSION = '([\d.]+)'/.exec(html);
+      if (m && newer(m[1], APP_VERSION)) $('#updBar').hidden = false;
+    } catch (e) {}
+  };
+  document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'visible') check(); });
+  setInterval(check, 30 * 60000);
+  $('#updGo').addEventListener('click', () => location.reload());
+  $('#updLater').addEventListener('click', () => { $('#updBar').hidden = true; lastCheck = Date.now() + 30 * 60000; });
+}
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 var MUS = { audio: $('#mAudio'), results: [], tab: 'songs', track: null, state: '', dir: 1, cache: new Map(), loading: false, searched: false };
 const mLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch (e) { return d; } };
