@@ -280,6 +280,24 @@ footer.foot a{color:var(--soft)}
 .mlactions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
 .mlactions .btn svg{color:currentColor}
 .mltabs{display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--line2)}
+.mldev{border:1px solid var(--line2);border-radius:12px;background:#10131d;padding:10px 12px;margin-bottom:14px}
+.mldev h3{margin:12px 0 4px}
+.mldev .hint{margin:0 0 8px}
+.mldevhead{display:flex;align-items:center;gap:10px}
+.mldot{width:10px;height:10px;border-radius:50%;background:#4b5563;flex:none}
+.mldev.on .mldot{background:#34d399;box-shadow:0 0 10px #34d399}
+.mldevtxt{flex:1;min-width:0;display:flex;flex-direction:column}
+.mldevtxt b{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mldevtxt small{color:var(--dim);font-size:12px}
+.mldevhead input[type=text]{flex:1;min-width:0;width:auto;font:600 14px var(--sans,inherit);padding:6px 9px}
+.mlknobs{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px;max-height:220px;overflow:auto}
+.mlknobs li{display:flex;align-items:center;gap:8px}
+.mlkn{display:flex;flex-direction:column;gap:4px;min-width:82px}
+.mlkn b{font:700 12px var(--mono)}
+.mlbar{display:block;height:5px;border-radius:3px;background:#262d40;overflow:hidden}
+.mlbar i{display:block;height:100%;background:linear-gradient(90deg,#a78bfa,#f472b6);transition:width .08s}
+.mlarrow{color:var(--dim)}
+.mlknobs select{flex:1;min-width:0;width:auto;font-size:13px;padding:7px 28px 7px 10px}
 .mltab{appearance:none;border:0;background:none;color:var(--soft);font:700 13px var(--sans,inherit);padding:8px 12px;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px}
 .mltab.on{color:#fff;border-bottom-color:#a78bfa}
 .mltab span{display:inline-block;min-width:18px;padding:0 5px;border-radius:999px;background:#a78bfa33;color:#c4b5fd;font-size:11px;margin-left:4px}
@@ -1668,6 +1686,13 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <button class="btn" type="button" id="mlSaveSong">Save whole song as MIDI</button>
     <input type="file" id="mlFile" accept=".mid,.midi,audio/midi,audio/x-midi" multiple hidden>
   </div>
+  <section class="mldev" id="mlDev" aria-label="Your MIDI device">
+    <div class="mldevhead"><span class="mldot" aria-hidden="true"></span><span class="mldevtxt"><b id="mlDevName">No MIDI device connected</b><small id="mlDevInfo"></small></span>
+      <button class="btn sm" type="button" id="mlDevRen">Rename</button><button class="btn sm primary" type="button" id="mlDevConnect">Connect</button></div>
+    <h3>Device knobs → effects</h3>
+    <p class="hint" id="mlKnobHint"></p>
+    <ul class="mlknobs" id="mlKnobs"></ul>
+  </section>
   <div class="mltabs" role="tablist"><button type="button" class="mltab on" role="tab" data-mtab="saved" aria-selected="true">Saved <span id="mlCount">0</span></button><button type="button" class="mltab" role="tab" data-mtab="recent" aria-selected="false">Recent</button></div>
   <ul class="liblist mllist" id="mlList"></ul>
   <p class="hint">MIDI files hold notes, not sound, so SpinLab plays them with its own instruments. Tap a MIDI to add it to your song. Everything stays in this browser on this device.</p>
@@ -1800,7 +1825,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.44'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.45'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Request a feature: requests are emailed through FormSubmit (formsubmit.co).
@@ -1813,7 +1838,7 @@ const ADSENSE_CLIENT = '';
 const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
-const RELEASES = [["1.0.44", "Nov 20, 2026", "Rebuilt the voice instruments so they sound like singing: each choir has five singers with their own vibrato, the vowels (aah, ooh, oh, hum) are shaped like a real mouth, high notes use women's voices and low notes men's, and Solo voice slides into each note."], ["1.0.43", "Nov 20, 2026", "New + MIDI button in Add track and a MIDI library with Saved and Recent tabs: import .mid files as instrument tracks, add a track for your MIDI keyboard, save a track or the whole song as MIDI, and download .mid files. The MIDI window also remembers devices you used before."], ["1.0.42", "Nov 20, 2026", "MIDI keyboards and controllers: SpinLab asks to connect once and remembers your device (with a name you can change) and the knobs you assign, then your keys play the Piano and the studio, pads trigger DJ hot cues, the sustain pedal works, and your controller's knobs turn SpinLab's knobs. Assign any knob with Assign a knob."], ["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
+const RELEASES = [["1.0.45", "Nov 20, 2026", "Devices you used before reconnect by themselves with their saved name and knobs; only a brand-new device gets a one-time setup offer. The MIDI library now shows which device is connected (rename it right there) and lets you link each knob on your device to the selected track's volume, pan, pitch or any effect knob. Knobs you turn appear automatically with a live level bar."], ["1.0.44", "Nov 20, 2026", "Rebuilt the voice instruments so they sound like singing: each choir has five singers with their own vibrato, the vowels (aah, ooh, oh, hum) are shaped like a real mouth, high notes use women's voices and low notes men's, and Solo voice slides into each note."], ["1.0.43", "Nov 20, 2026", "New + MIDI button in Add track and a MIDI library with Saved and Recent tabs: import .mid files as instrument tracks, add a track for your MIDI keyboard, save a track or the whole song as MIDI, and download .mid files. The MIDI window also remembers devices you used before."], ["1.0.42", "Nov 20, 2026", "MIDI keyboards and controllers: SpinLab asks to connect once and remembers your device (with a name you can change) and the knobs you assign, then your keys play the Piano and the studio, pads trigger DJ hot cues, the sustain pedal works, and your controller's knobs turn SpinLab's knobs. Assign any knob with Assign a knob."], ["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
 /* release notes table at the bottom of the page: add a row here with every update */
 const verNewer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
 /* the table merges this copy's notes with the newest notes from the website, so versions you don't have yet show up marked New */
@@ -4578,26 +4603,40 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   function noteOff(m) { const w = MIDI.held.get(m); MIDI.held.delete(m); if (w === 'create') releaseNote(m); else if (w === 'studio') stRelease(m); }
   function stopLearn() { MIDI.learn = false; if (MIDI.target) MIDI.target.classList.remove('midilearn'); MIDI.target = null; document.body.classList.remove('midi-learning'); }
   function cc(n, v) {
+    window.dispatchEvent(new CustomEvent('spinlab-midi-cc', { detail: { n, v } }));
     if (n === 64) { if (MODE === 'create') { CR.susKey = v >= 64; crSetSus(); } return; }
     if (n === 120 || n === 123) { [...MIDI.held.keys()].forEach(noteOff); return; }
     const dev = curDev();
     if (MIDI.learn && MIDI.target) { const label = MIDI.target.getAttribute('aria-label'); (dev ? devRec(dev) : (MIDI.devs['*'] = MIDI.devs['*'] || { nick: '', map: {} })).map[n] = label; saveMap(); stopLearn(); toast('Linked ' + (dev ? devName(dev) + ' ' : '') + 'knob ' + n + ' to ' + label + '. Saved for next time.'); return; }
     const mp = mapFor(dev);
-    if (mp[n]) { const el = [...document.querySelectorAll('.knob')].find(x => visible(x) && x.getAttribute('aria-label') === mp[n]); if (el) return setFromCC(el._knob, v); }
+    if (mp[n]) { const all = [...document.querySelectorAll('.knob')].filter(x => x._knob && x.getAttribute('aria-label') === mp[n]), el = all.find(visible) || all[0]; if (el) return setFromCC(el._knob, v); }
     const i = ccIndex(n); if (i < 0) return; const k = defaultKnob(i); if (k) setFromCC(k, v);
   }
-  const wire = () => { inputs().forEach(x => { x.onmidimessage = onMsg; }); renderDlg(); };
+  const wire = () => { inputs().forEach(x => { x.onmidimessage = onMsg; }); renderDlg(); window.dispatchEvent(new Event('spinlab-midi-change')); };
   async function connect(quiet) {
     if (!supported) { if (!quiet) toast('This browser can’t use MIDI. Try Chrome or Edge.'); return false; }
     try {
       MIDI.access = await navigator.requestMIDIAccess({ sysex: false });
-      MIDI.access.onstatechange = e => { const p = e.port; if (p && p.type === 'input' && p.state === 'connected') devRec(p), saveMap(); wire(); if (p && p.type === 'input') toast(devName(p) + (p.state === 'connected' ? ' connected' : ' unplugged')); };
+      MIDI.access.onstatechange = e => {
+        const p = e.port; if (!p || p.type !== 'input') return wire();
+        const isNew = p.state === 'connected' && !MIDI.devs[devKey(p)];
+        if (p.state === 'connected') { devRec(p).seen = Date.now(); saveMap(); }
+        wire();
+        if (isNew) newDevice(p); else toast(devName(p) + (p.state === 'connected' ? ' connected with your saved settings' : ' unplugged'));
+      };
+      const fresh = inputs().filter(x => x.state === 'connected' && !MIDI.devs[devKey(x)]);
       pref('on'); inputs().forEach(devRec); saveMap(); wire();
+      if (quiet && fresh.length) newDevice(fresh[0]);
       const n = inputs().filter(x => x.state === 'connected');
       if (!quiet) toast(n.length ? 'MIDI ready: ' + n.map(devName).join(', ') : 'MIDI is allowed. Plug in your keyboard or controller.');
-      else if (n.length) toast(n.map(devName).join(', ') + ' is connected');
+      else if (n.length && !fresh.length) toast(n.map(devName).join(', ') + ' is connected with your saved settings');
       return true;
     } catch (e) { if (!quiet) toast('MIDI wasn’t allowed. You can allow it in your browser’s site settings.'); pref('no'); renderDlg(); return false; }
+  }
+  /* a device SpinLab has never seen gets a one-time setup offer; devices you used before just reconnect with their name and knobs */
+  function newDevice(p) {
+    const bar = $('#midiBar'); bar.querySelector('span').textContent = 'New MIDI device: ' + (p.name || 'Untitled device') + '. Give it a name and set up its knobs? SpinLab remembers it next time.';
+    $('#midiBarYes').textContent = 'Set up'; bar.dataset.kind = 'new'; bar.hidden = false; clearTimeout(newDevice.t); newDevice.t = setTimeout(() => { bar.hidden = true; }, 25000);
   }
   /* ask once when you open DJ, Piano or the studio; reconnect quietly if it is already allowed */
   async function maybeAsk() {
@@ -4606,10 +4645,14 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
     if (state === 'denied') return;
     if (state === 'granted' || pref() === 'on') return void connect(true);
     if (pref() === 'no' || maybeAsk.shown) return;
-    maybeAsk.shown = true; $('#midiBar').hidden = false; setTimeout(() => { $('#midiBar').hidden = true; }, 20000);
+    maybeAsk.shown = true; const bar = $('#midiBar'); bar.dataset.kind = ''; bar.querySelector('span').textContent = 'Using a MIDI keyboard or controller? Connect it to play notes and turn SpinLab\'s knobs.'; $('#midiBarYes').textContent = 'Connect'; bar.hidden = false; setTimeout(() => { $('#midiBar').hidden = true; }, 20000);
   }
-  $('#midiBarYes').addEventListener('click', async () => { $('#midiBar').hidden = true; await connect(false); });
-  $('#midiBarNo').addEventListener('click', () => { $('#midiBar').hidden = true; pref('no'); toast('OK. The MIDI button connects a keyboard any time.'); });
+  $('#midiBarYes').addEventListener('click', async () => {
+    const bar = $('#midiBar'); bar.hidden = true;
+    if (bar.dataset.kind === 'new') { bar.dataset.kind = ''; if (MODE === 'studio' && window.openMidiLib) openMidiLib(); else { renderDlg(); $('#midiDlg').showModal(); } return; }
+    await connect(false);
+  });
+  $('#midiBarNo').addEventListener('click', () => { const bar = $('#midiBar'); bar.hidden = true; if (bar.dataset.kind === 'new') { bar.dataset.kind = ''; toast('OK. It works with the built-in knob layout, and SpinLab remembers it.'); return; } pref('no'); toast('OK. The MIDI button connects a keyboard any time.'); });
   document.addEventListener('click', e => { const b = e.target.closest('.midiopen'); if (!b) return; e.preventDefault(); e.stopPropagation(); closeMenu(); renderDlg(); $('#midiDlg').showModal(); }, true);
   $('#midiClose').addEventListener('click', () => $('#midiDlg').close());
   $('#midiConnect').addEventListener('click', async () => { await connect(false); renderDlg(); });
@@ -4634,7 +4677,9 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   const sm = setMode; setMode = async function (...a) { const r = await sm.apply(this, a); setTimeout(maybeAsk, 600); if (!['dj', 'create', 'studio'].includes(MODE)) $('#midiBar').hidden = true; return r; };
   /* remembered: once MIDI is allowed, SpinLab reconnects by itself every time it opens */
   addEventListener('load', async () => { if (!supported) return; let st = 'prompt'; try { st = (await navigator.permissions.query({ name: 'midi' })).state; } catch (e) {} if (st === 'granted' || (pref() === 'on' && st !== 'denied')) connect(true); });
-  window.SPINLAB_MIDI = { MIDI, onMsg, connect, renderDlg };
+  window.SPINLAB_MIDI = { MIDI, onMsg, connect, renderDlg, supported, curDev, devName, mapFor,
+    setMap(d, n, label) { const r = d ? devRec(d) : (MIDI.devs['*'] = MIDI.devs['*'] || { nick: '', map: {} }); if (label) r.map[n] = label; else { delete r.map[n]; if (MIDI.devs['*']) delete MIDI.devs['*'].map[n]; } saveMap(); renderDlg(); },
+    rename(d, v) { const r = devRec(d); r.nick = v && v !== d.name ? v : ''; saveMap(); renderDlg(); toast('Saved as ' + devName(d)); window.dispatchEvent(new Event('spinlab-midi-change')); } };
 }
 /* ---------- MIDI files: import, save and a library of saved and recent MIDI ---------- */
 const GM_MAP = (() => {
@@ -4768,6 +4813,56 @@ function makeMidi(tracks, bpm) {
   $('#mlSaveSong').addEventListener('click', () => { const ts = ST.tracks.filter(x => x.type === 'inst' && x.notes.length); if (ts.length) saveTracks(ts, $('#stTitle').value.trim() || 'Untitled song'); });
 }
 $('#stLibMidi').addEventListener('click', () => { $('#stLib').close(); openMidiLib(); });
+/* MIDI library: shows your device, its name, and lets you link its knobs to the selected track's effects */
+{
+  const M = () => window.SPINLAB_MIDI, esc = t => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  const seen = new Map();   // knob number → last value, for knobs moved while this window is open
+  function targets() {
+    const t = stSelTrack(); if (!t) return [];
+    renderFxRack(t);
+    const ks = [...document.querySelectorAll('#stFx .knob')].filter(k => k._knob && k.getAttribute('aria-label'));
+    const base = ks.filter(k => /^Track /.test(k.getAttribute('aria-label'))), fx = ks.filter(k => !/^Track /.test(k.getAttribute('aria-label')));
+    return [{ group: 'Track', items: base.map(k => k.getAttribute('aria-label')) }, { group: 'Effects on ' + (t.name || 'this track'), items: fx.map(k => k.getAttribute('aria-label')) }].filter(g => g.items.length);
+  }
+  function render() {
+    const api = M(); if (!api || !document.getElementById('mlDevName')) return;
+    const d = api.curDev(), on = !!(d && d.state === 'connected');
+    $('#mlDevName').textContent = d ? api.devName(d) : api.supported ? 'No MIDI device connected' : 'This browser can’t use MIDI';
+    $('#mlDevInfo').textContent = d ? [d.name || 'No name', d.manufacturer, on ? 'connected' : 'unplugged'].filter(Boolean).join(' · ') : api.supported ? (api.MIDI.access ? 'Plug in your keyboard or controller.' : 'Press Connect and allow MIDI when your browser asks.') : 'Use Chrome, Edge or Opera.';
+    $('#mlDev').classList.toggle('on', on);
+    $('#mlDevConnect').hidden = !!api.MIDI.access || !api.supported; $('#mlDevRen').hidden = !d;
+    const map = d ? api.mapFor(d) : {}, nums = [...new Set([...Object.keys(map).map(Number), ...seen.keys()])].sort((a, b) => a - b);
+    const tg = targets(), t = stSelTrack();
+    $('#mlKnobHint').textContent = !t ? 'Select a track first, then turn a knob on your device to link it to that track’s effects.' : nums.length ? 'Pick what each knob controls. “Built-in” uses SpinLab’s standard layout.' : 'Turn a knob or slider on your device and it shows up here.';
+    $('#mlKnobs').innerHTML = nums.map(n => {
+      const cur = map[n] || '', has = tg.some(g => g.items.includes(cur));
+      const opts = '<option value="">Built-in</option>' + (cur && !has ? `<option value="${esc(cur)}" selected>${esc(cur)}</option>` : '')
+        + tg.map(g => `<optgroup label="${esc(g.group)}">${g.items.map(l => `<option value="${esc(l)}"${l === cur ? ' selected' : ''}>${esc(l.replace(/^Track /, '').replace(/^./, c => c.toUpperCase()))}</option>`).join('')}</optgroup>`).join('');
+      const v = seen.get(n);
+      return `<li data-n="${n}"><span class="mlkn"><b>Knob ${n}</b><i class="mlbar"><i style="width:${v == null ? 0 : Math.round(v / 127 * 100)}%"></i></i></span><span class="mlarrow" aria-hidden="true">→</span><select data-cc="${n}" aria-label="What knob ${n} controls">${opts}</select>${map[n] ? `<button class="btn sm" type="button" data-unmap="${n}" aria-label="Unlink knob ${n}">✕</button>` : ''}</li>`;
+    }).join('');
+  }
+  window.addEventListener('spinlab-midi-cc', e => {
+    if (!$('#midiLib').open) return; const { n, v } = e.detail; const isNew = !seen.has(n); seen.set(n, v);
+    if (isNew) return render();
+    const bar = $('#mlKnobs').querySelector(`li[data-n="${n}"] .mlbar i`); if (bar) bar.style.width = Math.round(v / 127 * 100) + '%';
+  });
+  window.addEventListener('spinlab-midi-change', () => { if ($('#midiLib').open) render(); });
+  $('#mlKnobs').addEventListener('change', e => {
+    const s = e.target.closest('select[data-cc]'); if (!s) return; const api = M(), d = api.curDev(), n = +s.dataset.cc;
+    api.setMap(d, n, s.value || null); toast(s.value ? 'Knob ' + n + ' now controls ' + s.value + (d ? ' on ' + api.devName(d) : '') : 'Knob ' + n + ' is back to its built-in job'); render();
+  });
+  $('#mlKnobs').addEventListener('click', e => { const b = e.target.closest('[data-unmap]'); if (!b) return; const api = M(); api.setMap(api.curDev(), +b.dataset.unmap, null); render(); });
+  $('#mlDevConnect').addEventListener('click', async () => { await M().connect(false); render(); });
+  $('#mlDevRen').addEventListener('click', () => {
+    const api = M(), d = api.curDev(); if (!d) return; const box = $('#mlDevName'), inp = document.createElement('input');
+    inp.type = 'text'; inp.maxLength = 40; inp.value = api.devName(d); inp.setAttribute('aria-label', 'Name for this MIDI device'); box.replaceWith(inp); inp.focus(); inp.select();
+    let fin = false; const done = ok => { if (fin) return; fin = true; inp.replaceWith(box); if (ok) api.rename(d, inp.value.trim()); render(); };
+    inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); done(true); } else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); done(false); } });
+    inp.addEventListener('blur', () => done(true), { once: true });
+  });
+  const op = window.openMidiLib; window.openMidiLib = () => { seen.clear(); op(); render(); };
+}
 /* AdSense side ads: only on the real website, only once the IDs are set, only on wide screens */
 (() => {
   if (!ADSENSE_CLIENT || !ADSENSE_SLOT || !/^https?:$/.test(location.protocol) || document.querySelector('meta[name="spinlab-offline"]')) return;
