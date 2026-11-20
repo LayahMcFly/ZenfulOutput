@@ -28,11 +28,11 @@
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/">
 <meta name="theme-color" content="#0b0d14">
 <link rel="manifest" href="manifest.webmanifest">
-<meta name="description" content="Mix and remix songs, play dozens of instruments, and listen to radio and music from around the world. Free, right in your browser.">
+<meta name="description" content="Mix and remix songs, make songs with tracks and dozens of instruments, and listen to radio and music from around the world. Free, right in your browser.">
 <meta property="og:type" content="website">
 <meta property="og:site_name" content="SpinLab">
 <meta property="og:title" content="SpinLab: DJ, Piano, Online Radio and Music">
-<meta property="og:description" content="Mix and remix songs, play dozens of instruments, and listen to radio and music from around the world.">
+<meta property="og:description" content="Mix and remix songs, make songs with tracks and dozens of instruments, and listen to radio and music from around the world.">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/">
 <meta property="og:image" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/og-image.png">
 <meta property="og:image:width" content="1200">
@@ -40,7 +40,7 @@
 <meta property="og:image:alt" content="SpinLab logo with a turntable, sound wave and piano keys, plus DJ, Piano, Online Radio and Music labels">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:title" content="SpinLab: DJ, Piano, Online Radio and Music">
-<meta name="twitter:description" content="Mix and remix songs, play dozens of instruments, and listen to radio and music from around the world.">
+<meta name="twitter:description" content="Mix and remix songs, make songs with tracks and dozens of instruments, and listen to radio and music from around the world.">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/og-image.png">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
@@ -362,7 +362,7 @@ html.phone .pk-b .nm{bottom:10px;font-size:9.5px}
 .poct{border-radius:8px;padding:5px 10px;color:#0b0d14!important;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);transition:background .25s}
 @media (prefers-reduced-motion:reduce){ .pkb.slide-l,.pkb.slide-r{animation:none} .octflash.show{animation:none;opacity:0} }
 .pkeys.nolabels .nm{display:none}
-html.phone .pk .hk{display:none}
+
 /* phones: Create mode is landscape. If the phone can't be locked sideways, the whole app turns sideways. */
 html.phone body.mode-create header.top{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:6px 10px;scrollbar-width:none}
 html.phone body.mode-create header.top::-webkit-scrollbar{display:none}
@@ -890,6 +890,152 @@ html.phone body.mode-create .btn{min-height:38px}
   dialog#confirm .btn{min-height:44px;flex:1;justify-content:center}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+/* ===================== SpinLab studio: multitrack songs with note blocks ===================== */
+#studioView{display:none}
+body.mode-studio #studioView{display:flex}
+body.mode-studio header.top,body.mode-studio main,body.mode-studio .statusbar,body.mode-studio #home{display:none!important}
+body.mode-studio{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding-bottom:0;display:flex;flex-direction:column}
+#studioView{flex:1 1 auto;min-height:0;flex-direction:column;gap:8px;padding:10px clamp(8px,1.4vw,16px) max(8px,env(safe-area-inset-bottom));--sa:#fb923c}
+.sttop{display:flex;align-items:center;gap:8px;flex-wrap:wrap;flex:none}
+.sttop .btn svg{width:15px;height:15px}
+.stname{display:flex;align-items:center;gap:8px;flex:1 1 180px;min-width:150px;max-width:340px}
+.stname input{flex:1;min-width:0;font:700 15px var(--sans);padding:8px 10px;border-radius:10px}
+.ststate{font:700 11px var(--mono);color:var(--soft);white-space:nowrap}
+.ststate.dirty{color:var(--gold)}
+.sttrans{display:flex;align-items:center;gap:6px;padding:4px;border-radius:12px;background:#0e1220;border:1px solid var(--line2)}
+.sttrans .btn.play{--c:#34d399;min-width:58px;justify-content:center}
+.sttrans .btn.play svg{width:16px;height:16px}
+.sttrans .btn.rec{--c:var(--rec)}
+.sttrans .btn.rec svg{color:var(--rec)}
+.sttrans .btn.rec.on svg{color:#fff}
+.sttime{font:800 15px var(--mono);min-width:76px;text-align:center;color:#fff;letter-spacing:.02em}
+.sttools{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.stbpm,.stsnap{display:flex;align-items:center;gap:6px}
+.stbpm input{width:58px;text-align:center;font-size:14px;padding:7px 6px}
+.stsnap select{padding:7px 26px 7px 9px;font-size:13px}
+#stMetro.on{--c:var(--gold)}
+.stmain{flex:1 1 auto;min-height:120px;display:flex;border-radius:14px;border:1px solid var(--line);background:#090b12;overflow:hidden;position:relative}
+.stheads{flex:none;width:clamp(150px,19vw,230px);overflow:hidden;border-right:1px solid var(--line);background:linear-gradient(90deg,#121624,#0e1220);position:relative}
+.stheads .sthr{height:var(--rh);border-bottom:1px solid var(--line);display:flex;align-items:center;padding:0 10px;font:700 10px var(--mono);letter-spacing:.12em;color:var(--soft);text-transform:uppercase;position:sticky;top:0;z-index:2;background:#121624}
+.sthead{height:var(--lh);border-bottom:1px solid var(--line);display:grid;grid-template-columns:6px 1fr;cursor:pointer;position:relative}
+.sthead .bar{background:var(--tc)}
+.sthead .in{min-width:0;padding:6px 8px 6px 9px;display:flex;flex-direction:column;gap:4px;justify-content:center}
+.sthead .t1{display:flex;align-items:center;gap:6px;min-width:0}
+.sthead .t1 b{flex:1;min-width:0;font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sthead .t1 .btn{padding:3px 6px;min-height:0;font-size:11px;border-radius:6px}
+.sthead .t1 .btn svg{width:13px;height:13px}
+.sthead .ms{font:800 10.5px var(--mono);width:22px;padding:3px 0!important;justify-content:center}
+.sthead .ms.on[data-h="mute"]{--c:#f87171;background:rgba(248,113,113,.18)}
+.sthead .ms.on[data-h="solo"]{--c:#fbbf24;background:rgba(251,191,36,.18)}
+.sthead .t2{display:flex;align-items:center;gap:6px;min-width:0}
+.sthead .t2 small{flex:1;min-width:0;color:var(--soft);font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sthead input[type=range]{height:16px;width:70px;flex:none}
+.sthead input[type=range]::-webkit-slider-thumb{width:12px;height:12px;margin-top:-4px;border-radius:50%;background:var(--tc)}
+.sthead input[type=range]::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:var(--tc)}
+.sthead input[type=range]::-webkit-slider-runnable-track{height:4px}
+.sthead input[type=range]::-moz-range-track{height:4px}
+.sthead.sel{background:linear-gradient(90deg,color-mix(in srgb,var(--tc) 20%,#141a2a),#111624)}
+.sthead.sel::after{content:"";position:absolute;inset:0;border:1px solid color-mix(in srgb,var(--tc) 70%,transparent);pointer-events:none}
+.sthead.armed .t1 b::before{content:"● ";color:var(--rec)}
+.sttl{flex:1 1 auto;min-width:0;overflow:auto;position:relative;overscroll-behavior:contain;outline:none;touch-action:pan-x pan-y}
+.sttl canvas{position:sticky;left:0;top:0;display:block;z-index:1}
+.sttlin{position:absolute;left:0;top:0;pointer-events:none}
+.sttl:focus-visible{box-shadow:inset 0 0 0 2px var(--gold)}
+.stempty{position:absolute;inset:0;z-index:3;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:10px;padding:20px;pointer-events:none}
+.stempty[hidden]{display:none}
+.stempty b{font-size:20px}
+.stempty p{margin:0;max-width:440px;color:var(--soft);line-height:1.5}
+.stemptybtns{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;pointer-events:auto}
+.stadd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;flex:none}
+.stadd .lbl{margin-right:2px}
+.stdock{flex:0 0 auto;height:clamp(170px,30vh,300px);display:flex;flex-direction:column;gap:6px;border-radius:14px;border:1px solid color-mix(in srgb,var(--tc,#fb923c) 45%,var(--line));background:linear-gradient(#11151f,#0b0e16);padding:8px;min-height:0}
+.stdock[hidden]{display:none}
+.stdockbar{display:flex;align-items:center;gap:8px;flex:none;flex-wrap:wrap}
+.stdockbar .sp{flex:1}
+.stdcolor{width:12px;height:12px;border-radius:4px;background:var(--tc);flex:none}
+.stdname{font-size:14px;max-width:180px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#stDInst{gap:6px}
+#stDInst svg{width:15px;height:15px;color:var(--tc)}
+.stdtabs{display:inline-flex;border:1px solid var(--line2);border-radius:9px;padding:2px;background:#0e1220}
+.stdtab{appearance:none;-webkit-appearance:none;border:0;background:transparent;color:var(--soft);font:700 12px var(--sans);padding:5px 12px;border-radius:7px;cursor:pointer}
+.stdtab[aria-selected="true"]{background:var(--tc);color:#0b0d14}
+.stdtab:focus-visible{outline:2px solid var(--gold)}
+.stoct{font:800 12px var(--mono);min-width:30px;text-align:center}
+.stdkeysbar,.stdnotesbar,.stdaudiobar{display:inline-flex;align-items:center;gap:6px}
+.stdkeysbar[hidden],.stdnotesbar[hidden],.stdaudiobar[hidden]{display:none}
+.stkeys{flex:1 1 auto;min-height:70px}
+.stkeys[hidden]{display:none}
+.stroll{flex:1 1 auto;min-height:0;overflow:auto;position:relative;border-radius:10px;border:1px solid var(--line);background:#070910;overscroll-behavior:contain;outline:none;touch-action:pan-x pan-y}
+.stroll[hidden]{display:none}
+.stroll canvas{position:sticky;left:0;top:0;display:block;z-index:1}
+.strollin{position:absolute;left:0;top:0;pointer-events:none}
+.stroll:focus-visible{box-shadow:inset 0 0 0 2px var(--gold)}
+.staudio{flex:1 1 auto;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;text-align:center;color:var(--soft)}
+.staudio[hidden]{display:none}
+.staudio p{margin:0;max-width:520px;line-height:1.5}
+.stinstdlg{width:min(980px,96vw);max-width:96vw;height:min(640px,88vh);padding:0;display:none;flex-direction:column;overflow:hidden}
+.stinstdlg[open]{display:flex}
+.stlib{width:min(620px,94vw)}
+.stlib .libhead{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+.stlib .libhead h2{flex:1;margin:0}
+.stlib .liblist{max-height:58vh;overflow:auto}
+@media (max-height:520px) and (min-width:600px){
+  #studioView{gap:5px;padding:5px 8px max(5px,env(safe-area-inset-bottom))}
+  .sttop{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;gap:6px}
+  .sttop::-webkit-scrollbar{display:none}
+  .sttop>*{flex:none}
+  .sttools{flex-wrap:nowrap}
+  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span{display:none}
+  .stname{flex:0 0 170px;min-width:170px}
+  .sttop .btn{min-height:34px;padding:5px 9px}
+  .stadd{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .stadd::-webkit-scrollbar{display:none}
+  .stadd>*{flex:none}
+  .stdock{height:48vh;padding:5px}
+  .stdockbar{flex-wrap:nowrap}
+}
+body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
+.hcol.st .hbtn{background:radial-gradient(120% 90% at 50% 0%,rgba(251,146,60,.24),transparent 60%),linear-gradient(#211812,#120f14);border-color:color-mix(in srgb,#fb923c 45%,var(--line2))}
+.hcol.st .hbtn:hover{transform:translateY(-2px);box-shadow:0 14px 34px -14px rgba(251,146,60,.6);border-color:#fb923c}
+.hcol.st .hitem.cur{border-color:#fb923c}
+.hcol.st .i-st .nb{animation:stNote 2.4s ease-in-out infinite}
+.hcol.st .i-st .nb:nth-child(2n){animation-delay:.6s}
+.hcol.st .i-st .nb:nth-child(3n){animation-delay:1.2s}
+.hcol.st .i-st .ph{animation:stPh 3.2s linear infinite}
+@keyframes stNote{0%,100%{opacity:.75}50%{opacity:1}}
+@keyframes stPh{from{transform:translateX(0)}to{transform:translateX(62px)}}
+.hcol.st{grid-column:1 / -1}
+.hcol.st .hbtn{flex-direction:row;justify-content:flex-start;gap:22px;padding:18px 24px;text-align:left}
+.hcol.st .hbtn svg{width:clamp(86px,12vw,120px);height:auto;flex:none}
+.hcol.st .hbtn .rdtext{align-items:flex-start;text-align:left;gap:6px}
+.hcol.st .hbtn .hname{font-size:clamp(26px,3.4vw,38px)}
+.hcol.st .hbtn small{text-align:left;max-width:520px}
+@media (prefers-reduced-motion:reduce){ .hcol.st .i-st .nb,.hcol.st .i-st .ph{animation:none} }
+@media (max-width:760px){
+  #studioView{gap:6px;padding:6px 6px max(6px,env(safe-area-inset-bottom))}
+  .sttop{gap:6px}
+  .sttrans{order:3}
+  .sttools{order:4;flex-wrap:wrap;gap:5px}
+  .stname{order:2;flex:1 1 120px;min-width:110px}
+  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span{display:none}
+  .stname input{font-size:16px;padding:6px 8px}
+  .stheads{width:118px}
+  .sthead .t2 small{display:none}
+  .sthead input[type=range]{width:100%}
+  .sthead .t1 .btn[data-h="more"]{display:none}
+  .stadd{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
+  .stadd::-webkit-scrollbar{display:none}
+  .stadd>*{flex:none}
+  .stdock{height:clamp(150px,34vh,240px)}
+  .stdname{display:none}
+}
+.stdtabs[hidden],#stDInst[hidden]{display:none!important}
+#stKb .pk-w .hk{bottom:28px}
+#stKb .pk-w .nm{bottom:7px}
+#stKb .pk-b .hk{top:auto;bottom:6px}
+#stKb .pk-b .nm{display:none}
+#stKeysWrap.nohk .hk{display:none}
+#stDInst span{max-width:150px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 </style>
 </head>
 <body class="single mode-home">
@@ -1002,6 +1148,10 @@ html.phone body.mode-create .btn{min-height:38px}
     <b>Spin<span>Lab</span></b><span class="ver" id="ver3"></span>
   </div>
   <div class="hcols">
+    <div class="hcol st">
+      <button class="hbtn" id="goStudio"><svg class="i-st" viewBox="0 0 120 84" aria-hidden="true"><rect x="2" y="2" width="116" height="80" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><rect x="10" y="12" width="100" height="16" rx="4" fill="rgba(167,139,250,.16)" stroke="rgba(167,139,250,.55)"/><rect x="10" y="34" width="100" height="16" rx="4" fill="rgba(239,68,68,.14)" stroke="rgba(239,68,68,.5)"/><rect x="10" y="56" width="100" height="16" rx="4" fill="rgba(251,146,60,.14)" stroke="rgba(251,146,60,.5)"/><g fill="#a78bfa"><rect class="nb" x="14" y="21" width="12" height="4" rx="1.2"/><rect class="nb" x="28" y="17" width="8" height="4" rx="1.2"/><rect class="nb" x="38" y="15" width="16" height="4" rx="1.2"/><rect class="nb" x="58" y="19" width="10" height="4" rx="1.2"/><rect class="nb" x="72" y="16" width="14" height="4" rx="1.2"/><rect class="nb" x="90" y="21" width="12" height="4" rx="1.2"/></g><g fill="#ef4444"><rect class="nb" x="14" y="43" width="5" height="4" rx="1"/><rect class="nb" x="26" y="38" width="5" height="4" rx="1"/><rect class="nb" x="38" y="43" width="5" height="4" rx="1"/><rect class="nb" x="50" y="38" width="5" height="4" rx="1"/><rect class="nb" x="62" y="43" width="5" height="4" rx="1"/><rect class="nb" x="74" y="38" width="5" height="4" rx="1"/><rect class="nb" x="86" y="43" width="5" height="4" rx="1"/><rect class="nb" x="98" y="38" width="5" height="4" rx="1"/></g><path d="M12 64h4l3-5 4 10 4-12 4 13 3-7 4 3h4l3-6 4 9 4-11 4 12 3-6 4 2h4l3-4 4 8 4-10 4 11 3-5 4 1h6" fill="none" stroke="#fb923c" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/><g class="ph"><rect x="34" y="8" width="2.5" height="68" rx="1" fill="#f8fafc"/><path d="M31 6h8.5l-4.25 5z" fill="#f8fafc"/></g></svg><span class="rdtext"><span class="hname">SpinLab</span><small>Make your own songs with tracks, dozens of instruments, drums and your voice. Record notes and shape them as blocks.</small></span></button>
+      <div class="hlib"><div class="hlibhead"><span class="lbl">SpinLab songs</span></div><ul class="hlist" id="homeStudio"></ul></div>
+    </div>
     <div class="hcol dj">
       <button class="hbtn" id="goDJ"><svg class="i-dj" viewBox="0 0 96 96" aria-hidden="true"><rect x="4" y="10" width="88" height="76" rx="14" fill="#141824" stroke="#323a52" stroke-width="2"/><g class="spin"><circle cx="42" cy="48" r="28" fill="#0b0d14" stroke="#22d3ee" stroke-width="3"/><circle cx="42" cy="48" r="21" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="14" fill="none" stroke="#262d40" stroke-width="1.5"/><circle cx="42" cy="48" r="8" fill="#f472b6"/><path d="M42 21v7" stroke="#e2e8f0" stroke-width="3" stroke-linecap="round"/><circle cx="42" cy="48" r="2.4" fill="#0b0d14"/></g><path d="M80 18v30l-9 9" fill="none" stroke="#e2e8f0" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"/><circle cx="80" cy="18" r="4" fill="#e2e8f0"/></svg><span class="hname">DJ</span><small>Mix, loop and remix songs</small></button>
       <div class="hlib"><div class="hlibhead"><span class="lbl">DJ library</span></div><ul class="hlist" id="homeDJ" data-store="projects"></ul></div>
@@ -1067,6 +1217,86 @@ html.phone body.mode-create .btn{min-height:38px}
     <ul class="rlist" id="mList" aria-live="polite"></ul>
     <p class="rcredit">Song search and 30-second previews come from Apple’s free iTunes Search service.</p>
   </div>
+</section>
+<section id="studioView" aria-label="SpinLab studio">
+  <div class="sttop">
+    <button class="btn" id="stHome" title="Back to the SpinLab home screen"><svg viewBox="0 0 16 16"><path d="M2 7.5 8 2.5l6 5M3.8 6.3V13.5h8.4V6.3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></svg><span>Home</span></button>
+    <div class="stname"><input type="text" id="stTitle" maxlength="80" placeholder="Untitled song" aria-label="Song name" spellcheck="false"><span class="ststate" id="stState"></span></div>
+    <div class="sttrans" role="group" aria-label="Transport">
+      <button class="btn" id="stBack" aria-label="Back to the start" title="Back to the start (Home key)"><svg viewBox="0 0 16 16"><path d="M3.5 3v10" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/><path d="M13 3v10L5.5 8z" fill="currentColor"/></svg></button>
+      <button class="btn play" id="stPlay" aria-label="Play" title="Play or stop (Space)"></button>
+      <button class="btn rec" id="stRec" title="Record into the selected track (R)"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record</span></button>
+      <span class="sttime" id="stTime" aria-live="off">1.1</span>
+    </div>
+    <div class="sttools">
+      <label class="stbpm"><span class="lbl">BPM</span><input type="number" id="stBpm" min="40" max="240" step="1" value="100" aria-label="Tempo in beats per minute"></label>
+      <button class="btn" id="stMetro" aria-pressed="false" title="Metronome click"><svg viewBox="0 0 16 16"><path d="M5.5 2h5l2.5 12H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 11 11.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Click</span></button>
+      <label class="stsnap"><span class="lbl">Snap</span><select id="stSnap" aria-label="Snap notes and clips to"><option value="0">Off</option><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option></select></label>
+      <button class="btn" id="stUndo" title="Undo (Ctrl/⌘ Z)" aria-label="Undo"><svg viewBox="0 0 16 16"><path d="M5 4 2 7l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <button class="btn" id="stRedo" title="Redo (Ctrl/⌘ Shift Z)" aria-label="Redo"><svg viewBox="0 0 16 16"><path d="M11 4l3 3-3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M13.5 7H6a3.5 3.5 0 0 0 0 7h3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
+      <button class="btn" id="stZoomOut" aria-label="Zoom out" title="Zoom out">−</button>
+      <button class="btn" id="stZoomIn" aria-label="Zoom in" title="Zoom in">+</button>
+      <button class="btn" id="stSave" title="Save to your SpinLab library (Ctrl/⌘ S)"><svg viewBox="0 0 16 16"><path d="M3 2.5h8l2.5 2.5v8.5h-11z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M5.5 2.5v3.5h5V2.5M5 13.5V9.5h6v4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/></svg><span>Save</span></button>
+      <button class="btn" id="stLibBtn" title="Your saved SpinLab songs"><svg viewBox="0 0 16 16"><rect x="2" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="6.5" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m11 3.2 2.6-.7 2.4 10.4-2.6.7z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg><span>Library</span></button>
+      <button class="btn primary" id="stExport" aria-haspopup="menu" title="Export your song as an MP3 or WAV file"><svg viewBox="0 0 16 16"><path d="M8 2v8M4.5 6.5 8 10l3.5-3.5M2.5 13.5h11" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Export</span></button>
+    </div>
+  </div>
+  <div class="stmain">
+    <div class="stheads" id="stHeads"></div>
+    <div class="sttl" id="stTl" tabindex="0" aria-label="Song timeline. Click the top ruler to move the playhead.">
+      <canvas id="stCv"></canvas>
+      <div class="sttlin" id="stTlIn"></div>
+      <div class="stempty" id="stEmpty">
+        <b>Start your song</b>
+        <p>Add an instrument track, then press <b>Record</b> and play the keys. Your notes show up as blocks you can drag, stretch and delete.</p>
+        <div class="stemptybtns"><button class="btn primary" data-add="inst">+ Instrument</button><button class="btn" data-add="drums">+ Drums</button><button class="btn" data-add="audio">+ Audio file</button><button class="btn" data-add="voice">+ Voice</button></div>
+      </div>
+    </div>
+  </div>
+  <div class="stadd" role="group" aria-label="Add a track">
+    <span class="lbl">Add track</span>
+    <button class="btn sm" data-add="inst">+ Instrument</button>
+    <button class="btn sm" data-add="drums">+ Drums</button>
+    <button class="btn sm" data-add="audio">+ Audio file</button>
+    <button class="btn sm" data-add="voice">+ Voice / mic</button>
+    <button class="btn sm" data-add="piano">From Piano library</button>
+    <button class="btn sm" data-add="dj">From DJ library</button>
+    <input type="file" id="stFile" accept="audio/*,video/*,.mp3,.wav,.m4a,.ogg,.flac,.aac,.mp4,.webm" hidden>
+  </div>
+  <div class="stdock" id="stDock" hidden>
+    <div class="stdockbar">
+      <span class="stdcolor" id="stDColor"></span>
+      <b class="stdname" id="stDName"></b>
+      <button class="btn sm" id="stDInst" title="Change this track’s instrument"></button>
+      <div class="stdtabs" role="tablist" aria-label="Track view">
+        <button type="button" role="tab" class="stdtab" data-dtab="keys" aria-selected="true">Keyboard</button>
+        <button type="button" role="tab" class="stdtab" data-dtab="notes" aria-selected="false">Notes</button>
+      </div>
+      <span class="sp"></span>
+      <span class="stdkeysbar" id="stDKeysBar"><button class="btn sm" id="stOctDn" aria-label="Lower octave" title="Lower octave (Z)">−</button><span class="stoct" id="stOct">C4</span><button class="btn sm" id="stOctUp" aria-label="Higher octave" title="Higher octave (X)">+</button><button class="btn sm" id="stKeyHints" aria-pressed="false" title="Show which computer key plays each piano key. Turns on by itself when the screen is sideways.">Key letters</button></span>
+      <span class="stdnotesbar" id="stDNotesBar" hidden><button class="btn sm" id="stQuant" title="Line every note up with the snap grid">Quantize</button><button class="btn sm danger" id="stDelNote" title="Delete the selected note (Delete key)" disabled>Delete note</button></span>
+      <span class="stdaudiobar" id="stDAudioBar" hidden><button class="btn sm" id="stSplit" title="Split the clip under the playhead">Split at playhead</button><button class="btn sm danger" id="stDelClip" title="Delete the selected clip (Delete key)" disabled>Delete clip</button></span>
+      <button class="btn sm ghost" id="stDockHide" aria-label="Hide the bottom panel" title="Hide panel"><svg viewBox="0 0 16 16"><path d="m4 6 4 4 4-4" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></button>
+    </div>
+    <div class="stkeys pkeys" id="stKeysWrap"><div class="pkb" id="stKb"></div></div>
+    <div class="stroll" id="stRoll" hidden tabindex="0" aria-label="Note editor. Click an empty spot to add a note, drag a note to move it, drag its right edge to stretch it, double-click to delete it.">
+      <canvas id="stRollCv"></canvas>
+      <div class="strollin" id="stRollIn"></div>
+    </div>
+    <div class="staudio" id="stAudioPane" hidden>
+      <p id="stAudioMsg"></p>
+      <div class="stemptybtns"><button class="btn primary" id="stMicBtn">Record your voice here</button><button class="btn" id="stAddFile">Add an audio file here</button></div>
+    </div>
+  </div>
+  <dialog id="stInstDlg" class="stinstdlg" aria-label="Choose an instrument">
+    <div class="iphead"><b id="stInstTitle">Choose an instrument</b><span class="lbl" id="stInstCount"></span><button class="btn sm" id="stInstClose" aria-label="Close">Close</button></div>
+    <div class="ipbody" id="stInstList"></div>
+  </dialog>
+  <dialog id="stLib" class="stlib">
+    <div class="libhead"><h2>SpinLab library</h2><button class="btn sm primary" id="stLibNew">+ New song</button><button class="btn sm" id="stLibClose">Close</button></div>
+    <p class="hint">Your SpinLab songs are saved in this browser on this device, with every track, note and audio clip. Nothing is uploaded.</p>
+    <ul class="liblist" id="stLibList"></ul>
+  </dialog>
 </section>
 <div class="rplayer" id="rPlayer" hidden>
   <img class="rlogo" id="rpLogo" alt="" referrerpolicy="no-referrer">
@@ -1177,6 +1407,17 @@ html.phone body.mode-create .btn{min-height:38px}
 <dialog id="help">
   <h2>How to use SpinLab</h2>
   <p>SpinLab opens with one deck. Press <b>Add another track</b> under the waveform to open deck B and the crossfader so you can mix two songs. Press <b>Load</b> on a deck (or drop a song onto its waveform). Everything runs in this browser, so nothing is uploaded. Save your edits as a file with <b>Save WAV</b> or <b>Save MP3</b>, and record a live mix with <b>Record live</b>, which saves an MP3. Nothing goes online for any of them.</p>
+  <h3>SpinLab: make your own songs</h3>
+  <ul>
+    <li>The big <b>SpinLab</b> button on the home screen opens the studio. A song is made of tracks stacked on top of each other, like BandLab.</li>
+    <li><b>+ Instrument</b> adds a track with any of SpinLab’s instruments. <b>+ Drums</b> adds a drum kit. <b>+ Audio file</b> adds a song or sound. <b>+ Voice</b> adds a track for your microphone. You can also bring in a saved Piano creation or DJ project.</li>
+    <li>Select a track, press <b>Record</b> and play the keyboard at the bottom (or your computer keys). The notes appear as blocks on the timeline.</li>
+    <li>Open <b>Notes</b> to edit the blocks: click an empty spot to add one, drag to move it, drag its right edge to make it longer, and double-click (or press Delete) to remove it. <b>Quantize</b> lines your notes up with the snap grid.</li>
+    <li>Each track has <b>M</b> (mute), <b>S</b> (solo), a volume slider and a ⋯ menu to rename, duplicate, pan, move or delete it.</li>
+    <li>Click the numbers at the top of the timeline to move the playhead. Drag audio clips to move them, and use <b>Split at playhead</b> to cut one in two.</li>
+    <li><b>Save</b> keeps the song in your SpinLab library. <b>Export</b> makes an MP3 or WAV file.</li>
+    <li>Keys: <kbd>Space</kbd> play or stop, <kbd>R</kbd> record, <kbd>Z</kbd> <kbd>X</kbd> change octave, <kbd>Delete</kbd> remove the selected note or clip, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>Z</kbd> undo, <kbd>Ctrl</kbd>/<kbd>⌘</kbd> <kbd>S</kbd> save.</li>
+  </ul>
   <h3>Home: DJ and Piano</h3>
   <ul>
     <li>The home screen has three buttons. <b>DJ</b> is for mixing songs, <b>Piano</b> is for playing and making your own music (on a phone it turns sideways), and the third button opens <b>Online Radio</b> and <b>Online Music</b>. It shows the name of whichever side you used last.</li>
@@ -1259,7 +1500,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.31'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.32'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
@@ -2383,11 +2624,12 @@ function setClean() { dirty = false; showState(); }
 function openDB() {
   if (!dbP) dbP = new Promise((res, rej) => {
     if (!window.indexedDB) return rej(new Error('noidb'));
-    const r = indexedDB.open('spinlab', 2);
+    const r = indexedDB.open('spinlab', 3);
     r.onupgradeneeded = () => {
       const db = r.result;
       if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('creations')) db.createObjectStore('creations', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('studio')) db.createObjectStore('studio', { keyPath: 'id' });
     };
     r.onsuccess = () => res(r.result); r.onerror = () => { dbP = null; rej(r.error); };
   });
@@ -2491,7 +2733,7 @@ async function renderLibrary() {
   await fillList($('#libList'), STORE(), false);
   try { if (navigator.storage && navigator.storage.estimate) { const e = await navigator.storage.estimate(); $('#libSpace').textContent = 'Using ' + (e.usage / 1048576).toFixed(0) + ' MB of about ' + (e.quota / 1073741824).toFixed(1) + ' GB available to this site.'; } } catch (e) {}
 }
-function renderHome() { fillList($('#homeDJ'), 'projects', true); fillList($('#homePiano'), 'creations', true); renderHomeRadio(); }
+function renderHome() { fillList($('#homeDJ'), 'projects', true); fillList($('#homePiano'), 'creations', true); renderHomeRadio(); if (typeof stFillList === 'function') stFillList($('#homeStudio'), true); }
 const rerender = ul => ul.id === 'libList' ? renderLibrary() : renderHome();
 async function listClick(e) {
   const b = e.target.closest('[data-l]'); if (!b) return;
@@ -2548,7 +2790,7 @@ $('#saveBtn').addEventListener('click', saveProject);
 });
 window.addEventListener('beforeunload', e => {
   const un = m => (m === MODE ? dirty : modeState[m].dirty) && (m === 'create' ? CR.notes.length > 0 : !!(A.buffer || B.buffer));
-  if (un('dj') || un('create')) { e.preventDefault(); e.returnValue = ''; }
+  if (un('dj') || un('create') || (typeof stUnsaved === 'function' && stUnsaved())) { e.preventDefault(); e.returnValue = ''; }
 });
 
 /* ===================== CREATE MODE: piano, recorder, library ===================== */
@@ -2934,8 +3176,9 @@ const hkPref = () => { try { return localStorage.getItem('spinlab-keyhints'); } 
 const landscapeMQ = matchMedia('(orientation: landscape)');
 function keyHintsOn() { const p = hkPref(); return p === 'on' ? true : p === 'off' ? false : landscapeMQ.matches; }
 function applyKeyHints() {
-  const on = keyHintsOn(); $('#pKeys').classList.toggle('nohk', !on);
+  const on = keyHintsOn(); $('#pKeys').classList.toggle('nohk', !on); const sk = document.getElementById('stKeysWrap'); if (sk) sk.classList.toggle('nohk', !on);
   const b = $('#crKeyHints'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+  const sb = document.getElementById('stKeyHints'); if (sb) { sb.classList.toggle('on', on); sb.setAttribute('aria-pressed', String(on)); }
   b.textContent = 'Computer key letters' + (hkPref() ? '' : ' (auto)');
 }
 landscapeMQ.addEventListener && landscapeMQ.addEventListener('change', applyKeyHints);
@@ -3237,6 +3480,7 @@ $('#crOctDn').addEventListener('click', () => crOct(-1));
 $('#crOctUp').addEventListener('click', () => crOct(1));
 $('#crSus').addEventListener('click', () => { CR.susBtn = !CR.susBtn; crSetSus(); });
 $('#crLabels').addEventListener('click', () => { CR.labels = !CR.labels; renderKeys(); crUI(); });
+$('#stKeyHints').addEventListener('click', () => $('#crKeyHints').click());
 $('#crKeyHints').addEventListener('click', () => {
   const next = !keyHintsOn(); try { localStorage.setItem('spinlab-keyhints', next ? 'on' : 'off'); } catch (e) {}
   applyKeyHints(); toast(next ? 'Computer key letters on' : 'Computer key letters off');
@@ -3278,15 +3522,18 @@ async function setMode(m, fromTap) {
   const prev = MODE;
   if (prev === 'dj' || prev === 'create') modeState[prev] = { project, dirty };
   if (prev === 'create') { MODE = 'switching'; if (CR.playing) crStop(); stopMetro(); releaseAllInput(); closeMenu(); }
+  if (prev === 'studio') { if (ST.playing) stStop(); stReleaseAll(); }
   MODE = m;
   if (m === 'dj' || m === 'create') ({ project, dirty } = modeState[m]);
   document.body.classList.toggle('mode-create', m === 'create');
   document.body.classList.toggle('mode-home', m === 'home');
   document.body.classList.toggle('mode-radio', m === 'radio');
+  document.body.classList.toggle('mode-studio', m === 'studio');
   if ($('#lib').open) $('#lib').close();
   showState(); drawFav();
   if (m === 'home') { renderHome(); window.scrollTo(0, 0); }
   if (m === 'radio') { radioEnter(); window.scrollTo(0, 0); }
+  if (m === 'studio') { window.scrollTo(0, 0); stEnter(); }
   if (m === 'dj') decks.forEach(d => { d.waveKey = d.ovKey = null; });
   if (m === 'create') {
     if (CR.metro && ctx) startMetro();
@@ -3308,6 +3555,7 @@ async function setMode(m, fromTap) {
 $('#goDJ').addEventListener('click', () => setMode('dj', true));
 $('#goPiano').addEventListener('click', () => setMode('create', true));
 $('#goRadio').addEventListener('click', () => setMode('radio', true));
+$('#goStudio').addEventListener('click', () => setMode('studio', true));
 $('#rHome').addEventListener('click', () => setMode('home'));
 $('#homeBtn').addEventListener('click', () => setMode('home'));
 document.getElementById('ver3').textContent = 'v' + APP_VERSION;
@@ -4234,6 +4482,883 @@ document.addEventListener('keydown', e => {
   sc.addEventListener('touchstart', e => { y0 = sc.scrollTop <= 0 ? e.touches[0].clientY : null; }, { passive: true });
   sc.addEventListener('touchend', e => { if (y0 != null && e.changedTouches[0].clientY - y0 > 110 && sc.scrollTop <= 0) closeNP(); y0 = null; }, { passive: true }); }
 
+/* ===================== SPINLAB STUDIO: tracks, square note blocks, audio clips ===================== */
+/* Times are kept in beats so notes stay in time when the BPM changes. Audio clip lengths are in seconds. */
+const ST = {
+  tracks: [], bpm: 100, metro: false, snap: 0.25, pos: 0, playing: false, recording: false, t0: 0, pos0: 0,
+  sel: null, selClip: null, selNote: null, ppb: 26, rp: 52, rowH: 16, octave: 4, dock: 'keys', dockHidden: false,
+  voices: [], srcs: [], live: new Map(), down: new Set(), bufs: new Map(), blobs: new Map(), peaks: new Map(),
+  ch: new Map(), undo: [], redo: [], project: { id: null, created: null }, dirty: false, bus: null, metroTimer: null,
+  lastLen: 1, mic: null, need: true, follow: true, keyEls: new Map()
+};
+const RH = 26, LO_NOTE = 21, HI_NOTE = 108;
+const LH = () => (matchMedia('(max-width:760px)').matches ? 62 : 74);
+const spb = () => 60 / ST.bpm;
+const sUid = () => Math.random().toString(36).slice(2, 9);
+const AUDIO_COLORS = ['#fb923c', '#38bdf8', '#4ade80', '#facc15', '#f87171', '#c084fc'];
+const stTrack = id => ST.tracks.find(t => t.id === id);
+const stSelTrack = () => stTrack(ST.sel);
+const tColor = t => t.type === 'inst' ? FAMS[(INST[t.sound] || INST.piano).fam].color : t.color;
+const isDrumTrack = t => t && t.type === 'inst' && (INST[t.sound] || {}).kind === 'drum';
+const snapB = (b, s = ST.snap) => s ? Math.round(b / s) * s : b;
+function stNow() { return ST.playing && ctx ? ST.pos0 + Math.max(0, ctx.currentTime - ST.t0) / spb() : ST.pos; }
+function stEnd() {
+  let e = 0;
+  for (const t of ST.tracks) {
+    for (const n of t.notes || []) e = Math.max(e, n.t + n.d);
+    for (const c of t.clips || []) e = Math.max(e, c.start + c.len / spb());
+  }
+  return e;
+}
+const stDirty = () => { if (!ST.dirty) { ST.dirty = true; stState(); } };
+function stState() {
+  const el = $('#stState'); if (!el) return;
+  const d = ST.dirty && ST.tracks.length > 0;
+  el.textContent = d ? 'Not saved' : ST.project.id ? 'Saved' : '';
+  el.classList.toggle('dirty', d);
+}
+
+/* ---------- audio graph: each track gets volume + pan, instruments get a little reverb ---------- */
+function stInit() {
+  ac(); if (ST.bus) return;
+  ST.bus = ctx.createGain(); ST.bus.gain.value = 0.9; ST.bus.connect(master.gain);
+  ST.revIn = ctx.createGain(); const cv = ctx.createConvolver(); cv.buffer = IR; ST.revIn.connect(cv); cv.connect(master.gain);
+}
+function stChan(t) {
+  stInit(); let c = ST.ch.get(t.id);
+  if (!c) {
+    c = { g: ctx.createGain(), p: ctx.createStereoPanner ? ctx.createStereoPanner() : ctx.createGain(), rv: ctx.createGain() };
+    c.g.connect(c.p); c.p.connect(ST.bus); c.p.connect(c.rv); c.rv.connect(ST.revIn);
+    ST.ch.set(t.id, c);
+  }
+  return c;
+}
+function stMix() {
+  if (!ctx) return;
+  const solo = ST.tracks.some(t => t.solo);
+  for (const t of ST.tracks) {
+    const c = stChan(t), on = !t.mute && (!solo || t.solo);
+    c.g.gain.setTargetAtTime(on ? t.vol : 0, ctx.currentTime, 0.015);
+    if (c.p.pan) c.p.pan.setTargetAtTime(t.pan || 0, ctx.currentTime, 0.015);
+    c.rv.gain.value = t.type === 'inst' ? 0.16 : 0;
+  }
+}
+
+/* ---------- tracks ---------- */
+function newInstTrack(sound = 'piano', name) {
+  const t = { id: sUid(), type: 'inst', sound, name: name || (INST[sound] || INST.piano).name, vol: 0.8, pan: 0, mute: false, solo: false, notes: [] };
+  ST.tracks.push(t); return t;
+}
+function newAudioTrack(name) {
+  const used = ST.tracks.filter(t => t.type === 'audio').length;
+  const t = { id: sUid(), type: 'audio', name: name || 'Audio ' + (used + 1), color: AUDIO_COLORS[used % AUDIO_COLORS.length], vol: 0.85, pan: 0, mute: false, solo: false, clips: [] };
+  ST.tracks.push(t); return t;
+}
+function stSelect(id, keepDock) {
+  ST.sel = id; ST.selClip = null; ST.selNote = null;
+  if (!keepDock) ST.dockHidden = false;
+  renderStHeads(); renderDock(); ST.need = true;
+}
+function snapshotTracks() { return JSON.stringify({ tracks: ST.tracks, bpm: ST.bpm }); }
+function stPush() { ST.undo.push(snapshotTracks()); if (ST.undo.length > 80) ST.undo.shift(); ST.redo = []; stDirty(); }
+function stRestore(from, to) {
+  if (!from.length) return toast(from === ST.undo ? 'Nothing to undo.' : 'Nothing to redo.');
+  if (ST.playing) stStop();
+  to.push(snapshotTracks()); const s = JSON.parse(from.pop());
+  ST.tracks = s.tracks; ST.bpm = s.bpm; $('#stBpm').value = ST.bpm;
+  if (!stTrack(ST.sel)) ST.sel = ST.tracks.length ? ST.tracks[ST.tracks.length - 1].id : null;
+  ST.selClip = ST.selNote = null; stMix(); renderStudio(); stDirty();
+}
+
+/* ---------- playback ---------- */
+function stSchedule() {
+  const s = spb(), from = ST.pos0, t0 = ST.t0;
+  for (const t of ST.tracks) {
+    const c = stChan(t);
+    if (t.type === 'inst') {
+      for (const n of t.notes) {
+        if (n.t < from - 1e-4) continue;
+        const when = t0 + (n.t - from) * s, v = startVoice(ctx, c.g, t.sound, n.m, n.v || 0.8, when);
+        v.release(when + n.d * s); ST.voices.push(v);
+      }
+    } else {
+      for (const cl of t.clips) {
+        const buf = ST.bufs.get(cl.key); if (!buf) continue;
+        const cs = cl.start * s, ce = cs + cl.len, p = from * s; if (ce <= p) continue;
+        const src = ctx.createBufferSource(); src.buffer = buf; src.connect(c.g);
+        if (cs >= p) src.start(t0 + (cs - p), cl.off, cl.len); else src.start(t0, cl.off + (p - cs), ce - p);
+        ST.srcs.push(src);
+      }
+    }
+  }
+}
+function stPlay() {
+  stInit(); if (ctx.state === 'suspended') ctx.resume();
+  if (ST.playing) return stStop();
+  const end = stEnd();
+  if (!ST.recording) {
+    if (!end) return toast(ST.tracks.length ? 'Nothing to play yet. Press Record and play the keys.' : 'Add a track first, then record something.');
+    if (ST.pos >= end - 0.01) ST.pos = 0;
+  }
+  stMix(); ST.pos0 = ST.pos; ST.t0 = ctx.currentTime + 0.08; ST.playing = true;
+  stSchedule(); if (ST.metro) stMetroStart();
+  stUI();
+}
+function stStop() {
+  if (!ST.playing) return;
+  const p = stNow();
+  if (ST.recording) stEndRecording();
+  ST.playing = false; ST.pos = Math.max(0, p);
+  ST.voices.forEach(v => { try { v.stopNow(); } catch (e) {} }); ST.voices = [];
+  ST.srcs.forEach(s => { try { s.stop(); } catch (e) {} }); ST.srcs = [];
+  stMetroStop(); stUI(); ST.need = true;
+}
+function stSeek(b) {
+  b = Math.max(0, b); const was = ST.playing && !ST.recording;
+  if (ST.recording) return;
+  if (ST.playing) stStop();
+  ST.pos = b; if (was) stPlay(); ST.need = true; stTimeUI();
+}
+function stMetroStart() {
+  stMetroStop(); const beat = spb(), t0 = ST.t0, p0 = ST.pos0 * beat; let k = Math.ceil(ST.pos0 - 1e-6);
+  const tick = () => {
+    const ahead = ctx.currentTime + 0.15;
+    for (;;) { const when = t0 + (k * beat - p0); if (when > ahead) break; if (when >= ctx.currentTime - 0.01) metroClick(when, k % 4 === 0); k++; }
+  };
+  tick(); ST.metroTimer = setInterval(tick, 25);
+}
+function stMetroStop() { if (ST.metroTimer) { clearInterval(ST.metroTimer); ST.metroTimer = null; } }
+
+/* ---------- recording: notes from the keys, or your voice into an audio track ---------- */
+async function stRecord() {
+  if (ST.recording) return stStop();
+  stInit(); if (ST.playing) stStop();
+  let t = stSelTrack();
+  if (!t) { stPush(); t = newInstTrack('piano'); stSelect(t.id); renderStudio(); }
+  if (t.type === 'audio') return stMicRecord(t);
+  stPush();
+  ST.recording = true; ST.recTrack = t.id; ST.dock = 'keys'; ST.dockHidden = false; renderDock();
+  stPlay();
+  toast(t.notes.length ? 'Recording on “' + t.name + '”. Your other notes play along.' : 'Recording on “' + t.name + '”. Play the keys.');
+}
+function stEndRecording() {
+  const t = stTrack(ST.recTrack);
+  [...ST.live.keys()].forEach(m => stEndLive(m));
+  ST.recording = false;
+  if (ST.mic) stMicFinish();
+  if (t && t.type === 'inst') { t.notes.sort((a, b) => a.t - b.t); }
+  if (ST.undo.length && ST.undo[ST.undo.length - 1] === snapshotTracks()) ST.undo.pop();
+  renderStHeads(); ST.need = true;
+}
+async function stMicRecord(t) {
+  if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia || !window.MediaRecorder) return toast('This browser can’t record from a microphone.');
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: { echoCancellation: false, noiseSuppression: false, autoGainControl: false } }); }
+  catch (e) { return toast('SpinLab needs permission to use your microphone. Allow it in the browser and try again.'); }
+  stPush();
+  const chunks = [], rec = new MediaRecorder(stream);
+  rec.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  ST.mic = { stream, rec, chunks, track: t.id, startBeat: ST.pos, recCtx: 0 };
+  ST.recording = true; ST.recTrack = t.id;
+  rec.start(); ST.mic.recCtx = ctx.currentTime;
+  stPlay();
+  toast('Recording your voice on “' + t.name + '”. Headphones keep the other tracks out of the mic.');
+}
+function stMicFinish() {
+  const M = ST.mic; ST.mic = null; if (!M) return;
+  const lead = Math.max(0, ST.t0 - M.recCtx) + (ctx.outputLatency || 0) + (ctx.baseLatency || 0);
+  M.rec.onstop = async () => {
+    M.stream.getTracks().forEach(x => x.stop());
+    try {
+      const blob = new Blob(M.chunks, { type: M.rec.mimeType || 'audio/webm' });
+      const buf = await decodeAB(await blob.arrayBuffer());
+      const off = Math.min(lead, Math.max(0, buf.duration - 0.05));
+      const t = stTrack(M.track); if (!t) return;
+      const key = 'a' + sUid(); ST.blobs.set(key, blob); ST.bufs.set(key, buf); ST.peaks.set(key, computePeaks(buf));
+      t.clips.push({ id: sUid(), key, start: M.startBeat, off, len: buf.duration - off, name: 'Voice take' });
+      stDirty(); ST.need = true; renderDock(); toast('Voice take added to “' + t.name + '”');
+    } catch (e) { toast('The recording could not be saved.'); }
+  };
+  try { M.rec.stop(); } catch (e) {}
+}
+
+/* live notes from the on-screen keys and the computer keyboard */
+function stPress(m) {
+  const t = stSelTrack(); if (!t || t.type !== 'inst') return;
+  stInit(); if (ST.down.has(m)) return;
+  ST.down.add(m); stKeyOn(m, true);
+  if (ST.live.has(m)) stEndLive(m);
+  const voice = startVoice(ctx, stChan(t).g, t.sound, m, 0.8, ctx.currentTime);
+  const note = ST.recording && ST.recTrack === t.id ? { m, t: stNow(), d: 0, v: 0.8 } : null;
+  ST.live.set(m, { voice, note, track: t.id });
+  if (ctx && t) stMix();
+}
+function stRelease(m) { if (!ST.down.has(m)) return; ST.down.delete(m); stKeyOn(m, false); stEndLive(m); }
+function stEndLive(m) {
+  const L = ST.live.get(m); if (!L) return; ST.live.delete(m);
+  L.voice.release(ctx.currentTime);
+  if (L.note) { const t = stTrack(L.track); L.note.d = Math.max(0.06, stNow() - L.note.t); if (t) t.notes.push(L.note); stDirty(); ST.need = true; }
+}
+function stReleaseAll() { [...ST.down].forEach(stRelease); stKeyMap.clear(); stPtr.clear(); }
+const stKeyMap = new Map(), stPtr = new Map();
+
+/* ---------- top bar ---------- */
+function stUI() {
+  const p = $('#stPlay'); p.classList.toggle('on', ST.playing && !ST.recording); p.innerHTML = ST.playing && !ST.recording ? I.pause : I.play;
+  p.setAttribute('aria-label', ST.playing ? 'Stop' : 'Play');
+  const r = $('#stRec'); r.classList.toggle('on', ST.recording); r.querySelector('span').textContent = ST.recording ? 'Stop' : 'Record';
+  const m = $('#stMetro'); m.classList.toggle('on', ST.metro); m.setAttribute('aria-pressed', String(ST.metro));
+  $('#stUndo').disabled = !ST.undo.length; $('#stRedo').disabled = !ST.redo.length;
+  stTimeUI();
+}
+let stLastTime = '';
+function stTimeUI() {
+  const b = stNow(), bar = Math.floor(b / 4) + 1, beat = Math.floor(((b % 4) + 4) % 4) + 1, sec = b * spb();
+  const txt = bar + '.' + beat + ' · ' + Math.floor(sec / 60) + ':' + String(Math.floor(sec % 60)).padStart(2, '0');
+  if (txt !== stLastTime) { $('#stTime').textContent = txt; stLastTime = txt; }
+}
+
+/* ---------- track headers ---------- */
+const MS_SVG_VOL = '<svg viewBox="0 0 16 16"><path d="M2.5 6h2.5l3.5-3v10L5 10H2.5z" fill="currentColor"/><path d="M11 5.5a3.5 3.5 0 0 1 0 5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round"/></svg>';
+function renderStHeads() {
+  const h = $('#stHeads'), lh = LH();
+  h.style.setProperty('--rh', RH + 'px'); h.style.setProperty('--lh', lh + 'px');
+  h.innerHTML = '<div class="sthr">Tracks</div>' + ST.tracks.map(t => {
+    const c = tColor(t), I2 = t.type === 'inst' ? FAMS[(INST[t.sound] || INST.piano).fam].icon : '<svg viewBox="0 0 24 24"><path d="M3 12h2l2-5 3 10 3-14 3 12 2-3h3" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>';
+    const sub = t.type === 'inst' ? (INST[t.sound] || INST.piano).name + ' · ' + t.notes.length + ' note' + (t.notes.length === 1 ? '' : 's') : t.clips.length + ' clip' + (t.clips.length === 1 ? '' : 's');
+    return `<div class="sthead${t.id === ST.sel ? ' sel' : ''}${ST.recording && ST.recTrack === t.id ? ' armed' : ''}" data-id="${t.id}" style="--tc:${c}">
+      <span class="bar"></span><div class="in">
+      <div class="t1"><b title="${escapeHTML(t.name)}">${escapeHTML(t.name)}</b>
+        <button class="btn sm ms${t.mute ? ' on' : ''}" data-h="mute" aria-pressed="${t.mute}" title="Mute" aria-label="Mute ${escapeHTML(t.name)}">M</button>
+        <button class="btn sm ms${t.solo ? ' on' : ''}" data-h="solo" aria-pressed="${t.solo}" title="Solo" aria-label="Solo ${escapeHTML(t.name)}">S</button>
+        <button class="btn sm" data-h="more" aria-label="More for ${escapeHTML(t.name)}" title="Rename, duplicate or delete">${MORE}</button></div>
+      <div class="t2"><span style="color:${c};display:inline-flex;width:15px;height:15px">${I2.replace('<svg', '<svg width="15" height="15"')}</span><small>${escapeHTML(sub)}</small>
+        <input type="range" min="0" max="1.2" step="0.01" value="${t.vol}" data-h="vol" aria-label="Volume for ${escapeHTML(t.name)}" title="Volume"></div>
+      </div></div>`;
+  }).join('') + '<div style="height:60px"></div>';
+  h.scrollTop = $('#stTl').scrollTop;
+  $('#stEmpty').hidden = ST.tracks.length > 0;
+}
+$('#stHeads').addEventListener('click', e => {
+  const row = e.target.closest('.sthead'); if (!row) return; const t = stTrack(row.dataset.id); if (!t) return;
+  const b = e.target.closest('[data-h]');
+  if (b && b.dataset.h === 'mute') { t.mute = !t.mute; stMix(); renderStHeads(); stDirty(); return; }
+  if (b && b.dataset.h === 'solo') { t.solo = !t.solo; stMix(); renderStHeads(); stDirty(); return; }
+  if (b && b.dataset.h === 'more') return trackMenu(t, b);
+  if (b && b.dataset.h === 'vol') return;
+  if (ST.sel !== t.id) stSelect(t.id);
+});
+$('#stHeads').addEventListener('input', e => {
+  const r = e.target.closest('[data-h="vol"]'); if (!r) return; const t = stTrack(r.closest('.sthead').dataset.id); if (!t) return;
+  t.vol = +r.value; stMix(); stDirty();
+});
+function trackMenu(t, btn) {
+  openGMenu(btn, t.name, [
+    ...(t.type === 'inst' ? [{ label: 'Change instrument…', fn: () => openStInst(t) }] : []),
+    { label: 'Rename', fn: async () => { const n = await askText('Rename the track', t.name); if (n) { stPush(); t.name = n; renderStudio(); } } },
+    { label: 'Duplicate', fn: () => { stPush(); const c = JSON.parse(JSON.stringify(t)); c.id = sUid(); c.name = t.name + ' copy'; (c.clips || []).forEach(x => x.id = sUid()); ST.tracks.splice(ST.tracks.indexOf(t) + 1, 0, c); stMix(); stSelect(c.id); renderStudio(); } },
+    { label: 'Pan left', check: (t.pan || 0) < -0.1, fn: () => { stPush(); t.pan = (t.pan || 0) < -0.1 ? 0 : -0.6; stMix(); } },
+    { label: 'Pan right', check: (t.pan || 0) > 0.1, fn: () => { stPush(); t.pan = (t.pan || 0) > 0.1 ? 0 : 0.6; stMix(); } },
+    ...(ST.tracks.indexOf(t) > 0 ? [{ label: 'Move up', fn: () => { stPush(); const i = ST.tracks.indexOf(t); ST.tracks.splice(i, 1); ST.tracks.splice(i - 1, 0, t); renderStudio(); } }] : []),
+    ...(ST.tracks.indexOf(t) < ST.tracks.length - 1 ? [{ label: 'Move down', fn: () => { stPush(); const i = ST.tracks.indexOf(t); ST.tracks.splice(i, 1); ST.tracks.splice(i + 1, 0, t); renderStudio(); } }] : []),
+    '-',
+    { label: 'Delete track', fn: async () => {
+      if (!(await askConfirm('Are you sure you want to delete the track “' + t.name + '”? You can undo this right after.', 'Delete'))) return;
+      if (ST.playing) stStop(); stPush(); ST.tracks = ST.tracks.filter(x => x !== t); ST.ch.delete(t.id);
+      if (ST.sel === t.id) ST.sel = ST.tracks.length ? ST.tracks[0].id : null; renderStudio(); toast('Deleted “' + t.name + '”');
+    } }
+  ]);
+}
+
+/* ---------- the timeline canvas ---------- */
+const stCv = $('#stCv'), stTl = $('#stTl');
+function stSize(cv, box) {
+  const dpr = Math.min(2, window.devicePixelRatio || 1), w = box.clientWidth, h = box.clientHeight;
+  if (cv.width !== Math.round(w * dpr) || cv.height !== Math.round(h * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); cv.style.width = w + 'px'; cv.style.height = h + 'px'; }
+  const g = cv.getContext('2d'); g.setTransform(dpr, 0, 0, dpr, 0, 0); return { g, w, h };
+}
+const rr = (g, x, y, w, h, r) => { g.beginPath(); if (g.roundRect) g.roundRect(x, y, w, h, Math.min(r, w / 2, h / 2)); else g.rect(x, y, w, h); };
+const alpha = (hex, a) => { const r = parseInt(hex.slice(1, 3), 16), gg = parseInt(hex.slice(3, 5), 16), b = parseInt(hex.slice(5, 7), 16); return `rgba(${r},${gg},${b},${a})`; };
+function stDraw() {
+  if (MODE !== 'studio') return;
+  const lh = LH(), ppb = ST.ppb, endB = Math.max(stEnd(), stNow()) + 32;
+  const inner = $('#stTlIn'); inner.style.width = Math.max(stTl.clientWidth, endB * ppb) + 'px'; inner.style.height = Math.max(stTl.clientHeight, RH + ST.tracks.length * lh + 60) + 'px';
+  const { g, w, h } = stSize(stCv, stTl), sx = stTl.scrollLeft, sy = stTl.scrollTop;
+  g.fillStyle = '#090b12'; g.fillRect(0, 0, w, h);
+  // lanes
+  ST.tracks.forEach((t, i) => {
+    const y = RH + i * lh - sy; if (y > h || y + lh < RH) return;
+    g.fillStyle = t.id === ST.sel ? alpha(tColor(t), 0.07) : i % 2 ? '#0b0e16' : '#0a0c13'; g.fillRect(0, y, w, lh);
+    g.fillStyle = '#1b2132'; g.fillRect(0, y + lh - 1, w, 1);
+  });
+  // grid
+  const b0 = Math.floor(sx / ppb), b1 = Math.ceil((sx + w) / ppb);
+  for (let b = b0; b <= b1; b++) {
+    const x = Math.round(b * ppb - sx) + 0.5, bar = b % 4 === 0;
+    if (!bar && ppb < 9) continue;
+    g.fillStyle = bar ? '#232a3d' : '#151a28'; g.fillRect(x, RH, 1, h - RH);
+  }
+  // track content
+  ST.tracks.forEach((t, i) => {
+    const y = RH + i * lh - sy; if (y > h || y + lh < RH) return;
+    const col = tColor(t);
+    if (t.type === 'inst') {
+      const notes = t.notes.slice(); ST.live.forEach(L => { if (L.note && L.track === t.id) notes.push({ m: L.note.m, t: L.note.t, d: Math.max(0.06, stNow() - L.note.t), live: true }); });
+      if (!notes.length) { g.fillStyle = '#4b5574'; g.font = '600 12px Inter, system-ui, sans-serif'; g.fillText(ST.recording && ST.recTrack === t.id ? 'Recording… play the keys' : 'Empty. Select it and press Record, or open Notes to draw.', 12 - Math.min(0, 0), y + lh / 2 + 4); return; }
+      let lo = 127, hi = 0, s0 = 1e9, e0 = 0;
+      for (const n of notes) { lo = Math.min(lo, n.m); hi = Math.max(hi, n.m); s0 = Math.min(s0, n.t); e0 = Math.max(e0, n.t + n.d); }
+      if (hi - lo < 11) { const pad = (11 - (hi - lo)) / 2; lo -= Math.ceil(pad); hi += Math.floor(pad); }
+      const rs = Math.floor(s0 / 4) * 4, re = Math.ceil(e0 / 4) * 4 || 4;
+      const rx = rs * ppb - sx, rw = (re - rs) * ppb;
+      rr(g, rx + 1, y + 4, rw - 2, lh - 8, 7); g.fillStyle = alpha(col, 0.14); g.fill(); g.strokeStyle = alpha(col, 0.55); g.lineWidth = 1; g.stroke();
+      g.save(); rr(g, rx + 1, y + 4, rw - 2, lh - 8, 7); g.clip();
+      g.fillStyle = alpha(col, 0.9); g.font = '700 10.5px Inter, system-ui, sans-serif'; g.fillText(t.name, Math.max(rx, 0) + 8, y + 16);
+      const top = y + 22, ah = lh - 30, nh = Math.max(2, Math.min(8, ah / (hi - lo + 1)));
+      for (const n of notes) {
+        const x = n.t * ppb - sx, wd = Math.max(3, n.d * ppb - 1); if (x > w || x + wd < 0) continue;
+        const ny = top + (hi - n.m) / (hi - lo + 1) * ah;
+        rr(g, x, ny, wd, nh, 2); g.fillStyle = n.live ? '#fff' : col; g.fill();
+      }
+      g.restore();
+    } else {
+      for (const cl of t.clips) {
+        const x = cl.start * ppb - sx, wd = cl.len / spb() * ppb; if (x > w || x + wd < 0) continue;
+        rr(g, x + 1, y + 4, wd - 2, lh - 8, 7); g.fillStyle = alpha(col, 0.18); g.fill();
+        g.strokeStyle = cl.id === ST.selClip ? '#ffffff' : alpha(col, 0.7); g.lineWidth = cl.id === ST.selClip ? 2 : 1; g.stroke();
+        g.save(); rr(g, x + 1, y + 4, wd - 2, lh - 8, 7); g.clip();
+        const pk = ST.peaks.get(cl.key), buf = ST.bufs.get(cl.key);
+        if (pk && buf) {
+          const mid = y + lh / 2 + 5, amp = (lh - 26) / 2, secPerPx = spb() / ppb, from = Math.max(0, -x) | 0, to = Math.min(wd, w - x) | 0;
+          g.fillStyle = alpha(col, 0.85);
+          for (let px = from; px < to; px++) {
+            const s = cl.off + px * secPerPx, a = Math.floor(s * buf.sampleRate / BK), bE = Math.max(a + 1, Math.floor((s + secPerPx) * buf.sampleRate / BK));
+            let lo2 = 0, hi2 = 0; for (let k = a; k < bE && k < pk.mn.length; k++) { if (pk.mn[k] < lo2) lo2 = pk.mn[k]; if (pk.mx[k] > hi2) hi2 = pk.mx[k]; }
+            g.fillRect(x + px, mid - hi2 * amp, 1, Math.max(1, (hi2 - lo2) * amp));
+          }
+        } else { g.fillStyle = '#6b7489'; g.font = '600 11px Inter, system-ui, sans-serif'; g.fillText('Loading…', x + 10, y + lh / 2 + 4); }
+        g.fillStyle = '#fff'; g.font = '700 10.5px Inter, system-ui, sans-serif'; g.fillText(cl.name || 'Clip', Math.max(x, 0) + 8, y + 16);
+        g.restore();
+      }
+      if (ST.mic && ST.mic.track === t.id) {
+        const x = ST.mic.startBeat * ppb - sx, wd = Math.max(2, (stNow() - ST.mic.startBeat) * ppb);
+        rr(g, x, y + 4, wd, lh - 8, 7); g.fillStyle = 'rgba(239,68,68,.25)'; g.fill(); g.strokeStyle = '#ef4444'; g.stroke();
+        g.fillStyle = '#fca5a5'; g.font = '700 10.5px Inter, system-ui, sans-serif'; g.fillText('Recording…', Math.max(x, 0) + 8, y + 16);
+      }
+      if (!t.clips.length && !(ST.mic && ST.mic.track === t.id)) { g.fillStyle = '#4b5574'; g.font = '600 12px Inter, system-ui, sans-serif'; g.fillText('Empty. Select it and press Record to sing, or add an audio file.', 12, y + lh / 2 + 4); }
+    }
+  });
+  // ruler
+  g.fillStyle = '#10141f'; g.fillRect(0, 0, w, RH); g.fillStyle = '#262d40'; g.fillRect(0, RH - 1, w, 1);
+  const step = ppb * 4 < 34 ? 4 : 1;
+  for (let bar = Math.floor(b0 / 4); bar <= Math.ceil(b1 / 4); bar++) {
+    const x = Math.round(bar * 4 * ppb - sx) + 0.5;
+    g.fillStyle = '#3a4360'; g.fillRect(x, 12, 1, RH - 12);
+    if (bar % step === 0) { g.fillStyle = '#9aa3ba'; g.font = '700 10.5px ui-monospace, Menlo, monospace'; g.fillText(String(bar + 1), x + 4, 13); }
+    if (ppb >= 12) for (let k = 1; k < 4; k++) { g.fillStyle = '#262d40'; g.fillRect(Math.round((bar * 4 + k) * ppb - sx) + 0.5, 19, 1, RH - 19); }
+  }
+  // playhead
+  const px = stNow() * ppb - sx;
+  if (px >= -2 && px <= w + 2) {
+    const c = ST.recording ? '#ef4444' : '#f8fafc';
+    g.fillStyle = c; g.fillRect(Math.round(px), 0, 2, h);
+    g.beginPath(); g.moveTo(px - 6, 0); g.lineTo(px + 8, 0); g.lineTo(px + 1, 10); g.closePath(); g.fill();
+  }
+}
+stTl.addEventListener('scroll', () => { $('#stHeads').scrollTop = stTl.scrollTop; ST.follow = !ST.playing || ST.follow; ST.need = true; }, { passive: true });
+
+/* timeline pointer: ruler = move the playhead, clip = drag it, empty space = select the track and pan */
+(() => {
+  let drag = null;
+  const at = e => { const r = stCv.getBoundingClientRect(); return { x: e.clientX - r.left + stTl.scrollLeft, y: e.clientY - r.top + stTl.scrollTop, vy: e.clientY - r.top }; };
+  stCv.addEventListener('pointerdown', e => {
+    if (e.button > 0) return; const p = at(e); stTl.focus({ preventScroll: true });
+    if (p.vy < RH) { drag = { kind: 'seek' }; stSeek(snapB(p.x / ST.ppb, ST.snap ? Math.max(ST.snap, 0.25) : 0)); stCv.setPointerCapture(e.pointerId); return; }
+    const i = Math.floor((p.y - RH) / LH()), t = ST.tracks[i];
+    if (!t) { ST.sel = ST.sel; drag = { kind: 'pan', x0: e.clientX, y0: e.clientY, sl: stTl.scrollLeft, st: stTl.scrollTop, moved: false }; stCv.setPointerCapture(e.pointerId); return; }
+    if (ST.sel !== t.id) stSelect(t.id, true);
+    if (t.type === 'audio') {
+      const b = p.x / ST.ppb, cl = [...t.clips].reverse().find(c => b >= c.start && b <= c.start + c.len / spb());
+      if (cl) { ST.selClip = cl.id; renderDock(); drag = { kind: 'clip', cl, b0: b, s0: cl.start, pushed: false }; stCv.setPointerCapture(e.pointerId); ST.need = true; return; }
+      ST.selClip = null; renderDock();
+    }
+    drag = { kind: 'pan', x0: e.clientX, y0: e.clientY, sl: stTl.scrollLeft, st: stTl.scrollTop, moved: false, track: t };
+    stCv.setPointerCapture(e.pointerId); ST.need = true;
+  });
+  stCv.addEventListener('pointermove', e => {
+    if (!drag) return; const p = at(e);
+    if (drag.kind === 'seek') { if (!ST.playing) { ST.pos = Math.max(0, snapB(p.x / ST.ppb, ST.snap ? Math.max(ST.snap, 0.25) : 0)); stTimeUI(); ST.need = true; } return; }
+    if (drag.kind === 'clip') {
+      const nb = Math.max(0, snapB(drag.s0 + (p.x / ST.ppb - drag.b0)));
+      if (nb !== drag.cl.start) { if (!drag.pushed) { stPush(); drag.pushed = true; } drag.cl.start = nb; ST.need = true; }
+      return;
+    }
+    if (drag.kind === 'pan') {
+      const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0;
+      if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true;
+      if (drag.moved) { stTl.scrollLeft = drag.sl - dx; stTl.scrollTop = drag.st - dy; }
+    }
+  });
+  const up = () => { if (drag && drag.kind === 'clip' && drag.pushed && ST.playing) { const b = stNow(); stStop(); ST.pos = b; stPlay(); } drag = null; };
+  stCv.addEventListener('pointerup', up); stCv.addEventListener('pointercancel', up);
+  stCv.addEventListener('dblclick', e => {
+    const p = at(e); if (p.vy < RH) return; const t = ST.tracks[Math.floor((p.y - RH) / LH())];
+    if (t && t.type === 'inst') { stSelect(t.id); setDockTab('notes'); }
+  });
+  stCv.style.touchAction = 'none';
+})();
+
+/* ---------- bottom panel: keyboard, note editor, audio tools ---------- */
+function setDockTab(tab) { ST.dock = tab; ST.dockHidden = false; renderDock(); }
+function renderDock() {
+  const t = stSelTrack(), dock = $('#stDock');
+  dock.hidden = !t || ST.dockHidden;
+  if (!t) return;
+  const c = tColor(t); dock.style.setProperty('--tc', c);
+  $('#stDColor').style.background = c; $('#stDName').textContent = t.name;
+  const inst = t.type === 'inst';
+  $('#stDInst').hidden = !inst;
+  if (inst) { const P = INST[t.sound] || INST.piano; $('#stDInst').innerHTML = FAMS[P.fam].icon.replace('<svg', '<svg width="15" height="15"') + '<span>' + escapeHTML(P.name) + '</span>'; }
+  document.querySelector('.stdtabs').hidden = !inst;
+  document.querySelectorAll('.stdtab').forEach(b => b.setAttribute('aria-selected', String(b.dataset.dtab === ST.dock)));
+  const showKeys = inst && ST.dock === 'keys', showNotes = inst && ST.dock === 'notes';
+  $('#stKeysWrap').hidden = !showKeys; $('#stDKeysBar').hidden = !showKeys;
+  $('#stRoll').hidden = !showNotes; $('#stDNotesBar').hidden = !showNotes;
+  $('#stAudioPane').hidden = inst; $('#stDAudioBar').hidden = inst;
+  $('#stDelNote').disabled = !ST.selNote; $('#stDelClip').disabled = !ST.selClip;
+  if (!inst) $('#stAudioMsg').textContent = t.clips.length ? 'Drag clips left or right on the timeline to move them. Select a clip to split or delete it. Press Record to add a voice take at the playhead.' : 'This is an audio track. Record your voice into it, or add a song or sound file. Headphones keep the other tracks out of your microphone.';
+  if (showKeys) requestAnimationFrame(renderStKeys);
+  if (showNotes) requestAnimationFrame(() => { stRollCenter(); stRollDraw(); });
+}
+document.querySelectorAll('.stdtab').forEach(b => b.addEventListener('click', () => setDockTab(b.dataset.dtab)));
+$('#stDockHide').addEventListener('click', () => { ST.dockHidden = true; renderDock(); toast('Select a track to bring the panel back.'); });
+$('#stDInst').addEventListener('click', () => { const t = stSelTrack(); if (t) openStInst(t); });
+
+/* keyboard (same look and computer-key letters as Piano) */
+function renderStKeys() {
+  const t = stSelTrack(), kb = $('#stKb'); if (!t || t.type !== 'inst' || $('#stKeysWrap').hidden) return;
+  const w = kb.clientWidth; if (!w) return;
+  const coarse = matchMedia('(pointer:coarse)').matches, nW = clamp(Math.floor(w / (coarse ? 42 : 38)), 8, 29);
+  const base = 12 * (ST.octave + 1), whites = [], blacks = []; let m = base, wi = 0;
+  while (wi < nW) { if (!isBlack(m)) { whites.push({ m, wi }); wi++; } else blacks.push({ m, wi }); m++; }
+  const ww = 100 / nW, bw = ww * 0.62;
+  const hk = mm => { const i = mm - base; return i >= 0 && i < KEYMAP.length ? `<span class="hk">${KEYMAP[i]}</span>` : ''; };
+  const PI = INST[t.sound] || INST.piano, drums = PI.kind === 'drum', names = drums ? (KITS[PI.kit] || KITS.acoustic).names : null, dn = mm => names[((mm % 12) + 12) % 12];
+  kb.innerHTML = whites.map(k => `<div class="pk pk-w" data-m="${k.m}" style="--oc:${octColor(k.m)}">${hk(k.m)}<span class="nm${k.m % 12 === 0 ? ' c' : ''}">${drums ? dn(k.m) : k.m % 12 === 0 ? noteName(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('') +
+    blacks.map(k => `<div class="pk pk-b" data-m="${k.m}" style="--oc:${octColor(k.m)};left:${(k.wi * ww - bw / 2).toFixed(3)}%;width:${bw.toFixed(3)}%">${hk(k.m)}<span class="nm">${drums ? dn(k.m) : noteName(k.m).replace(/\d+$/, '')}</span></div>`).join('');
+  $('#stKeysWrap').classList.toggle('dr', drums);
+  ST.keyEls = new Map([...kb.querySelectorAll('.pk')].map(el => [+el.dataset.m, el]));
+  ST.down.forEach(mm => stKeyOn(mm, true));
+  $('#stOct').textContent = noteName(base);
+  applyKeyHints();
+}
+function stKeyOn(m, on) { const el = ST.keyEls.get(m); if (el) el.classList.toggle('on', on); }
+function stOct(d) { ST.octave = clamp(ST.octave + d, 1, 6); stReleaseAll(); renderStKeys(); toast('Keyboard starts at ' + noteName(12 * (ST.octave + 1))); }
+$('#stOctDn').addEventListener('click', () => stOct(-1));
+$('#stOctUp').addEventListener('click', () => stOct(1));
+(() => {
+  const kb = $('#stKeysWrap');
+  const noteAt = (x, y) => { const el = document.elementFromPoint(x, y), k = el && el.closest && el.closest('#stKb .pk'); return k ? +k.dataset.m : null; };
+  kb.addEventListener('pointerdown', e => { const k = e.target.closest('.pk'); if (!k) return; e.preventDefault(); try { kb.setPointerCapture(e.pointerId); } catch (er) {} const m = +k.dataset.m; stPtr.set(e.pointerId, m); stPress(m); });
+  kb.addEventListener('pointermove', e => { if (!stPtr.has(e.pointerId)) return; const m = noteAt(e.clientX, e.clientY), old = stPtr.get(e.pointerId); if (m !== old) { if (old != null) stRelease(old); if (m != null) stPress(m); stPtr.set(e.pointerId, m); } });
+  const up = e => { if (!stPtr.has(e.pointerId)) return; const old = stPtr.get(e.pointerId); stPtr.delete(e.pointerId); if (old != null) stRelease(old); };
+  kb.addEventListener('pointerup', up); kb.addEventListener('pointercancel', up); kb.addEventListener('contextmenu', e => e.preventDefault());
+  new ResizeObserver(() => { if (MODE === 'studio') { renderStKeys(); ST.need = true; } }).observe($('#stKeysWrap'));
+})();
+
+/* note editor: square note blocks you can add, drag, stretch and delete */
+const stRoll = $('#stRoll'), stRollCv = $('#stRollCv'), GUT = 46;
+function stRollCenter() {
+  const t = stSelTrack(); if (!t || t.type !== 'inst' || stRoll.dataset.for === t.id) return; stRoll.dataset.for = t.id;
+  stRollSize();
+  const ms = t.notes.map(n => n.m), mid = ms.length ? (Math.min(...ms) + Math.max(...ms)) / 2 : isDrumTrack(t) ? 42 : 62;
+  stRoll.scrollTop = Math.max(0, (HI_NOTE - mid) * ST.rowH - stRoll.clientHeight / 2);
+  const first = t.notes.length ? Math.min(...t.notes.map(n => n.t)) : stNow();
+  stRoll.scrollLeft = Math.max(0, first * ST.rp - 40);
+}
+function stRollSize() {
+  const t = stSelTrack(), end = Math.max(stEnd(), stNow()) + 16, inner = $('#stRollIn');
+  inner.style.width = Math.max(stRoll.clientWidth, GUT + end * ST.rp) + 'px'; inner.style.height = ((HI_NOTE - LO_NOTE + 1) * ST.rowH) + 'px';
+}
+function stRollDraw() {
+  if (MODE !== 'studio' || stRoll.hidden) return;
+  const t = stSelTrack(); if (!t || t.type !== 'inst') return;
+  stRollSize();
+  const { g, w, h } = stSize(stRollCv, stRoll), sx = stRoll.scrollLeft, sy = stRoll.scrollTop, rp = ST.rp, rh = ST.rowH, col = tColor(t);
+  const drums = isDrumTrack(t), names = drums ? (KITS[(INST[t.sound] || {}).kit] || KITS.acoustic).names : null;
+  g.fillStyle = '#070910'; g.fillRect(0, 0, w, h);
+  const m0 = HI_NOTE - Math.floor(sy / rh), m1 = HI_NOTE - Math.ceil((sy + h) / rh);
+  for (let m = m0; m >= Math.max(LO_NOTE, m1); m--) {
+    const y = (HI_NOTE - m) * rh - sy;
+    g.fillStyle = isBlack(m) ? '#0a0d15' : '#0d111b'; g.fillRect(GUT, y, w - GUT, rh);
+    g.fillStyle = m % 12 === 0 ? '#273049' : '#141927'; g.fillRect(GUT, y + rh - 1, w - GUT, 1);
+  }
+  const snap = ST.snap || 0.25, b0 = Math.floor((sx) / rp), b1 = Math.ceil((sx + w) / rp);
+  for (let b = b0; b <= b1; b += snap) {
+    const x = Math.round(GUT + b * rp - sx) + 0.5; if (x < GUT) continue;
+    const bar = Math.abs(b % 4) < 1e-6, beat = Math.abs(b - Math.round(b)) < 1e-6;
+    g.fillStyle = bar ? '#2c3550' : beat ? '#1a2033' : '#11151f'; g.fillRect(x, 0, 1, h);
+  }
+  // note blocks
+  g.save(); g.beginPath(); g.rect(GUT, 0, w - GUT, h); g.clip();
+  const all = t.notes.slice(); ST.live.forEach(L => { if (L.note && L.track === t.id) all.push({ m: L.note.m, t: L.note.t, d: Math.max(0.06, stNow() - L.note.t), live: true }); });
+  for (const n of all) {
+    const x = GUT + n.t * rp - sx, y = (HI_NOTE - n.m) * rh - sy, wd = Math.max(6, n.d * rp - 1);
+    if (x > w || x + wd < GUT || y > h || y + rh < 0) continue;
+    rr(g, x, y + 1, wd, rh - 2, 3); g.fillStyle = n.live ? '#ffffff' : col; g.fill();
+    g.strokeStyle = n === ST.selNote ? '#ffffff' : 'rgba(0,0,0,.45)'; g.lineWidth = n === ST.selNote ? 2 : 1; g.stroke();
+    if (wd > 34 && rh >= 14) { g.fillStyle = 'rgba(11,13,20,.75)'; g.font = '700 9.5px ui-monospace, Menlo, monospace'; g.fillText(drums ? names[((n.m % 12) + 12) % 12] : noteName(n.m), x + 4, y + rh - 4); }
+    if (wd > 12) { g.fillStyle = 'rgba(11,13,20,.35)'; g.fillRect(x + wd - 4, y + 4, 2, rh - 8); }
+  }
+  g.restore();
+  // playhead
+  const px = GUT + stNow() * rp - sx;
+  if (px >= GUT) { g.fillStyle = ST.recording ? '#ef4444' : '#f8fafc'; g.fillRect(Math.round(px), 0, 2, h); }
+  // key gutter
+  g.fillStyle = '#10141f'; g.fillRect(0, 0, GUT, h);
+  for (let m = m0; m >= Math.max(LO_NOTE, m1); m--) {
+    const y = (HI_NOTE - m) * rh - sy, blk = isBlack(m);
+    g.fillStyle = blk ? '#1b2031' : '#e9edf5'; g.fillRect(0, y, GUT - 2, rh - 1);
+    if (drums || m % 12 === 0 || rh >= 18) { g.fillStyle = blk ? '#9aa3ba' : m % 12 === 0 ? octColor(m) : '#4b5574'; g.font = '700 9px ui-monospace, Menlo, monospace'; g.fillText(drums ? names[((m % 12) + 12) % 12].slice(0, 7) : noteName(m), 3, y + rh - 4); }
+  }
+}
+stRoll.addEventListener('scroll', () => stRollDraw(), { passive: true });
+(() => {
+  let drag = null;
+  const at = e => { const r = stRollCv.getBoundingClientRect(); const vx = e.clientX - r.left, vy = e.clientY - r.top; return { vx, vy, b: (vx - GUT + stRoll.scrollLeft) / ST.rp, m: HI_NOTE - Math.floor((vy + stRoll.scrollTop) / ST.rowH) }; };
+  const hit = (t, p) => { for (let i = t.notes.length - 1; i >= 0; i--) { const n = t.notes[i]; if (n.m === p.m && p.b >= n.t && p.b <= n.t + Math.max(n.d, 6 / ST.rp)) return n; } return null; };
+  const preview = (t, m) => { stInit(); const v = startVoice(ctx, stChan(t).g, t.sound, m, 0.7, ctx.currentTime); v.release(ctx.currentTime + 0.25); stMix(); };
+  stRollCv.addEventListener('pointerdown', e => {
+    if (e.button > 0) return; const t = stSelTrack(); if (!t || t.type !== 'inst') return;
+    const p = at(e); stRoll.focus({ preventScroll: true });
+    if (p.m < LO_NOTE || p.m > HI_NOTE) return;
+    if (p.vx < GUT) { preview(t, p.m); return; }
+    const n = hit(t, p); stRollCv.setPointerCapture(e.pointerId);
+    if (n) {
+      ST.selNote = n; $('#stDelNote').disabled = false;
+      const edge = (n.t + n.d) * ST.rp - (p.b * ST.rp) < 8 && n.d * ST.rp > 12;
+      drag = { kind: edge ? 'size' : 'move', n, b0: p.b, m0: p.m, t0: n.t, d0: n.d, mm0: n.m, pushed: false };
+      if (!edge) preview(t, n.m);
+    } else if (e.pointerType === 'mouse') {
+      stPush(); const len = ST.snap ? Math.max(ST.snap, ST.lastLen) : ST.lastLen, nn = { m: p.m, t: Math.max(0, ST.snap ? Math.floor(p.b / ST.snap) * ST.snap : p.b), d: len, v: 0.8 };
+      t.notes.push(nn); ST.selNote = nn; drag = { kind: 'size', n: nn, b0: p.b, t0: nn.t, d0: len, pushed: true, fresh: true }; preview(t, p.m); renderStHeads();
+    } else {
+      drag = { kind: 'pan', x0: e.clientX, y0: e.clientY, sl: stRoll.scrollLeft, st: stRoll.scrollTop, moved: false, p };
+    }
+    $('#stDelNote').disabled = !ST.selNote; stRollDraw(); ST.need = true;
+  });
+  stRollCv.addEventListener('pointermove', e => {
+    if (!drag) { const t = stSelTrack(); if (t && t.type === 'inst' && e.pointerType === 'mouse') { const p = at(e), n = p.vx > GUT && hit(t, p); stRollCv.style.cursor = !n ? 'crosshair' : (n.t + n.d) * ST.rp - p.b * ST.rp < 8 ? 'ew-resize' : 'grab'; } return; }
+    const p = at(e), t = stSelTrack();
+    if (drag.kind === 'pan') { const dx = e.clientX - drag.x0, dy = e.clientY - drag.y0; if (!drag.moved && Math.hypot(dx, dy) > 6) drag.moved = true; if (drag.moved) { stRoll.scrollLeft = drag.sl - dx; stRoll.scrollTop = drag.st - dy; } return; }
+    if (!drag.pushed) { stPush(); drag.pushed = true; }
+    if (drag.kind === 'move') {
+      const nt = Math.max(0, snapB(drag.t0 + (p.b - drag.b0))), nm = clamp(drag.mm0 + (p.m - drag.m0), LO_NOTE, HI_NOTE);
+      if (nm !== drag.n.m) preview(t, nm);
+      drag.n.t = nt; drag.n.m = nm;
+    } else {
+      const end = Math.max(drag.t0 + (ST.snap || 0.0625), snapB(p.b) > drag.t0 ? snapB(p.b) : drag.t0 + (ST.snap || 0.0625));
+      drag.n.d = Math.max(ST.snap || 0.0625, end - drag.t0); ST.lastLen = drag.n.d;
+    }
+    stDirty(); stRollDraw(); ST.need = true;
+  });
+  const up = e => {
+    if (!drag) return; const t = stSelTrack();
+    if (drag.kind === 'pan' && !drag.moved && t) {   // a tap on an empty spot adds a note (touch screens)
+      const p = drag.p; stPush(); const len = ST.snap ? Math.max(ST.snap, ST.lastLen) : ST.lastLen;
+      const nn = { m: p.m, t: Math.max(0, ST.snap ? Math.floor(p.b / ST.snap) * ST.snap : p.b), d: len, v: 0.8 }; t.notes.push(nn); ST.selNote = nn; preview(t, p.m);
+    }
+    if (t) t.notes.sort((a, b) => a.t - b.t);
+    drag = null; renderStHeads(); $('#stDelNote').disabled = !ST.selNote; stRollDraw(); ST.need = true;
+  };
+  stRollCv.addEventListener('pointerup', up); stRollCv.addEventListener('pointercancel', up);
+  stRollCv.addEventListener('dblclick', e => { const t = stSelTrack(); if (!t) return; const n = hit(t, at(e)); if (n) { stPush(); t.notes.splice(t.notes.indexOf(n), 1); ST.selNote = null; renderStHeads(); stRollDraw(); ST.need = true; } });
+  stRollCv.addEventListener('contextmenu', e => { e.preventDefault(); const t = stSelTrack(); if (!t) return; const n = hit(t, at(e)); if (n) { stPush(); t.notes.splice(t.notes.indexOf(n), 1); ST.selNote = null; renderStHeads(); stRollDraw(); ST.need = true; } });
+  stRollCv.style.touchAction = 'none';
+  new ResizeObserver(() => { if (MODE === 'studio') stRollDraw(); }).observe(stRoll);
+})();
+function stDeleteSel() {
+  const t = stSelTrack(); if (!t) return false;
+  if (t.type === 'inst' && ST.selNote && t.notes.includes(ST.selNote)) { stPush(); t.notes.splice(t.notes.indexOf(ST.selNote), 1); ST.selNote = null; renderStHeads(); renderDock(); ST.need = true; return true; }
+  if (t.type === 'audio' && ST.selClip) { stPush(); t.clips = t.clips.filter(c => c.id !== ST.selClip); ST.selClip = null; renderStHeads(); renderDock(); ST.need = true; return true; }
+  return false;
+}
+$('#stDelNote').addEventListener('click', stDeleteSel);
+$('#stDelClip').addEventListener('click', stDeleteSel);
+$('#stQuant').addEventListener('click', () => {
+  const t = stSelTrack(); if (!t || t.type !== 'inst' || !t.notes.length) return;
+  const s = ST.snap || 0.25; stPush();
+  t.notes.forEach(n => { n.t = Math.max(0, Math.round(n.t / s) * s); n.d = Math.max(s, Math.round(n.d / s) * s); });
+  stRollDraw(); ST.need = true; toast('Lined up ' + t.notes.length + ' notes with the ' + $('#stSnap').selectedOptions[0].textContent.replace('Off', '1/16') + ' grid');
+});
+$('#stSplit').addEventListener('click', () => {
+  const t = stSelTrack(); if (!t || t.type !== 'audio') return; const b = stNow(), s = spb();
+  const cl = t.clips.find(c => b > c.start + 0.01 && b < c.start + c.len / s - 0.01); if (!cl) return toast('Move the playhead over a clip on this track first.');
+  stPush(); const cut = (b - cl.start) * s;
+  const right = { id: sUid(), key: cl.key, start: b, off: cl.off + cut, len: cl.len - cut, name: cl.name };
+  cl.len = cut; t.clips.push(right); ST.selClip = right.id; renderStHeads(); renderDock(); ST.need = true; toast('Split the clip at the playhead');
+});
+
+/* ---------- instruments ---------- */
+(() => {
+  $('#stInstList').innerHTML = Object.keys(FAMS).map(fk => {
+    const F = FAMS[fk], items = INSTRUMENTS.filter(x => x.fam === fk);
+    return `<h4 style="--fc:${F.color}">${F.name}</h4><div class="igrid" role="listbox" aria-label="${F.name}">` +
+      items.map(x => `<button type="button" class="iitem" role="option" data-sound="${x.id}" style="--fc:${F.color}" aria-selected="false"><span class="inum">${x.num}</span>${F.icon}<span>${x.name}</span></button>`).join('') + '</div>';
+  }).join('');
+  $('#stInstCount').textContent = INSTRUMENTS.length + ' to choose from';
+})();
+let stInstFor = null, stInstNew = false;
+function openStInst(t, isNew) {
+  stInstFor = t; stInstNew = !!isNew; $('#stInstTitle').textContent = isNew ? 'Pick an instrument for your new track' : 'Instrument for “' + t.name + '”';
+  document.querySelectorAll('#stInstList .iitem').forEach(b => b.setAttribute('aria-selected', String(t && b.dataset.sound === t.sound)));
+  $('#stInstDlg').showModal();
+  const sel = $('#stInstList .iitem[aria-selected="true"]'); if (sel) { sel.scrollIntoView({ block: 'center' }); sel.focus(); }
+}
+$('#stInstClose').addEventListener('click', () => $('#stInstDlg').close());
+$('#stInstList').addEventListener('click', e => {
+  const b = e.target.closest('.iitem'); if (!b) return; const id = b.dataset.sound;
+  if (stInstNew) { stPush(); const t = newInstTrack(id); stSelect(t.id); }
+  else if (stInstFor) { stPush(); const old = INST[stInstFor.sound]; if (!old || stInstFor.name === old.name) stInstFor.name = INST[id].name; stInstFor.sound = id; }
+  $('#stInstDlg').close(); renderStudio();
+  const t = stSelTrack(); if (t) { stInit(); stMix(); const m = INST[id].kind === 'drum' ? 60 : ['tuba', 'contrabass', 'bassoon'].includes(id) ? 48 : 60; const v = startVoice(ctx, stChan(t).g, id, m, 0.75, ctx.currentTime); v.release(ctx.currentTime + 0.45); }
+});
+
+/* ---------- adding tracks ---------- */
+async function stAddAudioFile(file, intoTrack) {
+  if (!file) return; stInit(); toast('Loading “' + file.name + '”…');
+  try {
+    const buf = await decodeAB(await file.arrayBuffer()), key = 'a' + sUid();
+    ST.blobs.set(key, file); ST.bufs.set(key, buf); ST.peaks.set(key, computePeaks(buf));
+    stPush();
+    const t = intoTrack && intoTrack.type === 'audio' ? intoTrack : newAudioTrack(file.name.replace(/\.[^.]+$/, '').slice(0, 40));
+    t.clips.push({ id: sUid(), key, start: snapB(ST.pos, 1), off: 0, len: buf.duration, name: file.name.replace(/\.[^.]+$/, '') });
+    stSelect(t.id); renderStudio(); toast('Added “' + file.name + '”');
+  } catch (e) { toast('That file could not be read as audio. Try an MP3, WAV, M4A or OGG.'); }
+}
+let stFileInto = null;
+$('#stFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; stAddAudioFile(f, stFileInto); stFileInto = null; });
+async function stAdd(kind, btn) {
+  if (kind === 'inst') return openStInst(null, true);
+  if (kind === 'drums') { stPush(); const t = newInstTrack('drums'); stSelect(t.id); renderStudio(); toast('Drum track added. Each key plays a different drum.'); return; }
+  if (kind === 'audio') { stFileInto = null; return $('#stFile').click(); }
+  if (kind === 'voice') { stPush(); const t = newAudioTrack('Voice'); stSelect(t.id); renderStudio(); toast('Voice track added. Press Record to sing or talk into your mic.'); return; }
+  if (kind === 'piano') {
+    let list = []; try { list = (await idbAll('creations')).sort((a, b) => b.updated - a.updated); } catch (e) {}
+    if (!list.length) return toast('Your Piano library is empty. Record something in Piano and save it first.');
+    return openGMenu(btn, 'Add a Piano creation', list.slice(0, 30).map(p => ({ label: p.title || 'Untitled', fn: () => stImportCreation(p) })));
+  }
+  if (kind === 'dj') {
+    let list = []; try { list = (await idbAll('projects')).sort((a, b) => b.updated - a.updated); } catch (e) {}
+    if (!list.length) return toast('Your DJ library is empty. Load a song in DJ and save the project first.');
+    return openGMenu(btn, 'Add a DJ project', list.slice(0, 30).map(p => ({ label: p.title || 'Untitled', fn: () => stImportDJ(p) })));
+  }
+}
+function stImportCreation(p) {
+  const notes = p.notes || []; if (!notes.length) return toast('That creation has no notes.');
+  stPush(); const at = snapB(ST.pos, 1), k = ST.bpm / 60, groups = new Map();
+  notes.forEach(n => { const s = n.s || p.sound || 'piano'; if (!groups.has(s)) groups.set(s, []); groups.get(s).push({ m: n.m, t: at + n.t * k, d: Math.max(0.06, n.d * k), v: n.v || 0.8 }); });
+  let last = null; groups.forEach((ns, s) => { last = newInstTrack(s, (p.title || 'Creation') + (groups.size > 1 ? ' · ' + (INST[s] || INST.piano).name : '')); last.notes = ns; });
+  stSelect(last.id); renderStudio(); toast('Added “' + (p.title || 'Untitled') + '” as ' + groups.size + ' track' + (groups.size > 1 ? 's' : ''));
+}
+async function stImportDJ(p) {
+  const decks = [p.decks && p.decks.A, p.decks && p.decks.B].filter(d => d && d.audio); if (!decks.length) return toast('That DJ project has no songs saved in it.');
+  stInit(); toast('Adding “' + (p.title || 'Untitled') + '”…');
+  try {
+    const at = snapB(ST.pos, 1); let last = null, pushed = false;
+    for (const d of decks) {
+      const buf = await decodeAB(await d.audio.arrayBuffer()), key = 'a' + sUid();
+      ST.blobs.set(key, d.audio); ST.bufs.set(key, buf); ST.peaks.set(key, computePeaks(buf));
+      if (!pushed) { stPush(); pushed = true; }
+      last = newAudioTrack((d.name || p.title || 'DJ song').slice(0, 40)); last.clips.push({ id: sUid(), key, start: at, off: 0, len: buf.duration, name: d.name || p.title || 'DJ song' });
+    }
+    stSelect(last.id); renderStudio(); toast('Added “' + (p.title || 'Untitled') + '”');
+  } catch (e) { toast('That DJ project could not be added.'); }
+}
+document.querySelectorAll('#studioView [data-add]').forEach(b => b.addEventListener('click', () => stAdd(b.dataset.add, b)));
+$('#stMicBtn').addEventListener('click', () => { const t = stSelTrack(); if (t && t.type === 'audio') { if (ST.recording) stStop(); else stRecord(); } });
+$('#stAddFile').addEventListener('click', () => { stFileInto = stSelTrack(); $('#stFile').click(); });
+
+/* ---------- saving, library, export ---------- */
+function stSnapshot(title) {
+  const used = new Set(); ST.tracks.forEach(t => (t.clips || []).forEach(c => used.add(c.key)));
+  const audio = {}; used.forEach(k => { if (ST.blobs.has(k)) audio[k] = ST.blobs.get(k); });
+  const notes = ST.tracks.reduce((a, t) => a + (t.notes ? t.notes.length : 0), 0);
+  return { kind: 'studio', title, bpm: ST.bpm, snap: ST.snap, metro: ST.metro, tracks: JSON.parse(JSON.stringify(ST.tracks)), audio, length: stEnd() * spb(), trackCount: ST.tracks.length, noteCount: notes };
+}
+async function stSave() {
+  if (!ST.tracks.length) return toast('Add a track and record something first, then save.');
+  if (stSave.busy) return; stSave.busy = true;
+  try {
+    let title = $('#stTitle').value.trim();
+    if (!title) { let n = 0; try { (await idbAll('studio')).forEach(p => { const m = /^Untitled song (\d+)$/.exec(p.title || ''); if (m) n = Math.max(n, +m[1]); }); } catch (e) {} title = 'Untitled song ' + (n + 1); $('#stTitle').value = title; }
+    const now = Date.now(), id = ST.project.id || 's' + now.toString(36) + Math.random().toString(36).slice(2, 6);
+    const rec = Object.assign({ id, created: ST.project.created || now, updated: now }, stSnapshot(title));
+    await idbPut(rec, 'studio');
+    ST.project = { id, created: rec.created }; ST.dirty = false; stState();
+    if (navigator.storage && navigator.storage.persist) navigator.storage.persist().catch(() => {});
+    toast('Saved “' + title + '” to your SpinLab library');
+    if ($('#stLib').open) stFillList($('#stLibList'), false);
+  } catch (e) { toast(e && e.name === 'QuotaExceededError' ? 'There isn’t enough storage space on this device to save this.' : 'This could not be saved in this browser.'); }
+  stSave.busy = false;
+}
+function stReset() {
+  if (ST.playing) stStop(); stReleaseAll();
+  ST.tracks = []; ST.sel = ST.selClip = ST.selNote = null; ST.pos = 0; ST.undo = []; ST.redo = []; ST.ch.forEach(c => { try { c.p.disconnect(); } catch (e) {} }); ST.ch.clear();
+  ST.bufs.clear(); ST.blobs.clear(); ST.peaks.clear(); ST.bpm = 100; ST.metro = false; ST.snap = 0.25; ST.project = { id: null, created: null }; ST.dirty = false;
+  $('#stTitle').value = ''; $('#stBpm').value = 100; $('#stSnap').value = '0.25'; stRoll.dataset.for = '';
+}
+const stUnsaved = () => ST.dirty && ST.tracks.length > 0;
+async function stNew() {
+  if (stUnsaved() && !(await askConfirm('Start a new song? The changes you haven’t saved in this one will be lost.', 'Start new'))) return;
+  stReset(); renderStudio(); stState(); $('#stLib').open && $('#stLib').close();
+}
+async function stOpen(id) {
+  if (stUnsaved() && !(await askConfirm('Open this song? The changes you haven’t saved in the current one will be lost.', 'Open'))) return;
+  try {
+    const p = await idbGet(id, 'studio'); if (!p) return toast('That song could not be found.');
+    stInit(); stReset(); toast('Opening “' + (p.title || 'Untitled') + '”…');
+    ST.tracks = p.tracks || []; ST.bpm = p.bpm || 100; ST.snap = p.snap ?? 0.25; ST.metro = !!p.metro;
+    $('#stBpm').value = ST.bpm; $('#stSnap').value = String(ST.snap); $('#stTitle').value = p.title || '';
+    for (const [k, blob] of Object.entries(p.audio || {})) {
+      try { const buf = await decodeAB(await blob.arrayBuffer()); ST.blobs.set(k, blob); ST.bufs.set(k, buf); ST.peaks.set(k, computePeaks(buf)); } catch (e) {}
+    }
+    ST.project = { id: p.id, created: p.created }; ST.dirty = false;
+    ST.sel = ST.tracks.length ? ST.tracks[0].id : null; stMix(); renderStudio(); stState();
+    if ($('#stLib').open) $('#stLib').close(); toast('Opened “' + (p.title || 'Untitled') + '”');
+  } catch (e) { toast('That song could not be opened.'); }
+}
+async function stFillList(ul, compact) {
+  let list = [];
+  try { list = (await idbAll('studio')).sort((a, b) => b.updated - a.updated); }
+  catch (e) { ul.innerHTML = '<li class="libempty">This browser won’t let SpinLab save here. Private or incognito windows often block it.</li>'; return; }
+  if (!list.length) { ul.innerHTML = '<li class="libempty">' + (compact ? 'No SpinLab songs yet.' : 'No saved songs yet. Add tracks, record, give your song a name at the top, and press Save.') + '</li>'; return; }
+  const meta = p => { const when = new Date(p.updated).toLocaleString([], { month: 'short', day: 'numeric', hour: 'numeric', minute: '2-digit' }); const n = p.trackCount || (p.tracks || []).length; return `${n} track${n === 1 ? '' : 's'} · ${fmt(p.length || 0).replace(/\.\d$/, '')} · ${when}`; };
+  ul.innerHTML = list.map(p => compact
+    ? `<li class="hitem${p.id === ST.project.id ? ' cur' : ''}" data-id="${p.id}"><button class="hopen" data-s="open" title="Open"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${meta(p)}</small></button><button class="btn sm icon" data-s="rename" aria-label="Rename ${escapeHTML(p.title || 'Untitled')}" title="Rename">${PENCIL}</button><button class="btn sm icon danger" data-s="delete" aria-label="Delete ${escapeHTML(p.title || 'Untitled')}" title="Delete">${BIN}</button></li>`
+    : `<li class="libitem${p.id === ST.project.id ? ' cur' : ''}" data-id="${p.id}"><div class="info" data-s="open" role="button" tabindex="0"><b>${escapeHTML(p.title || 'Untitled')}</b><small>${meta(p)}${p.id === ST.project.id ? ' · open now' : ''}</small></div><div class="row"><button class="btn sm primary" data-s="open">Open</button><button class="btn sm" data-s="rename">Rename</button><button class="btn sm danger" data-s="delete">Delete</button></div></li>`).join('');
+}
+async function stListClick(e) {
+  const b = e.target.closest('[data-s]'); if (!b) return; const li = b.closest('li'), id = li.dataset.id, ul = e.currentTarget;
+  const again = () => ul.id === 'stLibList' ? stFillList(ul, false) : stFillList(ul, true);
+  if (b.dataset.s === 'open') { if (MODE !== 'studio') await setMode('studio', true); return stOpen(id); }
+  const p = await idbGet(id, 'studio').catch(() => null); if (!p) return;
+  if (b.dataset.s === 'delete') {
+    if (!(await askConfirm('Are you sure you want to delete “' + (p.title || 'Untitled') + '”? This can’t be undone.', 'Delete'))) return;
+    await idbDel(id, 'studio').catch(() => {}); if (ST.project.id === id) { ST.project = { id: null, created: null }; ST.dirty = true; stState(); }
+    again(); toast('Deleted “' + (p.title || 'Untitled') + '”'); return;
+  }
+  if (b.dataset.s === 'rename') {
+    const n = await askText('Rename the song', p.title || ''); if (!n) return;
+    p.title = n; await idbPut(p, 'studio').catch(() => {}); if (ST.project.id === id) $('#stTitle').value = n; again(); toast('Renamed to “' + n + '”');
+  }
+}
+['#stLibList', '#homeStudio'].forEach(s => $(s).addEventListener('click', stListClick));
+$('#stLibList').addEventListener('keydown', e => { const i = e.target.closest('.info[data-s]'); if (i && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); stOpen(i.closest('li').dataset.id); } });
+$('#stLibBtn').addEventListener('click', () => { stFillList($('#stLibList'), false); $('#stLib').showModal(); });
+$('#stLibClose').addEventListener('click', () => $('#stLib').close());
+$('#stLibNew').addEventListener('click', stNew);
+$('#stSave').addEventListener('click', stSave);
+$('#stTitle').addEventListener('input', stDirty);
+$('#stTitle').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#stTitle').blur(); } });
+async function stRender() {
+  const endS = stEnd() * spb(); if (!endS) { toast('Record something first.'); return null; }
+  ac(); const sr = ctx.sampleRate, s = spb(), off = new OfflineAudioContext(2, Math.ceil((endS + 2.5) * sr), sr);
+  const lim = off.createDynamicsCompressor(); lim.threshold.value = -2; lim.knee.value = 0; lim.ratio.value = 20; lim.attack.value = 0.003; lim.release.value = 0.2; lim.connect(off.destination);
+  const bus = off.createGain(); bus.gain.value = 0.9; bus.connect(lim);
+  const rv = off.createGain(), cv = off.createConvolver(); cv.buffer = IR; rv.connect(cv); cv.connect(lim);
+  const solo = ST.tracks.some(t => t.solo);
+  for (const t of ST.tracks) {
+    if (t.mute || (solo && !t.solo)) continue;
+    const g = off.createGain(); g.gain.value = t.vol; const p = off.createStereoPanner ? off.createStereoPanner() : off.createGain(); if (p.pan) p.pan.value = t.pan || 0;
+    g.connect(p); p.connect(bus); if (t.type === 'inst') { const send = off.createGain(); send.gain.value = 0.16; p.connect(send); send.connect(rv); }
+    if (t.type === 'inst') for (const n of t.notes) startVoice(off, g, t.sound, n.m, n.v || 0.8, 0.05 + n.t * s).release(0.05 + (n.t + n.d) * s);
+    else for (const c of t.clips) { const b = ST.bufs.get(c.key); if (!b) continue; const src = off.createBufferSource(); src.buffer = b; src.connect(g); src.start(0.05 + c.start * s, c.off, c.len); }
+  }
+  return off.startRendering();
+}
+async function stExport(kind) {
+  if (stExport.busy) return; stExport.busy = true;
+  try {
+    if (ST.playing) stStop(); toast('Making your ' + kind.toUpperCase() + '…');
+    const buf = await stRender(); if (!buf) return;
+    const blob = kind === 'mp3' ? await encodeMP3(buf, f => toast('Making MP3… ' + Math.round(f * 100) + '%')) : encodeWAV(buf);
+    download(blob, ($('#stTitle').value.trim() || 'My SpinLab song') + '.' + kind); toast(kind.toUpperCase() + ' saved to Downloads');
+  } catch (e) { toast('The file could not be made.'); }
+  finally { stExport.busy = false; }
+}
+$('#stExport').addEventListener('click', e => openGMenu(e.currentTarget, 'Export your song', [
+  { label: 'MP3 file (smaller, plays everywhere)', fn: () => stExport('mp3') },
+  { label: 'WAV file (full quality)', fn: () => stExport('wav') }
+]));
+
+/* ---------- top bar controls ---------- */
+$('#stPlay').addEventListener('click', () => { if (ST.recording) stStop(); else stPlay(); });
+$('#stRec').addEventListener('click', stRecord);
+$('#stBack').addEventListener('click', () => { stSeek(0); stTl.scrollLeft = 0; });
+$('#stMetro').addEventListener('click', () => { ST.metro = !ST.metro; if (ST.playing) ST.metro ? stMetroStart() : stMetroStop(); stUI(); stDirty(); toast(ST.metro ? 'Click on at ' + ST.bpm + ' BPM' : 'Click off'); });
+$('#stBpm').addEventListener('change', () => {
+  const v = Math.round(+$('#stBpm').value); if (!(v >= 40 && v <= 240)) { $('#stBpm').value = ST.bpm; return; }
+  const was = ST.playing && !ST.recording, b = stNow(); if (ST.playing) stStop(); stPush(); ST.bpm = v; ST.pos = b; if (was) stPlay(); ST.need = true; stRollDraw();
+});
+$('#stBpm').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); $('#stBpm').blur(); } });
+$('#stSnap').addEventListener('change', () => { ST.snap = +$('#stSnap').value; stRollDraw(); stDirty(); });
+$('#stUndo').addEventListener('click', () => stRestore(ST.undo, ST.redo));
+$('#stRedo').addEventListener('click', () => stRestore(ST.redo, ST.undo));
+const stZoom = f => { const b = stNow(); ST.ppb = clamp(ST.ppb * f, 6, 120); ST.rp = clamp(ST.rp * f, 16, 200); ST.need = true; stRollDraw(); stTl.scrollLeft = Math.max(0, b * ST.ppb - stTl.clientWidth / 3); };
+$('#stZoomIn').addEventListener('click', () => stZoom(1.35));
+$('#stZoomOut').addEventListener('click', () => stZoom(1 / 1.35));
+$('#stHome').addEventListener('click', () => setMode('home'));
+
+/* computer keyboard */
+document.addEventListener('keydown', e => {
+  if (MODE !== 'studio' || document.querySelector('dialog[open]')) return;
+  const t = e.target, tag = t && t.tagName;
+  if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA') return;
+  if (e.ctrlKey || e.metaKey) {
+    const k = e.key.toLowerCase();
+    if (k === 'z') { e.preventDefault(); e.shiftKey ? stRestore(ST.redo, ST.undo) : stRestore(ST.undo, ST.redo); }
+    else if (k === 'y') { e.preventDefault(); stRestore(ST.redo, ST.undo); }
+    return;
+  }
+  if (e.altKey) return;
+  const k = e.key.toLowerCase();
+  if (e.key === ' ') { e.preventDefault(); if (!e.repeat) { if (ST.recording) stStop(); else stPlay(); } return; }
+  if (e.key === 'Home') { e.preventDefault(); stSeek(0); stTl.scrollLeft = 0; return; }
+  if (e.key === 'Delete' || e.key === 'Backspace') { if (stDeleteSel()) e.preventDefault(); return; }
+  if (e.key === 'Escape') { ST.selNote = null; ST.selClip = null; renderDock(); ST.need = true; stRollDraw(); return; }
+  if (k === 'r' && !e.repeat) { stRecord(); return; }
+  const tr = stSelTrack(); if (!tr || tr.type !== 'inst') return;
+  if (k === 'z') { stOct(-1); return; } if (k === 'x') { stOct(1); return; }
+  const i = KEYMAP.indexOf(k); if (i < 0) return;
+  e.preventDefault(); if (e.repeat || stKeyMap.has(k)) return;
+  const m = 12 * (ST.octave + 1) + i; stKeyMap.set(k, m); stPress(m);
+});
+document.addEventListener('keyup', e => { if (MODE !== 'studio') return; const k = e.key.toLowerCase(); if (stKeyMap.has(k)) { const m = stKeyMap.get(k); stKeyMap.delete(k); stRelease(m); } });
+window.addEventListener('blur', () => { if (MODE === 'studio') stReleaseAll(); });
+
+/* ---------- drawing loop hook + entering the studio ---------- */
+function stFrame() {
+  if (ST.playing) {
+    stTimeUI();
+    const end = stEnd();
+    if (!ST.recording && !ST.live.size && stNow() > end + 0.5) { stStop(); ST.pos = 0; stTimeUI(); toast('That’s the end of your song.'); }
+    const px = stNow() * ST.ppb - stTl.scrollLeft;
+    if (px > stTl.clientWidth * 0.86 || px < 0) stTl.scrollLeft = Math.max(0, stNow() * ST.ppb - stTl.clientWidth * 0.2);
+    if (!stRoll.hidden) { const rx = GUT + stNow() * ST.rp - stRoll.scrollLeft; if (rx > stRoll.clientWidth * 0.9) stRoll.scrollLeft += stRoll.clientWidth * 0.6; stRollDraw(); }
+    ST.need = true;
+  } else if (ST.live.size) { ST.need = true; if (!stRoll.hidden) stRollDraw(); }
+  if (ST.need) { ST.need = false; stDraw(); }
+}
+function renderStudio() { renderStHeads(); renderDock(); stUI(); stState(); ST.need = true; }
+function stEnter() {
+  stUI(); renderStudio();
+  if (!ST.tracks.length && !ST.project.id) { /* first visit: start with a piano track ready to record */
+    const t = newInstTrack('piano'); ST.sel = t.id; renderStudio();
+  }
+  requestAnimationFrame(() => { ST.need = true; renderStKeys(); });
+}
+new ResizeObserver(() => { if (MODE === 'studio') ST.need = true; }).observe(stTl);
+
 /* animated favicon: a spinning record in DJ, keys being played in Piano */
 const favLink = $('#favicon'), HOME_FAV = favLink.href, favCv = document.createElement('canvas'); favCv.width = favCv.height = 64;
 let favT = 0, favAng = 0;
@@ -4250,6 +5375,14 @@ function drawFav() {
       g.strokeStyle = `rgba(52,211,153,${a.toFixed(2)})`;
       g.beginPath(); g.arc(32, 32, r, -0.75, 0.75); g.stroke(); g.beginPath(); g.arc(32, 32, r, Math.PI - 0.75, Math.PI + 0.75); g.stroke();
     });
+  } else if (MODE === 'studio') {
+    favT++; const cols = ['#a78bfa', '#ef4444', '#fb923c']; const playing = ST.playing;
+    for (let r = 0; r < 3; r++) { g.fillStyle = 'rgba(255,255,255,.06)'; g.fillRect(4, 8 + r * 17, 56, 14); }
+    for (let r = 0; r < 3; r++) for (let k = 0; k < 4; k++) {
+      const x = 6 + k * 14, lit = Math.floor(favT / (playing ? 2 : 4)) % 4 === k;
+      g.fillStyle = cols[r]; g.globalAlpha = lit ? 1 : .55; g.fillRect(x, 10 + r * 17 + ((k + r) % 2) * 4, r === 1 ? 6 : 11, 6);
+    }
+    g.globalAlpha = 1; const ph = 6 + (favT * (playing ? 2 : 1)) % 52; g.fillStyle = '#f8fafc'; g.fillRect(ph, 5, 2.5, 54);
   } else if (MODE === 'dj') {
     favAng += (A.playing || B.playing) ? 0.55 : 0.16;
     g.save(); g.translate(30, 34); g.rotate(favAng);
@@ -4311,7 +5444,7 @@ $('#helpClose').addEventListener('click', () => $('#help').close());
 /* ---------------- keyboard ---------------- */
 document.addEventListener('keydown', e => {
   const t = e.target, tag = t && t.tagName;
-  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if ((MODE === 'dj' || MODE === 'create') && !document.querySelector('dialog[open]')) saveProject(); return; }
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 's') { e.preventDefault(); if (document.querySelector('dialog[open]')) return; if (MODE === 'dj' || MODE === 'create') saveProject(); else if (MODE === 'studio') stSave(); return; }
   if (MODE !== 'dj') return;
   if (tag === 'INPUT' && t.type !== 'range' || tag === 'SELECT' || tag === 'TEXTAREA' || document.querySelector('dialog[open]')) return;
   const d = activeDeck || A, mod = e.ctrlKey || e.metaKey, k = e.key.toLowerCase();
@@ -4343,6 +5476,7 @@ const spec = $('#spec');
 let freq = null, lastT = {};
 function frame() {
   if (MODE === 'create') crFrame();
+  if (MODE === 'studio') stFrame();
   decks.forEach(d => {
     if (MODE !== 'dj') return;
     if (d === B && !dual) return;
