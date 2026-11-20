@@ -273,6 +273,30 @@ footer.foot a{color:var(--soft)}
 .pillbtn:hover,.relnotes summary:hover{border-color:#4a5575;color:#fff}
 .pillbtn:focus-visible,.relnotes summary:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.45)}
 .reqdlg{width:min(560px,94vw)}
+.mididlg{width:min(600px,94vw)}
+.midistat{margin:0 0 8px;color:var(--soft)}
+.midistat.on{color:#6ee7b7}
+.midilist{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-direction:column;gap:6px}
+.midilist li{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border:1px solid var(--line2);border-radius:10px;background:#121725;font-size:13px}
+.midilist li::before{content:'';width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
+.midilist li.off::before{background:#4b5563;box-shadow:none}
+.midilist .mname{flex:1;min-width:0;display:flex;flex-direction:column}
+.midilist .mname b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.midilist .mname small{color:var(--dim);font-size:11.5px}
+.midilist input[type=text]{flex:1;min-width:0;width:auto;font:600 14px var(--sans,inherit);padding:6px 9px}
+.btn.midiopen .mdev{max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;color:#c4b5fd;font-weight:600}
+.midibtns{flex-wrap:wrap;gap:8px}
+.btn[hidden]{display:none!important}
+.midihelp li{font-size:13px;color:var(--soft)}
+.btn.midiopen svg{color:#a78bfa}
+.btn.midiopen.on{--c:#a78bfa}
+.midibar{position:fixed;left:50%;top:12px;transform:translateX(-50%);z-index:90;display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center;max-width:min(640px,94vw);padding:10px 12px 10px 14px;border-radius:14px;background:#171b2a;border:1px solid #a78bfa66;box-shadow:0 18px 50px -12px #000c;font-size:13px;color:var(--ink)}
+.midibar[hidden]{display:none}
+.midibar svg{width:20px;height:20px;color:#a78bfa;flex:none}
+.midibar span{flex:1 1 220px}
+.knob.midilearn{outline:2px dashed #a78bfa;outline-offset:3px;border-radius:50%}
+body.midi-learning .knob{cursor:crosshair}
+body.midi-learning .knob:hover{outline:2px dashed #a78bfa88;outline-offset:3px;border-radius:50%}
 .reqdlg form{display:flex;flex-direction:column;gap:12px}
 .reqsub{margin:-4px 0 0;color:var(--soft);font-size:13.5px}
 .reqareas{border:0;margin:0;padding:0;display:flex;flex-wrap:wrap;gap:7px}
@@ -1141,7 +1165,7 @@ body.mode-studio{height:100vh;height:100dvh;min-height:0;overflow:hidden;padding
   .sttop::-webkit-scrollbar{display:none}
   .sttop>*{flex:none}
   .sttools{flex-wrap:nowrap}
-  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span,#stFit span{display:none}
+  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span,#stFit span,#stMidi span{display:none}
   .stname{flex:0 0 170px;min-width:170px}
   .sttop .btn{min-height:34px;padding:5px 9px}
   .stadd{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}
@@ -1173,7 +1197,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
   .sttrans{order:3}
   .sttools{order:4;flex-wrap:wrap;gap:5px}
   .stname{order:2;flex:1 1 120px;min-width:110px}
-  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span,#stFit span{display:none}
+  #stHome span,#stSave span,#stLibBtn span,#stExport span,#stMetro span,#stFit span,#stMidi span{display:none}
   .stname input{font-size:16px;padding:6px 8px}
   .stheads{width:118px}
   .sthead .t2 small{display:none}
@@ -1212,6 +1236,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <button class="btn" id="libBtn" title="Open your saved projects"><svg viewBox="0 0 16 16"><rect x="2" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><rect x="6.5" y="2.5" width="3" height="11" rx="1" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="m11 3.4 2.6-.7 2 10.6-2.6.7z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round" transform="translate(-1.2 0)"/></svg>Library</button>
     <button class="btn rec" id="recBtn" title="Record everything you hear, live, into an MP3 file"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="5" fill="currentColor"/></svg><span>Record live</span></button>
     <span class="rectime" id="recTime"></span>
+    <button class="btn ghost midiopen" id="midiBtn" title="Connect a MIDI keyboard or controller"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg>MIDI</button>
     <button class="btn ghost" id="helpBtn" title="How to use SpinLab and keyboard shortcuts"><svg viewBox="0 0 16 16"><circle cx="8" cy="8" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M6.2 6.2a1.9 1.9 0 1 1 2.6 1.8c-.5.2-.8.6-.8 1.1v.4" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/><circle cx="8" cy="11.6" r=".9" fill="currentColor"/></svg>Help</button>
   </div>
 </header>
@@ -1277,6 +1302,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="dsec">
       <span class="lbl">Sound</span>
       <div class="dgrid2"><button class="btn" id="crSus" title="Let notes ring after you let go. On a computer, hold Shift.">Sustain</button><button class="btn on" id="crLabels" title="Show note names on the keys">Note names</button></div>
+      <button class="btn midiopen" type="button" title="Connect a MIDI keyboard or controller"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg>MIDI keyboard</button>
       <button class="btn" id="crKeyHints" aria-pressed="false" title="Show which computer key plays each piano key. Turns on by itself when the screen is sideways (landscape).">Computer key letters</button>
       <div class="row" style="justify-content:space-around">
         <div class="kn" style="--kc:#a78bfa"><div class="knob" id="crVol" role="slider" tabindex="0" aria-label="Piano volume"></div><span>Volume</span><output></output></div>
@@ -1391,6 +1417,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="sttools">
       <span class="stpitch" role="group" aria-label="Pitch of the whole song"><span class="lbl">Pitch</span><button class="btn sm" id="stPitchDn" aria-label="Lower the whole song by a semitone" title="Lower the whole song">−</button><b id="stPitchVal" title="Pitch of the whole song in semitones">0</b><button class="btn sm" id="stPitchUp" aria-label="Raise the whole song by a semitone" title="Raise the whole song">+</button></span>
       <label class="stbpm"><span class="lbl">BPM</span><input type="number" id="stBpm" min="40" max="240" step="1" value="100" aria-label="Tempo in beats per minute"></label>
+      <button class="btn midiopen" id="stMidi" type="button" title="Connect a MIDI keyboard or controller"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg><span>MIDI</span></button>
       <button class="btn" id="stMetro" aria-pressed="false" title="Metronome click"><svg viewBox="0 0 16 16"><path d="M5.5 2h5l2.5 12H3z" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round"/><path d="M8 11 11.5 4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg><span>Click</span></button>
       <label class="stsnap"><span class="lbl">Snap</span><select id="stSnap" aria-label="Snap notes and clips to"><option value="0">Off</option><option value="1">1/4</option><option value="0.5">1/8</option><option value="0.25" selected>1/16</option></select></label>
       <button class="btn" id="stUndo" title="Undo (Ctrl/⌘ Z)" aria-label="Undo"><svg viewBox="0 0 16 16"><path d="M5 4 2 7l3 3" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M2.5 7H10a3.5 3.5 0 0 1 0 7H7" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg></button>
@@ -1609,6 +1636,23 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="row" style="justify-content:flex-end"><button class="btn" type="button" id="reqCancel">Cancel</button><button class="btn primary" type="submit" id="reqSend">Send request</button></div>
   </form>
 </dialog>
+<dialog id="midiDlg" class="mididlg" aria-labelledby="midiTitle">
+  <h2 id="midiTitle">MIDI keyboard &amp; controller</h2>
+  <p class="midistat" id="midiStat">Not connected.</p>
+  <ul class="midilist" id="midiList"></ul>
+  <div class="row midibtns"><button class="btn primary" type="button" id="midiConnect">Connect</button><button class="btn" type="button" id="midiLearn">Assign a knob</button><button class="btn" type="button" id="midiReset">Reset knob assignments</button></div>
+  <h3>What your controller does</h3>
+  <ul class="midihelp">
+    <li><b>Keys</b> play the Piano, and the selected instrument track in the SpinLab studio (they record too when you press Record).</li>
+    <li><b>Sustain pedal</b> holds notes in Piano.</li>
+    <li><b>Pads</b> (notes 36–43) trigger DJ hot cues: the first four for deck A, the next four for deck B.</li>
+    <li><b>Knobs</b> turn SpinLab's knobs. DJ: deck A filter, reverb, echo and pitch, then the same for deck B. Piano: volume and reverb. Studio: the selected track's Volume, Pan, Pitch and effect knobs, left to right.</li>
+    <li><b>Assign a knob</b> lets you pick any knob on screen and link it to any knob or slider on your controller.</li>
+  </ul>
+  <p class="hint" id="midiAssigned"></p>
+  <div class="row" style="justify-content:flex-end"><button class="btn" type="button" id="midiClose">Close</button></div>
+</dialog>
+<div class="midibar" id="midiBar" hidden role="dialog" aria-label="Connect a MIDI keyboard"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg><span>Using a MIDI keyboard or controller? Connect it to play notes and turn SpinLab's knobs.</span><button class="btn sm primary" type="button" id="midiBarYes">Connect</button><button class="btn sm" type="button" id="midiBarNo">Not now</button></div>
 <dialog id="confirm" aria-labelledby="confirmMsg">
   <p id="confirmMsg" style="margin:0 0 16px;font-size:15px;max-width:440px"></p>
   <div class="row" style="justify-content:flex-end"><button class="btn" id="confirmNo">Cancel</button><button class="btn warn" id="confirmYes">OK</button></div>
@@ -1625,6 +1669,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <li>Each track has <b>M</b> (mute), <b>S</b> (solo), a volume slider and a ⋯ menu to rename, duplicate, pan, move or delete it.</li>
     <li>Click the numbers at the top of the timeline to move the playhead.</li>
     <li><b>Effects:</b> pick a track and tap the <b>Effects</b> tab at the bottom, then <b>Add effect</b>. The effects browser works like BandLab’s: search, or pick a group (Recommended, One Knobs, Polish, Amps &amp; Cabs, Compressor, Limiter, Rhythmic, EQ, Delay, Reverb, Modulation, Distortion, Lo-fi). Each effect you add becomes a card with its own knobs, an on/off switch, arrows to change the order, and an ✕ to remove it. Effects play live and are included when you export. For a big reverb with echo, add <b>Echo Verb</b>: <b>Power</b> makes the reverb louder, <b>Length</b> stretches the tail from a short room to a huge cave, <b>Pre-delay</b> leaves a gap before the reverb starts, and <b>Echo</b>, <b>Echo time</b> and <b>Repeats</b> add echoes in time with your song that fade into the reverb. Vocal Verb, Big Hall and Plate have the same Length and Echo knobs.</li>
+    <li><b>MIDI keyboard:</b> press <b>MIDI</b> in the top bar to connect one. Its keys play the selected instrument track (and record), and its knobs turn the selected track's knobs in the Effects tab, left to right.</li>
     <li><b>Auto-save:</b> once a song is in your SpinLab library, it saves itself every 5 minutes after you change something. A new song asks once if you want to save it to your library first.</li>
     <li><b>Pitch:</b> <b>Pitch − / +</b> in the top bar moves the whole song higher or lower, one semitone at a time (12 semitones is one octave). Each track also has its own <b>Pitch</b> knob in its Effects panel. Instrument tracks change their notes, so they stay perfectly clean. Audio, voice and drum tracks go through a pitch shifter, which keeps the speed the same.</li>
     <li><b>Seeing everything:</b> The <b>Piano</b>, <b>Notes</b> and <b>Effects</b> tabs at the bottom open and close the bottom panel. <b>Fit</b> squeezes the whole song and every track onto the screen. <b>−</b> and <b>+</b> squeeze or stretch the timeline, and the arrows beside <b>Tracks</b> make tracks shorter or taller. On a phone, pinch sideways to squeeze or stretch the song, and pinch up and down to change track height. On a computer, hold <kbd>Ctrl</kbd> and scroll (add <kbd>Shift</kbd> for track height).</li>
@@ -1696,6 +1741,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
   <h3>Decks</h3>
   <ul>
     <li><b>Speed</b> changes tempo and pitch together, the way a turntable does. Pick ±8%, ±16% or ±50% for the slider range.</li>
+    <li><b>MIDI controller:</b> press <b>MIDI</b> at the top to connect one. Pads (notes 36–43) trigger hot cues, and the first eight knobs control deck A and B filter, reverb, echo and pitch. Use <b>Assign a knob</b> to link any knob.</li>
     <li><b>Auto-save:</b> once a project is in your DJ library, it saves itself every 5 minutes after you change something. A new project asks once if you want to save it to your library first.</li>
     <li><b>Reverb</b> goes up to 200% for big washes, and <b>Size</b> sets how long it rings, from Room to Hall, Arena and Cave. When Echo is on, the echoes fade into the reverb too.</li>
     <li><b>Pitch</b> (in Effects) moves the song higher or lower by semitones without changing its speed. Turn on <b>Key lock</b> to keep the song in the same key when you change its speed. Save WAV and Save MP3 save your remix: your edits plus the speed, pitch, gain, EQ, filter, reverb and echo you set on that deck.</li>
@@ -1717,7 +1763,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.41'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.42'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Request a feature: requests are emailed through FormSubmit (formsubmit.co).
@@ -1730,7 +1776,7 @@ const ADSENSE_CLIENT = '';
 const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
-const RELEASES = [["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
+const RELEASES = [["1.0.42", "Nov 20, 2026", "MIDI keyboards and controllers: SpinLab asks to connect once and remembers your device (with a name you can change) and the knobs you assign, then your keys play the Piano and the studio, pads trigger DJ hot cues, the sustain pedal works, and your controller's knobs turn SpinLab's knobs. Assign any knob with Assign a knob."], ["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
 /* release notes table at the bottom of the page: add a row here with every update */
 const verNewer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
 /* the table merges this copy's notes with the newest notes from the website, so versions you don't have yet show up marked New */
@@ -1971,7 +2017,7 @@ function arc(cx, cy, r, a0, a1) {
 }
 function makeKnob(el, opt) {
   const k = Object.assign({ min: 0, max: 1, value: 0, def: 0, step: 0.01, bip: false, fmt: v => v.toFixed(2), onChange: () => {} }, opt);
-  k.el = el; k.out = el.parentElement.querySelector('output');
+  k.el = el; el._knob = k; k.out = el.parentElement.querySelector('output');
   el.setAttribute('aria-valuemin', k.min); el.setAttribute('aria-valuemax', k.max);
   const A0 = Math.PI * 0.75, A1 = Math.PI * 2.25;
   k.set = (v, silent) => {
@@ -4389,6 +4435,116 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
     } catch (err) { say('It couldn\'t be sent right now. Please try again in a moment. Your text is still here.', 'err'); }
     send.disabled = false;
   });
+}
+/* ---------- MIDI keyboards and controllers (Web MIDI) ----------
+   SpinLab asks once; the browser then shows its own permission prompt. Keys play notes, pads fire DJ hot cues,
+   the sustain pedal holds Piano notes, and controller knobs turn on-screen knobs (defaults, or ones you assign). */
+{
+  /* every device is remembered by its name: your nickname for it and the knobs you assigned on it */
+  const MIDI = { access: null, learn: false, target: null, held: new Map(), devs: {}, last: null };
+  try { MIDI.devs = JSON.parse(localStorage.getItem('spinlab-midi-devices') || '{}'); } catch (e) {}
+  try { const old = JSON.parse(localStorage.getItem('spinlab-midi-map') || 'null'); if (old && Object.keys(old).length) MIDI.devs['*'] = { nick: '', map: old }; localStorage.removeItem('spinlab-midi-map'); } catch (e) {}
+  const devKey = x => ((x && x.manufacturer ? x.manufacturer + ' · ' : '') + (x && x.name ? x.name : 'untitled')).trim();
+  const devRec = x => { const k = devKey(x); return MIDI.devs[k] || (MIDI.devs[k] = { nick: '', map: {} }); };
+  const devName = x => { const r = MIDI.devs[devKey(x)]; return (r && r.nick) || (x && x.name) || 'Untitled device'; };
+  const curDev = () => MIDI.last || inputs().find(x => x.state === 'connected') || null;
+  const mapFor = x => Object.assign({}, (MIDI.devs['*'] || {}).map, x ? devRec(x).map : {});
+  const pref = v => { try { if (v === undefined) return localStorage.getItem('spinlab-midi'); localStorage.setItem('spinlab-midi', v); } catch (e) {} };
+  const saveMap = () => { try { localStorage.setItem('spinlab-midi-devices', JSON.stringify(MIDI.devs)); } catch (e) {} };
+  const supported = !!navigator.requestMIDIAccess;
+  const inputs = () => MIDI.access ? [...MIDI.access.inputs.values()] : [];
+  const DEFAULT_CC = [[70, 71, 72, 73, 74, 75, 76, 77], [21, 22, 23, 24, 25, 26, 27, 28], [1, 2, 3, 4, 5, 6, 7, 8], [16, 17, 18, 19, 20, 80, 81, 82]];
+  const ccIndex = n => { for (const row of DEFAULT_CC) { const i = row.indexOf(n); if (i >= 0) return i; } return -1; };
+  const visible = el => !!(el && el.offsetParent !== null && el._knob);
+  const defaultKnob = i => {
+    if (MODE === 'dj') { const d = decks[i >> 2], n = ['filter', 'reverb', 'echo', 'pitch'][i & 3]; return d && d.k && d.k[n]; }
+    if (MODE === 'create') return [crK.vol, crK.rev][i];
+    if (MODE === 'studio') { const ks = [...document.querySelectorAll('#stFx .knob')].filter(visible); return ks[i] && ks[i]._knob; }
+    return null;
+  };
+  const setFromCC = (k, v) => k.set(k.min + (v / 127) * (k.max - k.min));
+  function renderDlg() {
+    const list = inputs(), on = list.some(x => x.state === 'connected'), esc = t => String(t || '').replace(/[<>&]/g, '');
+    $('#midiStat').textContent = !supported ? 'This browser can’t use MIDI. Use Chrome, Edge or Opera on a computer or Android.' : !MIDI.access ? 'Not connected. Press Connect and allow MIDI when your browser asks.' : on ? 'Connected and ready.' : 'MIDI is allowed. Plug in your keyboard or controller.';
+    $('#midiStat').classList.toggle('on', on);
+    $('#midiList').innerHTML = list.map((x, i) => `<li class="${x.state === 'connected' ? '' : 'off'}" data-i="${i}"><span class="mname"><b>${esc(devName(x))}</b><small>${esc(x.name || 'No name')}${x.manufacturer ? ' · ' + esc(x.manufacturer) : ''} · ${x.state === 'connected' ? 'connected' : 'unplugged'}</small></span><button class="btn sm" type="button" data-mren title="Rename this device">Rename</button></li>`).join('');
+    $('#midiConnect').hidden = !!MIDI.access || !supported; $('#midiLearn').disabled = !MIDI.access;
+    const d = curDev(), m = mapFor(d), n = Object.keys(m).length; $('#midiReset').hidden = !n;
+    $('#midiAssigned').textContent = n ? 'Knobs you assigned' + (d ? ' on ' + devName(d) : '') + ': ' + Object.entries(m).map(([c, l]) => 'controller knob ' + c + ' → ' + l).join(', ') : '';
+    const live = list.filter(x => x.state === 'connected');
+    document.querySelectorAll('.btn.midiopen').forEach(b => { b.classList.toggle('on', on); let t = b.querySelector('.mdev'); if (!t) { t = document.createElement('span'); t.className = 'mdev'; b.appendChild(t); } t.textContent = live.length ? ' · ' + devName(live[0]) : ''; t.hidden = !live.length; b.title = live.length ? 'MIDI: ' + live.map(devName).join(', ') : 'Connect a MIDI keyboard or controller'; });
+  }
+  function onMsg(e) {
+    if (e.currentTarget || e.target) MIDI.last = e.currentTarget || e.target;
+    const [st, d1, d2 = 0] = e.data, type = st & 0xf0;
+    if (type === 0x90 && d2 > 0) noteOn(d1, d2);
+    else if (type === 0x80 || (type === 0x90 && d2 === 0)) noteOff(d1);
+    else if (type === 0xb0) cc(d1, d2);
+  }
+  function noteOn(m) {
+    if (MODE === 'create') { pressNote(m); MIDI.held.set(m, 'create'); }
+    else if (MODE === 'studio') { stPress(m); MIDI.held.set(m, 'studio'); }
+    else if (MODE === 'dj' && m >= 36 && m <= 43) { const d = decks[(m - 36) >> 2]; if (d && d.buffer) d.hotCue((m - 36) & 3); }
+  }
+  function noteOff(m) { const w = MIDI.held.get(m); MIDI.held.delete(m); if (w === 'create') releaseNote(m); else if (w === 'studio') stRelease(m); }
+  function stopLearn() { MIDI.learn = false; if (MIDI.target) MIDI.target.classList.remove('midilearn'); MIDI.target = null; document.body.classList.remove('midi-learning'); }
+  function cc(n, v) {
+    if (n === 64) { if (MODE === 'create') { CR.susKey = v >= 64; crSetSus(); } return; }
+    if (n === 120 || n === 123) { [...MIDI.held.keys()].forEach(noteOff); return; }
+    const dev = curDev();
+    if (MIDI.learn && MIDI.target) { const label = MIDI.target.getAttribute('aria-label'); (dev ? devRec(dev) : (MIDI.devs['*'] = MIDI.devs['*'] || { nick: '', map: {} })).map[n] = label; saveMap(); stopLearn(); toast('Linked ' + (dev ? devName(dev) + ' ' : '') + 'knob ' + n + ' to ' + label + '. Saved for next time.'); return; }
+    const mp = mapFor(dev);
+    if (mp[n]) { const el = [...document.querySelectorAll('.knob')].find(x => visible(x) && x.getAttribute('aria-label') === mp[n]); if (el) return setFromCC(el._knob, v); }
+    const i = ccIndex(n); if (i < 0) return; const k = defaultKnob(i); if (k) setFromCC(k, v);
+  }
+  const wire = () => { inputs().forEach(x => { x.onmidimessage = onMsg; }); renderDlg(); };
+  async function connect(quiet) {
+    if (!supported) { if (!quiet) toast('This browser can’t use MIDI. Try Chrome or Edge.'); return false; }
+    try {
+      MIDI.access = await navigator.requestMIDIAccess({ sysex: false });
+      MIDI.access.onstatechange = e => { const p = e.port; if (p && p.type === 'input' && p.state === 'connected') devRec(p), saveMap(); wire(); if (p && p.type === 'input') toast(devName(p) + (p.state === 'connected' ? ' connected' : ' unplugged')); };
+      pref('on'); inputs().forEach(devRec); saveMap(); wire();
+      const n = inputs().filter(x => x.state === 'connected');
+      if (!quiet) toast(n.length ? 'MIDI ready: ' + n.map(devName).join(', ') : 'MIDI is allowed. Plug in your keyboard or controller.');
+      else if (n.length) toast(n.map(devName).join(', ') + ' is connected');
+      return true;
+    } catch (e) { if (!quiet) toast('MIDI wasn’t allowed. You can allow it in your browser’s site settings.'); pref('no'); renderDlg(); return false; }
+  }
+  /* ask once when you open DJ, Piano or the studio; reconnect quietly if it is already allowed */
+  async function maybeAsk() {
+    if (!supported || MIDI.access || !['dj', 'create', 'studio'].includes(MODE)) return;
+    let state = 'prompt'; try { state = (await navigator.permissions.query({ name: 'midi' })).state; } catch (e) {}
+    if (state === 'denied') return;
+    if (state === 'granted' || pref() === 'on') return void connect(true);
+    if (pref() === 'no' || maybeAsk.shown) return;
+    maybeAsk.shown = true; $('#midiBar').hidden = false; setTimeout(() => { $('#midiBar').hidden = true; }, 20000);
+  }
+  $('#midiBarYes').addEventListener('click', async () => { $('#midiBar').hidden = true; await connect(false); });
+  $('#midiBarNo').addEventListener('click', () => { $('#midiBar').hidden = true; pref('no'); toast('OK. The MIDI button connects a keyboard any time.'); });
+  document.addEventListener('click', e => { const b = e.target.closest('.midiopen'); if (!b) return; e.preventDefault(); e.stopPropagation(); closeMenu(); renderDlg(); $('#midiDlg').showModal(); }, true);
+  $('#midiClose').addEventListener('click', () => $('#midiDlg').close());
+  $('#midiConnect').addEventListener('click', async () => { await connect(false); renderDlg(); });
+  $('#midiReset').addEventListener('click', () => { const d = curDev(); if (d) devRec(d).map = {}; delete MIDI.devs['*']; saveMap(); renderDlg(); toast('Knob assignments cleared. The default knobs are back.'); });
+  /* rename a device: tap Rename, type, press Enter (an empty name goes back to the device's own name) */
+  $('#midiList').addEventListener('click', e => {
+    const b = e.target.closest('[data-mren]'); if (!b) return; const li = b.closest('li'), x = inputs()[+li.dataset.i]; if (!x) return;
+    const r = devRec(x), inp = document.createElement('input'); inp.type = 'text'; inp.maxLength = 40; inp.value = r.nick || x.name || ''; inp.placeholder = x.name || 'Untitled device'; inp.setAttribute('aria-label', 'Name for this MIDI device');
+    li.querySelector('.mname').replaceWith(inp); b.textContent = 'Save'; b.removeAttribute('data-mren'); inp.focus(); inp.select();
+    const done = ok => { if (ok) { const v = inp.value.trim(); r.nick = v && v !== x.name ? v : ''; saveMap(); toast('Saved as ' + devName(x)); } renderDlg(); };
+    b.addEventListener('click', ev => { ev.stopPropagation(); done(true); }, { once: true });
+    inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); done(true); } else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); done(false); } });
+  });
+  $('#midiLearn').addEventListener('click', () => { $('#midiDlg').close(); stopLearn(); MIDI.learn = true; document.body.classList.add('midi-learning'); toast('Click a knob in SpinLab, then turn a knob on your controller. Press Esc to cancel.'); });
+  document.addEventListener('pointerdown', e => {
+    if (!MIDI.learn) return; const k = e.target.closest('.knob'); if (!k || !k._knob) return;
+    e.preventDefault(); e.stopPropagation(); if (MIDI.target) MIDI.target.classList.remove('midilearn');
+    MIDI.target = k; k.classList.add('midilearn'); toast('Now turn a knob or slider on your controller');
+  }, true);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && MIDI.learn) { stopLearn(); toast('Knob assigning cancelled'); } });
+  const sm = setMode; setMode = async function (...a) { const r = await sm.apply(this, a); setTimeout(maybeAsk, 600); if (!['dj', 'create', 'studio'].includes(MODE)) $('#midiBar').hidden = true; return r; };
+  /* remembered: once MIDI is allowed, SpinLab reconnects by itself every time it opens */
+  addEventListener('load', async () => { if (!supported) return; let st = 'prompt'; try { st = (await navigator.permissions.query({ name: 'midi' })).state; } catch (e) {} if (st === 'granted' || (pref() === 'on' && st !== 'denied')) connect(true); });
+  window.SPINLAB_MIDI = { MIDI, onMsg, connect, renderDlg };
 }
 /* AdSense side ads: only on the real website, only once the IDs are set, only on wide screens */
 (() => {
