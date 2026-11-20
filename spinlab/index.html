@@ -274,12 +274,34 @@ footer.foot a{color:var(--soft)}
 .pillbtn:focus-visible,.relnotes summary:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.45)}
 .reqdlg{width:min(560px,94vw)}
 .mididlg{width:min(600px,94vw)}
+.midilib{width:min(720px,96vw)}
+.midilib .libhead{display:flex;align-items:center;justify-content:space-between;gap:10px;margin-bottom:12px}
+.midilib .libhead h2{margin:0}
+.mlactions{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px}
+.mlactions .btn svg{color:currentColor}
+.mltabs{display:flex;gap:6px;margin-bottom:10px;border-bottom:1px solid var(--line2)}
+.mltab{appearance:none;border:0;background:none;color:var(--soft);font:700 13px var(--sans,inherit);padding:8px 12px;border-bottom:2px solid transparent;cursor:pointer;margin-bottom:-1px}
+.mltab.on{color:#fff;border-bottom-color:#a78bfa}
+.mltab span{display:inline-block;min-width:18px;padding:0 5px;border-radius:999px;background:#a78bfa33;color:#c4b5fd;font-size:11px;margin-left:4px}
+.mltab:focus-visible{outline:none;box-shadow:0 0 0 2px rgba(251,191,36,.45);border-radius:6px}
+.mllist{max-height:min(46vh,420px);overflow:auto}
+.mllist li{display:flex;align-items:center;gap:6px;padding:6px;border:1px solid var(--line2);border-radius:10px;background:#121725;margin-bottom:6px;list-style:none}
+.mllist .mlmain{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;text-align:left;appearance:none;border:0;background:none;color:var(--ink);padding:4px 6px;cursor:pointer;border-radius:8px}
+.mllist .mlmain:hover{background:#1a2032}
+.mllist .mlmain b{font-size:14px;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mllist .mlmain small{color:var(--dim);font-size:11.5px}
+.mllist .btn.on{--c:#fbbf24}
+.mllist .mlempty{justify-content:center;color:var(--dim);font-size:13px;padding:18px;border-style:dashed}
+html.phone .mllist li{flex-wrap:wrap}
+html.phone .mllist .mlmain{flex-basis:100%}
 .midistat{margin:0 0 8px;color:var(--soft)}
 .midistat.on{color:#6ee7b7}
 .midilist{list-style:none;padding:0;margin:0 0 10px;display:flex;flex-direction:column;gap:6px}
 .midilist li{display:flex;align-items:center;gap:8px;padding:6px 6px 6px 10px;border:1px solid var(--line2);border-radius:10px;background:#121725;font-size:13px}
 .midilist li::before{content:'';width:8px;height:8px;border-radius:50%;background:#34d399;box-shadow:0 0 8px #34d399}
 .midilist li.off::before{background:#4b5563;box-shadow:none}
+.midilist li.mhdr{border:0;background:none;padding:6px 2px 0;color:var(--soft);font-weight:700;font-size:12px;letter-spacing:.06em;text-transform:uppercase}
+.midilist li.mhdr::before{display:none}
 .midilist .mname{flex:1;min-width:0;display:flex;flex-direction:column}
 .midilist .mname b{font-size:13.5px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .midilist .mname small{color:var(--dim);font-size:11.5px}
@@ -1438,7 +1460,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
       <div class="stempty" id="stEmpty">
         <b>Start your song</b>
         <p>Add an instrument track, then press <b>Record</b> and play the keys. Your notes show up as blocks you can drag, stretch and delete.</p>
-        <div class="stemptybtns"><button class="btn primary" data-add="inst">+ Instrument</button><button class="btn" data-add="drums">+ Drums</button><button class="btn" data-add="audio">+ Audio file</button><button class="btn" data-add="voice">+ Voice</button></div>
+        <div class="stemptybtns"><button class="btn primary" data-add="inst">+ Instrument</button><button class="btn" data-add="drums">+ Drums</button><button class="btn" data-add="audio">+ Audio file</button><button class="btn" data-add="voice">+ Voice</button><button class="btn" data-add="midi">+ MIDI</button></div>
       </div>
     </div>
   </div>
@@ -1448,6 +1470,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <button class="btn sm" data-add="drums">+ Drums</button>
     <button class="btn sm" data-add="audio">+ Audio file</button>
     <button class="btn sm" data-add="voice">+ Voice / mic</button>
+    <button class="btn sm" data-add="midi">+ MIDI</button>
     <button class="btn sm" data-add="piano">From Piano library</button>
     <button class="btn sm" data-add="dj">From DJ library</button>
     <span class="stedit" role="group" aria-label="Edit the selected part">
@@ -1504,7 +1527,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="ipbody" id="stInstList"></div>
   </dialog>
   <dialog id="stLib" class="stlib">
-    <div class="libhead"><h2>SpinLab library</h2><button class="btn sm primary" id="stLibNew">+ New song</button><button class="btn sm reqopen" type="button" data-area="SpinLab studio" title="Send an idea for SpinLab"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button><button class="btn sm" id="stLibClose">Close</button></div>
+    <div class="libhead"><h2>SpinLab library</h2><button class="btn sm primary" id="stLibNew">+ New song</button><button class="btn sm" type="button" id="stLibMidi"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg>MIDI library</button><button class="btn sm reqopen" type="button" data-area="SpinLab studio" title="Send an idea for SpinLab"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 1.8l1.6 3.6 3.9.4-2.9 2.6.8 3.8L8 10.3l-3.4 1.9.8-3.8L2.5 5.8l3.9-.4z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linejoin="round"/></svg>Request a feature</button><button class="btn sm" id="stLibClose">Close</button></div>
     <p class="hint">Your SpinLab songs are saved in this browser on this device, with every track, note and audio clip. Nothing is uploaded.</p>
     <ul class="liblist" id="stLibList"></ul>
   </dialog>
@@ -1636,6 +1659,19 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <div class="row" style="justify-content:flex-end"><button class="btn" type="button" id="reqCancel">Cancel</button><button class="btn primary" type="submit" id="reqSend">Send request</button></div>
   </form>
 </dialog>
+<dialog id="midiLib" class="midilib" aria-labelledby="mlTitle">
+  <div class="libhead"><h2 id="mlTitle">MIDI library</h2><button class="btn sm" type="button" id="mlClose">Close</button></div>
+  <div class="mlactions">
+    <button class="btn primary" type="button" id="mlImport"><svg viewBox="0 0 16 16"><path d="M8 13V5M4.5 8.5 8 5l3.5 3.5M2.5 2.5h11" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>Import MIDI file</button>
+    <button class="btn" type="button" id="mlKeys"><svg viewBox="0 0 16 16" aria-hidden="true"><rect x="1.5" y="4" width="13" height="8.5" rx="1.5" fill="none" stroke="currentColor" stroke-width="1.4"/><path d="M4.5 4v5M7 4v5M9.5 4v5M12 4v5" stroke="currentColor" stroke-width="1.2"/></svg>Add a track for my MIDI keyboard</button>
+    <button class="btn" type="button" id="mlSaveTrack">Save selected track as MIDI</button>
+    <button class="btn" type="button" id="mlSaveSong">Save whole song as MIDI</button>
+    <input type="file" id="mlFile" accept=".mid,.midi,audio/midi,audio/x-midi" multiple hidden>
+  </div>
+  <div class="mltabs" role="tablist"><button type="button" class="mltab on" role="tab" data-mtab="saved" aria-selected="true">Saved <span id="mlCount">0</span></button><button type="button" class="mltab" role="tab" data-mtab="recent" aria-selected="false">Recent</button></div>
+  <ul class="liblist mllist" id="mlList"></ul>
+  <p class="hint">MIDI files hold notes, not sound, so SpinLab plays them with its own instruments. Tap a MIDI to add it to your song. Everything stays in this browser on this device.</p>
+</dialog>
 <dialog id="midiDlg" class="mididlg" aria-labelledby="midiTitle">
   <h2 id="midiTitle">MIDI keyboard &amp; controller</h2>
   <p class="midistat" id="midiStat">Not connected.</p>
@@ -1670,6 +1706,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
     <li>Click the numbers at the top of the timeline to move the playhead.</li>
     <li><b>Effects:</b> pick a track and tap the <b>Effects</b> tab at the bottom, then <b>Add effect</b>. The effects browser works like BandLab’s: search, or pick a group (Recommended, One Knobs, Polish, Amps &amp; Cabs, Compressor, Limiter, Rhythmic, EQ, Delay, Reverb, Modulation, Distortion, Lo-fi). Each effect you add becomes a card with its own knobs, an on/off switch, arrows to change the order, and an ✕ to remove it. Effects play live and are included when you export. For a big reverb with echo, add <b>Echo Verb</b>: <b>Power</b> makes the reverb louder, <b>Length</b> stretches the tail from a short room to a huge cave, <b>Pre-delay</b> leaves a gap before the reverb starts, and <b>Echo</b>, <b>Echo time</b> and <b>Repeats</b> add echoes in time with your song that fade into the reverb. Vocal Verb, Big Hall and Plate have the same Length and Echo knobs.</li>
     <li><b>MIDI keyboard:</b> press <b>MIDI</b> in the top bar to connect one. Its keys play the selected instrument track (and record), and its knobs turn the selected track's knobs in the Effects tab, left to right.</li>
+    <li><b>MIDI files:</b> press <b>+ MIDI</b> in Add track to open the MIDI library. Import a .mid file and each of its parts becomes an instrument track (drums go on a drum track). You can also add a track for your MIDI keyboard, save the selected track or the whole song as MIDI, and download .mid files. <b>Saved</b> keeps the MIDI you starred; <b>Recent</b> shows what you used lately.</li>
     <li><b>Auto-save:</b> once a song is in your SpinLab library, it saves itself every 5 minutes after you change something. A new song asks once if you want to save it to your library first.</li>
     <li><b>Pitch:</b> <b>Pitch − / +</b> in the top bar moves the whole song higher or lower, one semitone at a time (12 semitones is one octave). Each track also has its own <b>Pitch</b> knob in its Effects panel. Instrument tracks change their notes, so they stay perfectly clean. Audio, voice and drum tracks go through a pitch shifter, which keeps the speed the same.</li>
     <li><b>Seeing everything:</b> The <b>Piano</b>, <b>Notes</b> and <b>Effects</b> tabs at the bottom open and close the bottom panel. <b>Fit</b> squeezes the whole song and every track onto the screen. <b>−</b> and <b>+</b> squeeze or stretch the timeline, and the arrows beside <b>Tracks</b> make tracks shorter or taller. On a phone, pinch sideways to squeeze or stretch the song, and pinch up and down to change track height. On a computer, hold <kbd>Ctrl</kbd> and scroll (add <kbd>Shift</kbd> for track height).</li>
@@ -1763,7 +1800,7 @@ body.mode-studio .toast{bottom:calc(16px + env(safe-area-inset-bottom))}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.42'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.43'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Request a feature: requests are emailed through FormSubmit (formsubmit.co).
@@ -1776,7 +1813,7 @@ const ADSENSE_CLIENT = '';
 const ADSENSE_SLOT = '';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
 document.getElementById('ver2').textContent = 'v' + APP_VERSION;
-const RELEASES = [["1.0.42", "Nov 20, 2026", "MIDI keyboards and controllers: SpinLab asks to connect once and remembers your device (with a name you can change) and the knobs you assign, then your keys play the Piano and the studio, pads trigger DJ hot cues, the sustain pedal works, and your controller's knobs turn SpinLab's knobs. Assign any knob with Assign a knob."], ["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
+const RELEASES = [["1.0.43", "Nov 20, 2026", "New + MIDI button in Add track and a MIDI library with Saved and Recent tabs: import .mid files as instrument tracks, add a track for your MIDI keyboard, save a track or the whole song as MIDI, and download .mid files. The MIDI window also remembers devices you used before."], ["1.0.42", "Nov 20, 2026", "MIDI keyboards and controllers: SpinLab asks to connect once and remembers your device (with a name you can change) and the knobs you assign, then your keys play the Piano and the studio, pads trigger DJ hot cues, the sustain pedal works, and your controller's knobs turn SpinLab's knobs. Assign any knob with Assign a knob."], ["1.0.41", "Nov 20, 2026", "The auto-save question uses a friendly Save button instead of a red warning button."], ["1.0.40", "Nov 20, 2026", "Computer key letters no longer show on phones and tablets, and their switch is hidden there, since those devices have no keyboard."], ["1.0.39", "Nov 20, 2026", "Auto-save every 5 minutes in DJ and the SpinLab studio. A new project asks once if you want to save it to your library; after that it saves itself."], ["1.0.38", "Nov 20, 2026", "New Request a feature button in the footer, the DJ and SpinLab libraries, the home library headings and the Piano menu: pick the part of SpinLab (or suggest a brand-new button), describe your idea, and it is emailed to the SpinLab team. Opening Release notes scrolls the table into view. No more blue tap flashes or blue text highlights on phones."], ["1.0.37", "Nov 20, 2026", "Tidier footer on computers: the Release notes button sits on the same line as the footer and opens as a panel above it."], ["1.0.36", "Nov 20, 2026", "Fixed sound not playing on some phones: the pitch shifter and the long reverbs now only run while you use them. Release notes now show newer versions you don't have yet, with an Update button."], ["1.0.35", "Nov 20, 2026", "Stronger reverb you can shape: new Echo Verb effect in the studio (Power, Length, Pre-delay, Echo, Echo time, Repeats, Tone), and Length and Echo knobs on Vocal Verb, Big Hall and Plate. DJ reverb goes up to 200% with a new Size knob, and echoes fade into the reverb. DJ Save WAV and Save MP3 now save your remix with the speed, pitch and effects, not only the original song. Release notes added here."], ["1.0.34", "Nov 20, 2026", "Pitch control: raise or lower the whole song or a single track in the studio, and a Pitch knob plus Key lock on each DJ deck."], ["1.0.33", "Nov 19, 2026", "Studio: cut, copy, paste, delete and move parts of tracks; hide the piano, Fit, squeeze and stretch tracks; Piano, Notes and Effects tabs; BandLab-style effects browser."], ["1.0.32", "Nov 19, 2026", "The SpinLab studio: make songs with instrument, drum, audio and voice tracks and square notes."], ["1.0.31", "Nov 19, 2026", "Computer key letters on the piano, turned on automatically in landscape, with a switch in the menu."], ["1.0.30", "Nov 19, 2026", "Home and Online Music scroll on computers, so artist pages and long lists are no longer cut off."], ["1.0.29", "Nov 19, 2026", "Says dozens of instruments instead of a number, except in the instrument picker."], ["1.0.28", "Nov 19, 2026", "Link preview image and app screenshots."], ["1.0.27", "Nov 19, 2026", "Privacy page and side ad spaces (off until set up)."], ["1.0.26", "Nov 19, 2026", "Removed the Hub link; the installed app always loads the newest version."], ["1.0.25", "Nov 19, 2026", "SpinLab can be installed as an app and works offline."], ["1.0.24", "Nov 19, 2026", "Swipe the bottom player away to pause and hide it."], ["1.0.23", "Nov 19, 2026", "Notice that songs are previews, with a Cash App button to support full songs."], ["1.0.22", "Nov 19, 2026", "Song menus no longer close by themselves on phones."], ["1.0.21", "Nov 19, 2026", "Metronome ticks, green and pink switch animation, home label remembers Radio or Music, full player fits phones."], ["1.0.20", "Nov 19, 2026", "Full Now Playing view with lyrics and song info, and following artists."], ["1.0.19", "Nov 19, 2026", "Online Radio and Music sides, and a roomier home screen on phones."], ["1.0.18", "Nov 19, 2026", "Online Music queue and playlists."], ["1.0.17", "Nov 19, 2026", "Online Music with live internet radio."], ["1.0.16", "Nov 19, 2026", "Fixed Home and Hub buttons overlapping on phones."], ["1.0.15", "Nov 18, 2026", "At least six instruments in every family."], ["1.0.14", "Nov 18, 2026", "More instruments in a numbered list."], ["1.0.13", "Nov 18, 2026", "No blue flash on key press, and names on the black keys."], ["1.0.12", "Nov 18, 2026", "Octave colors and an animation when the octave changes."], ["1.0.11", "Nov 18, 2026", "Home screen with DJ and Piano, and a piano-only view."], ["1.0.10", "Nov 18, 2026", "DJ mode and Create mode with a piano."], ["1.0.9", "Nov 18, 2026", "Easier selecting and remixing."], ["1.0.8", "Nov 18, 2026", "On computers, SpinLab looks and works like an app window."], ["1.0.7", "Nov 18, 2026", "Fixed the page sliding sideways on phones."], ["1.0.6", "Nov 18, 2026", "Easier library on phones."], ["1.0.5", "Nov 18, 2026", "Project library, Record live and a download for offline use."], ["1.0.4", "Nov 17, 2026", "Importing a song or video no longer downloads anything."], ["1.0.3", "Nov 17, 2026", "Record mix saves an MP3, fully offline."], ["1.0.2", "Nov 17, 2026", "Import videos and save MP3s."], ["1.0.1", "Nov 17, 2026", "Starts with one deck; add deck B when you want it."], ["1.0.0", "Nov 17, 2026", "First version: a two-deck DJ mixer, added to the hub."]];
 /* release notes table at the bottom of the page: add a row here with every update */
 const verNewer = (a, b) => { const x = a.split('.').map(Number), y = b.split('.').map(Number); for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0); return false; };
 /* the table merges this copy's notes with the newest notes from the website, so versions you don't have yet show up marked New */
@@ -3045,12 +3082,13 @@ function setClean() { dirty = false; showState(); }
 function openDB() {
   if (!dbP) dbP = new Promise((res, rej) => {
     if (!window.indexedDB) return rej(new Error('noidb'));
-    const r = indexedDB.open('spinlab', 3);
+    const r = indexedDB.open('spinlab', 4);
     r.onupgradeneeded = () => {
       const db = r.result;
       if (!db.objectStoreNames.contains('projects')) db.createObjectStore('projects', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('creations')) db.createObjectStore('creations', { keyPath: 'id' });
       if (!db.objectStoreNames.contains('studio')) db.createObjectStore('studio', { keyPath: 'id' });
+      if (!db.objectStoreNames.contains('midi')) db.createObjectStore('midi', { keyPath: 'id' });
     };
     r.onsuccess = () => res(r.result); r.onerror = () => { dbP = null; rej(r.error); };
   });
@@ -4467,7 +4505,11 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
     const list = inputs(), on = list.some(x => x.state === 'connected'), esc = t => String(t || '').replace(/[<>&]/g, '');
     $('#midiStat').textContent = !supported ? 'This browser can’t use MIDI. Use Chrome, Edge or Opera on a computer or Android.' : !MIDI.access ? 'Not connected. Press Connect and allow MIDI when your browser asks.' : on ? 'Connected and ready.' : 'MIDI is allowed. Plug in your keyboard or controller.';
     $('#midiStat').classList.toggle('on', on);
-    $('#midiList').innerHTML = list.map((x, i) => `<li class="${x.state === 'connected' ? '' : 'off'}" data-i="${i}"><span class="mname"><b>${esc(devName(x))}</b><small>${esc(x.name || 'No name')}${x.manufacturer ? ' · ' + esc(x.manufacturer) : ''} · ${x.state === 'connected' ? 'connected' : 'unplugged'}</small></span><button class="btn sm" type="button" data-mren title="Rename this device">Rename</button></li>`).join('');
+    list.filter(x => x.state === 'connected').forEach(x => { devRec(x).seen = Date.now(); }); saveMap();
+    const here = new Set(list.map(devKey)), day = t => t ? new Date(t).toLocaleDateString(undefined, { month: 'short', day: 'numeric' }) : 'before';
+    const past = Object.entries(MIDI.devs).filter(([k]) => k !== '*' && !here.has(k)).sort((a, b) => (b[1].seen || 0) - (a[1].seen || 0));
+    $('#midiList').innerHTML = list.map((x, i) => `<li class="${x.state === 'connected' ? '' : 'off'}" data-k="${esc(devKey(x))}"><span class="mname"><b>${esc(devName(x))}</b><small>${esc(x.name || 'No name')}${x.manufacturer ? ' · ' + esc(x.manufacturer) : ''} · ${x.state === 'connected' ? 'connected' : 'unplugged'}</small></span><button class="btn sm" type="button" data-mren title="Rename this device">Rename</button></li>`).join('')
+      + (past.length ? `<li class="mhdr">Saved devices you used before</li>` + past.map(([k, r]) => `<li class="off" data-k="${esc(k)}"><span class="mname"><b>${esc(r.nick || k.split(' · ').pop() || 'Untitled device')}</b><small>${esc(k)} · last used ${day(r.seen)}${Object.keys(r.map || {}).length ? ' · ' + Object.keys(r.map).length + ' knob' + (Object.keys(r.map).length === 1 ? '' : 's') + ' assigned' : ''}</small></span><button class="btn sm" type="button" data-mren title="Rename this device">Rename</button><button class="btn sm danger" type="button" data-mforget title="Forget this device">Forget</button></li>`).join('') : '');
     $('#midiConnect').hidden = !!MIDI.access || !supported; $('#midiLearn').disabled = !MIDI.access;
     const d = curDev(), m = mapFor(d), n = Object.keys(m).length; $('#midiReset').hidden = !n;
     $('#midiAssigned').textContent = n ? 'Knobs you assigned' + (d ? ' on ' + devName(d) : '') + ': ' + Object.entries(m).map(([c, l]) => 'controller knob ' + c + ' → ' + l).join(', ') : '';
@@ -4527,10 +4569,11 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   $('#midiReset').addEventListener('click', () => { const d = curDev(); if (d) devRec(d).map = {}; delete MIDI.devs['*']; saveMap(); renderDlg(); toast('Knob assignments cleared. The default knobs are back.'); });
   /* rename a device: tap Rename, type, press Enter (an empty name goes back to the device's own name) */
   $('#midiList').addEventListener('click', e => {
-    const b = e.target.closest('[data-mren]'); if (!b) return; const li = b.closest('li'), x = inputs()[+li.dataset.i]; if (!x) return;
-    const r = devRec(x), inp = document.createElement('input'); inp.type = 'text'; inp.maxLength = 40; inp.value = r.nick || x.name || ''; inp.placeholder = x.name || 'Untitled device'; inp.setAttribute('aria-label', 'Name for this MIDI device');
+    const f = e.target.closest('[data-mforget]'); if (f) { delete MIDI.devs[f.closest('li').dataset.k]; saveMap(); renderDlg(); toast('Device forgotten'); return; }
+    const b = e.target.closest('[data-mren]'); if (!b) return; const li = b.closest('li'), key = li.dataset.k, x = inputs().find(i => devKey(i) === key) || { name: (key.split(' · ').pop() || ''), _k: key };
+    const r = MIDI.devs[key] || (MIDI.devs[key] = { nick: '', map: {} }), inp = document.createElement('input'); inp.type = 'text'; inp.maxLength = 40; inp.value = r.nick || x.name || ''; inp.placeholder = x.name || 'Untitled device'; inp.setAttribute('aria-label', 'Name for this MIDI device');
     li.querySelector('.mname').replaceWith(inp); b.textContent = 'Save'; b.removeAttribute('data-mren'); inp.focus(); inp.select();
-    const done = ok => { if (ok) { const v = inp.value.trim(); r.nick = v && v !== x.name ? v : ''; saveMap(); toast('Saved as ' + devName(x)); } renderDlg(); };
+    const done = ok => { if (ok) { const v = inp.value.trim(); r.nick = v && v !== x.name ? v : ''; saveMap(); toast('Saved as ' + (r.nick || x.name || 'Untitled device')); } renderDlg(); };
     b.addEventListener('click', ev => { ev.stopPropagation(); done(true); }, { once: true });
     inp.addEventListener('keydown', ev => { if (ev.key === 'Enter') { ev.preventDefault(); done(true); } else if (ev.key === 'Escape') { ev.preventDefault(); ev.stopPropagation(); done(false); } });
   });
@@ -4546,6 +4589,138 @@ if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !docu
   addEventListener('load', async () => { if (!supported) return; let st = 'prompt'; try { st = (await navigator.permissions.query({ name: 'midi' })).state; } catch (e) {} if (st === 'granted' || (pref() === 'on' && st !== 'denied')) connect(true); });
   window.SPINLAB_MIDI = { MIDI, onMsg, connect, renderDlg };
 }
+/* ---------- MIDI files: import, save and a library of saved and recent MIDI ---------- */
+const GM_MAP = (() => {
+  const r = [], put = (a, b, id) => { for (let i = a; i <= b; i++) r[i] = id; };
+  put(0, 3, 'piano'); put(4, 5, 'epiano'); r[6] = 'harpsichord'; r[7] = 'clavinet'; put(8, 10, 'musicbox'); r[11] = 'vibraphone'; r[12] = 'marimba'; r[13] = 'xylophone'; put(14, 15, 'bells');
+  put(16, 20, 'organ'); put(21, 23, 'accordion'); r[24] = 'guitar'; r[25] = 'twelvestring'; put(26, 31, 'eguitar'); put(32, 37, 'bassguitar'); put(38, 39, 'bass');
+  r[40] = 'violin'; r[41] = 'viola'; r[42] = 'cello'; r[43] = 'contrabass'; r[44] = 'strings'; r[45] = 'pizzicato'; r[46] = 'harp'; r[47] = 'strings'; put(48, 51, 'strings');
+  r[52] = 'choir'; r[53] = 'chooh'; r[54] = 'solovoice'; r[55] = 'strings'; r[56] = 'trumpet'; r[57] = 'trombone'; r[58] = 'tuba'; r[59] = 'mutedtrumpet'; r[60] = 'horn'; put(61, 63, 'brasssection');
+  put(64, 67, 'sax'); put(68, 69, 'oboe'); r[70] = 'bassoon'; r[71] = 'clarinet'; put(72, 73, 'flute'); r[74] = 'recorder'; r[75] = 'panflute'; put(76, 77, 'panflute'); r[78] = 'whistle'; r[79] = 'recorder';
+  put(80, 87, 'synth'); put(88, 103, 'pad'); r[104] = 'sitar'; r[105] = 'banjo'; r[106] = 'guitar'; r[107] = 'harp'; r[108] = 'musicbox'; r[109] = 'oboe'; r[110] = 'violin'; r[111] = 'oboe';
+  r[112] = 'bells'; r[113] = 'percussion'; r[114] = 'steeldrum'; put(115, 119, 'percussion'); put(120, 127, 'synth');
+  return r;
+})();
+const instToGM = id => { const i = GM_MAP.indexOf(id); return i < 0 ? 0 : i; };
+/* read a standard MIDI file into tracks of notes measured in beats */
+function parseMidi(ab) {
+  const v = new DataView(ab); let p = 0;
+  const str = n => { let s = ''; for (let i = 0; i < n; i++) s += String.fromCharCode(v.getUint8(p + i)); p += n; return s; };
+  const u32 = () => { const x = v.getUint32(p); p += 4; return x; }, u16 = () => { const x = v.getUint16(p); p += 2; return x; };
+  const vlq = () => { let x = 0, b; do { b = v.getUint8(p++); x = (x << 7) | (b & 0x7f); } while (b & 0x80); return x; };
+  if (str(4) !== 'MThd') throw new Error('not midi');
+  const hl = u32(), fmt = u16(), ntr = u16(), div = u16(); p += hl - 6;
+  const tpq = div & 0x8000 ? 480 : div; let tempo = 0;
+  const groups = new Map();
+  for (let ti = 0; ti < ntr && p < v.byteLength - 8; ti++) {
+    const id = str(4), len = u32(), end = p + len; if (id !== 'MTrk') { p = end; continue; }
+    let tick = 0, run = 0, tname = ''; const prog = {}, open = {};
+    while (p < end) {
+      tick += vlq(); let st = v.getUint8(p);
+      if (st & 0x80) p++; else st = run;
+      if (st === 0xff) { const type = v.getUint8(p++), l = vlq();
+        if (type === 0x03 && !tname) { tname = ''; for (let i = 0; i < l; i++) tname += String.fromCharCode(v.getUint8(p + i)); tname = tname.replace(/[^\x20-\x7e]/g, '').trim(); }
+        if (type === 0x51 && !tempo) tempo = Math.round(60000000 / ((v.getUint8(p) << 16) | (v.getUint8(p + 1) << 8) | v.getUint8(p + 2)));
+        p += l; continue; }
+      if (st === 0xf0 || st === 0xf7) { p += vlq(); continue; }
+      run = st; const type = st & 0xf0, ch = st & 15;
+      if (type === 0xc0 || type === 0xd0) { const a = v.getUint8(p++); if (type === 0xc0) prog[ch] = a; continue; }
+      const a = v.getUint8(p++), b = v.getUint8(p++);
+      const key = ti + ':' + ch, g = groups.get(key) || (groups.set(key, { ch, name: tname, prog: null, notes: [] }), groups.get(key));
+      if (type === 0x90 && b > 0) { if (g.prog == null) g.prog = prog[ch] ?? 0; (open[ch * 128 + a] = open[ch * 128 + a] || []).push({ tick, vel: b }); }
+      else if (type === 0x80 || (type === 0x90 && b === 0)) { const q = open[ch * 128 + a]; const o = q && q.shift(); if (o) g.notes.push({ m: a, t: o.tick / tpq, d: Math.max(1 / 32, (tick - o.tick) / tpq), v: Math.max(0.1, o.vel / 127) }); }
+    }
+    groups.forEach(g => { if (!g.name) g.name = tname; });
+    p = end;
+  }
+  const tracks = [...groups.values()].filter(g => g.notes.length).map(g => {
+    const sound = g.ch === 9 ? 'drums' : (GM_MAP[g.prog || 0] || 'piano');
+    return { sound, name: (g.name || (INST[sound] || INST.piano).name).slice(0, 40), notes: g.notes.sort((x, y) => x.t - y.t) };
+  });
+  return { tempo: tempo || 120, tracks, format: fmt };
+}
+/* write instrument tracks as a standard MIDI file (format 1, 480 ticks per beat) */
+function makeMidi(tracks, bpm) {
+  const out = [], vlq = n => { const b = [n & 0x7f]; while ((n >>= 7)) b.unshift((n & 0x7f) | 0x80); return b; };
+  const chunk = (id, data) => [...id].map(c => c.charCodeAt(0)).concat([(data.length >>> 24) & 255, (data.length >>> 16) & 255, (data.length >>> 8) & 255, data.length & 255], data);
+  const text = s => [...unescape(encodeURIComponent(s))].map(c => c.charCodeAt(0));
+  out.push(...chunk('MThd', [0, 1, 0, tracks.length + 1, 0x01, 0xe0]));
+  const us = Math.round(60000000 / bpm); out.push(...chunk('MTrk', [0, 0xff, 0x51, 3, (us >> 16) & 255, (us >> 8) & 255, us & 255, 0, 0xff, 0x2f, 0]));
+  let chn = 0;
+  tracks.forEach(t => {
+    const drum = (INST[t.sound] || {}).kind === 'drum', ch = drum ? 9 : (chn === 9 ? ++chn : chn) % 16; if (!drum) chn++;
+    const ev = []; t.notes.forEach(n => { const a = Math.round(n.t * 480), b = Math.max(a + 1, Math.round((n.t + n.d) * 480)), m = clamp(Math.round(n.m), 0, 127), vel = clamp(Math.round((n.v || 0.8) * 127), 1, 127); ev.push([a, 1, 0x90 | ch, m, vel], [b, 0, 0x80 | ch, m, 0]); });
+    ev.sort((x, y) => x[0] - y[0] || x[1] - y[1]);
+    const nm = text(t.name || 'Track'), d = [0, 0xff, 0x03, ...vlq(nm.length), ...nm]; if (!drum) d.push(0, 0xc0 | ch, instToGM(t.sound));
+    let last = 0; ev.forEach(e => { d.push(...vlq(e[0] - last), e[2], e[3], e[4]); last = e[0]; }); d.push(0, 0xff, 0x2f, 0);
+    out.push(...chunk('MTrk', d));
+  });
+  return new Uint8Array(out).buffer;
+}
+{
+  const dlg = $('#midiLib'), list = $('#mlList'); let tab = 'saved';
+  const all = async () => { try { return await idbAll('midi'); } catch (e) { return []; } };
+  const fmtLen = s => Math.floor(s / 60) + ':' + String(Math.round(s % 60)).padStart(2, '0');
+  const esc = t => String(t || '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  async function addEntry(name, bytes, source, saved) {
+    const info = parseMidi(bytes), beats = Math.max(0, ...info.tracks.flatMap(t => t.notes.map(n => n.t + n.d)));
+    const e = { id: 'm' + Date.now().toString(36) + Math.random().toString(36).slice(2, 6), name: name.replace(/\.(mid|midi)$/i, '').slice(0, 60) || 'Untitled MIDI', bytes, source, saved: !!saved,
+      created: Date.now(), used: Date.now(), tracks: info.tracks.length, notes: info.tracks.reduce((a, t) => a + t.notes.length, 0), secs: beats * 60 / info.tempo, tempo: info.tempo };
+    await idbPut(e, 'midi');
+    const rest = (await all()).filter(x => !x.saved).sort((a, b) => b.used - a.used); for (const x of rest.slice(25)) await idbDel(x.id, 'midi');   // keep the 25 most recent unsaved
+    return e;
+  }
+  function addToSong(e) {
+    let info; try { info = parseMidi(e.bytes); } catch (err) { return toast('That MIDI file could not be read.'); }
+    if (!info.tracks.length) return toast('That MIDI file has no notes in it.');
+    const empty = !ST.tracks.some(t => (t.notes && t.notes.length) || (t.clips && t.clips.length));
+    stPush();
+    if (empty) { ST.tracks = ST.tracks.filter(t => (t.notes && t.notes.length) || (t.clips && t.clips.length)); ST.bpm = clamp(info.tempo, 40, 240); $('#stBpm').value = ST.bpm; }
+    const at = empty ? 0 : snapB(ST.pos, 1); let last = null;
+    info.tracks.forEach(t => { last = newInstTrack(t.sound, t.name); last.notes = t.notes.map(n => ({ m: n.m, t: at + n.t, d: n.d, v: n.v })); });
+    stSelect(last.id); renderStudio(); stDirty(); dlg.close();
+    e.used = Date.now(); idbPut(e, 'midi').catch(() => {});
+    toast('Added “' + e.name + '” as ' + info.tracks.length + ' track' + (info.tracks.length > 1 ? 's' : '') + (empty ? ' at ' + ST.bpm + ' BPM' : ''));
+  }
+  async function render() {
+    const items = (await all()).sort((a, b) => b.used - a.used), shown = tab === 'saved' ? items.filter(x => x.saved) : items.slice(0, 20);
+    document.querySelectorAll('#midiLib [data-mtab]').forEach(b => { const on = b.dataset.mtab === tab; b.classList.toggle('on', on); b.setAttribute('aria-selected', String(on)); });
+    $('#mlCount').textContent = items.filter(x => x.saved).length;
+    const t = stSelTrack(); $('#mlSaveTrack').disabled = !(t && t.type === 'inst' && t.notes.length); $('#mlSaveSong').disabled = !ST.tracks.some(x => x.type === 'inst' && x.notes.length);
+    list.innerHTML = shown.length ? shown.map(x => `<li data-id="${x.id}"><button class="mlmain" type="button" data-ma="add" title="Add to your song"><b>${esc(x.name)}</b><small>${x.tracks} track${x.tracks === 1 ? '' : 's'} · ${fmtLen(x.secs || 0)} · ${x.tempo} BPM · ${x.source === 'import' ? 'imported' : 'saved from SpinLab'} ${new Date(x.used).toLocaleDateString(undefined, { month: 'short', day: 'numeric' })}</small></button>
+      <button class="btn sm${x.saved ? ' on' : ''}" type="button" data-ma="star" aria-pressed="${x.saved}" title="${x.saved ? 'Remove from Saved' : 'Keep in Saved'}">${x.saved ? '★ Saved' : '☆ Save'}</button>
+      <button class="btn sm" type="button" data-ma="dl" title="Download .mid file">.mid</button>
+      <button class="btn sm danger" type="button" data-ma="del" aria-label="Delete ${esc(x.name)}" title="Delete">✕</button></li>`).join('')
+      : `<li class="mlempty">${tab === 'saved' ? 'No saved MIDI yet. Import a MIDI file or save a track as MIDI, then tap ☆ Save to keep it here.' : 'No recent MIDI yet. Imported files and MIDI you add show up here.'}</li>`;
+  }
+  const open = () => { render(); dlg.showModal(); };
+  window.openMidiLib = open;
+  list.addEventListener('click', async e => {
+    const b = e.target.closest('[data-ma]'); if (!b) return; const id = b.closest('li').dataset.id, x = await idbGet(id, 'midi'); if (!x) return;
+    const a = b.dataset.ma;
+    if (a === 'add') addToSong(x);
+    else if (a === 'star') { x.saved = !x.saved; await idbPut(x, 'midi'); toast(x.saved ? 'Saved “' + x.name + '”' : 'Removed from Saved'); render(); }
+    else if (a === 'dl') download(new Blob([x.bytes], { type: 'audio/midi' }), x.name + '.mid');
+    else if (a === 'del') { if (await askConfirm('Delete “' + x.name + '” from your MIDI library?', 'Delete')) { await idbDel(id, 'midi'); render(); if (!dlg.open) dlg.showModal(); } else if (!dlg.open) dlg.showModal(); }
+  });
+  document.querySelectorAll('#midiLib [data-mtab]').forEach(b => b.addEventListener('click', () => { tab = b.dataset.mtab; render(); }));
+  $('#mlClose').addEventListener('click', () => dlg.close());
+  $('#mlImport').addEventListener('click', () => $('#mlFile').click());
+  $('#mlFile').addEventListener('change', async e => {
+    const files = [...e.target.files]; e.target.value = ''; let lastE = null;
+    for (const f of files) { try { lastE = await addEntry(f.name, await f.arrayBuffer(), 'import', false); } catch (err) { toast('“' + f.name + '” isn’t a MIDI file SpinLab can read.'); } }
+    if (lastE) { tab = 'recent'; await render(); addToSong(lastE); }
+  });
+  $('#mlKeys').addEventListener('click', async () => {
+    dlg.close(); stPush(); const t = newInstTrack('piano', 'MIDI keyboard'); stSelect(t.id); renderStudio(); stDirty();
+    if (window.SPINLAB_MIDI && !SPINLAB_MIDI.MIDI.access) await SPINLAB_MIDI.connect(false);
+    toast('New track ready for your MIDI keyboard. Play to hear it, or press Record to record.');
+  });
+  const saveTracks = async (tracks, name) => { const e = await addEntry(name, makeMidi(tracks, ST.bpm), 'track', true); tab = 'saved'; render(); toast('Saved “' + e.name + '” to your MIDI library'); };
+  $('#mlSaveTrack').addEventListener('click', () => { const t = stSelTrack(); if (t && t.type === 'inst' && t.notes.length) saveTracks([t], t.name || 'Track'); });
+  $('#mlSaveSong').addEventListener('click', () => { const ts = ST.tracks.filter(x => x.type === 'inst' && x.notes.length); if (ts.length) saveTracks(ts, $('#stTitle').value.trim() || 'Untitled song'); });
+}
+$('#stLibMidi').addEventListener('click', () => { $('#stLib').close(); openMidiLib(); });
 /* AdSense side ads: only on the real website, only once the IDs are set, only on wide screens */
 (() => {
   if (!ADSENSE_CLIENT || !ADSENSE_SLOT || !/^https?:$/.test(location.protocol) || document.querySelector('meta[name="spinlab-offline"]')) return;
@@ -6197,6 +6372,7 @@ let stFileInto = null;
 $('#stFile').addEventListener('change', e => { const f = e.target.files[0]; e.target.value = ''; stAddAudioFile(f, stFileInto); stFileInto = null; });
 async function stAdd(kind, btn) {
   if (kind === 'inst') return openStInst(null, true);
+  if (kind === 'midi') return openMidiLib();
   if (kind === 'drums') { stPush(); const t = newInstTrack('drums'); stSelect(t.id); renderStudio(); toast('Drum track added. Each key plays a different drum.'); return; }
   if (kind === 'audio') { stFileInto = null; return $('#stFile').click(); }
   if (kind === 'voice') { stPush(); const t = newAudioTrack('Voice'); stSelect(t.id); renderStudio(); toast('Voice track added. Press Record to sing or talk into your mic.'); return; }
