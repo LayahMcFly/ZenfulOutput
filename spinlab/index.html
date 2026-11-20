@@ -454,6 +454,9 @@ body.pane-music .hcol.rd .hbtn svg.i-mu{display:block}
 body.mode-radio #radioView{display:flex}
 body.mode-radio header.top,body.mode-radio main{display:none!important}
 body.mode-radio{padding-bottom:96px}
+/* Home and Online Music scroll like a normal page on every screen (the one-window layout is only for DJ) */
+body.mode-radio,body.mode-home{height:auto!important;min-height:100vh;overflow-y:visible!important;overflow-x:clip!important}
+body.mode-radio.np-open{overflow:hidden!important}
 #radioView{flex-direction:column;gap:12px;padding:14px clamp(10px,3vw,30px);max-width:1100px;margin:0 auto;width:100%}
 @property --acc{syntax:'<color>';inherits:true;initial-value:#34d399}
 @property --acc2{syntax:'<color>';inherits:true;initial-value:#059669}
@@ -1252,7 +1255,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.29'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.30'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
