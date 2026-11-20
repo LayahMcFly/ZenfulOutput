@@ -27,6 +27,11 @@
 <meta property="og:description" content="A two-deck DJ mixer in your browser. Your songs never leave your device.">
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/spinlab/">
 <meta name="theme-color" content="#0b0d14">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="SpinLab">
 <link rel="icon" id="favicon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='14' fill='%230b0d14'/%3E%3Ccircle cx='30' cy='34' r='20' fill='%23141824' stroke='%2322d3ee' stroke-width='3'/%3E%3Ccircle cx='30' cy='34' r='7' fill='%23f472b6'/%3E%3Ccircle cx='30' cy='34' r='2' fill='%230b0d14'/%3E%3Cpath d='M50 8v22l-6 6' fill='none' stroke='%23e2e8f0' stroke-width='3.5' stroke-linecap='round'/%3E%3C/svg%3E">
 <style>
 :root{
@@ -1222,7 +1227,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.24'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.25'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 document.getElementById('ver').textContent = 'v' + APP_VERSION;
@@ -3634,6 +3639,9 @@ renderHomeRadio();
    Search, queue, Liked songs (built-in, can't be deleted) and playlists. Full songs come later through a music service. */
 (() => { const tag = (SUPPORT_CASHTAG || '').trim().replace(/^\$?/, ''); if (!tag) return;
   document.querySelectorAll('.supportlink').forEach(a => { a.href = 'https://cash.app/$' + encodeURIComponent(tag); a.hidden = false; a.title = 'Opens Cash App to $' + tag; }); })();
+/* installable app: register the offline helper (only on the real website, not in a downloaded copy) */
+if ('serviceWorker' in navigator && /^https?:$/.test(location.protocol) && !document.querySelector('meta[name="spinlab-offline"]'))
+  addEventListener('load', () => navigator.serviceWorker.register('sw.js').catch(() => {}));
 var BLANK = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7';
 var MUS = { audio: $('#mAudio'), results: [], tab: 'songs', track: null, state: '', dir: 1, cache: new Map(), loading: false, searched: false };
 const mLoad = (k, d) => { try { return JSON.parse(localStorage.getItem(k) || 'null') ?? d; } catch (e) { return d; } };
@@ -4187,6 +4195,7 @@ if (IS_OFFLINE_COPY) {
       const get = u => fetch(u, { cache: 'no-cache' }).then(r => { if (!r.ok) throw new Error(r.status); return r.text(); });
       const [html, lame] = await Promise.all([get(location.href.split('#')[0].split('?')[0]), get('lame.min.js')]);
       let out = html.replace('<meta name="theme-color"', () => '<meta name="spinlab-offline" content="1">\n<meta name="theme-color"');
+      out = out.replace(/<link rel="manifest"[^>]*>\n?/, '').replace(/<link rel="apple-touch-icon"[^>]*>\n?/, '');
       const notice = '<!--\n  Offline copy of SpinLab v' + APP_VERSION + ', downloaded ' + new Date().toISOString().slice(0, 10) + ' from ' + SITE + 'spinlab/\n' +
         '  It includes lamejs 1.2.1 (https://github.com/zhuker/lamejs), a JavaScript port of LAME (https://lame.sourceforge.io/),\n' +
         '  used unmodified under the GNU Lesser General Public License v3 (https://www.gnu.org/licenses/lgpl-3.0.html).\n-->\n';
