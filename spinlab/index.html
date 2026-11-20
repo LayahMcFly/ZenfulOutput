@@ -340,8 +340,11 @@ canvas.roll{width:100%;display:block;border-radius:10px;background:#070910;borde
 .pkeys.dr .pk-w .hk{bottom:auto;top:calc(61% + 10px)}
 .pkeys.dr .pk-b .hk{top:10px}
 .pk .nm.c{color:color-mix(in srgb,var(--oc,#4b5574) 70%,#0b0d14);font-weight:800}
-.pk .hk{position:absolute;left:0;right:0;bottom:30px;text-align:center;font:700 10px var(--mono);color:#6b7489;pointer-events:none;text-transform:uppercase}
-.pk-b .hk{bottom:auto;top:calc(100% - 64px);color:#8b93a9}
+.pk .hk{position:absolute;left:50%;bottom:34px;transform:translateX(-50%);min-width:22px;height:22px;padding:0 5px;display:grid;place-items:center;border-radius:6px;font:800 12px var(--mono);text-transform:uppercase;pointer-events:none;
+  color:#1d2335;background:linear-gradient(#ffffff,#e3e7f0);border:1px solid #b8c0d2;box-shadow:0 2px 0 #9aa3ba,0 3px 6px rgba(0,0,0,.18)}
+.pk-w.on .hk{transform:translateX(-50%) translateY(2px);box-shadow:0 0 0 #9aa3ba}
+.pk-b .hk{bottom:auto;top:calc(100% - 70px);color:#f4f6fb;background:linear-gradient(#4a5475,#2b3249);border-color:#5b6688;box-shadow:0 2px 0 #11141f,0 3px 6px rgba(0,0,0,.4)}
+.pkeys.nohk .hk{display:none}
 .pk-b .nm{bottom:24px;color:color-mix(in srgb,var(--oc) 55%,#e6e9f2);font-size:10.5px;letter-spacing:-.02em}
 .pk-b .fl{position:absolute;left:0;right:0;bottom:9px;text-align:center;font:600 9.5px var(--mono);color:#7b8496;pointer-events:none;letter-spacing:-.02em}
 .pkeys.nolabels .fl{display:none}
@@ -358,7 +361,7 @@ html.phone .pk-b .nm{bottom:10px;font-size:9.5px}
 @keyframes octFlash{0%{opacity:0;transform:translate(-50%,-30%) scale(.85)}15%{opacity:1;transform:translate(-50%,-50%) scale(1.04)}25%{transform:translate(-50%,-50%) scale(1)}70%{opacity:1}100%{opacity:0;transform:translate(-50%,-60%)}}
 .poct{border-radius:8px;padding:5px 10px;color:#0b0d14!important;font-weight:800;box-shadow:inset 0 0 0 1px rgba(255,255,255,.15);transition:background .25s}
 @media (prefers-reduced-motion:reduce){ .pkb.slide-l,.pkb.slide-r{animation:none} .octflash.show{animation:none;opacity:0} }
-.pkeys.nolabels .nm,.pkeys.nolabels .hk{display:none}
+.pkeys.nolabels .nm{display:none}
 html.phone .pk .hk{display:none}
 /* phones: Create mode is landscape. If the phone can't be locked sideways, the whole app turns sideways. */
 html.phone body.mode-create header.top{flex-wrap:nowrap;overflow-x:auto;gap:8px;padding:6px 10px;scrollbar-width:none}
@@ -972,6 +975,7 @@ html.phone body.mode-create .btn{min-height:38px}
     <div class="dsec">
       <span class="lbl">Sound</span>
       <div class="dgrid2"><button class="btn" id="crSus" title="Let notes ring after you let go. On a computer, hold Shift.">Sustain</button><button class="btn on" id="crLabels" title="Show note names on the keys">Note names</button></div>
+      <button class="btn" id="crKeyHints" aria-pressed="false" title="Show which computer key plays each piano key. Turns on by itself when the screen is sideways (landscape).">Computer key letters</button>
       <div class="row" style="justify-content:space-around">
         <div class="kn" style="--kc:#a78bfa"><div class="knob" id="crVol" role="slider" tabindex="0" aria-label="Piano volume"></div><span>Volume</span><output></output></div>
         <div class="kn" style="--kc:#a78bfa"><div class="knob" id="crRev" role="slider" tabindex="0" aria-label="Piano reverb"></div><span>Reverb</span><output></output></div>
@@ -1255,7 +1259,7 @@ html.phone body.mode-create .btn{min-height:38px}
 
 <script>
 'use strict';
-const APP_VERSION = '1.0.30'; // bump on every update: 1.0.1, 1.0.2 ...
+const APP_VERSION = '1.0.31'; // bump on every update: 1.0.1, 1.0.2 ...
 /* Support link for the "help us unlock full songs" notice. Put the $cashtag here (like '$YourName'); the button stays hidden while it's empty. */
 const SUPPORT_CASHTAG = '$LayahMcFly';
 /* Google AdSense. Ads stay off until these are filled in from the AdSense dashboard:
@@ -2925,6 +2929,16 @@ const FLATS = { 1: 'D♭', 3: 'E♭', 6: 'G♭', 8: 'A♭', 10: 'B♭' };
 const octColor = m => OCT_COLORS[clamp(octOf(m), 0, OCT_COLORS.length - 1)];
 
 /* keyboard drawing */
+/* computer-key letters on the piano keys: on by itself in landscape, and the menu switch overrides it */
+const hkPref = () => { try { return localStorage.getItem('spinlab-keyhints'); } catch (e) { return null; } };
+const landscapeMQ = matchMedia('(orientation: landscape)');
+function keyHintsOn() { const p = hkPref(); return p === 'on' ? true : p === 'off' ? false : landscapeMQ.matches; }
+function applyKeyHints() {
+  const on = keyHintsOn(); $('#pKeys').classList.toggle('nohk', !on);
+  const b = $('#crKeyHints'); b.classList.toggle('on', on); b.setAttribute('aria-pressed', String(on));
+  b.textContent = 'Computer key letters' + (hkPref() ? '' : ' (auto)');
+}
+landscapeMQ.addEventListener && landscapeMQ.addEventListener('change', applyKeyHints);
 function renderKeys() {
   const kb = $('#pKb'), w = kb.clientWidth; if (!w) return;
   const coarse = matchMedia('(pointer:coarse)').matches;
@@ -2945,6 +2959,7 @@ function renderKeys() {
   const cols = []; for (let o = octOf(CR.base); o <= octOf(CR.top); o++) cols.push(OCT_COLORS[clamp(o, 0, OCT_COLORS.length - 1)]);
   lbl.style.background = cols.length > 1 ? `linear-gradient(90deg,${cols.join(',')})` : cols[0];
   $('#pKeys').classList.toggle('nolabels', !CR.labels);
+  applyKeyHints();
 }
 function keyOn(m, on) { const el = CR.keyEls.get(m); if (el) el.classList.toggle('on', on); }
 function crOct(dir) {
@@ -3222,6 +3237,10 @@ $('#crOctDn').addEventListener('click', () => crOct(-1));
 $('#crOctUp').addEventListener('click', () => crOct(1));
 $('#crSus').addEventListener('click', () => { CR.susBtn = !CR.susBtn; crSetSus(); });
 $('#crLabels').addEventListener('click', () => { CR.labels = !CR.labels; renderKeys(); crUI(); });
+$('#crKeyHints').addEventListener('click', () => {
+  const next = !keyHintsOn(); try { localStorage.setItem('spinlab-keyhints', next ? 'on' : 'off'); } catch (e) {}
+  applyKeyHints(); toast(next ? 'Computer key letters on' : 'Computer key letters off');
+});
 
 /* computer keyboard in Create mode */
 document.addEventListener('keydown', e => {
