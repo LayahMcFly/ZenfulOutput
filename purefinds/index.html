@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.9.0">
+<meta name="pf-version" content="1.9.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.9.0';
+const VERSION = '1.9.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -723,7 +723,14 @@ let scanUrl = store.get('scanUrl', SCAN_DEFAULT);
 const scanBase = () => String(scanUrl || '').trim().replace(/\/+$/, '');
 const scanState = {cotton: {status: 'idle', stores: 0, done: 0, added: 0, errors: []}, food: {status: 'idle', stores: 0, done: 0, added: 0, errors: []}};
 // Version 2 of these saved lists: version 1 could hold garbled lists read from page code, so it's dropped
-const looksLikeIngredients = t => !!t && !/[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) && t.split(/\s+/).length <= 160;
+const looksLikeIngredients = t => {
+  t = String(t || '').trim();
+  if (!t || /[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) || t.split(/\s+/).length > 160) return false;
+  // marketing sentences are not ingredient lists ("each selected for maximum deliciousness")
+  if (/\b(delicious\w*|selected|crafted|enjoy\w*|perfect\w*|our|we|you\w*|maximum|favorite|love\w*|each)\b/i.test(t)) return false;
+  const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
+  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 4 && !/\.\s*$/.test(t));
+};
 try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledOut'); } catch(e){}
 let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
@@ -733,6 +740,7 @@ for (const u in noIng) if (Date.now() - noIng[u] > 7 * 864e5) delete noIng[u];
 const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`);
 const markNoIng = it => { noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
 for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
+for (const u in ingCache) if (!looksLikeIngredients(ingCache[u].ing)) delete ingCache[u];
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
 const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 

@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.2.0';
+const VERSION = '1.2.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -157,7 +157,14 @@ function cottonItem(d, p){
 const NOT_FOOD = /gift ?card|bundle|sampler|merch|tote|t-shirt|sweatshirt|\bhat\b|\bmug\b|apron|subscription box|e-?gift/i;
 const ING_STOP = /\s(?:contains|allergen|allergy|nutrition facts|directions|how to use|storage|store in|net wt|suggested use|manufactured|produced in|made in a facility|may contain|frequently asked|reviews|you may also|add to cart|shipping|distributed by)\b/i;
 // Real ingredient lists are plain words and commas, never page code or store data
-const looksLikeIngredients = t => !/[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) && t.split(/\s+/).length <= 160;
+const looksLikeIngredients = t => {
+  t = String(t || '').trim();
+  if (!t || /[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) || t.split(/\s+/).length > 160) return false;
+  // marketing sentences are not ingredient lists ("each selected for maximum deliciousness")
+  if (/\b(delicious\w*|selected|crafted|enjoy\w*|perfect\w*|our|we|you\w*|maximum|favorite|love\w*|each)\b/i.test(t)) return false;
+  const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
+  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 4 && !/\.\s*$/.test(t));
+};
 function findIngredients(text){
   const re = /ingredients?\s*[:\-–]\s*/gi; let m;
   while ((m = re.exec(text))){
