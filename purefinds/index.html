@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.7.2">
+<meta name="pf-version" content="1.8.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.7.2';
+const VERSION = '1.8.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -464,7 +464,7 @@ const FCATS = {
  fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
  nuts:['Walnuts & almonds','almonds',null,null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
  drinks:['Juice & kids drinks','juice'], 'plant-milk':['Almond milk','almond milk',null,null,/almond/i], 'ginger-tea':['Ginger & chaga tea','ginger chaga tea',null,null,/ginger|chaga/i], 'raspberry-tea':['Raspberry tea','raspberry tea',null,null,/raspberr/i], 'rosemary-tea':['Rosemary tea','rosemary tea',null,null,/rosemary/i],
- 'herbal-tea':['Herbal tea','herbal tea',null,null,/herbal|chamomile|peppermint|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden/i], tea:['Other tea & coffee','tea'],
+ 'herbal-tea':['Herbal tea','herbal tea',null,null,/herbal|chamomile|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden/i], tea:['Other tea & coffee','tea'],
  frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle'],
  sprouted:['Sprouted flours','sprouted flour',null,null,/sprout/i], spelt:['Spelt','spelt',null,null,/spelt/i], einkorn:['Einkorn','einkorn',null,null,/einkorn/i],
  kamut:['Kamut (khorasan)','kamut',null,null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',null,null,/quinoa/i], teff:['Teff','teff',null,null,/teff/i],
@@ -508,8 +508,8 @@ const PICKUP = {
  kamut:['Sprouted kamut flour','Kamut flour','Kamut berries'], quinoa:['Quinoa','Quinoa flour','Sprouted quinoa'],
  teff:['Teff flour','Teff grain'], amaranth:['Amaranth','Amaranth flour'], rye:['Sprouted rye flour','Rye flour','Rye berries'],
  fonio:['Fonio','Fonio flour'], chickpea:['Chickpea flour','Sprouted chickpea flour'],
- 'ginger-tea':['Ginger chaga tea','Organic ginger tea','Chaga tea','Ginger turmeric tea'], 'raspberry-tea':['Raspberry leaf tea','Raspberry herbal tea'], 'rosemary-tea':['Rosemary tea','Rosemary mint tea'],
- 'herbal-tea':['Chamomile tea','Peppermint tea','Hibiscus tea','Lemon balm tea','Tulsi tea','Nettle tea','Lemongrass tea','Rooibos tea'], tea:['Organic black tea','Organic coffee']
+ 'ginger-tea':['Ginger chaga tea','Organic ginger tea','Chaga tea','Ginger turmeric tea'], 'raspberry-tea':['Raspberry leaf tea','Raspberry herbal tea'], 'rosemary-tea':['Rosemary tea','Rosemary tea with lemon balm'],
+ 'herbal-tea':['Chamomile tea','Hibiscus tea','Lemon balm tea','Tulsi tea','Nettle tea','Lemongrass tea','Rooibos tea'], tea:['Organic black tea','Organic coffee']
 };
 
 const OUTFITS = [
@@ -563,12 +563,12 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive and grapeseed only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries (blackcurrant is fine too, but not cranberries). Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
+const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries (blackcurrant is fine too, but not cranberries). Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
 const BAD_FRUIT = /pineapple|coconut(?!\s*(oil|sugar|milk|cream|water|flour|nectar|aminos))|passion ?fruit|kiwi|\borange|cherr(y|ies)|guava|watermelon|melon|apricot|\bplums?\b|prune|\bfigs?\b|avocado(?!\s*oil)|\blemon(?!\s*(juice|essential))|\blime(?!\s*juice)|grapefruit|pomegranate|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|avocado|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
 const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
-const BAD_BANNED = /brown\s+rice|pumpkin|sunflower|flax|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?/i;
+const BAD_BANNED = /brown\s+rice|pumpkin|sunflower|flax|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?|peppermint/i;
 const BAD_TEA = /green\s+tea|matcha|sencha|genmaicha|gyokuro/i;
 const BAD_OAT = /\boat(s|meal|\s+(flour|milk|bran|fiber|syrup|beta)|\b)/i;
 const BAD_WHEAT = /(?<!buck)wheat|semolina|durum|farina|bulgur|couscous|\b(enriched|unbleached|bleached|all[- ]purpose|white|bread) flour/i;
@@ -662,6 +662,13 @@ const txt = v => Array.isArray(v) ? v.join(', ') : v && typeof v === 'object' ? 
 // Every live food is checked against the food rules each time it's shown, saved results included
 const passesRules = it => !ruleBreak(it.name, it.ing, FRUIT_CATS.some(c => (it.cats || []).includes(c)), it.certText || '');
 try { localStorage.removeItem('pf_off2'); localStorage.removeItem('pf_off'); } catch(e){}
+// Open Food Facts can fail from a phone browser (privacy settings, a bad network, busy servers). If the store scanner is set up, ask it to fetch the same address instead.
+async function offGet(url){
+  try { return await getJSON(url); } catch(e){
+    if (!scanBase()) throw e;
+    try { return await getJSON(`${scanBase()}/off?u=${encodeURIComponent(url)}`, 20000); } catch(e2){ throw new Error(e.message + ' (the store scanner could not fetch it either: ' + e2.message + ')'); }
+  }
+}
 async function offQuery(terms, label, sort, size){
   const key = [terms, label, sort, size].join('|');
   const cache = store.get('off3', {}), hit = cache[key];
@@ -669,17 +676,17 @@ async function offQuery(terms, label, sort, size){
   const tries = [
     async () => { // search-a-licious (Open Food Facts' new search service)
       const q = [terms && terms.split(/\s+/).join(' AND '), `labels_tags:"${label}"`, 'countries_tags:"en:united-states"'].filter(Boolean).join(' AND ');
-      const j = await getJSON('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
+      const j = await offGet('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
       return j.hits || [];
     },
     async () => { // classic full-text search
       const p = new URLSearchParams({search_terms: terms, search_simple: 1, action: 'process', json: 1, page_size: size, sort_by: sort, fields: OFF_FIELDS,
         tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: 'en:united-states'});
-      return (await getJSON('https://world.openfoodfacts.org/cgi/search.pl?' + p)).products || [];
+      return (await offGet('https://world.openfoodfacts.org/cgi/search.pl?' + p)).products || [];
     },
     async () => { // v2 API (label + country only, words matched afterwards)
       const p = new URLSearchParams({labels_tags: label, countries_tags: 'en:united-states', sort_by: sort, page_size: 100, fields: OFF_FIELDS});
-      const all = (await getJSON('https://world.openfoodfacts.org/api/v2/search?' + p)).products || [];
+      const all = (await offGet('https://world.openfoodfacts.org/api/v2/search?' + p)).products || [];
       const w = terms.toLowerCase().split(/\s+/).filter(Boolean);
       return all.filter(x => w.every(t => (txt(x.product_name) + ' ' + txt(x.generic_name)).toLowerCase().includes(t.replace(/s$/, '')))).slice(0, size);
     }
@@ -721,7 +728,7 @@ try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledO
 let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
-const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
+const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 
 function clothingType(t){
   const s = t.toLowerCase();
@@ -741,7 +748,7 @@ const FOOD_MAP = [
   [/kamut|khorasan/, 'kamut'], [/quinoa/, 'quinoa'], [/\bteff\b/, 'teff'], [/amaranth/, 'amaranth'], [/\brye\b/, 'rye'], [/fonio/, 'fonio'],
   [/chickpea|garbanzo/, 'chickpea'], [/\b(almonds?|walnuts?)\b(?! (butter|milk|flour))/, 'nuts'],
   [/(ginger|chaga)[a-z ,&-]*\b(tea|infusion|brew)\b|\b(tea|infusion)\b[a-z ,&-]*(ginger|chaga)/, 'ginger-tea'], [/raspberr[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*raspberr/, 'raspberry-tea'], [/rosemary[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*rosemary/, 'rosemary-tea'],
-  [/herbal|(chamomile|peppermint|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden)[a-z ]*\b(tea|infusion)\b/, 'herbal-tea'],
+  [/herbal|(chamomile|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden)[a-z ]*\b(tea|infusion)\b/, 'herbal-tea'],
   [/juice|smoothie|electrolyte|lemonade|\bdrinks?\b/, 'drinks'], [/(oat|almond|plant) milk/, 'plant-milk'], [/\btea\b|coffee/, 'tea'],
   [/ice cream/, 'frozen'], [/popsicle|frozen pop/, 'popsicles']
 ];

@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.1.3';
+const VERSION = '1.2.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -55,6 +55,13 @@ export default {
         if (type !== 'cotton' && type !== 'food') return json({error: 'type must be cotton or food'}, 400);
         const items = await scan(d, type);
         return json({store: ALLOWED.get(d), domain: d, type, count: items.length, checked: new Date().toISOString(), items}, 200, 21600);
+      }
+      if (u.pathname === '/off'){ // lets the site reach Open Food Facts through this worker when the visitor's browser cannot
+        const target = new URL(u.searchParams.get('u') || '');
+        if (target.protocol !== 'https:' || !/^(world|search)\.openfoodfacts\.org$/.test(target.hostname)) return json({error: 'Only Open Food Facts search addresses can be fetched.'}, 400);
+        const r = await fetch(target.toString(), {headers: UA, cf: {cacheTtl: 3600, cacheEverything: true}});
+        if (!r.ok) return json({error: `Open Food Facts answered HTTP ${r.status}`}, 502, 0);
+        return json(await r.json(), 200, 3600);
       }
       if (u.pathname === '/details'){
         const target = new URL(u.searchParams.get('url') || '');
