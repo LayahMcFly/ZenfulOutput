@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.11.3">
+<meta name="pf-version" content="1.11.4">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -331,7 +331,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.11.3';
+const VERSION = '1.11.4';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -838,21 +838,22 @@ function addScanned(type, rows){
 }
 // Read every listing's ingredients in the background (through the scanner) so products that can't be read are removed before you open them
 let resolving = false;
+const rs = {total: 0, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0};
 async function resolveOne(f){
   try {
     const r = await getJSON(`${scanBase()}/details?v=2&url=${encodeURIComponent(f.url)}`, 20000);
-    if (!r.ingredients || !looksLikeIngredients(r.ingredients)){ if (!ingFull(f)){ markNoIng(f); return true; } return false; }
+    if (!r.ingredients || !looksLikeIngredients(r.ingredients)){ if (!ingFull(f)){ markNoIng(f); rs.noIng++; return true; } rs.kept++; return false; }
     f.ing = r.ingredients; f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
     const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
-    if (why){ ruledOut[f.url] = why; store.set('ruledOut2', ruledOut); const i = FOODS.indexOf(f); if (i >= 0) FOODS.splice(i, 1); return true; }
-    return false;
-  } catch (e){ return false; } // could not reach the scanner just now: leave it and try again later
+    if (why){ ruledOut[f.url] = why; store.set('ruledOut2', ruledOut); const i = FOODS.indexOf(f); if (i >= 0) FOODS.splice(i, 1); rs.banned++; return true; }
+    rs.kept++; return false;
+  } catch (e){ rs.unreached++; return false; } // could not reach the scanner just now: leave it and try again later
 }
 async function resolveIngredients(){
   if (!scanBase() || resolving) return; resolving = true;
-  const todo = FOODS.filter(f => f.src === 'brand' && !ingFull(f)); let i = 0, changed = false;
-  await Promise.all(Array.from({length: 3}, async () => { while (i < todo.length){ if (await resolveOne(todo[i++])) changed = true; } }));
-  store.set('ingCache2', ingCache); resolving = false; if (changed) rerender();
+  const todo = FOODS.filter(f => f.src === 'brand' && !ingFull(f)); let i = 0, changed = false; Object.assign(rs, {total: todo.length, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0});
+  await Promise.all(Array.from({length: 3}, async () => { while (i < todo.length){ if (await resolveOne(todo[i++])) changed = true; rs.done++; if (rs.done % 10 === 0) scanNote(); } }));
+  store.set('ingCache2', ingCache); resolving = false; scanNote(); if (changed) rerender();
 }
 async function scanType(type){
   const st = scanState[type];
@@ -888,7 +889,7 @@ function scanNote(){
   el.hidden = false;
   if (st.status === 'loading') el.innerHTML = `Checking ${st.stores || 'the'} store catalogs for more ${what}… ${st.done}${st.stores ? ' of ' + st.stores : ''} done, ${st.added} added so far.`;
   else if (st.status === 'unreachable') el.innerHTML = `The store scanner didn't answer, so only the hand-checked products show. If you just redeployed it, wait a minute and reload. Inside Claude's preview it can't connect at all; open PureFinds from its website. <a href="#about">Scanner settings</a>.${errBox(st.err)}`;
-  else el.innerHTML = `${st.added} more ${what} found in ${st.stores} store catalogs. Store lists refresh every 6 hours.` +
+  else el.innerHTML = `${st.added} more ${what} found in ${st.stores} store catalogs. Store lists refresh every 6 hours.` + (type === 'food' && rs.total ? `<br>Reading ingredient lists: ${rs.done} of ${rs.total} checked. Kept ${rs.kept}; removed ${rs.noIng} with no readable ingredients and ${rs.banned} with banned ingredients${rs.unreached ? `; ${rs.unreached} couldn't be reached yet (the store scanner may need the latest Worker code)` : ''}.` : '') +
     (st.errors.length ? `<details style="margin-top:6px"><summary>${st.errors.length} store${st.errors.length === 1 ? '' : 's'} didn't answer</summary>${st.errors.map(errBox).join('')}</details>` : '');
 }
 function rerender(){
