@@ -1,0 +1,1117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="pf-version" content="1.3.2">
+<title>PureFinds · Organic food & 100% cotton finds</title>
+<meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* VOICE: calm, soft, editorial shopping journal
+   IDEA: a pinned mood board of real products
+   PICTURE: masonry pins of real product photos
+   COLOUR and TYPE: cream + beige ground, sage accents, blush details; Cormorant Garamond + Jost
+   LAYOUT: sticky header with search, rails on home, masonry grids with a filter bar on list pages */
+:root{--cream:#f8f3ea;--beige:#efe5d5;--sand:#e2d3bc;--ink:#3a332b;--muted:#7a6e61;--line:#e4d8c6;--sage:#8ea888;--sage-d:#56704f;--sage-l:#e3eadc;--pink:#f4dcd8;--pink-d:#c98682;--white:#fffdf9;--r:22px;--shadow:0 10px 30px -18px rgba(70,52,30,.45)}
+*{box-sizing:border-box;min-width:0}
+html{scroll-padding-top:150px}
+body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 Jost,system-ui,sans-serif;overflow-x:clip}
+h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.08;margin:0;text-wrap:balance}
+a{color:inherit}
+img{display:block;max-width:100%}
+button,input,select{font:inherit;color:inherit}
+:focus-visible{outline:2px solid var(--sage-d);outline-offset:2px}
+.wrap{max-width:1240px;margin:0 auto;padding:0 max(4vw,16px)}
+
+/* header */
+.top{position:sticky;top:0;z-index:30;background:rgba(248,243,234,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+.bar{display:flex;align-items:center;gap:18px;padding:12px 0}
+.logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600;letter-spacing:.2px;flex:none}
+.logo svg{width:30px;height:30px}
+.search{flex:1;display:flex;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 16px;box-shadow:var(--shadow);transition:border-color .2s}
+.search:focus-within{border-color:var(--sage)}
+.search input{flex:1;border:0;background:none;font-size:16px;padding:8px 6px;outline:none}
+.search button{border:0;background:var(--sage-d);color:#fff;border-radius:999px;padding:9px 18px;min-height:40px;cursor:pointer;font-weight:500}
+.icons{display:flex;gap:6px;flex:none}
+.ib{position:relative;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1px solid var(--line);background:var(--white);cursor:pointer;text-decoration:none}
+.ib svg{width:20px;height:20px}
+.ib b{position:absolute;top:-3px;right:-3px;background:var(--pink-d);color:#fff;font-size:11px;min-width:18px;height:18px;border-radius:9px;display:grid;place-items:center;padding:0 4px}
+.ib b:empty{display:none}
+nav.tabs{display:flex;gap:6px;overflow-x:auto;padding:0 0 10px;scrollbar-width:none}
+nav.tabs::-webkit-scrollbar{display:none}
+nav.tabs a{flex:none;text-decoration:none;padding:8px 15px;border-radius:999px;font-size:15px;color:var(--muted);transition:background .2s,color .2s}
+nav.tabs a:hover{background:var(--beige);color:var(--ink)}
+nav.tabs a[aria-current=page]{background:var(--sage-l);color:var(--sage-d);font-weight:500}
+@media(max-width:700px){.bar{flex-wrap:wrap}.search{order:3;flex-basis:100%}.logo{margin-right:auto}}
+
+/* hero */
+.hero{padding:clamp(28px,5vw,60px) 0 20px;text-align:center}
+.hero h1{font-size:clamp(38px,6vw,64px);max-width:820px;margin:0 auto}
+.hero h1 i{color:var(--sage-d)}
+.hero p{color:var(--muted);max-width:620px;margin:14px auto 0;font-size:17px}
+.collage{display:grid;grid-template-columns:repeat(6,minmax(0,1fr));gap:14px;margin:30px 0 0;align-items:end}
+.collage figure{margin:0;border-radius:var(--r);overflow:hidden;background:var(--beige);box-shadow:var(--shadow);cursor:pointer;animation:rise .8s both}
+.collage figure:nth-child(odd){aspect-ratio:3/4.2}.collage figure:nth-child(even){aspect-ratio:3/3.6;margin-bottom:28px}
+.collage img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.collage figure:hover img{transform:scale(1.05)}
+@media(max-width:760px){.collage{grid-template-columns:repeat(3,minmax(0,1fr))}.collage figure:nth-child(n+4){display:none}}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+
+/* sections */
+section.blk{padding:34px 0 10px}
+.sh{display:flex;align-items:end;justify-content:space-between;gap:14px;margin-bottom:16px;flex-wrap:wrap}
+.sh h2{font-size:clamp(28px,3.4vw,38px)}
+.sh p{margin:4px 0 0;color:var(--muted);font-size:15px}
+.link{color:var(--sage-d);font-weight:500;text-decoration:none;white-space:nowrap;background:none;border:0;cursor:pointer;padding:8px 0}
+.link:hover{text-decoration:underline}
+.rail{display:grid;grid-auto-flow:column;grid-auto-columns:minmax(220px,250px);gap:16px;overflow-x:auto;padding:4px 2px 18px;scroll-snap-type:x proximity}
+.rail>*{scroll-snap-align:start}
+.pagehead{padding:30px 0 6px}
+.pagehead h1{font-size:clamp(36px,5vw,52px)}
+.pagehead p{color:var(--muted);max-width:720px;margin:8px 0 0}
+
+/* chips */
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.chip{border:1px solid var(--line);background:var(--white);border-radius:999px;padding:8px 15px;min-height:40px;cursor:pointer;font-size:15px;transition:all .2s}
+.chip:hover{border-color:var(--sage)}
+.chip[aria-pressed=true]{background:var(--sage-d);border-color:var(--sage-d);color:#fff}
+
+/* filter bar */
+.filters{display:flex;flex-wrap:wrap;gap:10px;align-items:end;background:var(--beige);border-radius:var(--r);padding:14px 16px;margin:14px 0 18px}
+.filters label{display:grid;gap:3px;font-size:13px;color:var(--muted);flex:1 1 150px}
+.filters .pr{flex:1 1 200px}
+.pr div{display:flex;gap:6px}
+.field,select.field{appearance:none;-webkit-appearance:none;width:100%;min-height:44px;border:1px solid var(--sand);background:var(--white);border-radius:14px;padding:9px 12px;font-size:16px;color:var(--ink);transition:border-color .2s,box-shadow .2s}
+select.field{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath d='M1 1l5 5 5-5' stroke='%2356704f' stroke-width='1.8' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");background-repeat:no-repeat;background-position:right 13px center;cursor:pointer}
+.field:focus{outline:none;border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-l)}
+.field::placeholder{color:#a89c8c}
+.reset{border:0;background:none;color:var(--pink-d);font-weight:500;cursor:pointer;min-height:44px;padding:0 6px}
+.count{font-size:14px;color:var(--muted);margin:0 0 10px}
+
+/* grid + card */
+.grid{columns:4 230px;column-gap:18px}
+.grid>.card{break-inside:avoid;margin:0 0 18px}
+.card{position:relative;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;animation:rise .5s both}
+.card:hover{transform:translateY(-4px);box-shadow:0 18px 36px -20px rgba(70,52,30,.55)}
+.ph{background:var(--beige);cursor:pointer;display:block;width:100%;border:0;padding:0}
+.ph img{width:100%;height:auto;min-height:140px;object-fit:cover}
+.food .ph{background:#fff;padding:14px}
+.food .ph img{max-height:260px;object-fit:contain;min-height:120px;margin:0 auto}
+.noimg{aspect-ratio:4/5;width:100%;display:grid;place-items:center;padding:20px;text-align:center;font-family:'Cormorant Garamond',serif;font-size:20px;color:var(--sage-d);background:radial-gradient(circle at 30% 20%,var(--pink),transparent 55%),radial-gradient(circle at 80% 90%,var(--sage-l),transparent 60%),var(--beige)}
+.noimg span{max-width:16ch}
+.heart{position:absolute;top:10px;right:10px;width:40px;height:40px;border-radius:50%;border:0;background:rgba(255,253,249,.92);display:grid;place-items:center;cursor:pointer;box-shadow:0 4px 12px -6px rgba(0,0,0,.3);transition:transform .2s}
+.heart:active{transform:scale(.88)}
+.heart svg{width:19px;height:19px;fill:none;stroke:var(--pink-d);stroke-width:2}
+.heart[aria-pressed=true] svg{fill:var(--pink-d)}
+.badges{position:absolute;top:12px;left:12px;display:flex;flex-direction:column;gap:5px;align-items:flex-start;pointer-events:none}
+.bd{font-size:12px;font-weight:500;padding:3px 9px;border-radius:999px;background:var(--sage-l);color:var(--sage-d)}
+.bd.p{background:var(--pink);color:#8c4d49}
+.bd.u{background:#f1e9dc;color:var(--muted)}
+.cb{padding:12px 14px 14px}
+.meta{font-size:13px;color:var(--muted);margin:0 0 2px}
+.card h3{font-family:Jost,sans-serif;font-size:16px;font-weight:500;line-height:1.3;margin:0 0 4px}
+.price{font-weight:600;white-space:nowrap}
+.comp{font-size:13px;color:var(--muted);margin:6px 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.acts{display:flex;gap:8px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 15px;border-radius:999px;border:1px solid var(--sand);background:var(--white);text-decoration:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
+.btn:hover{border-color:var(--sage)}
+.btn.go{background:var(--sage-d);border-color:var(--sage-d);color:#fff}
+.btn.go:hover{background:#465e40}
+.btn.pk{background:var(--pink);border-color:var(--pink);color:#7a3f3b}
+.skel{break-inside:avoid;margin:0 0 18px;border-radius:var(--r);background:linear-gradient(100deg,var(--beige) 30%,#f6efe3 50%,var(--beige) 70%);background-size:300% 100%;animation:sh 1.4s infinite}
+@keyframes sh{to{background-position:-150% 0}}
+
+/* states */
+.empty{text-align:center;background:var(--white);border:1px dashed var(--sand);border-radius:var(--r);padding:40px 20px;margin:10px 0 24px}
+.empty h3{font-size:28px;margin-bottom:6px}
+.empty p{color:var(--muted);max-width:520px;margin:0 auto 14px}
+.note{font-size:14px;color:var(--muted);background:var(--white);border-left:3px solid var(--sage);border-radius:0 12px 12px 0;padding:10px 14px;margin:10px 0}
+
+/* daily */
+.daily{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:18px}
+.dcard{display:grid;grid-template-columns:minmax(0,.9fr) minmax(0,1.1fr);background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.dcard .dimg{background:var(--beige);cursor:pointer;border:0;padding:0}
+.dcard .dimg img{width:100%;height:100%;object-fit:cover;min-height:240px}
+.dcard.f .dimg{background:#fff}.dcard.f .dimg img{object-fit:contain;padding:16px}
+.dcard .db{padding:20px;display:flex;flex-direction:column;gap:6px}
+.dcard h3{font-size:26px}
+.kick{font-size:13px;color:var(--pink-d);font-weight:600}
+@media(max-width:820px){.daily{grid-template-columns:minmax(0,1fr)}}
+@media(max-width:480px){.dcard{grid-template-columns:minmax(0,1fr)}.dcard .dimg img{max-height:260px}}
+
+/* section hubs */
+.hub{display:grid;grid-template-columns:repeat(auto-fill,minmax(min(100%,330px),1fr));gap:16px;margin:18px 0}
+.hub.two{grid-template-columns:repeat(auto-fit,minmax(min(100%,320px),1fr))}
+.htile{position:relative;border:0;padding:0;border-radius:var(--r);overflow:hidden;aspect-ratio:4/3;cursor:pointer;background:var(--beige);box-shadow:var(--shadow);text-align:left;animation:rise .5s both;transition:transform .25s}
+.htile:hover{transform:translateY(-4px)}
+.htile img,.htile .noimg,.htile .art{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.htile .noimg span{display:none}
+.htile:hover img{transform:scale(1.05)}
+.art.a0{background:radial-gradient(circle at 25% 25%,#f4dcd8,transparent 60%),radial-gradient(circle at 80% 80%,#cfdcc9,transparent 60%),#efe5d5}
+.art.a1{background:radial-gradient(circle at 70% 30%,#cfdcc9,transparent 60%),radial-gradient(circle at 20% 90%,#f4dcd8,transparent 55%),#e8dcc8}
+.art.a2{background:radial-gradient(circle at 30% 70%,#f2cfc9,transparent 60%),radial-gradient(circle at 85% 20%,#efe5d5,transparent 55%),#e3eadc}
+.art.a3{background:radial-gradient(circle at 60% 60%,#e2d3bc,transparent 60%),radial-gradient(circle at 15% 15%,#e3eadc,transparent 55%),#f4dcd8}
+.htile>span{position:absolute;left:0;right:0;bottom:0;padding:40px 16px 14px;background:linear-gradient(transparent,rgba(45,36,26,.75));color:#fff;display:grid;gap:2px}
+.htile b{font-family:"Cormorant Garamond",serif;font-size:27px;font-weight:600;line-height:1.05}
+.htile small{font-size:14px;opacity:.92}
+.htile em{position:absolute;top:-28px;right:14px;font-style:normal;font-size:13px;background:rgba(255,253,249,.92);color:var(--sage-d);border-radius:999px;padding:3px 10px;font-weight:600}
+.crumb{margin:0 0 6px;font-size:14px;color:var(--muted)}.crumb a{color:var(--sage-d);text-decoration:none}.crumb a:hover{text-decoration:underline}
+/* pickup */
+.pick{background:var(--white);border-radius:var(--r);padding:18px;margin:16px 0;box-shadow:var(--shadow)}
+.pick .sh h2{font-size:30px}
+.prow-list{display:grid;gap:8px}
+.prow{display:grid;grid-template-columns:minmax(120px,170px) minmax(0,1fr) auto;gap:10px;align-items:center;padding:8px 0;border-top:1px solid var(--line)}
+.pname{display:grid}.pname small{color:var(--sage-d);font-size:12px}
+.plinks{display:flex;flex-wrap:wrap;gap:6px}
+.btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+.mylist{margin-top:14px;background:var(--sage-l);border-radius:16px;padding:12px 14px}.mylist p{margin:4px 0 10px}
+@media(max-width:640px){.prow{grid-template-columns:minmax(0,1fr) auto}.plinks{grid-column:1/-1;order:3}}
+.err{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}.err code{user-select:all;background:var(--beige);border-radius:8px;padding:4px 8px;font-size:12px;overflow-wrap:anywhere}
+/* aesthetics tiles */
+.tiles{display:grid;grid-template-columns:repeat(auto-fill,minmax(170px,1fr));gap:14px}
+.tile{position:relative;border:0;padding:0;border-radius:var(--r);overflow:hidden;aspect-ratio:4/5;cursor:pointer;background:var(--beige);box-shadow:var(--shadow);text-align:left}
+.tile img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
+.tile:hover img{transform:scale(1.06)}
+.tile span{position:absolute;left:0;right:0;bottom:0;padding:34px 14px 12px;background:linear-gradient(transparent,rgba(45,36,26,.72));color:#fff;font-family:"Cormorant Garamond",serif;font-size:24px;font-weight:600}
+.tile small{display:block;font-family:Jost,sans-serif;font-size:13px;font-weight:400;opacity:.9}
+
+/* outfits */
+.outfits{display:grid;grid-template-columns:repeat(auto-fill,minmax(270px,1fr));gap:18px}
+.outfit{background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow)}
+.ocol{display:grid;grid-template-columns:1.2fr 1fr;grid-template-rows:1fr 1fr;gap:4px;aspect-ratio:1/1;background:var(--beige)}
+.ocol button{border:0;padding:0;cursor:pointer;overflow:hidden;background:var(--beige)}
+.ocol button:first-child{grid-row:span 2}
+.ocol button:only-of-type,.ocol.two button{grid-row:span 2}
+.ocol img{width:100%;height:100%;object-fit:cover}
+.outfit .cb h3{font-family:"Cormorant Garamond",serif;font-size:24px}
+
+/* modal */
+.scrim{position:fixed;inset:0;z-index:50;background:rgba(48,38,28,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.scrim.on{display:flex;animation:fade .2s}
+@keyframes fade{from{opacity:0}}
+.modal{background:var(--cream);border-radius:28px;max-width:960px;width:100%;max-height:92vh;overflow:auto;display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.1fr);position:relative}
+.modal .mi{background:var(--beige);display:flex;align-items:center;justify-content:center;min-height:300px}
+.modal .mi.f{background:#fff;padding:24px}
+.modal .mi img{width:100%;height:100%;object-fit:cover;max-height:92vh}
+.modal .mi.f img{object-fit:contain;max-height:440px}
+.modal .mb{padding:26px;display:flex;flex-direction:column;gap:10px}
+.modal h2{font-size:34px}
+.x{position:absolute;top:12px;right:12px;width:44px;height:44px;border-radius:50%;border:0;background:var(--white);cursor:pointer;font-size:22px;z-index:2;box-shadow:var(--shadow)}
+dl.spec{display:grid;grid-template-columns:auto minmax(0,1fr);gap:6px 14px;margin:4px 0;font-size:15px}
+dl.spec dt{color:var(--muted)}dl.spec dd{margin:0}
+.flags{display:grid;gap:6px;margin:2px 0}
+.flag{display:flex;gap:8px;align-items:baseline;font-size:15px}
+.flag i{font-style:normal;width:20px;flex:none;text-align:center}
+.ing{font-size:15px;color:var(--ink);background:var(--white);border-radius:14px;padding:10px 12px;max-height:160px;overflow:auto}
+@media(max-width:760px){.modal{grid-template-columns:minmax(0,1fr)}.modal .mi{min-height:0;max-height:46vh}.modal .mi img{max-height:46vh}}
+
+/* cart list */
+.list{display:grid;gap:12px}
+.row{display:grid;grid-template-columns:80px minmax(0,1fr) auto;gap:14px;align-items:center;background:var(--white);border-radius:18px;padding:10px;box-shadow:var(--shadow)}
+.row img{width:80px;height:80px;object-fit:cover;border-radius:12px}
+
+/* about */
+.prose{max-width:760px}
+.prose h2{font-size:30px;margin:26px 0 8px}
+.prose li{margin:4px 0}
+
+.preview{margin:14px 0 0;background:var(--pink);color:#6d3632;border-radius:16px;padding:12px 16px;font-size:15px}
+/* copy fallback */
+.copybox{position:fixed;inset:0;z-index:70;background:rgba(48,38,28,.45);display:none;align-items:center;justify-content:center;padding:16px}
+.copybox.on{display:flex}
+.cbx{background:var(--cream);border-radius:24px;padding:22px;max-width:520px;width:100%;display:grid;gap:10px;box-shadow:var(--shadow)}
+.cbx h3{font-size:28px}
+.cbx textarea{resize:vertical;font:13px/1.5 ui-monospace,Menlo,Consolas,monospace}
+/* banner + footer */
+.update{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:var(--ink);color:#fff;border-radius:999px;padding:8px 8px 8px 20px;display:none;align-items:center;gap:12px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5);max-width:calc(100% - 24px)}
+.update.on{display:flex;animation:rise .4s}
+.update button{border:0;background:var(--pink);color:#6d3632;border-radius:999px;padding:8px 16px;min-height:40px;font-weight:600;cursor:pointer}
+.toast{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:60;background:var(--sage-d);color:#fff;padding:9px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .3s}
+.toast.on{opacity:1}
+footer{margin-top:50px;background:var(--beige);padding:30px 0;font-size:14px;color:var(--muted)}
+footer .wrap{display:flex;flex-wrap:wrap;gap:12px 30px;justify-content:space-between}
+footer a{color:var(--sage-d)}
+@media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="bar">
+      <a class="logo" href="#home" aria-label="PureFinds home">
+        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#f4dcd8"/><path d="M9 22c0-8 6-13 14-13 0 9-5 14-12 14" fill="#8ea888"/><path d="M10 23c3-4 6-7 10-10" stroke="#56704f" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        PureFinds
+      </a>
+      <form class="search" id="searchForm" role="search">
+        <input id="q" type="search" placeholder="Search organic snacks, cotton dresses, brands…" aria-label="Search products" autocomplete="off">
+        <button type="submit">Search</button>
+      </form>
+      <div class="icons">
+        <a class="ib" href="#favorites" aria-label="Favorites"><svg viewBox="0 0 24 24" fill="none" stroke="#c98682" stroke-width="2"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg><b id="favN"></b></a>
+        <a class="ib" href="#cart" aria-label="Cart"><svg viewBox="0 0 24 24" fill="none" stroke="#56704f" stroke-width="2"><path d="M5 7h14l-1.4 11H6.4z"/><path d="M9 7a3 3 0 0 1 6 0"/></svg><b id="cartN"></b></a>
+      </div>
+    </div>
+    <nav class="tabs" aria-label="Sections">
+      <a href="#home">Discover</a>
+      <a href="#food">Food</a>
+      <a href="#cotton">Cotton Closet</a>
+      <a href="#favorites">Favorites</a>
+      <a href="#recent">Recently viewed</a>
+      <a href="#about">How it works</a>
+    </nav>
+  </div>
+</header>
+
+<div class="wrap"><p class="preview" id="preview" hidden><b>You're looking at a preview.</b> The app showing this file blocks outside photos and live food data, so product pictures are blank here. Open PureFinds from its website (GitHub Pages) or in Chrome and they'll show.</p></div>
+<main id="main" class="wrap" tabindex="-1"></main>
+
+<footer>
+  <div class="wrap">
+    <div>PureFinds · v<span id="ver"></span> · Made by Leia</div>
+    <div>Food data live from <a href="https://world.openfoodfacts.org" rel="noopener" target="_blank">Open Food Facts</a> (ODbL). Clothing details checked on each brand's own product page.</div>
+  </div>
+</footer>
+
+<div class="scrim" id="scrim" aria-hidden="true"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="mt" id="modal"></div></div>
+<div class="update" id="update" role="status"><span>A new version of PureFinds is available.</span><button id="reload" type="button">Reload</button></div>
+<div class="toast" id="toast" role="status"></div>
+<div class="copybox" id="copybox" role="dialog" aria-modal="true" aria-labelledby="copyh"><div class="cbx">
+  <h3 id="copyh">Copy this text</h3>
+  <p class="meta">This browser blocked automatic copying. The text is selected: press Ctrl+C (Cmd+C on a Mac), or press and hold it on a phone and tap Copy.</p>
+  <textarea id="copytext" class="field" readonly rows="5"></textarea>
+  <div class="acts"><button class="btn go" type="button" data-copyclose>Done</button></div></div></div>
+
+<script>
+{
+const VERSION = '1.3.2';
+const CHECKED = 'Nov 22, 2026';
+
+/* ---------- Direct sales (sold by PureFinds) ----------
+   Nothing is sold directly yet. To sell your own product, add an object like this
+   and paste a Stripe Payment Link (Stripe Dashboard > Payment Links > New):
+   { id:'pf-tote', name:'Organic Cotton Tote', brand:'PureFinds', price:24, img:'https://...jpg',
+     fabric:'100% organic cotton canvas', desc:'...', stripeLink:'https://buy.stripe.com/...' } */
+const DIRECT_PRODUCTS = [];
+
+/* ---------- Verified 100% cotton catalog ----------
+   Each fabric line is quoted from the brand's product page, checked on CHECKED. */
+const BRANDS = {
+  K:  {brand:'Kotn', store:'Kotn', base:'https://kotn.com/products/'},
+  LA: {brand:'Los Angeles Apparel', store:'Los Angeles Apparel', base:'https://losangelesapparel.net/products/'},
+  CQ: {brand:'Cottonique', store:'Cottonique', base:'https://cottonique.com/products/'},
+  CD: {brand:'Christy Dawn', store:'Christy Dawn', base:'https://christydawn.com/products/'},
+  JK: {brand:'Jenni Kayne', store:'Jenni Kayne', base:'https://www.jennikayne.com/products/'},
+  MT: {brand:'MATE the Label', store:'MATE the Label', base:'https://matethelabel.com/products/'},
+  LW: {brand:'Lady White Co.', store:'Lady White Co.', base:'https://ladywhiteco.com/products/'}
+};
+const XS_XL = 'XS,S,M,L,XL';
+const KI = 'https://cdn.shopify.com/s/files/1/0932/1356/files/';
+const RAW = [
+ ['K','womens-mina-twisted-longsleeve-in-gypsum-haze',"Women's Mina Twisted Longsleeve – Gypsum/Haze",68,'100% Egyptian cotton jersey','Tops',XS_XL,'Gypsum/Haze',KI+'WOMENS_MINA_TWISTED_LONGSLEEVE_GYPSUM_HAZE_02.jpg?v=1793813148','clean-girl minimalist pinterest korean'],
+ ['K','womens-mina-twisted-longsleeve-in-lavender-ash-raisin',"Women's Mina Twisted Longsleeve – Lavender Ash/Raisin",68,'100% Egyptian cotton jersey','Tops',XS_XL,'Lavender Ash/Raisin',KI+'WOMENS_MINA_TWISTED_LONGSLEEVE_PURPLE_REIGN_02.jpg?v=1793812888','soft-girl pinterest korean'],
+ ['K','womens-shrunken-tee-in-birch-deep-ocean-haze',"Women's Shrunken Tee – Birch/Deep Ocean/Haze",48,'100% Egyptian cotton','Tops',XS_XL,'Birch/Deep Ocean/Haze',KI+'WOMENS_SHRUNKEN_TEE_BIRCH_DEEP_OCEAN_HAZE_02.jpg?v=1793742058','y2k casual-cute vintage'],
+ ['K','womens-shrunken-tee-in-lavender-ash-raisin',"Women's Shrunken Tee – Lavender Ash/Raisin",48,'100% Egyptian cotton','Tops',XS_XL,'Lavender Ash/Raisin',KI+'WOMENS_SHRUNKEN_TEE_LAVENDER_RASIN_02.jpg?v=1793741648','y2k soft-girl casual-cute'],
+ ['K','womens-shrunken-tee-in-black-v2',"Women's Shrunken Tee – Black",48,'in 100% Egyptian cotton','Tops','XS,S,M,L,XL,XXL','Black,Birch/Deep Ocean/Haze,Lavender Ash/Raisin,Pacific Blue,Olive',KI+'WOMENS_SHRUNKEN_TEE_BLACK_02.jpg?v=1793820083','y2k minimalist casual-cute'],
+ ['K','womens-curved-hem-3-4-sleeve-in-graphite',"Women's Curved Hem 3/4 Sleeve – Graphite",68,'100% Egyptian cotton midweight jersey','Tops',XS_XL,'Graphite',KI+'WOMENS_CURVED_HEM_3_4_SLEEVE_GRAPHITE_02.jpg?v=1793741334','minimalist neutral korean'],
+ ['K','womens-off-shoulder-longsleeve-tunic-in-tawny-port-chocolate-plum-stripe',"Women's Off Shoulder Longsleeve Tunic – Tawny Port/Chocolate Plum Stripe",68,'100% Egyptian cotton jersey','Tops',XS_XL,'Tawny Port/Chocolate Plum Stripe',KI+'WOMENS_OFF_SHOULDER_TUNIC_TAWNY_PORT_CHOCOLATE_PLUM_STRIPE_02.jpg?v=1793738116','brown vintage pinterest','XL was sold out when checked.'],
+ ['K','womens-boatneck-3-4-sleeve-top-in-tawny-port-gypsum-thunderstorm-stripe',"Women's Boatneck 3/4 Sleeve Top – Tawny Port Stripe",52,'crafted from 100% Egyptian cotton','Tops',XS_XL,'Black,Marshmallow,Pacific Blue,Cardamom,Tawny Port/Gypsum/Thunderstorm Stripe,Birch/Kelp/Persimmon,White,Taupe,Sorbet',KI+'WOMENS_BOATNECK_3_4_SLEEVE_TOP_TAWNY_PORT_GYPSUM_THUNDERSTORM_STRIPE_02.jpg?v=1793733741','old-money pinterest vintage'],
+ ['K','womens-lina-cowl-neck-longsleeve-in-white',"Women's Lina Cowl Neck Longsleeve – White",62,'made from 100% Egyptian cotton','Tops',XS_XL,'White,Black',KI+'WOMENS_LINA_COWL_NECK_LONGSLEEVE_WHITE_03.jpg?v=1793733450','clean-girl minimalist old-money'],
+ ['K','womens-micro-rib-longsleeve-in-cardamom-thunderstorm-stripe',"Women's Micro Rib Longsleeve – Cardamom/Thunderstorm Stripe",52,'100% Egyptian cotton','Tops','XS,S,M,L,XL,XXL','Black,Cardamom/Thunderstorm Stripe,Violet,White',KI+'WOMENS_MICRO_RIB_LONGSLEEVE_CARDAMOM_THUNDERSTORM_STRIPE_02.jpg?v=1793733074','casual-cute neutral'],
+ ['K','womens-low-v-neck-longsleeve-in-white',"Women's Low V-neck Longsleeve – White",52,'100% Egyptian cotton micro rib','Tops',XS_XL,'White,Lavender,Deep Ocean',KI+'WOMENS_LOW_VNECK_LONGSLEEVE_WHITE_02.jpg?v=1793731865','clean-girl minimalist korean'],
+ ['K','womens-baseball-longsleeve-in-white',"Women's Baseball Longsleeve – White",68,'100% Egyptian cotton','Tops',XS_XL,'White,Haze/Thunderstorm,Sangria,Raisin/Chocolate Plum',KI+'WOMENS_BASEBALL_LONGSLEEVE_WHITE_02.jpg?v=1793731493','casual-cute y2k'],
+ ['K','womens-crossover-3-4-sleeve-top-in-marshmallow',"Women's Crossover 3/4 Sleeve Top – Marshmallow",62,'in 100% Egyptian cotton','Tops',XS_XL,'Black,Marshmallow,Gypsum,Sangria,Deep Purple',KI+'WOMENS_CROSSOVER_3_4_SLEEVE_TOP_MARSHMALLOW_02.jpg?v=1792787283','soft-girl coquette clean-girl'],
+ ['K','womens-sleeveless-turtleneck-in-white',"Women's Sleeveless Turtleneck – White",32,'made from 100% cotton micro-rib jersey','Tops',XS_XL,'White',KI+'Women_sSleevelessTurtleneck_White2.jpg?v=1762276005','clean-girl minimalist'],
+ ['K','womens-off-shoulder-tee-in-azure',"Women's Off Shoulder Tee – Azure",39,'crafted from 100% Egyptian cotton','Tops','XS,S,M,L,XL,XXL','White,Black,Taupe,Sorbet,Midnight,Plum,Azure',KI+'WOMENS_OFF_SHOULDER_TEE_AZURE_02.jpg?v=1784301910','casual-cute korean pinterest y2k'],
+ ['K','womens-micro-rib-tee-in-salsa',"Women's Micro Rib Tee – Salsa",29,'Made from 100% Egyptian cotton','Tops',XS_XL,'White,Black,Barely Pink,Cardamom/Deep Ocean,Salsa',KI+'20260128_ECOMM_SS26_15_WOMENSMICRORIBTEE_SALSA_13109.jpg?v=1770319032','y2k casual-cute coquette'],
+ ['K','mens-midweight-longsleeve-in-walnut-taupe-birch-charcoal-stripe',"Men's Midweight Longsleeve – Walnut Stripe",62,'100% Egyptian cotton midweight jersey','Tops',XS_XL,'Walnut/Taupe/Birch/Charcoal Stripe',KI+'MENS_MIDWEIGHT_LONGSLEEVE_WALNUT_TAUPE_BIRCH_CHARCOAL_STRIPE_02.jpg?v=1793817157','brown vintage casual-cute'],
+ ['LA','43046-baby-rib-3-4-sleeve-v-neck-top','Baby Rib 3/4 Sleeve High V-Neck Top',36,'100% Combed Cotton','Tops',XS_XL,'Black,Navy,Eggplant,Red,Baby Pink,Taro,Aquamarine,White','https://cdn.shopify.com/s/files/1/2152/0639/files/43046-taro_a6b6c182-8f66-45c6-8c58-fd2f5c2594a8.jpg?v=1794260934','coquette y2k soft-girl','Avoid the Heather Grey color: the brand lists it as 90% cotton / 10% polyester.'],
+ ['K','mens-haddah-v-neck-sweater-in-light-charcoal',"Men's Haddah V-Neck Sweater – Light Charcoal",118,'Made from 100% cotton','Sweaters',XS_XL,'Light Charcoal',KI+'MENS_HADDAH_VNECK_SWEATER_LIGHT_CHARCOAL_02.jpg?v=1793818627','old-money minimalist'],
+ ['K','mens-haddah-v-neck-sweater-in-oak',"Men's Haddah V-Neck Sweater – Oak",118,'Made from 100% cotton','Sweaters',XS_XL,'Oak',KI+'MENS_HADDAH_VNECK_SWEATER_OAK_02.jpg?v=1793818326','old-money brown neutral'],
+ ['K','mens-varsity-polo-sweater-in-bark-pitch-navy',"Men's Varsity Polo Sweater – Bark/Pitch Navy",148,'Knit from 100% Egyptian cotton','Sweaters',XS_XL,'Bark/Pitch Navy',KI+'MENS_VARSITY_POLO_SWEATER_BARK_PITCH_NAVY_02.jpg?v=1793817908','old-money vintage brown'],
+ ['K','mens-varsity-polo-sweater-in-cardamom-birch',"Men's Varsity Polo Sweater – Cardamom/Birch",148,'Knit from 100% Egyptian cotton','Sweaters',XS_XL,'Cardamom/Birch',KI+'MENS_VARSITY_POLO_SWEATER_CARDAMOM_BIRCH_03.jpg?v=1793817597','old-money neutral pinterest'],
+ ['K','womens-cozy-turtleneck-in-marshmallow-v2',"Women's Cozy Turtleneck – Marshmallow",108,'Knitted from 100% Egyptian cotton','Sweaters',XS_XL,'Marshmallow,Chocolate Plum',KI+'WOMENS_COZY_TURTLENECK_MARSHMALLOW_02.jpg?v=1791555432','cozy soft-girl neutral'],
+ ['K','womens-cozy-turtleneck-in-chocolate-plum',"Women's Cozy Turtleneck – Chocolate Plum",108,'Knitted from 100% Egyptian cotton','Sweaters',XS_XL,'Chocolate Plum,Marshmallow',KI+'WOMENS_COZY_TURTLENECK_CHOCOLATE_PLUM_02.jpg?v=1791555191','cozy brown old-money'],
+ ['K','womens-rib-zip-hoodie-in-coffee-bean',"Women's Rib Zip Hoodie – Coffee Bean",122,'Knit from 100% cotton in an all-over rib','Hoodies & sweatshirts',XS_XL,'Coffee Bean,Lava Smoke',KI+'Women_sRibZipHoodie_Brown3.jpg?v=1757005358','brown cozy korean'],
+ ['K','mens-cozy-zip-hoodie-in-truffle',"Men's Cozy Zip Hoodie – Truffle",138,'Knitted from 100% Egyptian cotton','Hoodies & sweatshirts','XXS,XS,S,M,L,XL','Black,Truffle,Coffee Bean',KI+'MENS_COZY_ZIP_HOODIE_TRUFFLE_02.jpg?v=1791553587','cozy brown japanese-street'],
+ ['MT','organic-fleece-pocket-hoodie-leek','Organic Fleece Pocket Hoodie – Leek',94,'100% Organic Cotton','Hoodies & sweatshirts',XS_XL,'Leek','https://cdn.shopify.com/s/files/1/0518/6281/files/251209_BC_MTL_CLN_CONF_03_ORGANIC_STRETCH_BIKER_SHORT_4_LAGOON_ORGANIC_FLEECE_POCKET_HOODIE_LEEK_0017_916b300e-b8c3-4edf-a1c5-4a02897a05fa.jpg?v=1767896414','cozy clean-girl korean','The photo also shows a different item (a stretch biker short) that is not 100% cotton.'],
+ ['MT','organic-fleece-v-neck-sweatshirt-bone','Organic Fleece V-Neck Sweatshirt – Bone',76,'100% Organic Cotton','Hoodies & sweatshirts',XS_XL,'Bone','https://cdn.shopify.com/s/files/1/0518/6281/files/240903_MTL_11_FLEECE_VNECK_SWEATSHIRT_BONE_0014.jpg?v=1727186857','neutral clean-girl cozy'],
+ ['LW','quarter-zip-sweatshirt-black','Quarter Zip Sweatshirt – Black',260,'100% cotton','Hoodies & sweatshirts','S,M,L,XL','Black','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-SW530-QUARTER-ZIP-BLK-01.jpg?v=1794862288','japanese-street minimalist'],
+ ['LW','quarter-zip-sweatshirt-pigment-chalk','Quarter Zip Sweatshirt – Pigment Chalk',260,'100% cotton','Hoodies & sweatshirts','S,M,L,XL','Pigment Chalk','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-SW530-QUARTER-ZIP-PIGCHLK-01.jpg?v=1794862287','japanese-street neutral'],
+ ['LW','binded-zip-hoodie-pigment-chalk','Binded Zip Hoodie – Pigment Chalk',290,'100% cotton fleece (USA)','Hoodies & sweatshirts','S,M,L,XL','Pigment Chalk','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-H601-BINDED-ZIP-PIGCHLK-01.jpg?v=1794863694','japanese-street cozy neutral'],
+ ['LW','teddy-crewneck-molten','Teddy Crewneck – Molten',300,'100% cotton produced in Japan','Hoodies & sweatshirts','S,M,L,XL','Molten','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-SW505-TEDDY-CREWNECK-MLTN-01.jpg?v=1794861787','japanese-street vintage'],
+ ['LW','teddy-crewneck-charcoal','Teddy Crewneck – Charcoal',300,'100% cotton produced in Japan','Hoodies & sweatshirts','S,M,L,XL','Charcoal','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-SW505-TEDDY-CREWNECK-CHAR-01.jpg?v=1794861787','japanese-street minimalist'],
+ ['K','womens-cozy-track-pant-in-black-v2',"Women's Cozy Track Pant – Black",108,'Crafted from ultra-soft 100% Egyptian cotton','Sweatpants & pants','XXS,XS,S,M,L,XL,XXL','Black,Marshmallow,Chocolate Plum,Natural',KI+'WOMENS_COZY_TRACK_PANT_BLACK_01.jpg?v=1791554447','cozy minimalist japanese-street'],
+ ['K','womens-cozy-track-pant-in-marshmallow',"Women's Cozy Track Pant – Marshmallow",108,'Crafted from ultra-soft 100% Egyptian cotton','Sweatpants & pants',XS_XL,'Marshmallow,Black,Chocolate Plum,Natural',KI+'WOMENS_COZY_TRACK_PANT_MARSHMALLOW_01.jpg?v=1791554262','cozy neutral clean-girl soft-girl'],
+ ['K','womens-cozy-track-pant-in-chocolate-plum',"Women's Cozy Track Pant – Chocolate Plum",108,'Crafted from ultra-soft 100% Egyptian cotton','Sweatpants & pants',XS_XL,'Chocolate Plum,Black,Marshmallow,Natural',KI+'WOMENS_COZY_TRACK_PANT_CHOCOLATE_PLUM_01.jpg?v=1791554126','cozy brown'],
+ ['LW','twill-trouser-anvil','Twill Trouser – Anvil Grey',480,'100% cotton twill (Japan)','Sweatpants & pants','30,32,34,36','Anvil Grey','https://cdn.shopify.com/s/files/1/0063/8094/5490/files/LW-B1102-TWILL-TROUSER-ANVGRY-01.jpg?v=1794866433','japanese-street old-money minimalist'],
+ ['CD','the-jodi-dress-strawberry-vine','The Jodi Dress – Strawberry Vine',172.80,'Crafted from 100% regenerative cotton','Dresses','XS,S,M,L,XL,XXL','Strawberry Vine','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_042726_SUMMER_JUNE_1409_COVER.jpg?v=1780798216','cottagecore coquette pinterest'],
+ ['CD','the-simple-dawn-dress-rouge-rosette','The Simple Dawn Dress – Rouge Rosette',99,'Made from 100% organic cotton','Dresses',XS_XL,'Rouge Rosette','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_102125_SimpleDawn_Gratitude_083_COVER.jpg?v=1761935441','cottagecore coquette vintage'],
+ ['CD','the-simple-dawn-dress-dogwood-meadow','The Simple Dawn Dress – Dogwood Meadow',99,'Made from 100% organic cotton','Dresses','XS,S,M,L,XL,XXL','Dogwood Meadow','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_061726_SIMPLE_DAWN_462_COVER.jpg?v=1784557235','cottagecore soft-girl'],
+ ['CD','the-simple-dawn-dress-maroon-calico','The Simple Dawn Dress – Maroon Calico',99,'Made from 100% organic cotton','Dresses',XS_XL,'Maroon Calico','https://cdn.shopify.com/s/files/1/1132/5272/files/Petite_Cover.jpg?v=1762023453','cottagecore vintage brown'],
+ ['CD','the-simple-dawn-dress-cascading-daisy','The Simple Dawn Dress – Cascading Daisy',99,'Made from 100% organic cotton','Dresses','XS,S,M,L,XL,XXL','Cascading Daisy','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_061726_SIMPLE_DAWN_206_COVER.jpg?v=1784565307','cottagecore casual-cute'],
+ ['CD','the-simple-dawn-dress-cream-blueberry-harvest','The Simple Dawn Dress – Cream Blueberry Harvest',99,'Made from 100% organic cotton','Dresses','XS,S,M,L,XL,XXL','Cream Blueberry Harvest','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_061726_SIMPLE_DAWN_361_COVER.jpg?v=1784564951','cottagecore pinterest neutral'],
+ ['CD','the-simple-dawn-dress-petites-rouge-rosette','The Simple Dawn Dress Petites – Rouge Rosette',99,'Made from 100% organic cotton','Dresses','PXS,PS,PM,PL,PXL','Rouge Rosette','https://cdn.shopify.com/s/files/1/1132/5272/files/Petite_Cover-3.jpg?v=1761933912','cottagecore coquette'],
+ ['CD','the-raquel-dress-amethyst-dhalia','The Raquel Dress – Amethyst Dahlia',229.60,'Crafted from 100% Organic Cotton','Dresses','XS,S,M,L,XL,XXL','Amethyst Dahlia','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_090326_GRATITUDE_143_COVER.jpg?v=1794348831','cottagecore vintage'],
+ ['CD','the-katrina-dress-picnic-patchwork','The Katrina Dress – Picnic Patchwork',208.60,'Crafted from 100% Organic Cotton','Dresses','XS,S,M,L,XL,XXL','Picnic Patchwork','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_090326_GRATITUDE_295_COVER.jpg?v=1794349463','cottagecore vintage pinterest'],
+ ['CD','the-emma-dress-frost-florals','The Emma Dress – Frost Florals',243.60,'Made from 100% regeneratively grown cotton','Dresses','XS,S,M,L,XL,XXL','Frost Florals','https://cdn.shopify.com/s/files/1/1132/5272/files/DAWN_090326_GRATITUDE_173_COVER.jpg?v=1794350705','cottagecore soft-girl coquette'],
+ ['JK','lauren-skirt-navy','Lauren Skirt – Navy',395,'the 100% cotton Lauren Skirt','Skirts','XS,S,M,L,XL,XXL','Navy','https://cdn.shopify.com/s/files/1/0565/1234/8333/files/lauren-skirt-navy-1.jpg?v=1762183725','old-money minimalist','Only size L was in stock when checked.'],
+ ['MT','organic-pointelle-pant-golden','Organic Pointelle Pant – Golden',82,'100% Organic Cotton','Pajamas & lounge',XS_XL,'Golden','https://cdn.shopify.com/s/files/1/0518/6281/files/260414_BC_MTL_MJ_CAMP_13_ORGANIC_POINTELLE_TANK_PANT_GOLDEN_0011.jpg?v=1779478907','cozy cottagecore soft-girl'],
+ ['CQ','unisex-knitted-base-layer-leggings','Elastic-free Knitted Seamless Base Layer Leggings',40,'GOTS-Certified 100% Organic Combed Cotton Yarn','Underwear & base layers',XS_XL.replace('XS,',''),'Natural','https://cdn.shopify.com/s/files/1/0012/8072/files/8811NBC-Front.jpg?v=1795181344','cozy minimalist'],
+ ['CQ','unisex-knitted-base-layer-long-sleeve','Latex-Free Knitted Base Layer Long Sleeve',40,'GOTS-Certified 100% Organic Combed Cotton Yarn','Underwear & base layers','S,M,L,XL','Natural','https://cdn.shopify.com/s/files/1/0012/8072/files/8810NBC-Female.jpg?v=1795181410','cozy minimalist neutral'],
+ ['CQ','elite-elastic-free-anatomical-left-right-fit-socks','Elite Elastic-Free Left/Right Fit Socks (2 pairs)',26.40,'100% Organic Combed Cotton Yarn','Socks','S,M,L,XL,2XL','Natural','https://cdn.shopify.com/s/files/1/0012/8072/files/7706_-_Call-Out.jpg?v=1795179448','cozy neutral']
+];
+
+/* ---------- Organic food from brand stores ----------
+   Checked on each brand's own store on CHECKED. cert = the brand's own organic wording. */
+const FOOD_BRANDS = {
+  YE:{brand:'YumEarth',base:'https://yumearth.com/products/'}, TH:{brand:'Theo Chocolate',base:'https://www.theochocolate.com/products/'},
+  LE:{brand:'LesserEvil',base:'https://lesserevil.com/products/'}, MH:{brand:'Mavuno Harvest',base:'https://mavunoharvest.com/products/'},
+  MG:{brand:"Mary's Gone Crackers",base:'https://www.marysgonecrackers.com/products/'}, PE:{brand:'Purely Elizabeth',base:'https://purelyelizabeth.com/products/'},
+  OF:{brand:'Once Upon a Farm',base:'https://onceuponafarmorganics.com/products/'}, AE:{brand:'Alter Eco',base:'https://www.alterecofoods.com/products/'},
+  MD:{brand:'Made Good',base:'https://madegoodfoods.com/products/'}, HU:{brand:'Hu Kitchen',base:'https://hukitchen.com/products/'}
+};
+const S = 'https://cdn.shopify.com/s/files/1/';
+// [brand, handle, name, price|null, image, categories, organic wording, ingredients, brand claims, note]
+const FOOD_RAW = [
+ ['YE','organic-freeze-dried-giggles®','Organic Freeze Dried Giggles® (8 oz)',14.99,S+'0408/0576/1178/files/Item1206_62780_8ozFD_Giggles_850080433058Front.jpg?v=1776973239','gummies','Organic, vegan, non-GMO, no artificial dyes, allergy-friendly','','No artificial dyes|Vegan|Non-GMO'],
+ ['YE','yumearth-holiday-organic-gummy-fruits','Holiday Organic Gummy Fruits',16.49,S+'0408/0576/1178/files/item1683_63129_15holiday_gummyfriuts_810165016835front.jpg?v=1755099915','gummies fruit-snacks','allergy-friendly, organic gummy fruits','',''],
+ ['YE','organic-candy-cane-pops','Holiday Organic Candy Cane Lollipops (30 ct)',9.49,S+'0408/0576/1178/files/Item1588_62540_Holiday_30ctPops_810165015883_V2Front.jpg?v=1728408020','gummies','Organic (in product name)','',''],
+ ['YE','organic-holiday-candy-canes','Holiday Organic Candy Canes',12.99,S+'0408/0576/1178/products/Item1745_63068_Holiday_10ctCandyCanes_810165017450_Item1745_63068_Holiday_10ctCandyCanes_810165017450Front.jpg?v=1669056032','gummies','Organic (in product name)','',''],
+ ['TH','salted-maple-crunch-dark-chocolate','Salted Maple Crunch 70% Dark Chocolate (12-pack)',79.95,S+'0669/5577/1982/files/0dc3mQOo_copy_e2550af5-dfb9-42f5-9815-797ff8248edf.webp?v=1792711388','chocolate','Certified organic by Oregon Tilth','70% dark chocolate, organic maple syrup flakes, sea salt','Certified gluten free (GFCO)|Kosher dairy'],
+ ['TH','peppermint-crunch-dark-chocolate','Peppermint Crunch 70% Dark Chocolate (12-pack)',79.95,S+'0669/5577/1982/files/2408_Theo_Holiday_Peppermint_Crunch_FOP_1280x1280_Bug_EA__88367.1725920090.1280.1280.png?v=1757695776','chocolate','This organic and fair trade chocolate bar','Crunchy peppermint candy, 70% dark chocolate',''],
+ ['TH','coconut-almond-dark-chocolate','Coconut Almond 70% Dark Chocolate (12-pack)',59.95,S+'0669/5577/1982/files/2202_Theo_Coconut_Almond_3oz_Bar_FOP_Bug_BS__48178.1652997739.1280.1280.png?v=1757695835','chocolate','organic 70% Dark Chocolate','Almonds, toasted coconut, 70% dark chocolate','','On sale when checked (regular price $79.95).'],
+ ['TH','nutcracker-brittle-dark-chocolate','Nutcracker Brittle 55% Dark Chocolate (12-pack)',79.95,S+'0669/5577/1982/files/2408_Theo_Holiday_Nutcracker_Brittle_FOP_1280x1280_Bug_EA__86999.1725907613.1280.1280.png?v=1757695752','chocolate','organic and fair trade','Hazelnuts, brittle pieces, 55% dark chocolate, salt',''],
+ ['TH','coffee-toffee-dark-chocolate','Coffee Toffee 70% Dark Chocolate (12-pack)',79.95,S+'0669/5577/1982/files/2309_Theo_Coffee_Toffee_Product_1280x1280_KS__83164.1696014921.1280.1280_65825ba5-b99c-41d6-9db0-b942e7c8e40b.png?v=1757695468','chocolate','organic and fair trade beans','Crunchy toffee, ground coffee beans, 70% dark chocolate',''],
+ ['TH','lemon-milk-chocolate','Lemon Milk Chocolate (12-pack)',63.96,S+'0669/5577/1982/files/2202_Theo_Lemon_3oz_Bar_FOP_Bug_BS__84295.1661990638.1280.1280.png?v=1757695807','chocolate','organic and fair trade milk chocolate','Milk chocolate with organic lemon essential oil','','The 6-pack was sold out when checked.'],
+ ['LE','sweet-salty','Sweet + Salty Popcorn',4.66,S+'0252/4869/4365/files/OP_SS_Front.png?v=1794607693','popcorn','USDA Organic','Includes organic cane sugar and red beet powder','Non-GMO Project Verified|Certified gluten-free'],
+ ['LE','pumpkin-spice-popcorn','Pumpkin Spice Popcorn',4.66,S+'0252/4869/4365/files/OP_PS_Front.png?v=1786565715','popcorn','USDA Organic','','Certified gluten-free'],
+ ['LE','himalayan-gold-organic-popcorn-snack-pack','Himalayan Gold Organic Popcorn Snack Pack',7.49,S+'0252/4869/4365/files/OP_HG_10ct_Box_Front.png?v=1780424385','popcorn','USDA Organic','Includes organic coconut oil','Vegan|Dairy-free|Certified gluten-free|Kosher','Sold out on the brand site when checked.'],
+ ['LE','cowgirl-cheddar-cheezmos-puffs','Cowgirl Cheddar Cheezmos Puffs',4.66,S+'0252/4869/4365/files/CP_CC_6p5oz_Front.png?v=1787847299','chips','USDA Organic','Includes organic cheddar','Certified gluten-free','Sold out on the brand site when checked.'],
+ ['LE','jalapeno-cheddar-cheezmos-puffs','Jalapeño Cheddar Cheezmos Puffs',4.66,S+'0252/4869/4365/files/CP_JC_6p5oz_Front.png?v=1787854468','chips','USDA Organic','','Certified gluten-free','Sold out on the brand site when checked.'],
+ ['LE','intergalactic-onion-moonions-snack-box','Intergalactic Onion Moonions Snack Pack',8.49,S+'0252/4869/4365/files/M_IO_10ct_Front.png?v=1779121230','chips','USDA Organic','','Certified gluten-free','Sold out on the brand site when checked.'],
+ ['MH','organic-dried-mango-dipped-in-dark-chocolate','Organic Dried Mango Dipped in Dark Chocolate',5.49,S+'0790/1953/files/ChatGPTImageSep29_2026_08_04_35AM.png?v=1790684571','dried-fruit chocolate','Organic (product name and listing)','Organic dried mango, organic dark chocolate','No preservatives|No artificial flavors'],
+ ['MH','organic-dried-coconut-dipped-in-dark-chocolate','Organic Dried Coconut Dipped in Dark Chocolate',5.49,S+'0790/1953/files/850031185319-01_df2018c5-870a-400c-816a-46966678de74.png?v=1758793313','dried-fruit chocolate','Organic (product name and listing)','Organic dried coconut, organic dark chocolate','No preservatives|No artificial flavors'],
+ ['MH','organic-pineapple-passion-fruit-bites','Organic Fruit Bites: Pineapple & Passionfruit',2.99,S+'0790/1953/files/1.94_oz_front_d1e6e408-4182-42f6-af7b-510c0e02bd5a.png?v=1751560296','fruit-snacks dried-fruit','Organic (product name and listing)','Organic pineapple, organic passionfruit','No preservatives|No added sugar'],
+ ['MH','organic-dried-tropical-mix','Organic Dried Tropical Mix',4.49,S+'0790/1953/files/106-2-DFront.jpg?v=1763374049','dried-fruit','Organic (product name and listing)','Organic dried mango, organic dried pineapple, organic dried banana','No preservatives|No added sugar'],
+ ['MH','organic-dried-pineapple','Organic Dried Pineapple',4.49,S+'0790/1953/files/859750003294-01.png?v=1755283308','dried-fruit','Organic (product name and listing)','Organic dried pineapple','No preservatives|No added sugar'],
+ ['MG','marys-gone-crackers-super-seed-rosemary','Super Seed Crackers – Rosemary',5.89,S+'0768/8742/5319/files/26_US_Original_Rosemary_Renders_Front_Shadow.png?v=1783547949','crackers','organic, gluten-free brown rice, quinoa','Brown rice, quinoa, pumpkin, sunflower, flax, sesame and poppy seeds, rosemary','Gluten-free'],
+ ['MG','marys-gone-crackers-super-seed-seaweed-black-sesame','Super Seed Crackers – Seaweed & Black Sesame',5.89,S+'0768/8742/5319/files/26_US_Original_Renders_Seaweed_Front_Shadow.png?v=1783547143','crackers','organic, gluten-free brown rice, quinoa','Brown rice, quinoa, pumpkin, sunflower, flax and black sesame seeds, seaweed','Gluten-free'],
+ ['MG','marys-gone-crackers-super-seed-jalapeno','Super Seed Crackers – Jalapeño',5.89,S+'0768/8742/5319/files/26_US_Original_Jalapeno_Renders_FRONT_Shadow.png?v=1783547975','crackers','organic, gluten-free brown rice, quinoa','Brown rice, quinoa, pumpkin, sunflower, flax and sesame seeds, jalapeño','Gluten-free'],
+ ['MG','marys-gone-crackers-super-seed-everything','Super Seed Crackers – Everything',5.89,S+'0768/8742/5319/files/26_US_SuperSeed_Everything_Front_Shadow.png?v=1783547099','crackers','organic, gluten-free brown rice, quinoa','Brown rice, quinoa, pumpkin, sunflower, flax, sesame and poppy seeds, garlic, onion','Gluten-free'],
+ ['MG','marys-gone-crackers-super-seed-basil-garlic-crackers','Super Seed Crackers – Basil & Garlic',5.89,S+'0768/8742/5319/files/26_US_Original_Renders_Basil_Garlic_Front_Shadow.png?v=1783547078','crackers','organic, gluten-free brown rice, quinoa','Brown rice, quinoa, pumpkin, sunflower, flax, sesame and poppy seeds, basil, garlic','Gluten-free'],
+ ['MG','marys-gone-crackers-real-thin-crackers-sea-salt','Real Thin Crackers – Sea Salt',4.99,S+'0768/8742/5319/files/26_US_RTC_SeaSalt_Render_Front_Shadow_93ab3621-99bc-48be-8b5d-53d0112cd070.png?v=1790014479','crackers','Gluten-free, organic and vegan','','Gluten-free|Vegan'],
+ ['PE','blueberry-flax-superfood-oatmeal-multipack-with-prebiotic-fiber','Blueberry Flax Superfood Oatmeal Multipack',6.49,S+'0264/3725/5250/files/BlueberryFlaxV2_Hero.webp?v=1752603159','cereal','made with organic oats','Dried blueberries, superfood grains and seeds','Gluten-free|Vegan'],
+ ['PE','banana-nut-superfood-oatmeal-multipack','Banana Nut Superfood Oatmeal Multipack',6.49,S+'0264/3725/5250/files/BananaNutV2_Hero.webp?v=1752603542','cereal','made with organic oats','Dried bananas, superfood grains and seeds','Gluten-free|Vegan'],
+ ['PE','classic-cinnamon-superfood-oatmeal-multipack','Classic Cinnamon Superfood Oatmeal Multipack',6.49,S+'0264/3725/5250/files/ClassicCinnamonV2_Hero.webp?v=1752603481','cereal','made with organic oats','Cinnamon, superfood grains and seeds','Gluten-free|Vegan'],
+ ['PE','protein-granola-variety-pack-3-pack','Protein Granola Variety Pack (3 bags)',23.97,S+'0264/3725/5250/files/ProteinGranola_Multipacks_V1_ProteinG_Multipack_3_Hero_f5b4f6a2-052c-4b89-a6b8-554f30c345c8.webp?v=1774028782','cereal','Made with organic oats and baked with organic coconut oil','Nuts and seeds, organic oats, organic coconut oil','Gluten-free|Vegan'],
+ ['PE','maple-cinnamon-roll-protein-oatmeal-cup-3-pack','Maple Cinnamon Roll Protein Oatmeal Cups (3)',8.97,S+'0264/3725/5250/files/PO_3PackCups_PO_MCR_3Up.webp?v=1774556083','cereal','organic, 100% whole grains','Oats, buckwheat, quinoa, cinnamon',''],
+ ['PE','apple-harvest-crumble-protein-oatmeal-cup-3-pack','Apple Harvest Crumble Protein Oatmeal Cups (3)',8.97,S+'0264/3725/5250/files/PO_3PackCups_PO_AHC_3Up.webp?v=1774556099','cereal','organic, 100% whole grains','Oats, buckwheat, quinoa, dried apples, cinnamon',''],
+ ['OF','strawberry-kiwi-electrolyte-parent','Strawberry Kiwi Electrolyte Blend',4.80,S+'1889/4791/files/ELECTROLYTEBLEND_KID_STRAWBERRYKIWI_KEBSK00-0126A_FRONT.png?v=1786998077','drinks','USDA Organic & Non-GMO Project Verified','Apple, strawberry, coconut water, kiwi purée, date, zucchini, sea salt, lemon juice','No added sugar|No preservatives|No artificial ingredients'],
+ ['OF','apple-berry-punch-electrolyte-parent','Apple Berry Punch Electrolyte Blend',4.80,S+'1889/4791/files/OFARM_ELECTROLYTEBLEND_KID_APPLEBERRYPUNCH_KEBABP00-0126A_FRONT.png?v=1786997676','drinks','USDA Organic & Non-GMO Project Verified','Apple, strawberry, coconut water, blueberry purée, date, raspberry purée, kale, sea salt, lemon juice','No added sugar|No preservatives|No artificial ingredients'],
+ ['OF','6ct-electrolyte-blends-one-time-add-on-copy','Electrolyte Blends Variety (6 ct)',28.80,S+'1889/4791/files/PDPSection_ProductImages_VP_Electrolytes_Front.png?v=1789750185','drinks','USDA Organic & Non-GMO Project Verified','Fruit and veggie purées, coconut water, sea salt, lemon juice','No added sugar|No preservatives|No artificial ingredients'],
+ ['AE','oat-clusters-dark-chocolate','Dark Chocolate Oat Clusters',6.95,S+'0003/4501/4332/files/alte-012789-oat-clusters-dark-chocolate_1_4ef7777b-ae1a-4d58-8678-cacc7b29ac3e.jpg?v=1776271089','cereal chocolate','organic, certified chocolate','','No sugar added'],
+ ['AE','oat-clusters-almond-butter','Almond Butter Oat Clusters',6.95,S+'0003/4501/4332/files/alte-012796-oat-clusters-almond-butter_1.jpg?v=1776271133','cereal','organic, certified chocolate','','No sugar added'],
+ ['AE','oat-clusters-cashew-butter','Cashew Butter Oat Clusters',6.95,S+'0003/4501/4332/files/alte-012802-oat-clusters-cashew-butter_1.jpg?v=1776271180','cereal','organic, certified chocolate','','No sugar added'],
+ ['MD','hot-cocoa-organic-crunchy-mini-cookies','Hot Cocoa Organic Crunchy Mini Cookies',null,S+'0256/0583/2770/files/MGUS_CRUNCHY_HOTCOCOA_PACKAGING.png?v=1793214039','cookies','Certified USDA Organic','Begins: gluten free oat flour*, cane sugar*, potato starch* … (full list on the brand page)','Nut-free|Gluten-free|Free from the top 9 allergens'],
+ ['MD','strawberry-granola-bars-30-count','Strawberry Granola Bars',null,S+'0256/0583/2770/files/MGUS_CHEWYBARS_STRAWBERRY_PACKAGING.png?v=1792966426','granola-bars','USDA Organic','Begins: pure gluten free oats*, sugars* (agave syrup*, brown rice syrup*) … (full list on the brand page)','Certified nut-free|Allergy friendly'],
+ ['MD','strawberry-granola-bites','Strawberry Granola Bites',null,S+'0256/0583/2770/files/MGUS_BITES_STRAWBERRY_PACKAGING.png?v=1792946447','granola-bars','USDA Organic','Begins: pure gluten free oats*, cane sugar*, dried strawberries* … (full list on the brand page)','Certified nut-free|Certified gluten-free'],
+ ['MD','trail-mix-granola-bites','Trail Mix Granola Bites',null,S+'0256/0583/2770/files/MGUS_BITES_TRAILMIX_PACKAGING.png?v=1792947815','granola-bars','Certified Organic','Begins: pure gluten free oats*, cane sugar*, sunflower oil* … (full list on the brand page)','Gluten-free|Free from the top 9 allergens'],
+ ['MD','crunchy-granola-squares-oats-dark-chocolate','Crunchy Granola Squares – Oats & Dark Chocolate',null,S+'0256/0583/2770/files/MGUS_CRNCHYSQ_OATSDARKCHOC_PACKAGING.png?v=1792985630','granola-bars cookies','Certified Organic','Begins: pure gluten free oats*, sunflower oil*, cane sugar* … (full list on the brand page)','Free from the top 9 allergens'],
+ ['MD','crunchy-granola-squares-blueberry-vanilla','Crunchy Granola Squares – Blueberry & Vanilla',null,S+'0256/0583/2770/files/MGUS_CRNCHYSQ_BLUBRRYVAN_PACKAGING.png?v=1792986669','granola-bars cookies','Certified Organic','Begins: pure gluten free oats*, sunflower oil*, cane sugar* … (full list on the brand page)','Free from the top 9 allergens'],
+ ['MD','pumpkin-spice-granola-bites','Pumpkin Spice Granola Bites',null,S+'0256/0583/2770/files/MGUS_F22355_PDP_BITES_PUMPKNSPCE_1A_a2cb295b-8d4a-4a26-bc16-4d076c5d25e4.png?v=1787928663','granola-bars','organic, gluten-free oats','Begins: pure gluten free oats*, cane sugar*, orange vanilla chips* … (full list on the brand page)','Nut-free|Gluten-free|Vegan|Non-GMO'],
+ ['HU','baking-chips','Dark Chocolate Baking Chips',null,S+'1269/8457/files/Primary_Image_850043074380.png?v=1761226573','baking natural','','',''],
+ ['HU','semi-sweet-chocolate-baking-chips','Semi-Sweet Chocolate Baking Chips',null,S+'1269/8457/files/Primary_Image_850043074397-02.png?v=1761226517','baking natural','','','']
+];
+
+// Ingredient lists the brand stores don't publish as text, taken from the product's Open Food Facts record (matched by barcode)
+const ING_EXTRA = {
+ 'organic-holiday-candy-canes': 'Organic cane sugar, organic brown rice syrup, natural peppermint flavor, colored with organic fruit and vegetable concentrate (radish, apple, blackcurrant)',
+ 'organic-dried-coconut-dipped-in-dark-chocolate': 'Organic dried coconut, organic 50% dark chocolate (organic cocoa liquor, organic cocoa butter, organic raw cane sugar)',
+ 'organic-dried-pineapple': 'Organic dried pineapple',
+ 'baking-chips': 'Organic unrefined coconut sugar, organic cacao, organic cocoa butter',
+ 'semi-sweet-chocolate-baking-chips': 'Organic cacao, organic unrefined coconut sugar, organic cocoa butter'
+};
+
+const STYLES = [
+ ['soft-girl','Soft girl'],['coquette','Coquette'],['old-money','Old money'],['pinterest','Pinterest aesthetic'],['clean-girl','Clean girl'],
+ ['cottagecore','Cottagecore'],['korean','Korean fashion'],['japanese-street','Japanese streetwear'],['minimalist','Minimalist'],['casual-cute','Casual cute'],
+ ['vintage','Vintage'],['brown','Brown aesthetic'],['neutral','Neutral aesthetic'],['y2k','Y2K'],['cozy','Cozy aesthetic']
+];
+const STYLE_NAME = Object.fromEntries(STYLES);
+const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pants','Dresses','Skirts','Pajamas & lounge','Underwear & base layers','Socks','Cardigans','Shorts','Jackets'];
+
+// key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
+const FCATS = {
+ 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','popcorn','dried-fruit']],
+ 'fruit-snacks':['Fruit snacks','fruit snacks'], gummies:['Gummies & candy','gummies'], chocolate:['Chocolate','chocolate'], cookies:['Cookies','cookies'],
+ chips:['Chips & puffs','chips'], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'], popcorn:['Popcorn','popcorn'],
+ 'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',[],'gmo'],
+ cereal:['Cereal, oatmeal & granola','cereal'], 'peanut-butter':['Peanut butter & spreads','peanut butter'], pancake:['Pancake & waffle mix','pancake mix'],
+ bread:['Bread','bread'], tortillas:['Tortillas & wraps','tortilla'], bagels:['Bagels & muffins','bagel'], baking:['Baking','baking'],
+ fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
+ meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
+ drinks:['Juice & kids drinks','juice'], 'plant-milk':['Plant milk','oat milk'], tea:['Tea & coffee','tea'],
+ frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle']
+};
+const FOOD_SECTIONS = [
+ ['snacks','Snacks','Chips, chocolate, gummies, cookies, popcorn and more',['all-snacks','fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','popcorn','dried-fruit','natural']],
+ ['groceries','Groceries','Fruit, vegetables, eggs, dairy and pantry staples to pick up',['fruit','vegetables','eggs','milk','yogurt','meat','pantry','frozen-foods']],
+ ['bread','Bread & bakery','Bread, tortillas, bagels and baking',['bread','tortillas','bagels','baking']],
+ ['breakfast','Breakfast','Cereal, oatmeal, granola, spreads and pancake mix',['cereal','peanut-butter','pancake']],
+ ['drinks','Drinks','Juice, electrolytes, plant milk and tea',['drinks','plant-milk','tea']],
+ ['frozen','Frozen treats','Ice cream and popsicles',['frozen','popsicles']]
+];
+// Fresh items to pick up: each opens a store search for "organic <item>"
+const PICKUP = {
+ fruit:['Bananas','Apples','Strawberries','Blueberries','Grapes','Avocados','Lemons','Oranges','Mangoes','Pears'],
+ vegetables:['Baby spinach','Carrots','Broccoli','Cucumbers','Bell peppers','Sweet potatoes','Tomatoes','Salad mix','Yellow onions','Kale'],
+ eggs:['Large brown eggs','Pasture-raised eggs'],
+ milk:['Whole milk','2% milk','Butter','Cheddar cheese','Heavy cream'],
+ yogurt:['Greek yogurt','Whole milk yogurt','Yogurt tubes'],
+ meat:['Chicken breast','Chicken thighs','Ground beef','Ground turkey','Bacon'],
+ pantry:['Brown rice','Pasta','Black beans','Olive oil','Rolled oats','Tomato sauce'],
+ 'frozen-foods':['Frozen blueberries','Frozen strawberries','Frozen broccoli','Frozen mixed vegetables'],
+ bread:['Whole wheat bread','Sprouted grain bread','Sourdough bread'],
+ tortillas:['Flour tortillas','Corn tortillas'],
+ bagels:['Bagels','English muffins']
+};
+
+const OUTFITS = [
+ ['Old money weekend','old-money',['mens-varsity-polo-sweater-in-cardamom-birch','lauren-skirt-navy','elite-elastic-free-anatomical-left-right-fit-socks']],
+ ['Brown cozy Sunday','brown',['womens-rib-zip-hoodie-in-coffee-bean','womens-cozy-track-pant-in-chocolate-plum']],
+ ['Clean girl errands','clean-girl',['womens-lina-cowl-neck-longsleeve-in-white','womens-cozy-track-pant-in-marshmallow']],
+ ['Cottagecore picnic','cottagecore',['the-katrina-dress-picnic-patchwork','elite-elastic-free-anatomical-left-right-fit-socks']],
+ ['Soft girl lounge','soft-girl',['womens-crossover-3-4-sleeve-top-in-marshmallow','organic-pointelle-pant-golden']],
+ ['Tokyo layers','japanese-street',['teddy-crewneck-charcoal','twill-trouser-anvil']],
+ ['Y2K baby rib','y2k',['43046-baby-rib-3-4-sleeve-v-neck-top','womens-cozy-track-pant-in-black-v2']],
+ ['Neutral fleece day','neutral',['organic-fleece-v-neck-sweatshirt-bone','womens-cozy-track-pant-in-marshmallow']]
+];
+
+/* ---------- helpers ---------- */
+const $ = s => document.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const money = n => n == null ? '' : '$' + Number(n).toFixed(2).replace(/\.00$/, '');
+const store = {
+  get(k, d){ try { const v = localStorage.getItem('pf_' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ try { localStorage.setItem('pf_' + k, JSON.stringify(v)); } catch(e){} }
+};
+const REG = new Map();
+const reg = it => (REG.set(it.id, it), it);
+const sized = u => u && u.includes('cdn.shopify.com') ? u + (u.includes('?') ? '&' : '?') + 'width=700' : u;
+
+function fabricTags(t){
+  const s = t.toLowerCase(), out = ['100% cotton'];
+  if (/organic/.test(s)) out.push('Organic cotton');
+  if (/egyptian/.test(s)) out.push('Egyptian cotton');
+  if (/japan/.test(s)) out.push('Japanese cotton');
+  if (/regenerat/.test(s)) out.push('Regenerative cotton');
+  if (/gots/.test(s)) out.push('GOTS certified');
+  if (/combed/.test(s)) out.push('Combed cotton');
+  return out;
+}
+const SINGULAR = {'Tops':'Top','Sweaters':'Sweater','Hoodies & sweatshirts':'Hoodie or sweatshirt','Sweatpants & pants':'Pants','Dresses':'Dress','Skirts':'Skirt','Pajamas & lounge':'Loungewear','Underwear & base layers':'Base layer','Socks':'Socks'};
+const COTTON = RAW.map((r, i) => {
+  const b = BRANDS[r[0]], v = +((r[8].match(/v=(\d+)/) || [])[1] || 0);
+  return reg({
+    id: 'c-' + r[1], kind: 'cotton', name: r[2], brand: b.brand, store: b.store, url: b.base + r[1],
+    price: r[3], fabric: r[4], type: r[5], sizes: r[6].split(','), colors: r[7].split(','), img: sized(r[8]),
+    styles: r[9].split(' '), note: r[10] || '', order: i, created: v * 1000, fabricTags: fabricTags(r[4]),
+    cert: /gots/i.test(r[4]) ? 'GOTS certified organic' : /organic/i.test(r[4]) ? 'Organic cotton (brand claim)' : '',
+    desc: `${SINGULAR[r[5]] || r[5]} by ${b.brand}, sold on the brand's own website. It's in the Cotton Closet because the brand lists the fabric as 100% cotton.`
+  });
+});
+const DIRECT = DIRECT_PRODUCTS.map(p => reg({...p, id: 'd-' + p.id, kind: 'direct', store: 'PureFinds', type: 'Sold by PureFinds', fabricTags: [], styles: []}));
+const byHandle = h => REG.get('c-' + h);
+const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /certified/i.test(t) && /organic/i.test(t) ? 'Certified organic' : 'Organic (brand wording)';
+const FOODS = FOOD_RAW.map((r, i) => {
+  const b = FOOD_BRANDS[r[0]], v = +((r[4].match(/v=(\d+)/) || [])[1] || 0);
+  return reg({
+    id: 'b-' + r[1], kind: 'food', src: 'brand', name: r[2], brand: b.brand, store: b.brand, stores: [b.brand], url: b.base + encodeURIComponent(r[1]),
+    price: r[3], img: sized(r[4]), cats: r[5].split(' '), certText: r[6], cert: foodCert(r[6]), ing: ING_EXTRA[r[1]] || r[7], ingSrc: ING_EXTRA[r[1]] ? 'Open Food Facts record for this barcode' : r[7] ? (/^Begins:|^Includes/.test(r[7]) ? 'Brand page (partial list)' : 'Brand page') : '', claims: r[8] ? r[8].split('|') : [],
+    nonGmo: /non-gmo project/i.test(r[6] + r[8]) ? 'Non-GMO Project Verified' : /non-gmo/i.test(r[6] + r[8]) ? 'Non-GMO (brand claim)' : '',
+    note: r[9] || '', created: v * 1000, pop: (ING_EXTRA[r[1]] || r[7]) ? 1 : 0, order: i, fabricTags: [], styles: [],
+    desc: r[3] == null ? `Sold by ${b.brand}. The brand's site lists where to buy it, so the price is set by each store.` : `Sold on ${b.brand}'s own website.`
+  });
+});
+
+/* ---------- Open Food Facts (live) ---------- */
+const OFF_FIELDS = 'code,product_name,brands,image_front_url,image_front_small_url,ingredients_text_en,ingredients_text,labels_tags,additives_tags,stores,created_t,unique_scans_n,quantity,generic_name';
+const SYN_DYES = [102,104,110,122,123,124,127,129,131,132,133,142,143,151,155];
+function normFood(p){
+  const L = p.labels_tags || [];
+  const cert = L.includes('en:usda-organic') ? 'USDA Organic' : L.includes('en:eu-organic') ? 'EU Organic' : L.some(t => /organic/.test(t)) ? 'Organic label' : '';
+  const nonGmo = L.some(t => /non-gmo-project/.test(t)) ? 'Non-GMO Project Verified' : L.some(t => /gmo/.test(t)) ? 'Non-GMO label' : '';
+  const ing = String(p.ingredients_text_en || p.ingredients_text || '').trim();
+  const adds = (p.additives_tags || []).map(t => t.replace(/^[a-z]{2}:/, '').toUpperCase());
+  const num = a => +((a.match(/E(\d+)/) || [])[1] || 0);
+  const flags = ing ? {
+    dyes: adds.filter(a => SYN_DYES.includes(num(a))),
+    flavor: /artificial(ly)?\s+flavou?r/i.test(ing),
+    pres: adds.filter(a => { const n = num(a); return (n >= 200 && n < 300) || (n >= 310 && n <= 321); })
+  } : null;
+  const stores = String(p.stores || '').split(',').map(s => s.trim()).filter(Boolean);
+  return reg({
+    id: 'f-' + p.code, kind: 'food', code: p.code, name: String(p.product_name).trim(),
+    brand: String(p.brands || '').split(',')[0].trim() || 'Brand not listed', stores, store: stores[0] || 'Store not listed',
+    img: p.image_front_url || p.image_front_small_url, price: null, ing, cert, nonGmo, flags, adds,
+    created: (p.created_t || 0) * 1000, pop: p.unique_scans_n || 0, qty: p.quantity || '',
+    desc: [p.generic_name, p.quantity].filter(Boolean).join(' · '),
+    url: 'https://world.openfoodfacts.org/product/' + p.code, fabricTags: [], styles: []
+  });
+}
+// Every food search asks for organic AND for Non-GMO labels (mode 'both'), then merges the two
+async function offSearch(terms, {mode = 'both', sort = 'unique_scans_n', size = 24} = {}){
+  const labels = mode === 'both' ? ['en:organic', 'en:no-gmos'] : mode === 'gmo' ? ['en:no-gmos'] : ['en:organic'];
+  const res = await Promise.allSettled(labels.map(l => offQuery(terms, l, sort, size)));
+  const ok = res.filter(r => r.status === 'fulfilled');
+  if (!ok.length) throw res[0].reason;
+  const seen = new Set(), out = [];
+  for (const r of ok) for (const it of r.value) if (!seen.has(it.id)) { seen.add(it.id); out.push(it); }
+  return sort === 'created_t' ? out.sort((a, b) => b.created - a.created) : out.sort((a, b) => b.pop - a.pop);
+}
+// Tries three Open Food Facts endpoints in turn, so one busy or blocked server doesn't empty the page
+const offErrors = [];
+async function getJSON(url, ms = 9000){
+  const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), ms);
+  try {
+    const r = await fetch(url, {signal: ctl.signal});
+    if (!r.ok) throw new Error('HTTP ' + r.status);
+    return await r.json();
+  } catch(e){ throw new Error((e.name === 'AbortError' ? 'Timed out after ' + ms / 1000 + 's' : e.message) + ' — ' + url.split('?')[0]); }
+  finally { clearTimeout(timer); }
+}
+const txt = v => Array.isArray(v) ? v.join(', ') : v && typeof v === 'object' ? (v.en || v.main || Object.values(v)[0] || '') : (v || '');
+async function offQuery(terms, label, sort, size){
+  const key = [terms, label, sort, size].join('|');
+  const cache = store.get('off2', {}), hit = cache[key];
+  if (hit && Date.now() - hit.t < 6 * 3600e3) return hit.items.map(reg);
+  const tries = [
+    async () => { // search-a-licious (Open Food Facts' new search service)
+      const q = [terms && terms.split(/\s+/).join(' AND '), `labels_tags:"${label}"`, 'countries_tags:"en:united-states"'].filter(Boolean).join(' AND ');
+      const j = await getJSON('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
+      return j.hits || [];
+    },
+    async () => { // classic full-text search
+      const p = new URLSearchParams({search_terms: terms, search_simple: 1, action: 'process', json: 1, page_size: size, sort_by: sort, fields: OFF_FIELDS,
+        tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: 'en:united-states'});
+      return (await getJSON('https://world.openfoodfacts.org/cgi/search.pl?' + p)).products || [];
+    },
+    async () => { // v2 API (label + country only, words matched afterwards)
+      const p = new URLSearchParams({labels_tags: label, countries_tags: 'en:united-states', sort_by: sort, page_size: 100, fields: OFF_FIELDS});
+      const all = (await getJSON('https://world.openfoodfacts.org/api/v2/search?' + p)).products || [];
+      const w = terms.toLowerCase().split(/\s+/).filter(Boolean);
+      return all.filter(x => w.every(t => (txt(x.product_name) + ' ' + txt(x.generic_name)).toLowerCase().includes(t.replace(/s$/, '')))).slice(0, size);
+    }
+  ];
+  let raw = null;
+  for (const t of tries){ try { raw = await t(); break; } catch(e){ offErrors.push(e.message); } }
+  if (!raw) throw new Error('All Open Food Facts searches failed:\n' + offErrors.slice(-3).join('\n'));
+  const items = raw.map(x => ({...x, product_name: txt(x.product_name) || txt(x.product_name_en), brands: txt(x.brands), stores: txt(x.stores),
+    ingredients_text: txt(x.ingredients_text) || txt(x.ingredients_text_en), generic_name: txt(x.generic_name)}))
+    .filter(x => x.code && x.product_name).map(normFood);
+  const keys = Object.keys(cache);
+  if (keys.length > 40) delete cache[keys[0]];
+  cache[key] = {t: Date.now(), items};
+  store.set('off2', cache);
+  return items;
+}
+async function latestPrice(code){
+  const r = await fetch(`https://prices.openfoodfacts.org/api/v1/prices?product_code=${encodeURIComponent(code)}&order_by=-date&size=1`);
+  if (!r.ok) throw 0;
+  const j = await r.json();
+  return (j.items || [])[0] || null;
+}
+const shopLinks = it => {
+  const q = encodeURIComponent((it.brand !== 'Brand not listed' ? it.brand + ' ' : '') + it.name);
+  return [['Target', 'https://www.target.com/s?searchTerm=' + q], ['Walmart', 'https://www.walmart.com/search?q=' + q],
+          ['Amazon', 'https://www.amazon.com/s?k=' + q], ['Whole Foods', 'https://www.wholefoodsmarket.com/search?text=' + q]];
+};
+
+/* ---------- saved state ---------- */
+let favs = store.get('favs', {});
+let recent = store.get('recent', []);
+let cart = store.get('cart', {});
+Object.values(favs).forEach(reg); recent.forEach(reg);
+const lite = it => { const o = {...it}; delete o.order; return o; };
+function counts(){ $('#favN').textContent = Object.keys(favs).length || ''; $('#cartN').textContent = Object.values(cart).reduce((a, b) => a + b, 0) || ''; }
+function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); }
+
+/* ---------- cards ---------- */
+const heartSvg = '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
+function img(it, alt){
+  return it.img ? `<img loading="lazy" src="${esc(it.img)}" alt="${esc(alt || it.name)}" data-name="${esc(it.name)}">` : `<div class="noimg"><span>${esc(it.name)}</span></div>`;
+}
+function badges(it){
+  if (it.kind === 'cotton') return `<span class="bd">100% cotton · verified</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
+  if (it.kind === 'direct') return '<span class="bd p">Sold by PureFinds</span>';
+  const g = it.nonGmo ? `<span class="bd p">${esc(it.nonGmo.replace(' (brand claim)', ''))}</span>` : '';
+  if (it.src === 'brand') return (it.cert ? `<span class="bd">${esc(it.cert)}</span>` : '<span class="bd u">Organic status unverified</span>') + g;
+  return (it.cert ? `<span class="bd">${esc(it.cert)}</span>` : g ? '' : '<span class="bd u">Not labeled organic</span>') + g;
+}
+function card(it){
+  const fav = !!favs[it.id];
+  const comp = it.kind === 'food' ? (it.ing ? 'Ingredients: ' + it.ing.replace(/^Begins: /, '') : 'Ingredients: not published online, printed on the package') : it.fabric ? 'Fabric: ' + it.fabric : '';
+  const buy = it.src === 'brand' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View at ' + esc(it.brand)} ↗</a>`
+    : it.kind === 'cotton' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a>`
+    : it.kind === 'direct' ? `<button class="btn go" data-add="${esc(it.id)}">Add to cart</button>`
+    : `<a class="btn go" href="${esc(shopLinks(it)[0][1])}" target="_blank" rel="noopener">Find at Target ↗</a>`;
+  return `<article class="card ${it.kind}">
+    <button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
+    <div class="badges">${badges(it)}</div>
+    <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
+    <div class="cb">
+      <p class="meta">${esc(it.brand)} · ${esc(it.store)}</p>
+      <h3>${esc(it.name)}</h3>
+      ${it.price != null ? `<span class="price">${money(it.price)}</span>` : it.kind === 'food' ? '<span class="meta">Price at store</span>' : ''}
+      <p class="comp">${esc(comp)}</p>
+      <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button>${buy}</div>
+    </div></article>`;
+}
+const skeletons = n => Array.from({length: n}, (_, i) => `<div class="skel" style="height:${220 + (i * 53) % 140}px"></div>`).join('');
+
+/* ---------- filters ---------- */
+let pool = [], F = {}, listMode = '';
+const blankF = () => ({gmo: '', sort: 'pop', brand: '', store: '', min: '', max: '', style: '', fabric: '', cert: '', kind: ''});
+const opts = (arr, sel, all) => `<option value="">${all}</option>` + [...new Set(arr)].filter(Boolean).sort().map(v => `<option ${v === sel ? 'selected' : ''}>${esc(v)}</option>`).join('');
+function applyF(items){
+  let out = items.filter(it =>
+    (!F.kind || it.kind === F.kind) && (!F.brand || it.brand === F.brand) &&
+    (!F.store || it.store === F.store || (it.stores || []).includes(F.store)) &&
+    (!F.style || it.styles.includes(F.style)) && (!F.fabric || it.fabricTags.includes(F.fabric)) &&
+    (!F.gmo || (F.gmo === 'label' ? !!it.nonGmo : !!(it.nonGmo || it.cert))) &&
+    (!F.cert || (F.cert === 'Not labeled organic' ? !it.cert : (it.cert || '').startsWith(F.cert))) &&
+    (F.min === '' || (it.price != null && it.price >= +F.min)) && (F.max === '' || (it.price != null && it.price <= +F.max)));
+  const s = F.sort;
+  out = [...out].sort((a, b) => s === 'cheap' ? (a.price ?? 1e9) - (b.price ?? 1e9) : s === 'new' ? b.created - a.created
+    : (b.pop || 0) - (a.pop || 0) || (a.order ?? 0) - (b.order ?? 0));
+  return out;
+}
+function filterBar(items){
+  const hasFood = items.some(i => i.kind === 'food'), hasCot = items.some(i => i.kind === 'cotton');
+  const certs = hasFood ? ['USDA Organic', 'Certified organic', 'Organic (brand wording)', 'EU Organic', 'Organic label', 'Not labeled organic'] : ['GOTS certified organic', 'Organic cotton'];
+  return `<form class="filters" id="fb" onsubmit="return false">
+    ${hasFood && hasCot ? `<label>Show<select class="field" name="kind"><option value="">Everything</option><option value="food" ${F.kind === 'food' ? 'selected' : ''}>Food only</option><option value="cotton" ${F.kind === 'cotton' ? 'selected' : ''}>Clothing only</option></select></label>` : ''}
+    <label>Sort by<select class="field" name="sort">
+      <option value="pop" ${F.sort === 'pop' ? 'selected' : ''}>Most popular</option>
+      <option value="new" ${F.sort === 'new' ? 'selected' : ''}>Newest</option>
+      <option value="cheap" ${F.sort === 'cheap' ? 'selected' : ''}>Cheapest</option></select></label>
+    <label>Brand<select class="field" name="brand">${opts(items.map(i => i.brand), F.brand, 'All brands')}</select></label>
+    <label>Store<select class="field" name="store">${opts(items.flatMap(i => i.stores || [i.store]), F.store, 'All stores')}</select></label>
+    ${hasCot ? `<label>Aesthetic<select class="field" name="style"><option value="">All aesthetics</option>${STYLES.map(([k, n]) => `<option value="${k}" ${F.style === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
+    <label>Fabric<select class="field" name="fabric">${opts(items.flatMap(i => i.fabricTags), F.fabric, 'Any 100% cotton')}</select></label>` : ''}
+    ${hasFood ? `<label>Non-GMO<select class="field" name="gmo"><option value="">Organic or Non-GMO</option><option value="label" ${F.gmo === 'label' ? 'selected' : ''}>Non-GMO label only</option></select></label>` : ''}
+    <label>Organic certification<select class="field" name="cert"><option value="">Any</option>${certs.map(c => `<option ${F.cert === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
+    ${items.some(i => i.price != null) ? `<label class="pr">Price ($)<div><input class="field" name="min" type="number" min="0" inputmode="decimal" placeholder="Min" value="${esc(F.min)}"><input class="field" name="max" type="number" min="0" inputmode="decimal" placeholder="Max" value="${esc(F.max)}"></div></label>` : ''}
+    <button class="reset" type="button" id="resetF">Clear filters</button>
+  </form>`;
+}
+function paint(){
+  const g = $('#grid'); if (!g) return;
+  const items = applyF(pool);
+  $('#count').textContent = `${items.length} ${items.length === 1 ? 'find' : 'finds'}` + (F.min !== '' || F.max !== '' ? ' · price filter hides items without a listed price' : '');
+  g.innerHTML = items.length ? items.map(card).join('') : '';
+  $('#none').hidden = !!items.length;
+}
+function mountList(el, items, emptyMsg){
+  pool = items;
+  el.innerHTML = filterBar(items) + '<p class="count" id="count"></p><div class="grid" id="grid"></div>' +
+    `<div class="empty" id="none" hidden><h3>Nothing matches yet</h3><p>${emptyMsg || 'Try clearing a filter or searching for something broader.'}</p><button class="btn go" type="button" data-clear>Clear filters</button></div>`;
+  paint();
+}
+document.addEventListener('input', e => { const f = e.target.closest('#fb'); if (!f) return; F[e.target.name] = e.target.value; paint(); });
+document.addEventListener('change', e => { const f = e.target.closest('#fb'); if (!f) return; F[e.target.name] = e.target.value; paint(); });
+
+/* ---------- views ---------- */
+const main = $('#main');
+let state = {sub: {}, cottonCat: '', style: 'soft-girl', q: store.get('q', '')};
+const seed = (() => { const d = new Date(); return d.getFullYear() * 1e4 + (d.getMonth() + 1) * 100 + d.getDate(); })();
+const pick = (arr, n, s = seed) => { const a = [...arr]; let x = s; for (let i = a.length - 1; i > 0; i--){ x = (x * 9301 + 49297) % 233280; const j = Math.floor(x / 233280 * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
+const sh = (title, sub, more) => `<div class="sh"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div>${more || ''}</div>`;
+const errText = e => String((e && (e.message || e)) || 'Unknown error');
+const errBox = e => `<span class="err"><code>${esc(errText(e))}</code><button class="btn sm" type="button" data-copy="${esc(errText(e))}">Copy error</button></span>`;
+
+function home(){
+  const hero = pick(COTTON, 6);
+  const cute = COTTON.filter(c => c.styles.some(s => ['casual-cute', 'soft-girl', 'coquette'].includes(s)));
+  const newest = [...COTTON, ...FOODS].sort((a, b) => b.created - a.created).slice(0, 12);
+  main.innerHTML = `
+  <section class="hero">
+    <h1>Real finds, made of <i>real materials</i></h1>
+    <p>Organic snacks from the brands' own stores and the Open Food Facts database, plus clothing checked to be 100% cotton on each brand's product page.</p>
+    <div class="collage">${hero.map((c, i) => `<figure data-open="${c.id}" style="animation-delay:${i * .08}s">${img(c)}</figure>`).join('')}</div>
+  </section>
+  <section class="blk">${sh('Two ways to shop')}<div class="hub two">
+    ${hubTile({go: 'food', title: 'Food', sub: 'Organic and Non-GMO snacks, groceries, bread and drinks', item: FOODS[5]}, 1)}
+    ${hubTile({go: 'cotton', title: 'Cotton Closet', sub: 'Verified 100% cotton clothing, aesthetics and outfits', item: byHandle('the-simple-dawn-dress-cascading-daisy')}, 2)}</div></section>
+  <section class="blk" id="daily-s">${sh('Daily discovery', 'Two fresh picks every day: one to wear, one to snack on.', '<button class="link" data-shuffle>Show me different ones</button>')}<div class="daily" id="daily"></div></section>
+  <section class="blk">${sh('Best Organic Snacks', 'Certified and organic-labeled snacks from brand stores, plus the most-scanned organic snacks on Open Food Facts.', '<a class="link" href="#food-snacks">All snacks →</a>')}<div class="rail" id="best">${pick(FOODS.filter(f => f.price != null && f.cert && f.ing), 12, seed + 3).map(card).join('')}</div></section>
+  <section class="blk">${sh('Cute Finds', 'Casual cute, soft girl and coquette pieces. All 100% cotton.', '<a class="link" href="#cotton-aesthetics">Browse aesthetics →</a>')}<div class="rail">${cute.map(card).join('')}</div></section>
+  <section class="blk">${sh('New Finds', 'The most recently updated organic snacks and cotton pieces at their stores.')}<div class="rail" id="newf">${newest.map(card).join('')}</div></section>
+  <section class="blk">${sh('100% Cotton Only', `${COTTON.length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Cotton Closet →</a>')}<div class="rail">${pick(COTTON, 10, seed + 7).map(card).join('')}</div></section>
+  <section class="blk">${sh('Pinterest Outfit Finds', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
+  <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
+  loadHomeFood();
+}
+let bestPool = FOODS;
+async function loadHomeFood(){
+  const daily = () => {
+    const c = pick(COTTON, 1, seed + dshift)[0], f = pick(bestPool.filter(x => x.ing), 1, seed + dshift)[0];
+    const d = $('#daily'); if (!d) return;
+    d.innerHTML = dcard(c) + (f ? dcard(f) : `<div class="empty" style="margin:0"><h3>Snack pick loading</h3><p>Waiting on live food data.</p></div>`);
+  };
+  daily();
+  try { const live = await offSearch('snack'); bestPool = [...FOODS, ...live]; const b = $('#best'); if (b && live.length) b.insertAdjacentHTML('beforeend', live.slice(0, 10).map(card).join('')); }
+  catch(e){}
+  try {
+    const nf = await offSearch('', {mode: 'organic', sort: 'created_t', size: 12});
+    const n = $('#newf'); if (n && nf.length) n.insertAdjacentHTML('beforeend', nf.slice(0, 8).map(card).join(''));
+  } catch(e){}
+}
+let dshift = 0;
+function dcard(it){
+  const f = it.kind === 'food';
+  return `<article class="dcard ${f ? 'f' : ''}"><button class="dimg" data-open="${it.id}" aria-label="View ${esc(it.name)}">${img(it)}</button>
+   <div class="db"><span class="kick">${f ? "Today's snack" : "Today's outfit piece"}</span><h3>${esc(it.name)}</h3>
+   <p class="meta">${esc(it.brand)} · ${esc(it.store)}</p>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}
+   <p class="comp">${esc(f ? (it.ing || (it.claims || []).join(', ') || 'Ingredients on the brand page') : it.fabric)}</p>
+   <div class="acts"><button class="btn" data-open="${it.id}">Details</button>${f && it.src !== 'brand' ? '' : `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View'} ↗</a>`}<button class="heart" style="position:static" data-fav="${it.id}" aria-pressed="${!!favs[it.id]}" aria-label="Save to favorites">${heartSvg}</button></div></div></article>`;
+}
+function tile([k, n]){
+  const items = COTTON.filter(c => c.styles.includes(k)); const c = items[0];
+  return `<button class="tile" data-style="${k}">${c ? img(c, n) : ''}<span>${n}<small>${items.length} ${items.length === 1 ? 'piece' : 'pieces'}</small></span></button>`;
+}
+function outfit([title, style, ids]){
+  const items = ids.map(byHandle).filter(Boolean);
+  const total = items.reduce((a, b) => a + b.price, 0);
+  return `<article class="outfit"><div class="ocol ${items.length === 2 ? 'two' : ''}">${items.map(i => `<button data-open="${i.id}" aria-label="${esc(i.name)}">${img(i)}</button>`).join('')}</div>
+   <div class="cb"><p class="meta">${esc(STYLE_NAME[style])} · ${items.length} pieces</p><h3>${esc(title)}</h3><p class="comp" style="-webkit-line-clamp:3">${items.map(i => esc(i.brand + ' ' + i.name.split(' – ')[0])).join(' + ')}</p>
+   <p><span class="price">${money(total)}</span> <span class="meta">total</span></p>
+   <div class="acts">${items.map(i => `<a class="btn" href="${esc(i.url)}" target="_blank" rel="noopener">${esc(i.type === 'Dresses' ? 'Dress' : i.name.split(' – ')[0].replace(/^(Women's|Men's) /, ''))} ↗</a>`).join('')}</div></div></article>`;
+}
+
+function hubTile({go, cot, title, sub, item, n}, i){
+  return `<button class="htile" data-go="${go}"${cot !== undefined ? ` data-cot="${esc(cot)}"` : ''}>
+    ${item ? img(item, title) : `<div class="art a${i % 4}"></div>`}
+    <span><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${n != null ? `<em>${n}</em>` : ''}</span></button>`;
+}
+const crumb = (root, rootName, here) => `<p class="crumb"><a href="#${root}">${rootName}</a> <span aria-hidden="true">/</span> ${esc(here)}</p>`;
+const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; return FOODS.filter(f => f.cats.some(x => want.includes(x))); };
+
+function foodHub(){
+  main.innerHTML = `<div class="pagehead"><h1>Food</h1><p>Organic and Non-GMO food. Every search looks for both labels automatically. Pick a section to start.</p></div>
+  <div class="hub">${FOOD_SECTIONS.map(([k, name, sub, cats], i) => {
+    const items = cats.flatMap(brandFor); const pic = items.find(f => f.img);
+    return hubTile({go: 'food-' + k, title: name, sub, item: pic}, i);
+  }).join('')}</div>
+  <section class="blk">${sh('Popular right now', 'Organic and Non-GMO snacks from brand stores.')}<div class="rail">${pick(FOODS.filter(f => f.price != null), 12, seed + 11).map(card).join('')}</div></section>`;
+}
+function foodSection(k){
+  const sec = FOOD_SECTIONS.find(s => s[0] === k); if (!sec) return foodHub();
+  const cats = sec[3];
+  if (!cats.includes(state.sub[k])) state.sub[k] = cats[0];
+  const key = state.sub[k], cat = FCATS[key];
+  main.innerHTML = `<div class="pagehead">${crumb('food', 'Food', sec[1])}<h1>${esc(sec[1])}</h1><p>${esc(sec[2])}.</p></div>
+  <div class="chips" role="group" aria-label="${esc(sec[1])} categories">${cats.map(c => `<button class="chip" data-sub="${c}" data-sec="${k}" aria-pressed="${c === key}">${esc(FCATS[c][0])}</button>`).join('')}</div>
+  ${PICKUP[key] ? pickupPanel(key) : ''}
+  <div id="live" class="note">Searching Open Food Facts for organic and Non-GMO ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
+  loadFoodList(k, key);
+}
+async function loadFoodList(k, key){
+  const cat = FCATS[key], mine = brandFor(key).sort((a, b) => b.pop - a.pop);
+  const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
+  const show = items => items.length ? mountList($('#list'), items, emptyMsg)
+    : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${PICKUP[key] ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
+  if (mine.length) show(mine);
+  try {
+    const live = await offSearch(cat[1], {mode: cat[3] || 'both'});
+    if (state.sub[k] !== key || !$('#list')) return;
+    show([...mine, ...live]);
+    $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts with an organic or Non-GMO label`;
+  } catch(e){
+    if (!$('#live') || state.sub[k] !== key) return;
+    $('#live').innerHTML = `${mine.length ? `Showing ${mine.length} ${mine.length === 1 ? 'find' : 'finds'} from brand stores, checked ${CHECKED}. ` : ''}The live Open Food Facts search didn't load, so more results are missing.${viewerNote()}${errBox(e)}`;
+    if (!mine.length) show([]);
+  }
+}
+const storeLinks = term => { const q = encodeURIComponent(term); return [
+  ['Walmart', 'https://www.walmart.com/search?q=' + q], ['Instacart', 'https://www.instacart.com/store/s?k=' + q],
+  ['Target', 'https://www.target.com/s?searchTerm=' + q], ['Kroger', 'https://www.kroger.com/search?query=' + q],
+  ['Whole Foods', 'https://www.wholefoodsmarket.com/search?text=' + q]]; };
+let plist = store.get('pick', []);
+function pickupPanel(key){
+  return `<section class="pick" aria-label="Pickup">
+    <div class="sh"><div><h2>Pick up today</h2><p>Each button opens that store's search for the organic item. Choose pickup at the store's checkout. Prices and stock depend on your nearest store.</p></div></div>
+    <div class="prow-list">${PICKUP[key].map(name => { const term = 'organic ' + name.toLowerCase(); const on = plist.includes(name);
+      return `<div class="prow"><div class="pname"><b>${esc(name)}</b><small>Organic</small></div>
+      <div class="plinks">${storeLinks(term).map(([s, u]) => `<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${s} ↗</a>`).join('')}</div>
+      <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; }).join('')}</div>
+    <div id="mylist">${myList()}</div></section>`;
+}
+function myList(){
+  if (!plist.length) return '<p class="meta">Tap “+ My list” to build a pickup list you can copy into Walmart, Instacart or a notes app.</p>';
+  return `<div class="mylist"><b>My pickup list (${plist.length})</b><p>${plist.map(esc).join(', ')}</p>
+    <div class="acts"><button class="btn go sm" data-copylist>Copy list</button><button class="btn sm" data-clearlist>Clear list</button></div></div>`;
+}
+function cottonHub(){
+  const types = COTTON_CATS.map(t => [t, COTTON.filter(c => c.type === t)]).filter(([, a]) => a.length);
+  main.innerHTML = `<div class="pagehead"><h1>Cotton Closet</h1><p>Only clothing whose fabric is stated as 100% cotton on the brand's own product page. No polyester, nylon, acrylic, spandex or blends. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
+  <div class="hub">
+    ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: COTTON.find(c => c.styles.includes('coquette'))}, 0)}
+    ${hubTile({go: 'cotton-outfits', title: 'Pinterest outfit finds', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
+    ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every verified piece', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), n: COTTON.length}, 2)}
+    ${types.map(([t, a], i) => hubTile({go: 'cotton-shop', cot: t, title: t, item: a[Math.min(1, a.length - 1)], n: a.length}, i + 3)).join('')}
+  </div>
+  <p class="meta" style="margin-top:14px">Not in the closet yet: cardigans, shorts and jackets. None checked so far were 100% cotton.</p>`;
+}
+function cottonShop(){
+  const cat = state.cottonCat;
+  const items = cat ? COTTON.filter(c => c.type === cat) : COTTON;
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
+  <div class="chips" role="group" aria-label="Clothing types"><button class="chip" data-cot="" aria-pressed="${!cat}">All</button>${COTTON_CATS.map(c => `<button class="chip" data-cot="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join('')}</div>
+  <div id="list"></div>`;
+  if (!items.length) { $('#list').innerHTML = `<div class="empty"><h3>No verified 100% cotton ${esc(cat.toLowerCase())} yet</h3><p>PureFinds only lists pieces it could confirm as 100% cotton, and none in this category have passed so far.</p><button class="btn go" data-cot="">See all cotton pieces</button></div>`; return; }
+  mountList($('#list'), items);
+}
+function styles(){
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton. The aesthetic tags are PureFinds style picks, not the brands' own labels.</p></div>
+  <div class="tiles" style="margin:18px 0">${STYLES.map(tile).join('')}</div>
+  <div id="sty"></div>`;
+  showStyle(state.style, false);
+}
+function showStyle(k, scroll = true){
+  state.style = k; F = blankF();
+  const el = $('#sty'); if (!el) return;
+  const items = COTTON.filter(c => c.styles.includes(k));
+  el.innerHTML = `<div class="sh" id="sty-h"><div><h2>${esc(STYLE_NAME[k])}</h2><p>${items.length} cotton ${items.length === 1 ? 'piece' : 'pieces'}</p></div></div><div id="list"></div>`;
+  items.length ? mountList($('#list'), items) : ($('#list').innerHTML = '<div class="empty"><h3>No pieces yet</h3><p>Nothing verified in this aesthetic so far.</p></div>');
+  if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
+}
+function outfitsView(){
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', 'Outfit finds')}<h1>Pinterest Outfit Finds</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
+}
+function savedView(kind){
+  const items = kind === 'fav' ? Object.values(favs).reverse() : recent;
+  main.innerHTML = `<div class="pagehead"><h1>${kind === 'fav' ? 'Favorites' : 'Recently viewed'}</h1><p>${kind === 'fav' ? 'Tap the heart on any product to save it here.' : 'The last products you opened.'} These stay in this browser on this device.</p></div><div id="list"></div>`;
+  if (!items.length) { $('#list').innerHTML = `<div class="empty"><h3>${kind === 'fav' ? 'No favorites yet' : 'Nothing viewed yet'}</h3><p>${kind === 'fav' ? 'Save the snacks and cotton pieces you love and they will wait for you here.' : 'Open any product and it will show up here.'}</p><a class="btn go" href="#home">Start discovering</a></div>`; return; }
+  mountList($('#list'), items);
+  if (kind === 'recent') $('#list').insertAdjacentHTML('beforeend', '<button class="btn" type="button" data-clearrecent>Clear history</button>');
+}
+function cartView(){
+  const lines = Object.entries(cart).map(([id, q]) => [REG.get(id), q]).filter(x => x[0]);
+  main.innerHTML = `<div class="pagehead"><h1>Your cart</h1><p>The cart is only for products sold directly by PureFinds. Everything else is bought on the store's own website through its Buy Now button.</p></div><div id="cartBody"></div>`;
+  const body = $('#cartBody');
+  if (!DIRECT.length) { body.innerHTML = `<div class="empty"><h3>PureFinds doesn't sell anything directly yet</h3><p>Every product on PureFinds right now is sold by its own store. Use Buy Now to check out on that store's official website. Checkout here turns on once PureFinds lists its own products with a Stripe payment link.</p><a class="btn go" href="#cotton">Shop the Cotton Closet</a></div>`; return; }
+  if (!lines.length) { body.innerHTML = `<div class="empty"><h3>Your cart is empty</h3><p>Products sold by PureFinds have an Add to cart button.</p></div><h2 style="margin:20px 0 12px">Sold by PureFinds</h2><div class="grid">${DIRECT.map(card).join('')}</div>`; return; }
+  const total = lines.reduce((a, [it, q]) => a + it.price * q, 0);
+  body.innerHTML = `<div class="list">${lines.map(([it, q]) => `<div class="row">${img(it)}<div><h3 style="font-family:Jost;font-size:16px">${esc(it.name)}</h3><p class="meta">${money(it.price)} × ${q}</p>
+    <div class="acts"><button class="btn" data-qty="${it.id}" data-d="-1" aria-label="One fewer">−</button><button class="btn" data-qty="${it.id}" data-d="1" aria-label="One more">+</button></div></div>
+    ${it.stripeLink ? `<a class="btn go" href="${esc(it.stripeLink)}" target="_blank" rel="noopener">Pay with Stripe ↗</a>` : '<span class="meta">Checkout not connected</span>'}</div>`).join('')}</div>
+    <p style="font-size:20px;margin:18px 0 6px">Subtotal <b>${money(total)}</b></p>
+    <p class="note">Each item is paid for on Stripe's secure checkout page. Shipping and taxes are shown there before you pay.</p>`;
+}
+function searchView(){
+  const q = state.q.trim();
+  $('#q').value = q;
+  main.innerHTML = `<div class="pagehead"><h1>${q ? `Results for “${esc(q)}”` : 'Search PureFinds'}</h1><p>Clothing comes from the verified cotton catalog. Food is searched live in Open Food Facts for organic-labeled products sold in the US.</p></div><div id="list"><div class="grid">${skeletons(6)}</div></div>`;
+  if (!q) { $('#list').innerHTML = `<div class="empty"><h3>What are you looking for?</h3><p>Try one of these:</p><div class="chips" style="justify-content:center">${['dark chocolate', 'gummies', 'granola', 'dress', 'hoodie', 'Kotn', 'cottagecore'].map(s => `<button class="chip" data-q="${s}">${s}</button>`).join('')}</div></div>`; return; }
+  const words = q.toLowerCase().split(/\s+/);
+  const cot = COTTON.filter(c => { const hay = [c.name, c.brand, c.fabric, c.type, c.colors.join(' '), c.styles.map(s => STYLE_NAME[s]).join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+  const fd = FOODS.filter(c => { const hay = [c.name, c.brand, c.cats.join(' '), c.ing, c.certText, c.claims.join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+  const done = (foodItems, err) => {
+    if (state.q.trim() !== q || !$('#list')) return;
+    const all = [...cot, ...fd, ...foodItems];
+    if (!all.length) { $('#list').innerHTML = `<div class="empty"><h3>No matches for “${esc(q)}”</h3><p>${err ? 'Live food search was unavailable, and no' : 'No'} clothing or organic food matched. Try a broader word like “snack”, “tee” or a brand name.</p><div class="chips" style="justify-content:center">${['snack', 'chocolate', 'tee', 'dress'].map(s => `<button class="chip" data-q="${s}">${s}</button>`).join('')}</div></div>`; return; }
+    mountList($('#list'), all);
+    if (err) $('#list').insertAdjacentHTML('afterbegin', '<p class="note">The live Open Food Facts search didn\'t respond, so these results come from PureFinds\' checked brand stores only.</p>');
+  };
+  offSearch(q, {size: 30}).then(r => done(r), () => done([], true));
+}
+function about(){
+  main.innerHTML = `<div class="pagehead"><h1>How PureFinds works</h1></div><div class="prose">
+  <h2>Organic food from brand stores</h2>
+  <p>${FOODS.length} organic foods were checked on the brands' own stores on ${CHECKED}: YumEarth, Theo Chocolate, LesserEvil, Mavuno Harvest, Mary's Gone Crackers, Purely Elizabeth, Once Upon a Farm, Alter Eco, Made Good and Hu Kitchen. Each shows the brand's own organic wording, and Buy Now opens the product's page on that brand's store. Items whose page doesn't state organic are marked unverified.</p>
+  <h2>Non-GMO</h2>
+  <p>Every live food search runs twice, once for an organic label and once for a Non-GMO label, and merges the results. Products show a Non-GMO badge when the record or the brand says so. USDA Organic rules also don't allow GMOs.</p>
+  <h2>Groceries for pickup</h2>
+  <p>Fresh groceries change by store and zip code, so the Groceries section lists organic staples with buttons that open each store's search (Walmart, Instacart, Target, Kroger, Whole Foods). Choose pickup when you check out there. Showing live store prices here would need the Walmart affiliate API or the Instacart Developer Platform, which both require an approved account and key.</p>
+  <h2>More organic food: live data</h2>
+  <p>Food results load live from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, a free, open product database. PureFinds asks only for products labeled organic and sold in the US. Certification shows as USDA Organic or EU Organic when that label is on file, and as "Organic label" when the record only says organic.</p>
+  <p>Ingredient lists, additives and store names are contributed by shoppers and brands, so they're labeled as coming from Open Food Facts. When there's no ingredient list, PureFinds says the product is unverified. Synthetic dyes and preservatives are flagged from the additive codes on file, and artificial flavors from the ingredient text.</p>
+  <p>Open Food Facts doesn't carry prices or store links. Each food's details page shows the latest shopper-reported price from Open Prices when one exists, and its buttons open that product's search results at Target, Walmart, Amazon and Whole Foods.</p>
+  <h2>100% cotton clothing: verified by hand</h2>
+  <p>Each clothing item was checked on the brand's own product page on ${CHECKED}, and the fabric line is quoted exactly. Anything that listed a blend (polyester, nylon, acrylic, spandex, viscose) or didn't state "100%" was left out. Buy Now opens the exact product page on the brand's official store, where you choose size and color and check out.</p>
+  <h2>Shopping and checkout</h2>
+  <p>PureFinds doesn't sell anything itself yet, so there's no checkout here. The cart and Stripe checkout are built in and switch on once direct products are added.</p>
+  <h2>What would need connecting for more</h2>
+  <ul>
+    <li><b>Amazon:</b> Product Advertising API (needs an Amazon Associates account with qualifying sales) for live prices and direct product links.</li>
+    <li><b>Walmart and Target:</b> their affiliate programs (Walmart Creator/Impact, Target Partners via Impact) provide product feeds.</li>
+    <li><b>Etsy:</b> Etsy Open API key. Etsy listings would still need a fabric check before showing as 100% cotton.</li>
+    <li><b>Thrive Market and Whole Foods:</b> no public product API. Affiliate feeds would be needed.</li>
+    <li><b>Direct sales:</b> a Stripe account and a Stripe Payment Link for each product.</li>
+  </ul>
+  <p>Favorites, recently viewed and the cart are saved in this browser only.</p></div>`;
+}
+
+/* ---------- modal ---------- */
+let lastFocus = null;
+function openItem(id){
+  const it = REG.get(id); if (!it) return;
+  recent = [lite(it), ...recent.filter(r => r.id !== id)].slice(0, 40); store.set('recent', recent);
+  const f = it.kind === 'food', fav = !!favs[id];
+  const flagRows = f ? (it.flags ? [
+    [it.flags.dyes.length ? '⚠' : '✓', it.flags.dyes.length ? 'Synthetic dyes listed: ' + it.flags.dyes.join(', ') : 'No synthetic dyes listed'],
+    [it.flags.flavor ? '⚠' : '✓', it.flags.flavor ? 'Ingredients mention artificial flavor' : 'No artificial flavor in the ingredient text'],
+    [it.flags.pres.length ? '⚠' : '✓', it.flags.pres.length ? 'Preservatives listed: ' + it.flags.pres.join(', ') : 'No preservative additives listed']
+  ].map(([i, t]) => `<div class="flag"><i>${i}</i><span>${esc(t)}</span></div>`).join('') + '<p class="meta">Checked against the ingredient data on Open Food Facts.</p>'
+    : '<div class="flag"><i>?</i><span>Unverified: no ingredient list on file, so colors, flavors and preservatives can’t be checked.</span></div>') : '';
+  $('#modal').innerHTML = `<button class="x" data-close aria-label="Close">×</button>
+   <div class="mi ${f ? 'f' : ''}">${img(it)}</div>
+   <div class="mb">
+     <div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badges(it)}</div>
+     <h2 id="mt">${esc(it.name)}</h2>
+     <p class="meta" style="font-size:15px">${esc(it.brand)} · sold at ${esc(f ? (it.stores.join(', ') || 'stores not listed') : it.store)}</p>
+     ${it.price != null ? `<p class="price" style="font-size:24px;margin:0">${money(it.price)} <span class="meta" style="font-weight:400;font-size:14px">${it.kind === 'cotton' ? 'when checked ' + CHECKED : ''}</span></p>` : ''}
+     ${f && it.src !== 'brand' ? '<p class="meta" id="opr">Looking up a shopper-reported price…</p>' : ''}
+     ${it.src === 'brand' && it.price != null ? `<p class="meta" style="margin:0">Price on ${esc(it.brand)}'s site when checked ${CHECKED}</p>` : ''}
+     ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
+     ${it.src === 'brand' ? `<h3 style="font-size:22px">Ingredients</h3>
+       <div class="ing">${it.ing ? esc(it.ing.replace(/^Begins: /, '')) : `${esc(it.brand)} doesn’t publish this ingredient list online. It’s printed on the package, and the brand page may show it in a photo.`}</div>
+       ${it.ingSrc ? `<p class="meta" style="margin:0">Source: ${esc(it.ingSrc)}</p>` : ''}
+       <dl class="spec"><dt>Organic</dt><dd>${it.certText ? `${esc(it.cert)}: the brand says “${esc(it.certText)}”` : 'Unverified: the brand page doesn’t state organic certification'}</dd>
+         <dt>Non-GMO</dt><dd>${esc(it.nonGmo || (it.cert ? 'Organic standards don’t allow GMOs' : 'Not stated'))}</dd>
+         <dt>Brand says</dt><dd>${esc(it.claims.length ? it.claims.join(' · ') : 'Nothing about artificial colors, flavors or preservatives')}</dd></dl>
+       ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
+       <p class="meta">Free-from details are the brand's own claims. Shipping and stock are on ${esc(it.brand)}'s page.</p>
+       <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now at ' : 'View at '}${esc(it.brand)} ↗</a>${shopLinks(it).slice(0, 2).map(([n, u]) => `<a class="btn" href="${esc(u)}" target="_blank" rel="noopener">Find at ${n} ↗</a>`).join('')}</div>`
+     : f ? `<h3 style="font-size:22px">Ingredients</h3><div class="ing">${esc(it.ing || 'Not on file. This product is unverified.')}</div><div class="flags">${flagRows}</div>
+       <dl class="spec"><dt>Organic</dt><dd>${esc(it.cert || 'Not labeled organic')}${it.cert ? ' (from label data, check the package)' : ''}</dd><dt>Non-GMO</dt><dd>${esc(it.nonGmo || (it.cert ? 'Organic standards don’t allow GMOs' : 'No Non-GMO label on file'))}</dd>${it.qty ? `<dt>Size</dt><dd>${esc(it.qty)}</dd>` : ''}</dl>
+       <div class="acts">${shopLinks(it).map(([n, u], i) => `<a class="btn ${i ? '' : 'go'}" href="${esc(u)}" target="_blank" rel="noopener">Find at ${n} ↗</a>`).join('')}</div>
+       <p class="meta">These open the store's search results for this product. Price and shipping are on the store's site. <a href="${esc(it.url)}" target="_blank" rel="noopener">Open Food Facts record ↗</a></p>`
+     : it.kind === 'cotton' ? `<dl class="spec"><dt>Fabric</dt><dd>“${esc(it.fabric)}”</dd><dt>Sizes</dt><dd>${esc(it.sizes.join(', '))}</dd><dt>Colors</dt><dd>${esc(it.colors.join(', '))}</dd><dt>Type</dt><dd>${esc(it.type)}</dd><dt>Style</dt><dd>${esc(it.styles.map(s => STYLE_NAME[s]).join(', '))}</dd>${it.cert ? `<dt>Organic</dt><dd>${esc(it.cert)}</dd>` : ''}</dl>
+       ${it.note ? `<p class="note">${esc(it.note)}</p>` : ''}
+       <p class="meta">Shipping, returns and live stock are set by ${esc(it.store)} and shown on its product page.</p>
+       <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at ${esc(it.store)} ↗</a></div>`
+     : `<dl class="spec"><dt>Material</dt><dd>${esc(it.fabric || '')}</dd></dl><div class="acts"><button class="btn go" data-add="${esc(it.id)}">Add to cart</button></div>`}
+     <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fav}">${fav ? '♥ Saved' : '♡ Save to favorites'}</button></div>
+   </div>`;
+  lastFocus = document.activeElement;
+  $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
+  $('#modal').querySelector('.x').focus();
+  if (f && it.src !== 'brand') latestPrice(it.code).then(p => {
+    const el = $('#opr'); if (!el) return;
+    el.innerHTML = p ? `Latest shopper-reported price: <b>${esc(p.price)} ${esc(p.currency)}</b> on ${esc(p.date)}${p.location && p.location.osm_name ? ' at ' + esc(p.location.osm_name) : ''} (Open Prices)` : 'No shopper-reported price yet. See the store for the current price.';
+  }).catch(() => { const el = $('#opr'); if (el) el.textContent = 'Price lookup unavailable. See the store for the current price.'; });
+}
+function closeModal(){ $('#scrim').classList.remove('on'); $('#scrim').setAttribute('aria-hidden', 'true'); document.body.style.overflow = ''; if (lastFocus) lastFocus.focus(); }
+
+/* ---------- copy (works in previews, file:// and https) ---------- */
+function copyText(text){
+  const ta = document.createElement('textarea');
+  ta.value = text; ta.setAttribute('readonly', ''); ta.style.cssText = 'position:fixed;top:0;left:0;width:1px;height:1px;opacity:0';
+  document.body.appendChild(ta); ta.focus(); ta.select(); ta.setSelectionRange(0, text.length);
+  let ok = false; try { ok = document.execCommand('copy'); } catch(e){}
+  ta.remove();
+  if (ok) return toast('Copied');
+  if (navigator.clipboard && window.isSecureContext) navigator.clipboard.writeText(text).then(() => toast('Copied'), () => manualCopy(text));
+  else manualCopy(text);
+}
+function manualCopy(text){
+  const box = $('#copybox'), ta = $('#copytext');
+  ta.value = text; box.classList.add('on'); ta.focus(); ta.select();
+}
+
+/* ---------- blocked-by-viewer detection ---------- */
+let blockedByViewer = false;
+document.addEventListener('securitypolicyviolation', e => {
+  if (!/connect-src|img-src|default-src/.test(e.effectiveDirective || e.violatedDirective || '')) return;
+  blockedByViewer = true; $('#preview').hidden = false;
+});
+const viewerNote = () => blockedByViewer ? ' The app you opened PureFinds in blocks outside connections, so live food and product photos can’t load here. Open it in Chrome or on its website to see them.' : '';
+
+/* ---------- events ---------- */
+document.addEventListener('error', e => {
+  const im = e.target;
+  if (im.tagName !== 'IMG' || !im.dataset.name) return;
+  const d = document.createElement('div'); d.className = 'noimg'; d.innerHTML = `<span>${esc(im.dataset.name)}</span>`; im.replaceWith(d);
+}, true);
+document.addEventListener('click', e => {
+  const t = e.target.closest('button,figure,[data-open]'); if (!t) { if (e.target === $('#scrim')) closeModal(); return; }
+  const d = t.dataset;
+  if (d.close !== undefined) return closeModal();
+  if (d.copyclose !== undefined) return $('#copybox').classList.remove('on');
+  if (d.fav){
+    const it = REG.get(d.fav); if (!it) return;
+    if (favs[d.fav]) { delete favs[d.fav]; toast('Removed from favorites'); } else { favs[d.fav] = lite(it); toast('Saved to favorites'); }
+    store.set('favs', favs); counts();
+    document.querySelectorAll(`[data-fav="${CSS.escape(d.fav)}"]`).forEach(b => { const on = !!favs[d.fav]; b.setAttribute('aria-pressed', on); if (b.classList.contains('pk')) b.textContent = on ? '♥ Saved' : '♡ Save to favorites'; });
+    if (location.hash === '#favorites' && !t.closest('.modal')) savedView('fav');
+    return;
+  }
+  if (d.open) return openItem(d.open);
+  if (d.sub){ state.sub[d.sec] = d.sub; F = blankF(); return foodSection(d.sec); }
+  if (d.cot !== undefined){ state.cottonCat = d.cot; F = blankF(); if (location.hash === '#cotton-shop') return cottonShop(); location.hash = 'cotton-shop'; return; }
+  if (d.go){ location.hash = d.go; return; }
+  if (d.style){ if (location.hash !== '#cotton-aesthetics') { state.style = d.style; location.hash = 'cotton-aesthetics'; return; } return showStyle(d.style); }
+  if (d.plist){ const n = d.plist; plist = plist.includes(n) ? plist.filter(x => x !== n) : [...plist, n]; store.set('pick', plist);
+    const on = plist.includes(n); t.setAttribute('aria-pressed', on); t.classList.toggle('pk', on); t.textContent = on ? 'On my list' : '+ My list';
+    const m = $('#mylist'); if (m) m.innerHTML = myList(); return; }
+  if (d.clearlist !== undefined){ plist = []; store.set('pick', plist); return route(); }
+  if (d.copylist !== undefined || d.copy !== undefined){
+    const text = d.copy !== undefined ? d.copy : 'Organic pickup list:\n' + plist.map(x => '- organic ' + x.toLowerCase()).join('\n');
+    copyText(text);
+    return; }
+  if (d.q){ state.q = d.q; store.set('q', d.q); return location.hash === '#search' ? searchView() : (location.hash = 'search'); }
+  if (d.clear !== undefined){ F = blankF(); const l = $('#list'); if (l) mountList(l, pool); return; }
+  if (t.id === 'resetF'){ F = blankF(); mountList($('#list'), pool); return; }
+  if (d.retry){ return route(); }
+  if (d.shuffle !== undefined){ dshift++; const c = pick(COTTON, 1, seed + dshift)[0], fi = bestPool.length ? pick(bestPool, 1, seed + dshift)[0] : null; $('#daily').innerHTML = dcard(c) + (fi ? dcard(fi) : ''); return; }
+  if (d.clearrecent !== undefined){ recent = []; store.set('recent', recent); return savedView('recent'); }
+  if (d.add){ cart[d.add] = (cart[d.add] || 0) + 1; store.set('cart', cart); counts(); toast('Added to cart'); return; }
+  if (d.qty){ cart[d.qty] = Math.max(0, (cart[d.qty] || 0) + +d.d); if (!cart[d.qty]) delete cart[d.qty]; store.set('cart', cart); counts(); return cartView(); }
+  if (t.id === 'reload') return location.reload();
+});
+document.addEventListener('keydown', e => {
+  if (e.key === 'Escape' && $('#copybox').classList.contains('on')) return $('#copybox').classList.remove('on');
+  if (!$('#scrim').classList.contains('on')) return;
+  if (e.key === 'Escape') closeModal();
+  if (e.key === 'Tab'){ const f = [...$('#modal').querySelectorAll('a,button')]; if (!f.length) return; const a = f[0], z = f[f.length - 1];
+    if (e.shiftKey && document.activeElement === a){ e.preventDefault(); z.focus(); } else if (!e.shiftKey && document.activeElement === z){ e.preventDefault(); a.focus(); } }
+});
+$('#searchForm').addEventListener('submit', e => { e.preventDefault(); state.q = $('#q').value; store.set('q', state.q); if (location.hash === '#search') { F = blankF(); searchView(); } else location.hash = 'search'; });
+
+/* ---------- router ---------- */
+const VIEWS = {home, food: foodHub, cotton: cottonHub, 'cotton-shop': cottonShop, 'cotton-aesthetics': styles, 'cotton-outfits': outfitsView,
+  ...Object.fromEntries(FOOD_SECTIONS.map(([k]) => ['food-' + k, () => foodSection(k)])), favorites: () => savedView('fav'), recent: () => savedView('recent'), cart: cartView, search: searchView, about};
+function route(){
+  const v = location.hash.slice(1);
+  const name = VIEWS[v] ? v : 'home';
+  F = blankF(); pool = [];
+  if ($('#scrim').classList.contains('on')) closeModal();
+  const top = name.split('-')[0];
+  document.querySelectorAll('nav.tabs a').forEach(a => a.getAttribute('href') === '#' + top ? a.setAttribute('aria-current', 'page') : a.removeAttribute('aria-current'));
+  VIEWS[name]();
+  window.scrollTo(0, 0);
+}
+window.addEventListener('hashchange', route);
+$('#ver').textContent = VERSION;
+counts(); route();
+
+/* ---------- new version banner ---------- */
+async function checkVersion(){
+  if (!/^https?:/.test(location.protocol)) return;
+  try {
+    const r = await fetch(location.href.split('#')[0], {cache: 'no-store'});
+    const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/);
+    if (m && m[1] !== VERSION) $('#update').classList.add('on');
+  } catch(e){}
+}
+setInterval(checkVersion, 5 * 60e3);
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
+}
+</script>
+</body>
+</html>
