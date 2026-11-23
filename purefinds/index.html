@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.4.2">
+<meta name="pf-version" content="1.5.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -220,6 +220,7 @@ dl.spec dt{color:var(--muted)}dl.spec dd{margin:0}
 .prose h2{font-size:30px;margin:26px 0 8px}
 .prose li{margin:4px 0}
 
+.note.warn{border-left-color:var(--pink-d);background:#fbeceb}
 .preview{margin:14px 0 0;background:var(--pink);color:#6d3632;border-radius:16px;padding:12px 16px;font-size:15px}
 /* copy fallback */
 .copybox{position:fixed;inset:0;z-index:70;background:rgba(48,38,28,.45);display:none;align-items:center;justify-content:center;padding:16px}
@@ -292,7 +293,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.4.2';
+const VERSION = '1.5.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -454,17 +455,17 @@ const FCATS = {
  'all-snacks':['All snacks','snack',['fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','dried-fruit']],
  'fruit-snacks':['Fruit snacks','fruit snacks'], gummies:['Gummies & candy','gummies'], chocolate:['Chocolate','chocolate'], cookies:['Cookies','cookies'],
  chips:['Chips & puffs','chips'], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
- 'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',[],'gmo'],
- cereal:['Cereal, oatmeal & granola','cereal'], 'nut-butter':['Almond & walnut butter','almond butter',[],null,/almond|walnut/i], pancake:['Pancake & waffle mix','pancake mix'],
+ 'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',null,'gmo'],
+ cereal:['Cereal, oatmeal & granola','cereal'], 'nut-butter':['Almond & walnut butter','almond butter',null,null,/almond|walnut/i], pancake:['Pancake & waffle mix','pancake mix'],
  bread:['Bread','bread'], tortillas:['Tortillas & wraps','tortilla'], bagels:['Bagels & muffins','bagel'], baking:['Baking','baking'],
  fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
- nuts:['Walnuts & almonds','almonds',[],null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
+ nuts:['Walnuts & almonds','almonds',null,null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
  drinks:['Juice & kids drinks','juice'], 'plant-milk':['Plant milk','oat milk'], tea:['Tea & coffee','tea'],
  frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle'],
- sprouted:['Sprouted flours','sprouted flour',[],null,/sprout/i], spelt:['Spelt','spelt',[],null,/spelt/i], einkorn:['Einkorn','einkorn',[],null,/einkorn/i],
- kamut:['Kamut (khorasan)','kamut',[],null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',[],null,/quinoa/i], teff:['Teff','teff',[],null,/teff/i],
- amaranth:['Amaranth','amaranth',[],null,/amaranth/i], rye:['Rye','rye flour',[],null,/\brye\b/i], fonio:['Fonio','fonio',[],null,/fonio/i],
- chickpea:['Chickpea flour','chickpea flour',[],null,/chickpea|garbanzo/i]
+ sprouted:['Sprouted flours','sprouted flour',null,null,/sprout/i], spelt:['Spelt','spelt',null,null,/spelt/i], einkorn:['Einkorn','einkorn',null,null,/einkorn/i],
+ kamut:['Kamut (khorasan)','kamut',null,null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',null,null,/quinoa/i], teff:['Teff','teff',null,null,/teff/i],
+ amaranth:['Amaranth','amaranth',null,null,/amaranth/i], rye:['Rye','rye flour',null,null,/\brye\b/i], fonio:['Fonio','fonio',null,null,/fonio/i],
+ chickpea:['Chickpea flour','chickpea flour',null,null,/chickpea|garbanzo/i]
 };
 const FOOD_SECTIONS = [
  ['snacks','Snacks','Chips, chocolate, gummies, cookies, dried fruit and more',['all-snacks','fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','dried-fruit','natural']],
@@ -674,6 +675,132 @@ const shopLinks = it => {
           ['Amazon', 'https://www.amazon.com/s?k=' + q], ['Whole Foods', 'https://www.wholefoodsmarket.com/search?text=' + q]];
 };
 
+/* ---------- store scanner (PureFinds Cloudflare Worker) ----------
+   Reads more real products from the brand stores listed in worker.js.
+   The address can be changed on the How it works page. */
+const SCAN_DEFAULT = 'https://purefinds.princesslayah404.workers.dev';
+let scanUrl = store.get('scanUrl', SCAN_DEFAULT);
+const scanBase = () => String(scanUrl || '').trim().replace(/\/+$/, '');
+const scanState = {cotton: {status: 'idle', stores: 0, done: 0, added: 0, errors: []}, food: {status: 'idle', stores: 0, done: 0, added: 0, errors: []}};
+let ingCache = store.get('ingCache', {});
+let ruledOut = store.get('ruledOut', {});
+FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
+const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat'};
+
+function clothingType(t){
+  const s = t.toLowerCase();
+  return /dress/.test(s) ? 'Dresses' : /skirt/.test(s) ? 'Skirts' : /cardigan/.test(s) ? 'Cardigans'
+    : /hood|sweatshirt|crewneck|pullover/.test(s) ? 'Hoodies & sweatshirts' : /sweater|turtleneck|knit/.test(s) ? 'Sweaters'
+    : /pajama|\bpj|sleep|robe|nightgown|lounge/.test(s) ? 'Pajamas & lounge' : /sock/.test(s) ? 'Socks'
+    : /underwear|brief|boxer|\bbra\b|bralette|thong|bikini|hipster|legging|base layer/.test(s) ? 'Underwear & base layers'
+    : /short/.test(s) ? 'Shorts' : /jacket|coat|overshirt|chore/.test(s) ? 'Jackets'
+    : /pant|trouser|jogger|sweatpant|jean|overall|jumpsuit/.test(s) ? 'Sweatpants & pants' : 'Tops';
+}
+const FOOD_MAP = [
+  [/chocolate|cacao|cocoa/, 'chocolate'], [/gumm|candy|lollipop|\bchews?\b|caramel/, 'gummies'], [/fruit snack|fruit bite|fruit leather/, 'fruit-snacks'],
+  [/cookie|biscuit/, 'cookies'], [/\bchips?\b|\bpuffs?\b|crisps/, 'chips'], [/cracker/, 'crackers'], [/granola bar|\bbars?\b|\bbites\b/, 'granola-bars'],
+  [/dried|freeze[- ]dried/, 'dried-fruit'], [/cereal|oatmeal|\boats\b|granola|muesli|porridge|clusters/, 'cereal'],
+  [/(almond|walnut) butter|nut butter/, 'nut-butter'], [/pancake|waffle/, 'pancake'], [/\bbread\b|\bloaf\b/, 'bread'], [/tortilla|\bwraps?\b/, 'tortillas'],
+  [/bagel|muffin/, 'bagels'], [/baking|cake mix|brownie mix/, 'baking'], [/sprouted/, 'sprouted'], [/spelt/, 'spelt'], [/einkorn/, 'einkorn'],
+  [/kamut|khorasan/, 'kamut'], [/quinoa/, 'quinoa'], [/\bteff\b/, 'teff'], [/amaranth/, 'amaranth'], [/\brye\b/, 'rye'], [/fonio/, 'fonio'],
+  [/chickpea|garbanzo/, 'chickpea'], [/\b(almonds?|walnuts?)\b(?! (butter|milk|flour))/, 'nuts'],
+  [/juice|smoothie|electrolyte|lemonade|\bdrinks?\b/, 'drinks'], [/(oat|almond|plant) milk/, 'plant-milk'], [/\btea\b|coffee/, 'tea'],
+  [/ice cream/, 'frozen'], [/popsicle|frozen pop/, 'popsicles']
+];
+const foodCats = t => { const s = t.toLowerCase(), c = FOOD_MAP.filter(([re]) => re.test(s)).map(([, k]) => k); return c.length ? [...new Set(c)] : ['natural']; };
+const claimsFrom = t => [[/no preservatives|preservative[- ]free/i, 'No preservatives'], [/no artificial (colors|dyes)|no artificial/i, 'No artificial colors or flavors'],
+  [/gluten[- ]free/i, 'Gluten-free'], [/\bvegan\b/i, 'Vegan'], [/no added sugar/i, 'No added sugar']].filter(([re]) => re.test(t)).map(([, c]) => c);
+
+function addScanned(type, rows){
+  let n = 0;
+  for (const r of rows){
+    const id = 's-' + r.domain + '-' + r.handle;
+    if (REG.has(id) || ruledOut[r.url]) continue;
+    if (type === 'cotton'){
+      if (COTTON.some(c => c.url === r.url)) continue;
+      const t = clothingType(`${r.name} ${r.ptype}`);
+      COTTON.push(reg({id, kind: 'cotton', src: 'scan', name: r.name, brand: r.vendor || r.store, store: r.store, url: r.url, price: r.price, fabric: r.fabric,
+        type: t, sizes: r.sizes || [], colors: r.colors || [], img: sized(r.img), styles: [], order: 1000 + COTTON.length, created: Date.parse(r.created) || 0,
+        fabricTags: fabricTags(r.fabric), cert: /gots/i.test(r.fabric) ? 'GOTS certified organic' : /organic/i.test(r.fabric) ? 'Organic cotton (brand claim)' : '',
+        note: 'Found automatically in the store’s catalog. The fabric line is quoted from its listing, so check the store page for each color.',
+        desc: `${SINGULAR[t] || 'Piece'} from ${r.store}, found in its online catalog. The listing says “${r.fabric}”.`}));
+    } else {
+      if (FOODS.some(f => f.url === r.url)) continue;
+      const cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
+      const cached = ingCache[r.url], ing = r.ing || (cached && cached.ing) || '';
+      if (ruleBreak(r.name, `${ing} ${r.desc || ''}`, cats.some(c => FRUIT_CATS.includes(c)))) continue;
+      FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
+        price: r.price, img: sized(r.img), cats, certText: r.organic || r.nonGmo, cert: r.organic, nonGmo: r.nonGmo, ing,
+        ingSrc: r.ing ? 'Brand listing' : cached ? cached.src : '', claims: claimsFrom(r.desc || ''), note: '', created: Date.parse(r.created) || 0,
+        pop: ing ? 1 : 0, order: 1000 + FOODS.length, fabricTags: [], styles: [],
+        desc: `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
+    }
+    n++;
+  }
+  return n;
+}
+async function scanType(type){
+  const st = scanState[type];
+  if (!scanBase()) { st.status = 'off'; return scanNote(); }
+  Object.assign(st, {status: 'loading', done: 0, added: 0, errors: []}); scanNote();
+  let stores;
+  try { stores = (await getJSON(scanBase() + '/stores', 12000)).stores[type] || []; }
+  catch (e){ st.status = 'unreachable'; st.err = errText(e); return scanNote(); }
+  st.stores = stores.length;
+  let i = 0;
+  await Promise.all(Array.from({length: 4}, async () => {
+    while (i < stores.length){
+      const [d, name] = stores[i++], key = 'scan|' + type + '|' + d, hit = store.get(key, null);
+      let rows = [];
+      if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+      else {
+        try { rows = (await getJSON(`${scanBase()}/store?d=${encodeURIComponent(d)}&type=${type}`, 30000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+        catch (e){ st.errors.push(`${name}: ${errText(e)}`); }
+      }
+      st.added += addScanned(type, rows); st.done++; scanNote();
+    }
+  }));
+  st.status = 'done'; scanNote(); rerender();
+}
+function scanNote(){
+  const el = document.getElementById('scanNote'); if (!el) return;
+  const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? '100% cotton pieces' : 'organic and Non-GMO foods';
+  if (st.status === 'off' || st.status === 'idle') { el.hidden = true; return; }
+  el.hidden = false;
+  if (st.status === 'loading') el.innerHTML = `Checking ${st.stores || 'the'} store catalogs for more ${what}… ${st.done}${st.stores ? ' of ' + st.stores : ''} done, ${st.added} added so far.`;
+  else if (st.status === 'unreachable') el.innerHTML = `The store scanner isn't connected yet, so only the hand-checked products show. <a href="#about">Set it up on How it works</a>.${errBox(st.err)}`;
+  else el.innerHTML = `${st.added} more ${what} found in ${st.stores} store catalogs. Store lists refresh every 6 hours.` +
+    (st.errors.length ? `<details style="margin-top:6px"><summary>${st.errors.length} store${st.errors.length === 1 ? '' : 's'} didn't answer</summary>${st.errors.map(errBox).join('')}</details>` : '');
+}
+function rerender(){
+  const v = location.hash.slice(1) || 'home';
+  if (!/^(home|food|cotton)/.test(v) || !VIEWS[v] || $('#scrim').classList.contains('on')) return;
+  const y = window.scrollY; VIEWS[v](); window.scrollTo(0, y);
+}
+// When a listing is opened: read its ingredients from the product's own page (through the scanner)
+async function fetchDetails(it){
+  const partial = !it.ing || /partial|^Begins|^Includes/.test(`${it.ingSrc || ''} ${it.ing}`);
+  if (it.kind !== 'food' || it.src !== 'brand' || !partial || !scanBase()) return;
+  const box = document.querySelector('#modal .ing'), src = document.getElementById('ingsrc');
+  if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
+  try {
+    const r = await getJSON(`${scanBase()}/details?url=${encodeURIComponent(it.url)}`, 20000);
+    if (!r.ingredients){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either. It’s printed on the package.`; return; }
+    it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
+    ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache', ingCache);
+    if (box) box.textContent = it.ing;
+    if (src) src.textContent = 'Source: ' + it.ingSrc;
+    const why = ruleBreak(it.name, it.ing, (it.cats || []).some(c => FRUIT_CATS.includes(c)));
+    if (why){
+      ruledOut[it.url] = why; store.set('ruledOut', ruledOut);
+      const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1);
+      box && box.insertAdjacentHTML('afterend', `<p class="note warn">Heads up: the full list has ${esc(RULE_REASON[why])}, so this doesn't fit your food rules. PureFinds will stop showing it.</p>`);
+    }
+  } catch (e){
+    if (box && !it.ing) box.innerHTML = `Couldn't reach the product page just now.${errBox(e)}`;
+  }
+}
+
 /* ---------- saved state ---------- */
 let favs = store.get('favs', {});
 let recent = store.get('recent', []);
@@ -689,7 +816,7 @@ function img(it, alt){
   return it.img ? `<img loading="lazy" src="${esc(it.img)}" alt="${esc(alt || it.name)}" data-name="${esc(it.name)}">` : `<div class="noimg"><span>${esc(it.name)}</span></div>`;
 }
 function badges(it){
-  if (it.kind === 'cotton') return `<span class="bd">100% cotton · verified</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
+  if (it.kind === 'cotton') return `<span class="bd">100% cotton · ${it.src === 'scan' ? 'per listing' : 'verified'}</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
   if (it.kind === 'direct') return '<span class="bd p">Sold by PureFinds</span>';
   const g = it.nonGmo ? `<span class="bd p">${esc(it.nonGmo.replace(' (brand claim)', ''))}</span>` : '';
   if (it.src === 'brand') return (it.cert ? `<span class="bd">${esc(it.cert)}</span>` : '<span class="bd u">Organic status unverified</span>') + g;
@@ -842,10 +969,11 @@ function hubTile({go, cot, title, sub, item, n}, i){
     <span><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${n != null ? `<em>${n}</em>` : ''}</span></button>`;
 }
 const crumb = (root, rootName, here) => `<p class="crumb"><a href="#${root}">${rootName}</a> <span aria-hidden="true">/</span> ${esc(here)}</p>`;
-const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; return FOODS.filter(f => f.cats.some(x => want.includes(x))); };
+const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; return FOODS.filter(f => !ruledOut[f.url] && f.cats.some(x => want.includes(x))); };
 
-function foodHub(){
+function foodHub(){ setTimeout(scanNote);
   main.innerHTML = `<div class="pagehead"><h1>Food</h1><p>Organic and Non-GMO food. Every search looks for both labels automatically. Pick a section to start.</p></div>
+  <p class="note" id="scanNote" data-type="food" hidden></p>
   <p class="note"><b>PureFinds food rules.</b> ${RULE_TEXT} Products that break a rule are left out. When a brand doesn't publish its ingredients, the card says so, so you can check the package.</p>
   <div class="hub">${FOOD_SECTIONS.map(([k, name, sub, cats], i) => {
     const items = cats.flatMap(brandFor); const pic = items.find(f => f.img);
@@ -853,7 +981,7 @@ function foodHub(){
   }).join('')}</div>
   <section class="blk">${sh('Popular right now', 'Organic and Non-GMO snacks from brand stores.')}<div class="rail">${pick(FOODS.filter(f => f.price != null), 12, seed + 11).map(card).join('')}</div></section>`;
 }
-function foodSection(k){
+function foodSection(k){ setTimeout(scanNote);
   const sec = FOOD_SECTIONS.find(s => s[0] === k); if (!sec) return foodHub();
   const cats = sec[3];
   if (!cats.includes(state.sub[k])) state.sub[k] = cats[0];
@@ -861,6 +989,7 @@ function foodSection(k){
   main.innerHTML = `<div class="pagehead">${crumb('food', 'Food', sec[1])}<h1>${esc(sec[1])}</h1><p>${esc(sec[2])}.</p></div>
   <div class="chips" role="group" aria-label="${esc(sec[1])} categories">${cats.map(c => `<button class="chip" data-sub="${c}" data-sec="${k}" aria-pressed="${c === key}">${esc(FCATS[c][0])}</button>`).join('')}</div>
   <p class="note">${RULE_TEXT}</p>
+  <p class="note" id="scanNote" data-type="food" hidden></p>
   ${PICKUP[key] ? pickupPanel(key) : ''}
   <div id="live" class="note">Searching Open Food Facts for organic and Non-GMO ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
   loadFoodList(k, key);
@@ -905,22 +1034,25 @@ function myList(){
 function cottonHub(){
   const types = COTTON_CATS.map(t => [t, COTTON.filter(c => c.type === t)]).filter(([, a]) => a.length);
   main.innerHTML = `<div class="pagehead"><h1>Cotton Closet</h1><p>Only clothing whose fabric is stated as 100% cotton on the brand's own product page. No polyester, nylon, acrylic, spandex or blends. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
+  <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
     ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: COTTON.find(c => c.styles.includes('coquette'))}, 0)}
     ${hubTile({go: 'cotton-outfits', title: 'Pinterest outfit finds', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
-    ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every verified piece', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), n: COTTON.length}, 2)}
+    ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every piece, hand-checked and found by the scanner', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), n: COTTON.length}, 2)}
     ${types.map(([t, a], i) => hubTile({go: 'cotton-shop', cot: t, title: t, item: a[Math.min(1, a.length - 1)], n: a.length}, i + 3)).join('')}
   </div>
-  <p class="meta" style="margin-top:14px">Not in the closet yet: cardigans, shorts and jackets. None checked so far were 100% cotton.</p>`;
+  ${['Cardigans', 'Shorts', 'Jackets'].some(t => !types.find(x => x[0] === t)) ? `<p class="meta" style="margin-top:14px">Not in the closet yet: ${['Cardigans', 'Shorts', 'Jackets'].filter(t => !types.find(x => x[0] === t)).join(', ').toLowerCase()}. None found so far were 100% cotton.</p>` : ''}`;
+  scanNote();
 }
-function cottonShop(){
+function cottonShop(){ setTimeout(scanNote);
   const cat = state.cottonCat;
   const items = cat ? COTTON.filter(c => c.type === cat) : COTTON;
   main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
+  <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="chips" role="group" aria-label="Clothing types"><button class="chip" data-cot="" aria-pressed="${!cat}">All</button>${COTTON_CATS.map(c => `<button class="chip" data-cot="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join('')}</div>
   <div id="list"></div>`;
   if (!items.length) { $('#list').innerHTML = `<div class="empty"><h3>No verified 100% cotton ${esc(cat.toLowerCase())} yet</h3><p>PureFinds only lists pieces it could confirm as 100% cotton, and none in this category have passed so far.</p><button class="btn go" data-cot="">See all cotton pieces</button></div>`; return; }
-  mountList($('#list'), items);
+  mountList($('#list'), items); scanNote();
 }
 function styles(){
   main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton. The aesthetic tags are PureFinds style picks, not the brands' own labels.</p></div>
@@ -990,6 +1122,13 @@ function about(){
   <p>Open Food Facts doesn't carry prices or store links. Each food's details page shows the latest shopper-reported price from Open Prices when one exists, and its buttons open that product's search results at Target, Walmart, Amazon and Whole Foods.</p>
   <h2>100% cotton clothing: verified by hand</h2>
   <p>Each clothing item was checked on the brand's own product page on ${CHECKED}, and the fabric line is quoted exactly. Anything that listed a blend (polyester, nylon, acrylic, spandex, viscose) or didn't state "100%" was left out. Buy Now opens the exact product page on the brand's official store, where you choose size and color and check out.</p>
+  <h2>Store scanner</h2>
+  <p>The scanner is a small free Cloudflare Worker that reads the online catalogs of the brand stores listed in its code. It keeps only clothing whose listing says 100% cotton, with no blends, and only food labeled organic or Non-GMO that fits your food rules. When you open a food, it also reads the product's own page for the full ingredient list, then checks Open Food Facts by barcode if the page doesn't have one.</p>
+  <form class="filters" id="scanForm" onsubmit="return false" style="align-items:end">
+    <label style="flex:3 1 260px">Scanner address<input class="field" id="scanInput" type="url" inputmode="url" placeholder="https://purefinds.yourname.workers.dev" value="${esc(scanUrl)}"></label>
+    <button class="btn go" type="button" id="scanSave">Save and test</button>
+  </form>
+  <div id="scanTest" class="meta"></div>
   <h2>Shopping and checkout</h2>
   <p>PureFinds doesn't sell anything itself yet, so there's no checkout here. The cart and Stripe checkout are built in and switch on once direct products are added.</p>
   <h2>What would need connecting for more</h2>
@@ -1027,7 +1166,7 @@ function openItem(id){
      ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
      ${it.src === 'brand' ? `<h3 style="font-size:22px">Ingredients</h3>
        <div class="ing">${it.ing ? esc(it.ing.replace(/^Begins: /, '')) : `${esc(it.brand)} doesn’t publish this ingredient list online. It’s printed on the package, and the brand page may show it in a photo.`}</div>
-       ${it.ingSrc ? `<p class="meta" style="margin:0">Source: ${esc(it.ingSrc)}</p>` : ''}
+       <p class="meta" style="margin:0" id="ingsrc">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) : ''}</p>
        <dl class="spec"><dt>Organic</dt><dd>${it.certText ? `${esc(it.cert)}: the brand says “${esc(it.certText)}”` : 'Unverified: the brand page doesn’t state organic certification'}</dd>
          <dt>Non-GMO</dt><dd>${esc(it.nonGmo || (it.cert ? 'Organic standards don’t allow GMOs' : 'Not stated'))}</dd>
          <dt>Brand says</dt><dd>${esc(it.claims.length ? it.claims.join(' · ') : 'Nothing about artificial colors, flavors or preservatives')}</dd></dl>
@@ -1048,6 +1187,7 @@ function openItem(id){
   lastFocus = document.activeElement;
   $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden';
   $('#modal').querySelector('.x').focus();
+  fetchDetails(it);
   if (f && it.src !== 'brand') latestPrice(it.code).then(p => {
     const el = $('#opr'); if (!el) return;
     el.innerHTML = p ? `Latest shopper-reported price: <b>${esc(p.price)} ${esc(p.currency)}</b> on ${esc(p.date)}${p.location && p.location.osm_name ? ' at ' + esc(p.location.osm_name) : ''} (Open Prices)` : 'No shopper-reported price yet. See the store for the current price.';
@@ -1119,6 +1259,15 @@ document.addEventListener('click', e => {
   if (d.clearrecent !== undefined){ recent = []; store.set('recent', recent); return savedView('recent'); }
   if (d.add){ cart[d.add] = (cart[d.add] || 0) + 1; store.set('cart', cart); counts(); toast('Added to cart'); return; }
   if (d.qty){ cart[d.qty] = Math.max(0, (cart[d.qty] || 0) + +d.d); if (!cart[d.qty]) delete cart[d.qty]; store.set('cart', cart); counts(); return cartView(); }
+  if (t.id === 'scanSave'){
+    scanUrl = $('#scanInput').value.trim(); store.set('scanUrl', scanUrl);
+    const out = $('#scanTest'); out.textContent = 'Testing…';
+    getJSON(scanBase() + '/stores', 12000).then(j => {
+      out.innerHTML = `Connected. Scanner v${esc(j.version)} reads ${j.stores.cotton.length} clothing stores and ${j.stores.food.length} food stores.`;
+      scanType('cotton'); scanType('food');
+    }, e => { out.innerHTML = `Couldn't reach the scanner at that address.${errBox(e)}`; });
+    return;
+  }
   if (t.id === 'reload'){
     // Remember which version we expect, then load a fresh copy that skips the browser's cache
     try { sessionStorage.setItem('pf_want', newVersion || ''); } catch(e){}
@@ -1151,6 +1300,7 @@ function route(){
 window.addEventListener('hashchange', route);
 $('#ver').textContent = VERSION;
 counts(); route();
+scanType('cotton'); scanType('food');
 
 /* ---------- new version banner ---------- */
 let newVersion = '';
