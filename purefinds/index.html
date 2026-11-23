@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.15.0">
+<meta name="pf-version" content="1.15.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -359,7 +359,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.15.0';
+const VERSION = '1.15.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -626,8 +626,8 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive and grapeseed only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries (blackcurrant is fine too, but not cranberries). Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, beans (cocoa, cacao and vanilla beans are fine), soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
-const BAD_FRUIT = /pineapple|coconut(?!\s*(oil|sugar|milk|cream|water|flour|nectar|aminos))|passion ?fruit|kiwi|\borange|cherr(y|ies)|guava|watermelon|melon|apricot|\bplums?\b|prune|\bfigs?\b|avocado(?!\s*oil)|\blemon(?!\s*(juice|essential))|\blime(?!\s*juice)|grapefruit|pomegranate|lychee|dragon ?fruit|tangerine|clementine/i;
+const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya, berries, blackcurrant, coconut, limes, grapefruit, cherries, kiwi, melons, apricots, plums, prunes, figs, avocado, guava and pomegranate are fine. Not allowed: cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines and clementines. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, beans (cocoa, cacao and vanilla beans are fine), soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
+const BAD_FRUIT = /pineapple|passion ?fruit|\borange|\blemon(?!\s*(juice|essential))|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|avocado|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
 const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
@@ -815,7 +815,7 @@ const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); st
 if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
 for (const u in ingCache) if (!looksLikeIngredients(ingCache[u].ing)) delete ingCache[u];
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
-const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, beans, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
+const RULE_REASON = {fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, beans, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 
 function clothingType(t){
   const s = t.toLowerCase();
@@ -1369,7 +1369,7 @@ function searchView(){
 }
 
 const RULES_TABLE = [
-  ['Fruit', 'Apples, bananas, peaches, pears, grapes, mango, papaya, all berries (strawberries, blueberries, raspberries, blackberries), blackcurrant', 'Cranberries, pineapple, coconut (the fruit), oranges, lemons, limes, grapefruit, cherries, kiwi, melons, apricots, plums and prunes, figs, avocado, guava, pomegranate, lychee, passion fruit, dragon fruit, tangerines, clementines'],
+  ['Fruit', 'Apples, bananas, peaches, pears, grapes, mango, papaya, all berries (strawberries, blueberries, raspberries, blackberries), blackcurrant, coconut (the fruit), limes, grapefruit, cherries, kiwi, melons, apricots, plums and prunes, figs, avocado, guava, pomegranate', 'Cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines, clementines'],
   ['Nuts and seeds', 'Walnuts and almonds (including almond butter, almond meal and almond flour), chia seeds', 'Peanuts, cashews, hazelnuts, pecans, pistachios, macadamias, Brazil nuts, pine nuts, sunflower seeds, pumpkin seeds (pepitas), flax'],
   ['Oils', 'Coconut oil, olive oil, grapeseed oil', 'Sunflower, canola, safflower, palm, soybean, vegetable, corn, rice bran, cottonseed, avocado, peanut, sesame and high-oleic oils'],
   ['Grains and flours', 'Spelt, einkorn, kamut, quinoa, quinoa flakes, teff, amaranth, rye, buckwheat, fonio, chickpea flour, sprouted flours', 'Wheat (including enriched, all-purpose and bread flour, semolina, durum, bulgur, couscous), oats and oatmeal, corn and popcorn (cornstarch, corn syrup, cornmeal, polenta, grits), brown rice'],
