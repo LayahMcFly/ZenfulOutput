@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.4.1">
+<meta name="pf-version" content="1.4.2">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -230,7 +230,10 @@ dl.spec dt{color:var(--muted)}dl.spec dd{margin:0}
 /* banner + footer */
 .update{position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:60;background:var(--ink);color:#fff;border-radius:999px;padding:8px 8px 8px 20px;display:none;align-items:center;gap:12px;box-shadow:0 12px 30px -12px rgba(0,0,0,.5);max-width:calc(100% - 24px)}
 .update.on{display:flex;animation:rise .4s}
-.update{border-radius:22px;flex-wrap:wrap}.update span{flex:1 1 220px;font-size:15px}.update small{display:block;opacity:.85;font-size:13px;margin-top:2px}
+.update{border-radius:22px;width:min(560px,calc(100% - 24px));padding:12px 12px 12px 18px;gap:12px}
+.update span{flex:1 1 auto;font-size:15px;line-height:1.4}.update small{display:block;opacity:.85;font-size:13px;margin-top:4px}
+.update button{flex:none;white-space:nowrap;padding:10px 20px;min-height:44px}
+@media(max-width:480px){.update{left:12px;right:12px;bottom:12px;width:auto;transform:none}}
 .update button{border:0;background:var(--pink);color:#6d3632;border-radius:999px;padding:8px 16px;min-height:40px;font-weight:600;cursor:pointer}
 .toast{position:fixed;left:50%;top:84px;transform:translateX(-50%);z-index:60;background:var(--sage-d);color:#fff;padding:9px 18px;border-radius:999px;font-size:14px;opacity:0;pointer-events:none;transition:opacity .3s}
 .toast.on{opacity:1}
@@ -289,7 +292,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.4.1';
+const VERSION = '1.4.2';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
