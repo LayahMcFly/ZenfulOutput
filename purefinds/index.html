@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.7.1">
+<meta name="pf-version" content="1.7.2">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.7.1';
+const VERSION = '1.7.2';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -563,7 +563,7 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive and grapeseed only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
+const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries (blackcurrant is fine too, but not cranberries). Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar and coconut sugar, never white or cane sugar.';
 const BAD_FRUIT = /pineapple|coconut(?!\s*(oil|sugar|milk|cream|water|flour|nectar|aminos))|passion ?fruit|kiwi|\borange|cherr(y|ies)|guava|watermelon|melon|apricot|\bplums?\b|prune|\bfigs?\b|avocado(?!\s*oil)|\blemon(?!\s*(juice|essential))|\blime(?!\s*juice)|grapefruit|pomegranate|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|avocado|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
