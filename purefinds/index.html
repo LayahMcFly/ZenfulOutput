@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.4">
+<meta name="pf-version" content="1.17.5">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -116,6 +116,9 @@ select.field{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg 
 .meta{font-size:13px;color:var(--muted);margin:0 0 2px}
 .card h3{font-family:Jost,sans-serif;font-size:16px;font-weight:500;line-height:1.3;margin:0 0 4px}
 .price{font-weight:600;white-space:nowrap}
+.comp.full{display:block;-webkit-line-clamp:unset;overflow:visible;line-height:1.5;color:var(--ink,inherit)}
+.comp.full b{font-weight:600}
+.rulechk{font-size:12px;color:var(--muted);margin:-4px 0 10px}
 .comp{font-size:13px;color:var(--muted);margin:6px 0 10px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .acts{display:flex;gap:8px;flex-wrap:wrap}
 .btn{display:inline-flex;align-items:center;justify-content:center;gap:6px;min-height:40px;padding:8px 15px;border-radius:999px;border:1px solid var(--sand);background:var(--white);text-decoration:none;font-size:14px;font-weight:500;cursor:pointer;transition:all .2s}
@@ -365,7 +368,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.4';
+const VERSION = '1.17.5';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1044,7 +1047,7 @@ function card(it){
       <p class="meta">${esc(it.brand)} · ${esc(it.store)}</p>
       <h3>${esc(it.name)}</h3>
       ${it.price != null ? `<span class="price">${money(it.price)}</span>` : it.kind === 'food' ? '<span class="meta">Price at store</span>' : ''}
-      <p class="comp">${esc(comp)}</p>
+      ${it.kind === 'food' && it.ing ? `<p class="comp full"><b>Ingredients:</b> ${esc(it.ing.replace(/^Begins: /, ''))}</p><p class="rulechk">${esc(it.ingSrc ? 'Read from: ' + it.ingSrc + '. ' : '')}No banned ingredient found.</p>` : `<p class="comp">${esc(comp)}</p>`}
       <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button>${buy}</div>
     </div></article>`;
 }
