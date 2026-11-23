@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.14.1">
+<meta name="pf-version" content="1.15.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -359,7 +359,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.14.1';
+const VERSION = '1.15.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -890,6 +890,20 @@ async function resolveIngredients(){
   await Promise.all(Array.from({length: 3}, async () => { while (i < todo.length){ if (await resolveOne(todo[i++])) changed = true; rs.done++; if (rs.done % 10 === 0) scanNote(); } }));
   store.set('ingCache2', ingCache); resolving = false; scanNote(); if (changed) rerender();
 }
+
+// Etsy (clothing only): the scanner searches Etsy and keeps listings that say 100% cotton with no blend. Needs the ETSY_KEY secret on the Worker.
+const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% organic cotton shirt'];
+let etsyNote = '';
+async function scanEtsy(st){
+  for (const q of ETSY_QUERIES){
+    const key = 'etsy1|' + q, hit = store.get(key, null); let rows = [];
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else try { rows = (await getJSON(`${scanBase()}/etsy?q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
+    st.added += addScanned('cotton', rows);
+  }
+  if (!etsyNote) etsyNote = 'ok';
+}
 async function scanType(type){
   const st = scanState[type];
   if (!scanBase()) { st.status = 'off'; return scanNote(); }
@@ -914,6 +928,7 @@ async function scanType(type){
       st.added += addScanned(type, rows); st.done++; scanNote();
     }
   }));
+  if (type === 'cotton') await scanEtsy(st);
   st.status = 'done'; scanNote(); rerender();
   if (type === 'food') resolveIngredients();
 }
@@ -1064,7 +1079,7 @@ const REGIONS = [['americas', 'Americas', 'United States and Canada'], ['europe'
 const OFF_COUNTRIES = {americas: ['en:united-states', 'en:canada'], europe: ['en:united-kingdom', 'en:france', 'en:germany', 'en:spain', 'en:italy'], asia: ['en:japan', 'en:australia'], other: []};
 // Where each store ships from. Stores not listed here count as "Other and unlisted".
 const STORE_REGION = {'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
-  'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas',
+  'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas', 'Etsy': 'other',
   'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'europe', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
   'YumEarth': 'americas', 'Theo Chocolate': 'americas', 'LesserEvil': 'americas', 'Mavuno Harvest': 'americas', "Mary's Gone Crackers": 'americas', 'Purely Elizabeth': 'americas', 'Once Upon a Farm': 'americas',
   'Alter Eco': 'americas', 'Made Good': 'americas', 'Hu Kitchen': 'americas', "Janie's Mill": 'americas', 'Jovial': 'americas', 'Yolélé': 'americas', 'Wilderness Poets': 'americas'};
@@ -1588,6 +1603,7 @@ async function runDebug(){
       catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
+  if (scanBase()){ const t = performance.now(); try { const j = await getJSON(`${scanBase()}/etsy?q=${encodeURIComponent('100% cotton dress')}`, 25000); log(`\n[Etsy] OK ${ms(t)} · ${(j.items || []).length} listings that say 100% cotton`); } catch (e){ log(`\n[Etsy] ${errText(e)}`); } }
   const cs = srcCountries();
   log(`\n[Open Food Facts] countries asked for: ${cs.join(', ')}`);
   const tests = [

@@ -7,10 +7,14 @@
 //   /details?url=<product page>  ingredients (or fabric) read from the product's own page,
 //                                with Open Food Facts as a backup when the page doesn't list them
 //
+//   /etsy?q=100%25+cotton+dress   100% cotton clothing listings from Etsy (needs the ETSY_KEY secret)
+//
+// Optional: add a secret named ETSY_KEY with your Etsy keystring and shared secret joined by a colon
+// (keystring:sharedsecret) to turn on Etsy.
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.3.0';
+const VERSION = '1.4.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -62,6 +66,12 @@ export default {
         const r = await fetch(target.toString(), {headers: UA, cf: {cacheTtl: 3600, cacheEverything: true}});
         if (!r.ok) return json({error: `Open Food Facts answered HTTP ${r.status}`}, 502, 0);
         return json(await r.json(), 200, 3600);
+      }
+      if (u.pathname === '/etsy'){
+        const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
+        if (!q) return json({error: 'Add a search, for example /etsy?q=100% cotton dress'}, 400);
+        if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add a Worker secret named ETSY_KEY (keystring:sharedsecret).'}, 501, 0);
+        return json({items: await etsySearch(q, env.ETSY_KEY)}, 200, 21600);
       }
       if (u.pathname === '/details'){
         const target = new URL(u.searchParams.get('url') || '');
@@ -151,6 +161,27 @@ function cottonItem(d, p){
   const text = plain(p.body_html), m = text.match(COTTON_LINE);
   if (!m || BLEND.test(text)) return null;
   return {...base(d, p), fabric: m[0].trim(), sizes: optionValues(p, /size/i), colors: optionValues(p, /colou?r/i)};
+}
+
+/* ---------- Etsy (100% cotton clothing) ---------- */
+async function etsySearch(q, key){
+  const url = 'https://openapi.etsy.com/v3/application/listings/active?' + new URLSearchParams({keywords: q, limit: '100', sort_on: 'score', includes: 'Images,Shop'});
+  const r = await fetch(url, {headers: {...UA, 'x-api-key': key}, cf: {cacheTtl: 21600, cacheEverything: true}});
+  if (!r.ok){ let why = ''; try { why = ': ' + (await r.json()).error; } catch (e){} throw new Error(`Etsy answered HTTP ${r.status}${why}`); }
+  const out = [];
+  for (const l of (await r.json()).results || []){
+    const text = plain(`${l.title} ${l.description}`), kind = `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`;
+    const m = plain(l.description).match(COTTON_LINE) || plain(l.title).match(COTTON_LINE);
+    if (!m || BLEND.test(text) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '') || (l.state && l.state !== 'active')) continue;
+    const price = l.price && l.price.divisor ? l.price.amount / l.price.divisor : null;
+    out.push({
+      domain: 'etsy.com', store: 'Etsy', vendor: (l.shop && l.shop.shop_name) || 'Etsy seller', handle: String(l.listing_id), name: plain(l.title),
+      url: String(l.url || `https://www.etsy.com/listing/${l.listing_id}`).split('?')[0], img: ((l.images || [])[0] || {}).url_570xN || '', price,
+      ptype: (l.taxonomy_path || []).join(' '), tags: l.tags || [], created: l.creation_timestamp ? new Date(l.creation_timestamp * 1000).toISOString() : '',
+      fabric: m[0].trim(), sizes: [], colors: []
+    });
+  }
+  return out;
 }
 
 /* ---------- organic or Non-GMO food ---------- */
