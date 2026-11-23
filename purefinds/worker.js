@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.0.0';
+const VERSION = '1.0.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -33,7 +33,8 @@ const STORES = {
     ['www.bobsredmill.com', "Bob's Red Mill"], ['wildernesspoets.com', 'Wilderness Poets']
   ]
 };
-const ALLOWED = new Map([...STORES.cotton, ...STORES.food]);
+const ALLOWED = new Map();
+for (const [domain, name] of [...STORES.cotton, ...STORES.food]) ALLOWED.set(domain, name);
 
 const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'};
 const json = (o, status = 200, maxAge = 1800) => new Response(JSON.stringify(o), {
