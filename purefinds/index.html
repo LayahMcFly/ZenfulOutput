@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.3">
+<meta name="pf-version" content="1.17.4">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -365,7 +365,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.3';
+const VERSION = '1.17.4';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1302,8 +1302,14 @@ async function loadFoodList(k, key){
   // Nothing is shown under a category unless it belongs there. Other finds from the same section are offered, never mixed in.
   const show = items => {
     if (items.length) return mountList($('#list'), items, emptyMsg);
-    const rel = related(), gone = removedLog.filter(x => (x.cats || []).some(c => c === key) || catWords(key).some(w => x.name.toLowerCase().includes(w)));
-    $('#list').innerHTML = `<div class="empty"><h3>No ${esc(cat[0].toLowerCase())} that pass your food rules</h3><p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : 'None of the brand stores or Open Food Facts results passed your food rules.'}${gone.length ? ` ${gone.length} ${gone.length === 1 ? 'was' : 'were'} removed: ${gone.slice(0, 4).map(x => esc(x.name + ' (' + x.reason + ')')).join('; ')}.` : ''}</p>${rel.length ? `<button class="btn" type="button" id="showRel">Show the ${rel.length} other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds</button>` : ''}</div>`;
+    const rel = related(), word = cat[0].toLowerCase(), ws = catWords(key);
+    // only foods whose own name says they belong here (a cookie, a pancake mix), so the list never shows unrelated removals
+    const gone = removedLog.filter(x => ws.some(w => x.name.toLowerCase().includes(w)));
+    const reasonText = r => /no readable/.test(r) ? 'its ingredient list could not be read' : /^banned: ?(.*)/.exec(r) ? 'it contains ' + /^banned: ?(.*)/.exec(r)[1] : r;
+    $('#list').innerHTML = `<div class="empty"><h3>No ${esc(word)} to show right now</h3>
+      <p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : `PureFinds found no ${esc(word)} that follow your food rules.`}</p>
+      ${gone.length ? `<p>${gone.length} ${esc(word)} ${gone.length === 1 ? 'was' : 'were'} hidden:</p><ul style="text-align:left;margin:6px auto;max-width:460px">${gone.slice(0, 6).map(x => `<li>${esc(x.name)}: ${esc(reasonText(x.reason))}</li>`).join('')}</ul>` : `<p>None were found in the stores PureFinds checks, so nothing was hidden either.</p>`}
+      ${rel.length ? `<button class="btn" type="button" id="showRel">See the ${rel.length} other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds instead</button>` : ''}</div>`;
     const b = $('#showRel'); if (b) b.onclick = () => mountList($('#list'), rel, emptyMsg);
   };
   if (mine.length) show(mine);
