@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.16.3">
-<title>PureFinds · Organic food & 100% cotton finds</title>
-<meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
+<meta name="pf-version" content="1.17.0">
+<title>PureFinds · Organic food & natural-fabric finds</title>
+<meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
 <meta name="theme-color" content="#f8f3ea">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -334,7 +334,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
     <nav class="tabs" aria-label="Sections">
       <a href="#home">Discover</a>
       <a href="#food">Food</a>
-      <a href="#cotton">Cotton Closet</a>
+      <a href="#cotton">Natural Closet</a>
       <a href="#favorites">Favorites</a>
       <a href="#recent">Recently viewed</a>
       <a href="#sources">Sources</a>
@@ -365,7 +365,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.16.3';
+const VERSION = '1.17.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -606,9 +606,9 @@ const REG = new Map();
 const reg = it => (REG.set(it.id, it), it);
 const sized = u => u && u.includes('cdn.shopify.com') ? u + (u.includes('?') ? '&' : '?') + 'width=700' : u;
 
-function fabricTags(t){
-  const s = t.toLowerCase(), out = ['100% cotton'];
-  if (/organic/.test(s)) out.push('Organic cotton');
+function fabricTags(t, material = 'Cotton'){
+  const s = t.toLowerCase(), out = ['100% ' + material.toLowerCase()];
+  if (/organic/.test(s)) out.push('Organic ' + material.toLowerCase());
   if (/egyptian/.test(s)) out.push('Egyptian cotton');
   if (/japan/.test(s)) out.push('Japanese cotton');
   if (/regenerat/.test(s)) out.push('Regenerative cotton');
@@ -624,7 +624,7 @@ const COTTON = RAW.map((r, i) => {
     price: r[3], fabric: r[4], type: r[5], sizes: r[6].split(','), colors: r[7].split(','), img: sized(r[8]),
     styles: r[9].split(' '), note: r[10] || '', order: i, created: v * 1000, fabricTags: fabricTags(r[4]),
     cert: /gots/i.test(r[4]) ? 'GOTS certified organic' : /organic/i.test(r[4]) ? 'Organic cotton (brand claim)' : '',
-    desc: `${SINGULAR[r[5]] || r[5]} by ${b.brand}, sold on the brand's own website. It's in the Cotton Closet because the brand lists the fabric as 100% cotton.`
+    desc: `${SINGULAR[r[5]] || r[5]} by ${b.brand}, sold on the brand's own website. It's in the Natural Closet because the brand lists the fabric as 100% cotton.`
   });
 });
 const DIRECT = DIRECT_PRODUCTS.map(p => reg({...p, id: 'd-' + p.id, kind: 'direct', store: 'PureFinds', type: 'Sold by PureFinds', fabricTags: [], styles: []}));
@@ -874,9 +874,9 @@ function addScanned(type, rows){
       const t = clothingType(`${r.name} ${r.ptype}`);
       COTTON.push(reg({id, kind: 'cotton', src: 'scan', name: r.name, brand: r.vendor || r.store, store: r.store, url: r.url, price: r.price, fabric: r.fabric,
         type: t, sizes: r.sizes || [], colors: r.colors || [], img: sized(r.img), styles: [], order: 1000 + COTTON.length, created: Date.parse(r.created) || 0,
-        fabricTags: fabricTags(r.fabric), cert: /gots/i.test(r.fabric) ? 'GOTS certified organic' : /organic/i.test(r.fabric) ? 'Organic cotton (brand claim)' : '',
+        material: r.material || 'Cotton', fabricTags: fabricTags(r.fabric, r.material || 'Cotton'), cert: /gots/i.test(r.fabric) ? 'GOTS certified organic' : /organic/i.test(r.fabric) ? `Organic ${(r.material || 'cotton').toLowerCase()} (brand claim)` : '',
         note: 'Found automatically in the store’s catalog. The fabric line is quoted from its listing, so check the store page for each color.',
-        desc: `${SINGULAR[t] || 'Piece'} from ${r.store}, found in its online catalog. The listing says “${r.fabric}”.`}));
+        desc: `${SINGULAR[t] || 'Piece'} from ${r.store}, found in its online catalog. The listing says “${r.fabric}”, with no other fabric mentioned.`}));
     } else {
       if (FOODS.some(f => f.url === r.url)) continue;
       const cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
@@ -916,7 +916,7 @@ async function resolveIngredients(){
 }
 
 // Etsy (clothing only): the scanner searches Etsy and keeps listings that say 100% cotton with no blend. Needs the ETSY_KEY secret on the Worker.
-const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% organic cotton shirt'];
+const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '';
 async function scanEtsy(st){
   for (const q of ETSY_QUERIES){
@@ -958,7 +958,7 @@ async function scanType(type){
 }
 function scanNote(){
   const el = document.getElementById('scanNote'); if (!el) return;
-  const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? '100% cotton pieces' : 'foods that fit your rules';
+  const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? 'pieces (100% cotton, silk, wool or linen)' : 'foods that fit your rules';
   if (st.status === 'off' || st.status === 'idle') { el.hidden = true; return; }
   el.hidden = false;
   if (st.status === 'loading') el.innerHTML = `Checking ${st.stores || 'the'} store catalogs for more ${what}… ${st.done}${st.stores ? ' of ' + st.stores : ''} done, ${st.added} added so far.`;
@@ -1012,7 +1012,7 @@ function img(it, alt){
   return it.img ? `<img loading="lazy" src="${esc(it.img)}" alt="${esc(alt || it.name)}" data-name="${esc(it.name)}">` : `<div class="noimg"><span>${esc(it.name)}</span></div>`;
 }
 function badges(it){
-  if (it.kind === 'cotton') return `<span class="bd">100% cotton · ${it.src === 'scan' ? 'per listing' : 'verified'}</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
+  if (it.kind === 'cotton') return `<span class="bd">100% ${esc((it.material || 'Cotton').toLowerCase())} · ${it.src === 'scan' ? 'per listing' : 'verified'}</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
   if (it.kind === 'direct') return '<span class="bd p">Sold by PureFinds</span>';
   const g = it.nonGmo ? `<span class="bd p">${esc(it.nonGmo.replace(' (brand claim)', ''))}</span>` : '';
   if (it.src === 'brand') return (it.cert ? `<span class="bd">${esc(it.cert)}</span>` : '<span class="bd u">Organic status unverified</span>') + g;
@@ -1069,7 +1069,7 @@ function filterBar(items){
     <label>Brand<select class="field" name="brand">${opts(items.map(i => i.brand), F.brand, 'All brands')}</select></label>
     <label>Store<select class="field" name="store">${opts(items.flatMap(i => i.stores || [i.store]), F.store, 'All stores')}</select></label>
     ${hasCot ? `<label>Aesthetic<select class="field" name="style"><option value="">All aesthetics</option>${STYLES.map(([k, n]) => `<option value="${k}" ${F.style === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
-    <label>Fabric<select class="field" name="fabric">${opts(items.flatMap(i => i.fabricTags), F.fabric, 'Any 100% cotton')}</select></label>` : ''}
+    <label>Fabric<select class="field" name="fabric">${opts(items.flatMap(i => i.fabricTags), F.fabric, 'Any fabric')}</select></label>` : ''}
     ${hasFood ? `<label>Non-GMO<select class="field" name="gmo"><option value="">Organic or Non-GMO</option><option value="label" ${F.gmo === 'label' ? 'selected' : ''}>Non-GMO label only</option></select></label>` : ''}
     <label>Organic certification<select class="field" name="cert"><option value="">Any</option>${certs.map(c => `<option ${F.cert === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
     ${items.some(i => i.price != null) ? `<label class="pr">Price ($)<div><input class="field" name="min" type="number" min="0" inputmode="decimal" placeholder="Min" value="${esc(F.min)}"><input class="field" name="max" type="number" min="0" inputmode="decimal" placeholder="Max" value="${esc(F.max)}"></div></label>` : ''}
@@ -1196,12 +1196,12 @@ function home(){
   </section>
   <section class="blk">${sh('Two ways to shop')}<div class="hub two">
     ${hubTile({go: 'food', title: 'Food', sub: 'Organic and Non-GMO snacks, groceries, bread and drinks', item: foodsV()[5], items: foodsV().filter(f => f.img)}, 1)}
-    ${hubTile({go: 'cotton', title: 'Cotton Closet', sub: 'Verified 100% cotton clothing, aesthetics and outfits', item: byHandle('the-simple-dawn-dress-cascading-daisy'), items: pick(cottonV(), 6, seed + 3)}, 2)}</div></section>
+    ${hubTile({go: 'cotton', title: 'Natural Closet', sub: 'Clothing that is 100% cotton, silk, wool or linen', item: byHandle('the-simple-dawn-dress-cascading-daisy'), items: pick(cottonV(), 6, seed + 3)}, 2)}</div></section>
   <section class="blk" id="daily-s">${sh('Daily discovery', 'Two fresh picks every day: one to wear, one to snack on.', '<button class="link" data-shuffle>Show me different ones</button>')}<div class="daily" id="daily"></div></section>
   <section class="blk">${sh('Best Organic Snacks', 'Certified and organic-labeled snacks from brand stores, plus the most-scanned organic snacks on Open Food Facts.', '<a class="link" href="#food-snacks">All snacks →</a>')}<div class="rail" id="best">${pick(foodsV().filter(f => f.price != null && f.cert && f.ing), 12, seed + 3).map(card).join('')}</div></section>
   <section class="blk">${sh('Cute Finds', 'Casual cute, soft girl and coquette pieces. All 100% cotton.', '<a class="link" href="#cotton-aesthetics">Browse aesthetics →</a>')}<div class="rail">${cute.map(card).join('')}</div></section>
   <section class="blk">${sh('New Finds', 'The most recently updated organic snacks and cotton pieces at their stores.')}<div class="rail" id="newf">${newest.map(card).join('')}</div></section>
-  <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Cotton Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
+  <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Natural Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
   <section class="blk">${sh('Pinterest Outfit Finds', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
   loadHomeFood();
@@ -1350,7 +1350,7 @@ function myList(){
 }
 function cottonHub(){
   const types = COTTON_CATS.map(t => [t, cottonV().filter(c => c.type === t)]).filter(([, a]) => a.length);
-  main.innerHTML = `<div class="pagehead"><h1>Cotton Closet</h1><p>Only clothing whose fabric is stated as 100% cotton on the brand's own product page. No polyester, nylon, acrylic, spandex or blends. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
+  main.innerHTML = `<div class="pagehead"><h1>Natural Closet</h1><p>Only clothing whose fabric is stated as 100% cotton, 100% silk, 100% wool or 100% linen on the brand's own product page. Never mixed, and no polyester, nylon, acrylic, spandex, viscose or any other fabric. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
   ${srcLine()}
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
@@ -1365,7 +1365,7 @@ function cottonHub(){
 function cottonShop(){ setTimeout(scanNote);
   const cat = state.cottonCat;
   const items = cat ? cottonV().filter(c => c.type === cat) : cottonV();
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="chips" role="group" aria-label="Clothing types"><button class="chip" data-cot="" aria-pressed="${!cat}">All</button>${COTTON_CATS.map(c => `<button class="chip" data-cot="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join('')}</div>
   <div id="list"></div>`;
@@ -1373,7 +1373,7 @@ function cottonShop(){ setTimeout(scanNote);
   mountList($('#list'), items); scanNote();
 }
 function styles(){
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton. The aesthetic tags are PureFinds style picks, not the brands' own labels.</p></div>
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton. The aesthetic tags are PureFinds style picks, not the brands' own labels.</p></div>
   <div class="tiles" style="margin:18px 0">${STYLES.map(tile).join('')}</div>
   <div id="sty"></div>`;
   showStyle(state.style, false);
@@ -1387,7 +1387,7 @@ function showStyle(k, scroll = true){
   if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
 }
 function outfitsView(){
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', 'Outfit finds')}<h1>Pinterest Outfit Finds</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Outfit finds')}<h1>Pinterest Outfit Finds</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
 }
 function savedView(kind){
   const items = kind === 'fav' ? Object.values(favs).reverse() : recent;
@@ -1400,7 +1400,7 @@ function cartView(){
   const lines = Object.entries(cart).map(([id, q]) => [REG.get(id), q]).filter(x => x[0]);
   main.innerHTML = `<div class="pagehead"><h1>Your cart</h1><p>The cart is only for products sold directly by PureFinds. Everything else is bought on the store's own website through its Buy Now button.</p></div><div id="cartBody"></div>`;
   const body = $('#cartBody');
-  if (!DIRECT.length) { body.innerHTML = `<div class="empty"><h3>PureFinds doesn't sell anything directly yet</h3><p>Every product on PureFinds right now is sold by its own store. Use Buy Now to check out on that store's official website. Checkout here turns on once PureFinds lists its own products with a Stripe payment link.</p><a class="btn go" href="#cotton">Shop the Cotton Closet</a></div>`; return; }
+  if (!DIRECT.length) { body.innerHTML = `<div class="empty"><h3>PureFinds doesn't sell anything directly yet</h3><p>Every product on PureFinds right now is sold by its own store. Use Buy Now to check out on that store's official website. Checkout here turns on once PureFinds lists its own products with a Stripe payment link.</p><a class="btn go" href="#cotton">Shop the Natural Closet</a></div>`; return; }
   if (!lines.length) { body.innerHTML = `<div class="empty"><h3>Your cart is empty</h3><p>Products sold by PureFinds have an Add to cart button.</p></div><h2 style="margin:20px 0 12px">Sold by PureFinds</h2><div class="grid">${DIRECT.map(card).join('')}</div>`; return; }
   const total = lines.reduce((a, [it, q]) => a + it.price * q, 0);
   body.innerHTML = `<div class="list">${lines.map(([it, q]) => `<div class="row">${img(it)}<div><h3 style="font-family:Jost;font-size:16px">${esc(it.name)}</h3><p class="meta">${money(it.price)} × ${q}</p>

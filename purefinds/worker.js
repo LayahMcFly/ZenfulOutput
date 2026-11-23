@@ -2,19 +2,19 @@
 // Paste this whole file into a Worker named "purefinds" and press Deploy.
 //
 //   /stores                     the store list
-//   /store?d=kotn.com&type=cotton   one store's 100% cotton clothing
+//   /store?d=kotn.com&type=cotton   one store's clothing that is 100% cotton, silk, wool or linen (never mixed)
 //   /store?d=lesserevil.com&type=food   one store's food (the site applies the food rules)
 //   /details?url=<product page>  ingredients (or fabric) read from the product's own page,
 //                                with Open Food Facts as a backup when the page doesn't list them
 //
-//   /etsy?q=100%25+cotton+dress   100% cotton clothing listings from Etsy (needs the ETSY_KEY secret)
+//   /etsy?q=100%25+silk+dress   100% cotton, silk, wool or linen clothing listings from Etsy (needs the ETSY_KEY secret)
 //
 // Optional: add a secret named ETSY_KEY with your Etsy keystring and shared secret joined by a colon
 // (keystring:sharedsecret) to turn on Etsy.
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.5.0';
+const VERSION = '1.6.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -152,20 +152,29 @@ const base = (d, p) => ({
   created: p.published_at || p.created_at || ''
 });
 
-/* ---------- 100% cotton clothing ---------- */
-const CLOTHING = /\b(dress|top|tee|t-shirt|shirt|blouse|tank|cami|sweater|cardigan|hoodie|sweatshirt|crewneck|pullover|pant|trouser|jogger|sweatpant|jean|short|skirt|pajama|pj|sleep|robe|nightgown|sock|underwear|brief|boxer|bra|bralette|legging|jacket|coat|overall|jumpsuit|romper|polo|henley|turtleneck|lounge|thong|bikini|hipster|longsleeve|knit)s?\b/i;
+/* ---------- clothing that is 100% cotton, silk, wool or linen (one fabric, never mixed) ---------- */
+const CLOTHING = /\b(dress|top|tee|t-shirt|shirt|blouse|tank|cami|sweater|cardigan|hoodie|sweatshirt|crewneck|pullover|pant|trouser|jogger|sweatpant|jean|short|skirt|pajama|pj|sleep|robe|nightgown|sock|underwear|brief|boxer|bra|bralette|legging|jacket|coat|overall|jumpsuit|romper|polo|henley|turtleneck|lounge|thong|bikini|hipster|longsleeve|knit|slip|camisole|scrunchie|pillowcase)s?\b/i;
 const NOT_CLOTHING = /\b(sheet|duvet|pillow|towel|blanket|quilt|napkin|tablecloth|bag|tote|gift ?card|candle|mug|scarf|beanie|hat|cap|arm sleeve|headband|mask)s?\b/i;
-const COTTON_LINE = /[^.;!?]{0,60}100\s*%\s*(?:(?:certified|gots[- ]certified|organic|egyptian|pima|supima|combed|ring[- ]spun|japanese|japan|turkish|peruvian|regenerative(?:ly grown)?|us[- ]grown|american[- ]grown|heavyweight|brushed)\s+){0,3}cotton\b[^.;!?]{0,50}/i;
-const BLEND = /\b(polyester|spandex|elastane|lycra|nylon|acrylic|rayon|viscose|lyocell|tencel|modal|cupro|wool|merino|alpaca|cashmere|mohair|linen|hemp|silk|bamboo|lurex|metallic|polyamide|elasterell)\b/i;
+const FABRIC_LINE = /[^.;!?]{0,60}100\s*%\s*(?:(?:certified|gots[- ]certified|organic|egyptian|pima|supima|combed|ring[- ]spun|japanese|japan|turkish|peruvian|regenerative(?:ly grown)?|us[- ]grown|american[- ]grown|heavyweight|brushed|pure|mulberry|charmeuse|merino|lambs|lamb's|virgin|superfine|extra[- ]fine|european|french|belgian|irish|italian|stonewashed|washed|natural|new zealand|australian)\s+){0,3}(cotton|silk|(?:lambs)?wool|linen)\b[^.;!?]{0,50}/i;
+const FIBERS = {
+  cotton: 'cotton', silk: 'silk', wool: 'wool|woolen|woollen|lambswool|merino', linen: 'linen|flax'
+};
+const OTHER_FIBERS = 'polyester|spandex|elastane|lycra|nylon|acrylic|rayon|viscose|lyocell|tencel|modal|cupro|cashmere|alpaca|mohair|angora|camel hair|hemp|bamboo|ramie|jute|lurex|metallic|polyamide|elasterell|polyurethane|faux fur|leather|down fill';
+// Returns the fabric line and name ("Cotton", "Silk", "Wool" or "Linen") only when the text says 100% of one of them and mentions no other fiber at all
+function pureFabric(text){
+  const m = String(text || '').match(FABRIC_LINE); if (!m) return null;
+  const name = m[1].toLowerCase().replace('lambswool', 'wool'), others = Object.entries(FIBERS).filter(([k]) => k !== name).map(([, v]) => v).join('|');
+  if (new RegExp('\\b(' + OTHER_FIBERS + '|' + others + ')\\b', 'i').test(text)) return null;
+  return {line: m[0].trim(), material: name[0].toUpperCase() + name.slice(1)};
+}
 function cottonItem(d, p){
   const title = p.title || '', kind = `${p.product_type || ''} ${title}`;
   if (!CLOTHING.test(kind) || NOT_CLOTHING.test(kind) || !available(p)) return null;
-  const text = plain(p.body_html), m = text.match(COTTON_LINE);
-  if (!m || BLEND.test(text)) return null;
-  return {...base(d, p), fabric: m[0].trim(), sizes: optionValues(p, /size/i), colors: optionValues(p, /colou?r/i)};
+  const f = pureFabric(plain(p.body_html)); if (!f) return null;
+  return {...base(d, p), fabric: f.line, material: f.material, sizes: optionValues(p, /size/i), colors: optionValues(p, /colou?r/i)};
 }
 
-/* ---------- Etsy (100% cotton clothing) ---------- */
+/* ---------- Etsy (clothing that is 100% cotton, silk, wool or linen) ---------- */
 async function etsySearch(q, key){
   const url = 'https://openapi.etsy.com/v3/application/listings/active?' + new URLSearchParams({keywords: q, limit: '100', sort_on: 'score', includes: 'Images,Shop'});
   const r = await fetch(url, {headers: {...UA, 'x-api-key': key}, cf: {cacheTtl: 21600, cacheEverything: true}});
@@ -173,14 +182,14 @@ async function etsySearch(q, key){
   const out = [];
   for (const l of (await r.json()).results || []){
     const text = plain(`${l.title} ${l.description}`), kind = `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`;
-    const m = plain(l.description).match(COTTON_LINE) || plain(l.title).match(COTTON_LINE);
-    if (!m || BLEND.test(text) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '') || (l.state && l.state !== 'active')) continue;
+    const f = pureFabric(plain(l.description)) || pureFabric(plain(l.title));
+    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(text) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '') || (l.state && l.state !== 'active')) continue;
     const price = l.price && l.price.divisor ? l.price.amount / l.price.divisor : null;
     out.push({
       domain: 'etsy.com', store: 'Etsy', vendor: (l.shop && l.shop.shop_name) || 'Etsy seller', handle: String(l.listing_id), name: plain(l.title),
       url: String(l.url || `https://www.etsy.com/listing/${l.listing_id}`).split('?')[0], img: ((l.images || [])[0] || {}).url_570xN || '', price,
       ptype: (l.taxonomy_path || []).join(' '), tags: l.tags || [], created: l.creation_timestamp ? new Date(l.creation_timestamp * 1000).toISOString() : '',
-      fabric: m[0].trim(), sizes: [], colors: []
+      fabric: f.line, material: f.material, sizes: [], colors: []
     });
   }
   return out;
@@ -235,7 +244,7 @@ async function details(target, env){
   if (handle) try {
     const p = (await getJSON(`https://${d}/products/${handle}.json`)).product || {};
     const text = plain(p.body_html);
-    out.ingredients = findIngredients(plainList(p.body_html)); out.fabric = (text.match(COTTON_LINE) || [''])[0].trim(); out.barcode = barcodeOf(p);
+    out.ingredients = findIngredients(plainList(p.body_html)); out.fabric = ((pureFabric(text) || {}).line) || ''; out.barcode = barcodeOf(p);
     if (out.ingredients) out.ingredientsSource = 'Product description';
   } catch (e){ out.tried.push(String(e.message || e)); }
   // 2. the product page itself (ingredients are often in a tab or accordion)
@@ -246,7 +255,7 @@ async function details(target, env){
       const html = await r.text(), text = plain(html);
       out.ingredients = findIngredients(plainList(html));
       if (out.ingredients) out.ingredientsSource = 'Product page';
-      if (!out.fabric) out.fabric = (text.match(COTTON_LINE) || [''])[0].trim();
+      if (!out.fabric) out.fabric = ((pureFabric(text) || {}).line) || '';
       if (!out.barcode){ const m = html.match(/"(?:gtin1[234]|gtin|barcode)"\s*:\s*"(\d{8,14})"/); if (m) out.barcode = m[1]; }
     } catch (e){ out.tried.push(String(e.message || e)); }
   }
