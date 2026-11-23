@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.12.0">
+<meta name="pf-version" content="1.12.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -332,7 +332,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.12.0';
+const VERSION = '1.12.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1167,10 +1167,21 @@ function foodSection(k){ setTimeout(scanNote);
   <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
   loadFoodList(k, key);
 }
+
+// Smarter matching: besides the category tags, look for the category's own words in each product's name and ingredients
+const GENERIC = /^(all|organic|snack|snacks|food|foods|natural|other|more|and|with|from|only|first|then|fresh)$/;
+const catWords = key => {
+  const c = FCATS[key]; const labels = key.startsWith('all-') ? (c[2] || []).map(x => FCATS[x] && FCATS[x][0]) : [c[0]];
+  return [...new Set([...labels, c[1]].filter(Boolean).join(' ').toLowerCase().replace(/\(.*?\)/g, ' ').split(/[^a-zé]+/).map(w => w.replace(/(ies)$/, 'y').replace(/s$/, '')).filter(w => w.length > 3 && !GENERIC.test(w)))];
+};
+const textMatches = key => { const ws = catWords(key); if (!ws.length) return []; return foodsV().filter(f => !ruledOut[f.url] && ws.some(w => (f.name + ' ' + (f.brand || '')).toLowerCase().includes(w))); };
 async function loadFoodList(k, key){
-  const cat = FCATS[key], mine = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name)).sort((a, b) => b.pop - a.pop);
+  const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name));
+  const mine = [...base, ...textMatches(key).filter(f => !base.includes(f))].sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
+  const sec = FOOD_SECTIONS.find(x => x[0] === k), related = () => { const seen = new Set(); return (sec ? sec[3] : []).flatMap(c => FCATS[c] ? brandFor(c) : []).filter(f => !seen.has(f.id) && seen.add(f.id)); };
   const show = items => items.length ? mountList($('#list'), items, emptyMsg)
+    : related().length ? (mountList($('#list'), related(), emptyMsg), setTimeout(() => $('#live') && $('#live').insertAdjacentHTML('beforeend', ` Nothing matched ${esc(cat[0].toLowerCase())} exactly, so this shows everything else PureFinds found in ${esc(sec ? sec[1].toLowerCase() : 'this section')}.`), 0))
     : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
   if (mine.length) show(mine);
   if (!cat[1]){
