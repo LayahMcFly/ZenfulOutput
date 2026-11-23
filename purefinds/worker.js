@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.1.2';
+const VERSION = '1.1.3';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -28,9 +28,10 @@ const STORES = {
     ['mavunoharvest.com', 'Mavuno Harvest'], ['www.marysgonecrackers.com', "Mary's Gone Crackers"],
     ['purelyelizabeth.com', 'Purely Elizabeth'], ['onceuponafarmorganics.com', 'Once Upon a Farm'],
     ['www.alterecofoods.com', 'Alter Eco'], ['madegoodfoods.com', 'Made Good'], ['hukitchen.com', 'Hu Kitchen'],
-    ['healthyflour.com', 'To Your Health Sprouted Flour'], ['shilohfarms.com', 'Shiloh Farms'],
-    ['jovialfoods.com', 'Jovial'], ['yolele.com', 'Yolélé'], ['onedegreeorganics.com', 'One Degree Organic Foods'],
-    ['www.bobsredmill.com', "Bob's Red Mill"], ['wildernesspoets.com', 'Wilderness Poets']
+    ['janiesmill.com', "Janie's Mill"], ['jovialfoods.com', 'Jovial'], ['yolele.com', 'Yolélé'],
+    ['wildernesspoets.com', 'Wilderness Poets']
+    // Removed: To Your Health Sprouted Flour, Shiloh Farms, One Degree and Bob's Red Mill.
+    // Their websites don't publish a product list the scanner can read.
   ]
 };
 const ALLOWED = new Map();
