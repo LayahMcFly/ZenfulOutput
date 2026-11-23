@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.0.1';
+const VERSION = '1.1.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -57,7 +57,7 @@ export default {
       }
       if (u.pathname === '/details'){
         const target = new URL(u.searchParams.get('url') || '');
-        if (!ALLOWED.has(target.hostname) || !target.pathname.startsWith('/products/')) return json({error: 'Only product pages from PureFinds stores can be read.'}, 400);
+        if (!ALLOWED.has(target.hostname) || target.protocol !== 'https:') return json({error: 'Only product pages from PureFinds stores can be read.'}, 400);
         return json(await details(target, env), 200, 86400);
       }
       return json({error: 'Not found'}, 404);
@@ -69,9 +69,10 @@ export default {
 
 /* ---------- helpers ---------- */
 const plain = h => String(h || '')
-  .replace(/<(script|style|noscript|svg)[\s\S]*?<\/\1>/gi, ' ')
+  .replace(/<(script|style|noscript|svg|template|iframe)\b[\s\S]*?<\/\1>/gi, ' ')
+  .replace(/<!--[\s\S]*?-->/g, ' ')
   .replace(/<br\s*\/?>|<\/(p|div|li|h\d|tr)>/gi, '. ')
-  .replace(/<[^>]+>/g, ' ')
+  .replace(/<(?:[^>"']|"[^"]*"|'[^']*')*>/g, ' ')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&(#39|rsquo|lsquo);/g, "'").replace(/&(quot|ldquo|rdquo);/g, '"')
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&[a-z]+;/g, ' ')
   .replace(/\s+/g, ' ').trim();
@@ -86,20 +87,47 @@ async function getJSON(url){
   return r.json();
 }
 
+// Shopify stores first, then WooCommerce (WordPress) stores, which publish a public product list too
 async function scan(d, type){
-  const out = [];
-  for (let page = 1; page <= 4; page++){
-    const j = await getJSON(`https://${d}/products.json?limit=250&page=${page}`);
-    const ps = j.products || [];
-    for (const p of ps){ const it = type === 'cotton' ? cottonItem(d, p) : foodItem(d, p); if (it) out.push(it); }
-    if (ps.length < 250) break;
+  const keep = ps => ps.map(p => type === 'cotton' ? cottonItem(d, p) : foodItem(d, p)).filter(Boolean);
+  let shopifyErr;
+  try {
+    const out = [];
+    for (let page = 1; page <= 4; page++){
+      const ps = (await getJSON(`https://${d}/products.json?limit=250&page=${page}`)).products || [];
+      out.push(...keep(ps));
+      if (ps.length < 250) break;
+    }
+    return out;
+  } catch (e){ shopifyErr = String(e.message || e); }
+  try {
+    const out = [];
+    for (let page = 1; page <= 4; page++){
+      const ps = await getJSON(`https://${d}/wp-json/wc/store/v1/products?per_page=100&page=${page}`);
+      if (!Array.isArray(ps)) throw new Error('unexpected reply');
+      out.push(...keep(ps.map(fromWoo)));
+      if (ps.length < 100) break;
+    }
+    return out;
+  } catch (e){
+    throw new Error(`${d} isn't readable as a Shopify or WooCommerce store, or it blocks the scanner. Shopify: ${shopifyErr}. WooCommerce: ${String(e.message || e)}.`);
   }
-  return out;
+}
+function fromWoo(x){
+  const minor = (x.prices && x.prices.currency_minor_unit) || 2, link = x.permalink || '';
+  return {
+    title: plain(x.name), handle: (new URL(link || 'https://x/p').pathname.split('/').filter(Boolean).pop() || String(x.id)), _url: link,
+    product_type: (x.categories || []).map(c => c.name).join(' '), tags: [...(x.categories || []), ...(x.tags || [])].map(t => t.name),
+    body_html: `${x.description || ''} ${x.short_description || ''}`,
+    variants: [{price: x.prices ? +x.prices.price / 10 ** minor : 0, available: x.is_in_stock !== false, barcode: x.sku && /^\d{8,14}$/.test(x.sku) ? x.sku : ''}],
+    options: (x.attributes || []).map(a => ({name: a.name, values: (a.terms || []).map(t => t.name)})),
+    images: (x.images || []).map(i => ({src: i.src})), published_at: ''
+  };
 }
 
 const base = (d, p) => ({
   domain: d, store: ALLOWED.get(d), vendor: p.vendor || ALLOWED.get(d), handle: p.handle, name: p.title,
-  url: `https://${d}/products/${p.handle}`, img: ((p.images || [])[0] || {}).src || '', price: minPrice(p),
+  url: p._url || `https://${d}/products/${p.handle}`, img: ((p.images || [])[0] || {}).src || '', price: minPrice(p),
   ptype: p.product_type || '', tags: Array.isArray(p.tags) ? p.tags : String(p.tags || '').split(',').map(t => t.trim()),
   created: p.published_at || p.created_at || ''
 });
@@ -120,13 +148,15 @@ function cottonItem(d, p){
 /* ---------- organic or Non-GMO food ---------- */
 const NOT_FOOD = /gift ?card|bundle|sampler|merch|tote|t-shirt|sweatshirt|\bhat\b|\bmug\b|apron|subscription box|e-?gift/i;
 const ING_STOP = /\s(?:contains|allergen|allergy|nutrition facts|directions|how to use|storage|store in|net wt|suggested use|manufactured|produced in|made in a facility|may contain|frequently asked|reviews|you may also|add to cart|shipping|distributed by)\b/i;
+// Real ingredient lists are plain words and commas, never page code or store data
+const looksLikeIngredients = t => !/[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) && t.split(/\s+/).length <= 160;
 function findIngredients(text){
   const re = /ingredients?\s*[:\-–]\s*/gi; let m;
   while ((m = re.exec(text))){
     let rest = text.slice(m.index + m[0].length, m.index + m[0].length + 900);
     const stop = rest.search(ING_STOP); if (stop > 0) rest = rest.slice(0, stop);
     rest = rest.replace(/\s*\.\s*$/, '').trim();
-    if (rest.length > 6 && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6)) return rest.slice(0, 700);
+    if (rest.length > 6 && looksLikeIngredients(rest) && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6)) return rest.slice(0, 700);
   }
   return '';
 }
@@ -148,10 +178,10 @@ function barcodeOf(p){
 
 /* ---------- details for one product (opened when a listing is tapped) ---------- */
 async function details(target, env){
-  const d = target.hostname, handle = target.pathname.split('/')[2];
+  const d = target.hostname, handle = target.pathname.startsWith('/products/') ? target.pathname.split('/')[2] : '';
   const out = {url: target.href, ingredients: '', ingredientsSource: '', fabric: '', barcode: '', tried: []};
-  // 1. the product's data file
-  try {
+  // 1. the product's data file (Shopify stores)
+  if (handle) try {
     const p = (await getJSON(`https://${d}/products/${handle}.json`)).product || {};
     const text = plain(p.body_html);
     out.ingredients = findIngredients(text); out.fabric = (text.match(COTTON_LINE) || [''])[0].trim(); out.barcode = barcodeOf(p);
@@ -174,7 +204,7 @@ async function details(target, env){
     try {
       const j = await getJSON(`https://world.openfoodfacts.org/api/v2/product/${out.barcode}.json?fields=ingredients_text_en,ingredients_text`);
       const t = (j.product && (j.product.ingredients_text_en || j.product.ingredients_text)) || '';
-      if (t){ out.ingredients = t.trim(); out.ingredientsSource = 'Open Food Facts (barcode ' + out.barcode + ')'; }
+      if (t && looksLikeIngredients(t)){ out.ingredients = t.trim(); out.ingredientsSource = 'Open Food Facts (barcode ' + out.barcode + ')'; }
     } catch (e){ out.tried.push(String(e.message || e)); }
   }
   // 4. USDA FoodData Central by barcode (only if you added an FDC_KEY secret)
