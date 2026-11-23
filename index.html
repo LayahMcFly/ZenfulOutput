@@ -127,6 +127,23 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
 @keyframes pp-bob{50%{transform:translateY(-4px)}}
 @keyframes pp-pulse{50%{box-shadow:0 0 36px rgba(236,72,153,.95)}}
 @media (prefers-reduced-motion:reduce){.card.party,.card.party::before,.card.party::after,.card.party svg,.card.party .go{animation:none}}
+/* Pip's Learning Garden card: sunny meadow colors, a rainbow top edge and a wiggling owl so it stands out as the kids' corner */
+.card.pip{position:relative;overflow:hidden;isolation:isolate;color:#14532d;
+  border:3px solid #fff;border-top:10px solid transparent;
+  background:linear-gradient(#e8f6ff,#e8f6ff) padding-box,linear-gradient(90deg,#ff6b6b,#ffb84a,#ffe14a,#5fd068,#4aa8ff,#a07bff) border-box;
+  background-image:radial-gradient(circle at 86% 14%,#ffe14a 0 22px,transparent 23px),linear-gradient(180deg,#d8f0ff 0%,#eaf8e0 62%,#8fd36a 62%,#6cbf4f 100%),linear-gradient(90deg,#ff6b6b,#ffb84a,#ffe14a,#5fd068,#4aa8ff,#a07bff);
+  background-origin:border-box;background-clip:padding-box,padding-box,border-box;
+  box-shadow:0 12px 22px -12px rgba(46,125,50,.7),0 0 0 4px rgba(255,225,74,.55)}
+.card.pip>*{position:relative;z-index:1}
+.card.pip svg{width:64px;height:64px;animation:pip-wig 3.6s ease-in-out infinite;transform-origin:50% 90%}
+.card.pip h2,.card.pip p,.card.pip .go{font-family:"Baloo 2","Fredoka",ui-rounded,"Comic Sans MS","Trebuchet MS",sans-serif}
+.card.pip h2{color:#1d4ed8;font-weight:800;font-size:1.5em}
+.card.pip p{color:#166534;font-size:17px}
+.card.pip .go{background:linear-gradient(#ffd84a,#ff9f1c);color:#5a2d00;border-radius:99px;padding:13px 20px;box-shadow:0 4px 0 #c76f00;letter-spacing:.04em}
+.card.pip:hover{box-shadow:0 16px 26px -12px rgba(46,125,50,.85),0 0 0 4px rgba(255,225,74,.9)}
+.card.pip:focus-visible{outline-color:#1d4ed8}
+@keyframes pip-wig{0%,70%,100%{transform:rotate(0)}76%{transform:rotate(-8deg)}82%{transform:rotate(8deg)}88%{transform:rotate(-5deg)}94%{transform:rotate(4deg)}}
+@media (prefers-reduced-motion:reduce){.card.pip svg{animation:none}}
 @media (prefers-reduced-motion:reduce){.card{transition:none}.card:hover{transform:none}}
 </style>
 </head>
@@ -197,6 +214,14 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
       </a>
     </li>
     <li>
+      <a class="card pip" href="pips-learning-garden/">
+        <svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="32" cy="38" rx="19" ry="20" fill="#a86a3a"/><ellipse cx="32" cy="43" rx="12" ry="13" fill="#f7e2b8"/><path d="M15 22l5-10 8 7zM49 22l-5-10-8 7z" fill="#8a5129"/><circle cx="24" cy="29" r="8.5" fill="#fff"/><circle cx="40" cy="29" r="8.5" fill="#fff"/><circle cx="25" cy="30" r="4.2" fill="#2b2118"/><circle cx="39" cy="30" r="4.2" fill="#2b2118"/><circle cx="26.3" cy="28.6" r="1.4" fill="#fff"/><circle cx="40.3" cy="28.6" r="1.4" fill="#fff"/><path d="M29.5 34h5L32 39z" fill="#ff9f1c"/><path d="M26 45l3 3 3-3 3 3 3-3" fill="none" stroke="#d9a866" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/><path d="M26 56l-2 4M38 56l2 4" stroke="#ff9f1c" stroke-width="3" stroke-linecap="round"/></svg>
+        <h2>Pip&rsquo;s Learning Garden</h2>
+        <p>Kids learn their ABCs, letter sounds, reading and spelling with Pip the owl.</p>
+        <span class="go">Play with Pip</span>
+      </a>
+    </li>
+    <li>
       <a class="card" href="spinlab/" style="--c:#4b5a8a">
         <svg viewBox="0 0 32 32" aria-hidden="true"><rect x="3" y="3" width="26" height="26" rx="4" fill="#6f4a33"/><circle cx="14.5" cy="17" r="8.5" fill="#f7efdf"/><circle cx="14.5" cy="17" r="5.5" fill="none" stroke="#b0845b" stroke-width="1"/><circle cx="14.5" cy="17" r="2.6" fill="#93573a"/><path d="M24.5 6.5v9l-3.5 3.5" fill="none" stroke="#f7efdf" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
         <h2>SpinLab</h2>
@@ -211,7 +236,7 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
   <div class="in">
     <section aria-labelledby="f-about">
       <h2 id="f-about">About</h2>
-      <p>A small family corner of the web: recipes, a shared calendar, a private family feed, a pantry planner, a period tracker, a coloring game, party games and a DJ mixer. Made at home, for home.</p>
+      <p>A small family corner of the web: recipes, a shared calendar, a private family feed, a pantry planner, a period tracker, a coloring game, party games, a DJ mixer and a learning garden for the kids. Made at home, for home.</p>
     </section>
     <nav aria-labelledby="f-apps">
       <h2 id="f-apps">The apps</h2>
@@ -222,6 +247,7 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
         <li><a href="pantryledger/">Pantry Ledger</a></li>
         <li><a href="party-pocket/">Party Pocket</a></li>
         <li><a href="petal/">Petal</a></li>
+        <li><a href="pips-learning-garden/">Pip&rsquo;s Learning Garden</a></li>
         <li><a href="spinlab/">SpinLab</a></li>
       </ul>
     </nav>
@@ -248,6 +274,7 @@ main{width:min(960px,100%);margin:0 auto;padding:36px clamp(16px,4vw,32px) 48px}
         <li><strong>Pantry Ledger:</strong> only when you search for a food, which sends the words you typed to Open Food Facts.</li>
         <li><strong>Party Pocket:</strong> never goes online. Scores and names stay in your browser.</li>
         <li><strong>Petal:</strong> never goes online. Entries stay in your browser.</li>
+        <li><strong>Pip&rsquo;s Learning Garden:</strong> never goes online. Progress stays in your browser, and Pip speaks with your device&rsquo;s own voice.</li>
         <li><strong>SpinLab:</strong> DJ and Piano never go online. Songs, DJ projects and piano creations you save stay in your browser on this device. Online Music is the one part that uses the internet. Online Radio looks up stations in the free Radio Browser directory and plays the station you pick. Music sends your song searches to Apple’s free iTunes Search service and plays Apple’s 30-second previews. Your queues, playlists, favorite stations and liked songs are saved only on this device.</li>
       </ul>
     </section>
