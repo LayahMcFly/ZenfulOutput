@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.6.0';
+const VERSION = '1.6.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -255,6 +255,8 @@ async function details(target, env){
       const html = await r.text(), text = plain(html);
       out.ingredients = findIngredients(plainList(html));
       if (out.ingredients) out.ingredientsSource = 'Product page';
+      // what the page held, so a missing list can be diagnosed from the Debug page
+      out.page = {status: r.status, length: html.length, mentions: (text.match(/ingredients?/gi) || []).length, snippets: (text.match(/.{0,30}\bingredients?\b.{0,150}/gi) || []).slice(0, 3)};
       if (!out.fabric) out.fabric = ((pureFabric(text) || {}).line) || '';
       if (!out.barcode){ const m = html.match(/"(?:gtin1[234]|gtin|barcode)"\s*:\s*"(\d{8,14})"/); if (m) out.barcode = m[1]; }
     } catch (e){ out.tried.push(String(e.message || e)); }

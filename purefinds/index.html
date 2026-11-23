@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.1">
+<meta name="pf-version" content="1.17.2">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -365,7 +365,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.1';
+const VERSION = '1.17.2';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -910,7 +910,7 @@ const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscr
 const rs = {total: 0, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0};
 async function resolveOne(f){
   try {
-    const r = await getJSON(`${scanBase()}/details?v=3&url=${encodeURIComponent(f.url)}`, 20000);
+    const r = await getJSON(`${scanBase()}/details?v=4&url=${encodeURIComponent(f.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
     f.ing = tidyIng(r.ingredients); f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
     const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
@@ -988,7 +988,7 @@ async function fetchDetails(it){
   const box = document.querySelector('#modal .ing'), src = document.getElementById('ingsrc');
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
-    const r = await getJSON(`${scanBase()}/details?v=3&url=${encodeURIComponent(it.url)}`, 20000);
+    const r = await getJSON(`${scanBase()}/details?v=4&url=${encodeURIComponent(it.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.ing || !ingFull(it)){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
     it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
     ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache2', ingCache);
@@ -1665,17 +1665,17 @@ async function runDebug(){
         const withIng = it.filter(x => okIng(x.ing, 'Brand listing')).length, banned = it.filter(x => ruleBreak(x.name, x.ing, false)).length;
         log(`  ${name}: ${it.length} items (${withIng} with ingredients on the page, ${banned} break rules) ${ms(t)}`);
         if (!sample && it.length) sample = it[0];
-        if (miss.length < 4) it.filter(x => !okIng(x.ing, 'Brand listing')).slice(0, 1).forEach(x => miss.push(x));
+        if (withIng < it.length) it.filter(x => !okIng(x.ing, 'Brand listing') && !ruleBreak(x.name, '', false)).slice(0, 1).forEach(x => miss.push(x));
       } catch (e){ log(`  ${name}: FAILED ${ms(t)}: ${errText(e)}`); }
     }
     if (sample){
       t = performance.now();
-      try { const r = await getJSON(`${scanBase()}/details?v=3&url=${encodeURIComponent(sample.url)}`, 20000); log(`\n[Scanner /details] ${sample.name}: ${r.ingredients ? 'ingredients found (' + (r.ingredientsSource || '?') + '): ' + String(r.ingredients).slice(0, 90) : 'no ingredients found'} ${ms(t)}`); }
+      try { const r = await getJSON(`${scanBase()}/details?v=4&url=${encodeURIComponent(sample.url)}`, 20000); log(`\n[Scanner /details] ${sample.name}: ${r.ingredients ? 'ingredients found (' + (r.ingredientsSource || '?') + '): ' + String(r.ingredients).slice(0, 90) : 'no ingredients found'} ${ms(t)}`); }
       catch (e){ log(`\n[Scanner /details] FAILED ${ms(t)}: ${errText(e)}`); }
     }
     log('\n[Products whose page had no ingredients: what the scanner tried]');
     for (const m of miss){
-      try { const r = await getJSON(`${scanBase()}/details?v=3&url=${encodeURIComponent(m.url)}`, 20000); log(`  ${m.store} · ${m.name}: ${r.ingredients ? 'found via ' + r.ingredientsSource : 'still none'}${r.barcode ? ' · barcode ' + r.barcode : ' · no barcode'}${(r.tried || []).length ? ' · problems: ' + r.tried.join(' | ') : ''}`); }
+      try { const r = await getJSON(`${scanBase()}/details?v=4&url=${encodeURIComponent(m.url)}`, 20000); log(`  ${m.store} · ${m.name}: ${r.ingredients ? 'found via ' + r.ingredientsSource : 'still none'}${r.barcode ? ' · barcode ' + r.barcode : ' · no barcode'}${(r.tried || []).length ? ' · problems: ' + r.tried.join(' | ') : ''}${r.page ? ` · page HTTP ${r.page.status}, ${r.page.length} chars, "ingredients" appears ${r.page.mentions}x: ${(r.page.snippets || []).map(s => '[' + s.replace(/\s+/g, ' ') + ']').join(' ')}` : ''}`); }
       catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
@@ -1687,6 +1687,7 @@ async function runDebug(){
     ['classic search direct', () => getJSON('https://world.openfoodfacts.org/cgi/search.pl?' + new URLSearchParams({search_terms: 'snack', search_simple: 1, action: 'process', json: 1, page_size: 10, fields: 'code,product_name,ingredients_text'}), 12000)],
     ['v2 direct', () => getJSON('https://world.openfoodfacts.org/api/v2/search?' + new URLSearchParams({countries_tags: cs[0], page_size: 10, fields: 'code,product_name,ingredients_text'}), 12000)]
   ];
+  if (scanBase()) tests.push(['search-a-licious via Worker', () => getJSON(`${scanBase()}/off?u=${encodeURIComponent('https://search.openfoodfacts.org/search?' + new URLSearchParams({q: 'snack', page_size: 10, langs: 'en'}))}`, 20000)]);
   if (scanBase()) tests.push(['classic search via Worker', () => getJSON(`${scanBase()}/off?u=${encodeURIComponent('https://world.openfoodfacts.org/cgi/search.pl?' + new URLSearchParams({search_terms: 'snack', search_simple: 1, action: 'process', json: 1, page_size: 10, fields: 'code,product_name,ingredients_text'}))}`, 20000)]);
   for (const [name, fn] of tests){
     const t = performance.now();
