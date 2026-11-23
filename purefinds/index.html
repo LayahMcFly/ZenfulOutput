@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.8.0">
+<meta name="pf-version" content="1.9.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.8.0';
+const VERSION = '1.9.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -696,7 +696,7 @@ async function offQuery(terms, label, sort, size){
   if (!raw) throw new Error('All Open Food Facts searches failed:\n' + offErrors.slice(-3).join('\n'));
   const items = raw.map(x => ({...x, product_name: txt(x.product_name) || txt(x.product_name_en), brands: txt(x.brands), stores: txt(x.stores),
     ingredients_text: txt(x.ingredients_text) || txt(x.ingredients_text_en), generic_name: txt(x.generic_name)}))
-    .filter(x => x.code && x.product_name).map(normFood).filter(passesRules);
+    .filter(x => x.code && x.product_name && String(x.ingredients_text || '').trim().length > 3).map(normFood).filter(passesRules);
   const keys = Object.keys(cache);
   if (keys.length > 40) delete cache[keys[0]];
   cache[key] = {t: Date.now(), items};
@@ -727,6 +727,12 @@ const looksLikeIngredients = t => !!t && !/[{}\[\]"<>=_\\|]|https?:|\b(sku|varia
 try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledOut'); } catch(e){}
 let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
+// Products whose ingredients could not be read anywhere are not shown. They are tried again after a week.
+let noIng = store.get('noIng1', {});
+for (const u in noIng) if (Date.now() - noIng[u] > 7 * 864e5) delete noIng[u];
+const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`);
+const markNoIng = it => { noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
+for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
 const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 
@@ -760,7 +766,7 @@ function addScanned(type, rows){
   let n = 0;
   for (const r of rows){
     const id = 's-' + r.domain + '-' + r.handle;
-    if (REG.has(id) || ruledOut[r.url]) continue;
+    if (REG.has(id) || ruledOut[r.url] || noIng[r.url]) continue;
     if (type === 'cotton'){
       if (COTTON.some(c => c.url === r.url)) continue;
       const t = clothingType(`${r.name} ${r.ptype}`);
@@ -783,6 +789,24 @@ function addScanned(type, rows){
     n++;
   }
   return n;
+}
+// Read every listing's ingredients in the background (through the scanner) so products that can't be read are removed before you open them
+let resolving = false;
+async function resolveOne(f){
+  try {
+    const r = await getJSON(`${scanBase()}/details?v=2&url=${encodeURIComponent(f.url)}`, 20000);
+    if (!r.ingredients || !looksLikeIngredients(r.ingredients)){ if (!ingFull(f)){ markNoIng(f); return true; } return false; }
+    f.ing = r.ingredients; f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
+    const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
+    if (why){ ruledOut[f.url] = why; store.set('ruledOut2', ruledOut); const i = FOODS.indexOf(f); if (i >= 0) FOODS.splice(i, 1); return true; }
+    return false;
+  } catch (e){ return false; } // could not reach the scanner just now: leave it and try again later
+}
+async function resolveIngredients(){
+  if (!scanBase() || resolving) return; resolving = true;
+  const todo = FOODS.filter(f => f.src === 'brand' && !ingFull(f)); let i = 0, changed = false;
+  await Promise.all(Array.from({length: 3}, async () => { while (i < todo.length){ if (await resolveOne(todo[i++])) changed = true; } }));
+  store.set('ingCache2', ingCache); resolving = false; if (changed) rerender();
 }
 async function scanType(type){
   const st = scanState[type];
@@ -809,6 +833,7 @@ async function scanType(type){
     }
   }));
   st.status = 'done'; scanNote(); rerender();
+  if (type === 'food') resolveIngredients();
 }
 function scanNote(){
   const el = document.getElementById('scanNote'); if (!el) return;
@@ -833,7 +858,7 @@ async function fetchDetails(it){
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
     const r = await getJSON(`${scanBase()}/details?v=2&url=${encodeURIComponent(it.url)}`, 20000);
-    if (!r.ingredients || !looksLikeIngredients(r.ingredients)){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either. It’s printed on the package.`; return; }
+    if (!r.ingredients || !looksLikeIngredients(r.ingredients)){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.ing || !ingFull(it)){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
     it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
     ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache2', ingCache);
     if (box) box.textContent = it.ing;
