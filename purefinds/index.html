@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.5.5">
+<meta name="pf-version" content="1.5.6">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -169,6 +169,9 @@ select.field{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg 
 .pname{display:grid}.pname small{color:var(--sage-d);font-size:12px}
 .plinks{display:flex;flex-wrap:wrap;gap:6px}
 .btn.sm{min-height:36px;padding:6px 12px;font-size:13px}
+.pgroup h3{font-size:22px;margin:16px 0 4px}.pgroup:first-child h3{margin-top:4px}
+.pickq{display:grid;gap:4px;font-size:13px;color:var(--muted);margin:0 0 10px;max-width:420px}
+.prow[hidden],.pgroup[hidden]{display:none}
 .mylist{margin-top:14px;background:var(--sage-l);border-radius:16px;padding:12px 14px}.mylist p{margin:4px 0 10px}
 @media(max-width:640px){.prow{grid-template-columns:minmax(0,1fr) auto}.plinks{grid-column:1/-1;order:3}}
 .err{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:8px}.err code{user-select:all;background:var(--beige);border-radius:8px;padding:4px 8px;font-size:12px;overflow-wrap:anywhere}
@@ -293,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.5.5';
+const VERSION = '1.5.6';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -476,6 +479,15 @@ const FOOD_SECTIONS = [
  ['drinks','Drinks','Juice, electrolytes, almond milk and tea',['drinks','plant-milk','tea']],
  ['frozen','Frozen treats','Ice cream and popsicles',['frozen','popsicles']]
 ];
+// Every section starts with an "All" option that shows everything in it.
+// Live search words for each section's All (null = brand stores and pickup lists only).
+const ALL_TERMS = {groceries: null, flours: 'flour', bread: 'bread', breakfast: 'cereal', drinks: 'juice', frozen: 'frozen dessert'};
+for (const sec of FOOD_SECTIONS){
+  if (sec[3][0].startsWith('all-')) continue;
+  const key = 'all-' + sec[0];
+  FCATS[key] = ['All ' + sec[1].toLowerCase(), ALL_TERMS[sec[0]], [...sec[3]]];
+  sec[3].unshift(key);
+}
 // Fresh items to pick up: each opens a store search for "organic <item>"
 const PICKUP = {
  fruit:['Apples','Bananas','Peaches','Pears','Grapes','Mangoes','Papaya','Strawberries','Blueberries','Raspberries','Blackberries'],
@@ -1002,7 +1014,7 @@ function foodSection(k){ setTimeout(scanNote);
   <div class="chips" role="group" aria-label="${esc(sec[1])} categories">${cats.map(c => `<button class="chip" data-sub="${c}" data-sec="${k}" aria-pressed="${c === key}">${esc(FCATS[c][0])}</button>`).join('')}</div>
   <p class="note">${RULE_TEXT}</p>
   <p class="note" id="scanNote" data-type="food" hidden></p>
-  ${PICKUP[key] ? pickupPanel(key) : ''}
+  ${pickupPanel(key)}
   <div id="live" class="note">Searching Open Food Facts for organic and Non-GMO ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
   loadFoodList(k, key);
 }
@@ -1010,8 +1022,13 @@ async function loadFoodList(k, key){
   const cat = FCATS[key], mine = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name)).sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const show = items => items.length ? mountList($('#list'), items, emptyMsg)
-    : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${PICKUP[key] ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
+    : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
   if (mine.length) show(mine);
+  if (!cat[1]){
+    $('#live').textContent = mine.length ? `${mine.length} from brand stores. Pick a category above for live results too.` : 'Pick a category above for live results, or use the pickup lists.';
+    if (!mine.length) show([]);
+    return;
+  }
   try {
     const live = (await offSearch(cat[1], {mode: cat[3] || 'both'}))
       .filter(it => (!cat[4] || cat[4].test(it.name)) && !(FRUIT_CATS.includes(key) && BAD_FRUIT.test(clean(it.ing))));
@@ -1029,15 +1046,32 @@ const storeLinks = term => { const q = encodeURIComponent(term); return [
   ['Target', 'https://www.target.com/s?searchTerm=' + q], ['Kroger', 'https://www.kroger.com/search?query=' + q],
   ['Whole Foods', 'https://www.wholefoodsmarket.com/search?text=' + q]]; };
 let plist = store.get('pick', []);
+const pickupGroups = key => key.startsWith('all-')
+  ? (FCATS[key][2] || []).filter(c => PICKUP[c]).map(c => [FCATS[c][0], PICKUP[c]])
+  : PICKUP[key] ? [['', PICKUP[key]]] : [];
 function pickupPanel(key){
+  const groups = pickupGroups(key); if (!groups.length) return '';
+  const total = groups.reduce((n, [, l]) => n + l.length, 0);
+  const row = name => { const term = 'organic ' + name.toLowerCase().replace(/^100% /, ''); const on = plist.includes(name);
+    return `<div class="prow" data-name="${esc(name.toLowerCase())}"><div class="pname"><b>${esc(name)}</b><small>Organic</small></div>
+      <div class="plinks">${storeLinks(term).map(([s, u]) => `<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${s} ↗</a>`).join('')}</div>
+      <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; };
   return `<section class="pick" aria-label="Pickup">
     <div class="sh"><div><h2>Pick up today</h2><p>Each button opens that store's search for the organic item. Choose pickup at the store's checkout. Prices and stock depend on your nearest store.</p></div></div>
-    <div class="prow-list">${PICKUP[key].map(name => { const term = 'organic ' + name.toLowerCase().replace(/^100% /, ''); const on = plist.includes(name);
-      return `<div class="prow"><div class="pname"><b>${esc(name)}</b><small>Organic</small></div>
-      <div class="plinks">${storeLinks(term).map(([s, u]) => `<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${s} ↗</a>`).join('')}</div>
-      <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; }).join('')}</div>
+    ${total > 6 ? `<label class="pickq">Search these ${total} items<input class="field" id="pickq" type="search" placeholder="Try strawberries, spinach, almonds…" autocomplete="off"></label>` : ''}
+    <div class="prow-list">${groups.map(([title, list]) => `<div class="pgroup">${title ? `<h3>${esc(title)}</h3>` : ''}${list.map(row).join('')}</div>`).join('')}</div>
+    <p class="meta" id="picknone" hidden>Nothing on the pickup list matches. Try another word, or use the search bar at the top to search all of PureFinds.</p>
     <div id="mylist">${myList()}</div></section>`;
 }
+document.addEventListener('input', e => {
+  if (e.target.id !== 'pickq') return;
+  const q = e.target.value.trim().toLowerCase(); let shown = 0;
+  document.querySelectorAll('.pick .pgroup').forEach(g => {
+    let n = 0; g.querySelectorAll('.prow').forEach(r => { const hit = !q || r.dataset.name.includes(q); r.hidden = !hit; if (hit) n++; });
+    g.hidden = !n; shown += n;
+  });
+  $('#picknone').hidden = !!shown;
+});
 function myList(){
   if (!plist.length) return '<p class="meta">Tap “+ My list” to build a pickup list you can copy into Walmart, Instacart or a notes app.</p>';
   return `<div class="mylist"><b>My pickup list (${plist.length})</b><p>${plist.map(esc).join(', ')}</p>
