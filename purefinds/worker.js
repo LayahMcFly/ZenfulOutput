@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.6.2';
+const VERSION = '1.6.3';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -207,19 +207,30 @@ const looksLikeIngredients = t => {
   // marketing sentences are not ingredient lists ("each selected for maximum deliciousness")
   if (/\b(delicious\w*|selected|crafted|enjoy\w*|perfect\w*|our|we|you\w*|maximum|favorite|love\w*|each)\b/i.test(t)) return false;
   const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
-  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 4 && !/\.\s*$/.test(t));
+  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 8 && !/\.\s*$/.test(t));
 };
 const NAV_WORD = /\b(shop|cart|login|log in|sign in|account|search|menu|subscribe|contact|about us|our story|blog|careers|press|privacy|terms|shipping|returns|wholesale|store locator|recipes)\b/i;
 function findIngredients(text){
-  // The heading is often "Ingredients:", but accordions show just "Ingredients" followed by + or −, with no colon at all
+  // The heading is often "Ingredients:", but accordions show just "Ingredients" followed by + or −, with no colon at all.
+  // "Simple Ingredients" and "Full Ingredients" headings work the same way.
   const re = /\bingredients?\b[\s:\-–—+−×▼▲>|]*/gi; let m;
+  const tidy = s => s.replace(/^[\s,.:;+−\-–]+|[\s,.:;+−\-–]+$/g, '').replace(/\s*,\s*(,\s*)+/g, ', ').replace(/\s+/g, ' ');
+  const good = rest => {
+    const parts = rest.split(/,/).map(x => x.trim()).filter(Boolean);
+    return rest.length > 2 && looksLikeIngredients(rest) && !NAV_WORD.test(rest) && parts.length <= 70 && parts.every(x => x.split(' ').length <= 14)
+      && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6);
+  };
   while ((m = re.exec(text))){
     let rest = text.slice(m.index + m[0].length, m.index + m[0].length + 1200);
     const stop = rest.search(ING_STOP); if (stop > 0) rest = rest.slice(0, stop);
-    rest = rest.replace(/^[\s,.:;+−\-–]+|[\s,.:;+−\-–]+$/g, '').replace(/\s*,\s*(,\s*)+/g, ', ').replace(/\s+/g, ' ');
-    const parts = rest.split(/,/).map(x => x.trim()).filter(Boolean);
-    if (rest.length > 6 && looksLikeIngredients(rest) && !NAV_WORD.test(rest) && parts.length <= 70 && parts.every(x => x.split(' ').length <= 14)
-        && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6)) return rest.slice(0, 900);
+    rest = tidy(rest);
+    if (rest.length > 6 && good(rest)) return rest.slice(0, 900);
+    // The list often runs straight into the next part of the page. Try it as one sentence, then two, so the page text after it is dropped.
+    const sents = rest.split(/(?<=[.!?])\s+/).map(s => tidy(s)).filter(Boolean);
+    for (const n of [1, 2]){
+      const cand = tidy(sents.slice(0, n).join('. '));
+      if (cand.length > 2 && good(cand)) return cand.slice(0, 900);
+    }
   }
   return '';
 }

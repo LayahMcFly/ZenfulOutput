@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.5">
+<meta name="pf-version" content="1.17.6">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -368,7 +368,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.5';
+const VERSION = '1.17.6';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -820,7 +820,7 @@ const looksLikeIngredients = t => {
   // marketing sentences are not ingredient lists ("each selected for maximum deliciousness")
   if (/\b(delicious\w*|selected|crafted|enjoy\w*|perfect\w*|our|we|you\w*|maximum|favorite|love\w*|each)\b/i.test(t)) return false;
   const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
-  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 4 && !/\.\s*$/.test(t));
+  return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 8 && !/\.\s*$/.test(t));
 };
 // Text from a brand's own page must read like an ingredient list, not a sentence ("real fuel for kids on the move. Refrigerated for freshness…", "authentic flavor, and wholesome")
 const MARKETING = /\b(wholesome|authentic|fuel|kids?|refrigerat\w*|freshness|on the (go|move)|up to a week|good for|made with love|nutritious|goodness|snack time|lunchbox|family|tastes?|taste buds|deliver\w*|packed with|free from|contains no|see (nutrition|package|label))\b|\*\s*see\b/i;
@@ -840,7 +840,7 @@ let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
 // Products whose ingredients could not be read anywhere are not shown. They are tried again after a week.
 let noIng = store.get('noIng1', {});
-if (store.get('noIngGen', 0) < 3){ noIng = {}; store.set('noIng1', noIng); store.set('noIngGen', 3); } // the scanner learned to read more ingredient lists: give every food another chance
+if (store.get('noIngGen', 0) < 4){ noIng = {}; store.set('noIng1', noIng); store.set('noIngGen', 4); } // the scanner learned to read more ingredient lists: give every food another chance
 for (const u in noIng) if (Date.now() - noIng[u] > 7 * 864e5) delete noIng[u];
 const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`);
 const SHOW_NOING = store.get('showNoIng', false); // optional: keep foods whose ingredient list can't be read (marked unverified)
@@ -913,7 +913,7 @@ const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscr
 const rs = {total: 0, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0};
 async function resolveOne(f){
   try {
-    const r = await getJSON(`${scanBase()}/details?v=5&url=${encodeURIComponent(f.url)}`, 20000);
+    const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(f.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
     f.ing = tidyIng(r.ingredients); f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
     const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
@@ -991,7 +991,7 @@ async function fetchDetails(it){
   const box = document.querySelector('#modal .ing'), src = document.getElementById('ingsrc');
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
-    const r = await getJSON(`${scanBase()}/details?v=5&url=${encodeURIComponent(it.url)}`, 20000);
+    const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(it.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.ing || !ingFull(it)){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
     it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
     ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache2', ingCache);
@@ -1679,12 +1679,12 @@ async function runDebug(){
     }
     if (sample){
       t = performance.now();
-      try { const r = await getJSON(`${scanBase()}/details?v=5&url=${encodeURIComponent(sample.url)}`, 20000); log(`\n[Scanner /details] ${sample.name}: ${r.ingredients ? 'ingredients found (' + (r.ingredientsSource || '?') + '): ' + String(r.ingredients).slice(0, 90) : 'no ingredients found'} ${ms(t)}`); }
+      try { const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(sample.url)}`, 20000); log(`\n[Scanner /details] ${sample.name}: ${r.ingredients ? 'ingredients found (' + (r.ingredientsSource || '?') + '): ' + String(r.ingredients).slice(0, 90) : 'no ingredients found'} ${ms(t)}`); }
       catch (e){ log(`\n[Scanner /details] FAILED ${ms(t)}: ${errText(e)}`); }
     }
     log('\n[Products whose page had no ingredients: what the scanner tried]');
     for (const m of miss){
-      try { const r = await getJSON(`${scanBase()}/details?v=5&url=${encodeURIComponent(m.url)}`, 20000); log(`  ${m.store} · ${m.name}: ${r.ingredients ? 'found via ' + r.ingredientsSource : 'still none'}${r.barcode ? ' · barcode ' + r.barcode : ' · no barcode'}${(r.tried || []).length ? ' · problems: ' + r.tried.join(' | ') : ''}${r.page ? ` · page HTTP ${r.page.status}, ${r.page.length} chars, "ingredients" appears ${r.page.mentions}x: ${(r.page.snippets || []).map(s => '[' + s.replace(/\s+/g, ' ') + ']').join(' ')}` : ''}`); }
+      try { const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(m.url)}`, 20000); log(`  ${m.store} · ${m.name}: ${r.ingredients ? 'found via ' + r.ingredientsSource : 'still none'}${r.barcode ? ' · barcode ' + r.barcode : ' · no barcode'}${(r.tried || []).length ? ' · problems: ' + r.tried.join(' | ') : ''}${r.page ? ` · page HTTP ${r.page.status}, ${r.page.length} chars, "ingredients" appears ${r.page.mentions}x: ${(r.page.snippets || []).map(s => '[' + s.replace(/\s+/g, ' ') + ']').join(' ')}` : ''}`); }
       catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
