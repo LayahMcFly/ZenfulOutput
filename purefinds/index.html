@@ -3,9 +3,11 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.3.2">
+<meta name="pf-version" content="1.4.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
+<link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
+<meta name="theme-color" content="#f8f3ea">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600;1,500&family=Jost:wght@400;500;600&display=swap" rel="stylesheet">
@@ -30,7 +32,7 @@ button,input,select{font:inherit;color:inherit}
 .top{position:sticky;top:0;z-index:30;background:rgba(248,243,234,.92);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
 .bar{display:flex;align-items:center;gap:18px;padding:12px 0}
 .logo{display:flex;align-items:center;gap:8px;text-decoration:none;font-family:"Cormorant Garamond",serif;font-size:30px;font-weight:600;letter-spacing:.2px;flex:none}
-.logo svg{width:30px;height:30px}
+.logo svg{width:36px;height:36px}
 .search{flex:1;display:flex;align-items:center;background:var(--white);border:1px solid var(--line);border-radius:999px;padding:4px 4px 4px 16px;box-shadow:var(--shadow);transition:border-color .2s}
 .search:focus-within{border-color:var(--sage)}
 .search input{flex:1;border:0;background:none;font-size:16px;padding:8px 6px;outline:none}
@@ -242,7 +244,7 @@ footer a{color:var(--sage-d)}
   <div class="wrap">
     <div class="bar">
       <a class="logo" href="#home" aria-label="PureFinds home">
-        <svg viewBox="0 0 32 32" aria-hidden="true"><circle cx="16" cy="16" r="15" fill="#f4dcd8"/><path d="M9 22c0-8 6-13 14-13 0 9-5 14-12 14" fill="#8ea888"/><path d="M10 23c3-4 6-7 10-10" stroke="#56704f" stroke-width="1.6" fill="none" stroke-linecap="round"/></svg>
+        <svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="29" fill="#fffdf9" stroke="#e9bdb8" stroke-width="1.5"/><circle cx="32" cy="32" r="23.5" fill="none" stroke="#e3d5bf" stroke-width="1"/><path d="M20 44C20 29 30 19 45 18c1 15-8 26-23 27" fill="#8ea888"/><path d="M21 44c6-8 12-15 21-22M29 36l-1-7M34 31l6 1" fill="none" stroke="#fffdf9" stroke-width="1.6" stroke-linecap="round"/><circle cx="46" cy="45" r="2.6" fill="#c98682"/></svg>
         PureFinds
       </a>
       <form class="search" id="searchForm" role="search">
@@ -286,7 +288,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.3.2';
+const VERSION = '1.4.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -445,38 +447,49 @@ const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pan
 
 // key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
 const FCATS = {
- 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','popcorn','dried-fruit']],
+ 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','dried-fruit']],
  'fruit-snacks':['Fruit snacks','fruit snacks'], gummies:['Gummies & candy','gummies'], chocolate:['Chocolate','chocolate'], cookies:['Cookies','cookies'],
- chips:['Chips & puffs','chips'], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'], popcorn:['Popcorn','popcorn'],
+ chips:['Chips & puffs','chips'], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
  'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',[],'gmo'],
- cereal:['Cereal, oatmeal & granola','cereal'], 'peanut-butter':['Peanut butter & spreads','peanut butter'], pancake:['Pancake & waffle mix','pancake mix'],
+ cereal:['Cereal, oatmeal & granola','cereal'], 'nut-butter':['Almond & walnut butter','almond butter',[],null,/almond|walnut/i], pancake:['Pancake & waffle mix','pancake mix'],
  bread:['Bread','bread'], tortillas:['Tortillas & wraps','tortilla'], bagels:['Bagels & muffins','bagel'], baking:['Baking','baking'],
  fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
- meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
+ nuts:['Walnuts & almonds','almonds',[],null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
  drinks:['Juice & kids drinks','juice'], 'plant-milk':['Plant milk','oat milk'], tea:['Tea & coffee','tea'],
- frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle']
+ frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle'],
+ sprouted:['Sprouted flours','sprouted flour',[],null,/sprout/i], spelt:['Spelt','spelt',[],null,/spelt/i], einkorn:['Einkorn','einkorn',[],null,/einkorn/i],
+ kamut:['Kamut (khorasan)','kamut',[],null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',[],null,/quinoa/i], teff:['Teff','teff',[],null,/teff/i],
+ amaranth:['Amaranth','amaranth',[],null,/amaranth/i], rye:['Rye','rye flour',[],null,/\brye\b/i], fonio:['Fonio','fonio',[],null,/fonio/i],
+ chickpea:['Chickpea flour','chickpea flour',[],null,/chickpea|garbanzo/i]
 };
 const FOOD_SECTIONS = [
- ['snacks','Snacks','Chips, chocolate, gummies, cookies, popcorn and more',['all-snacks','fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','popcorn','dried-fruit','natural']],
- ['groceries','Groceries','Fruit, vegetables, eggs, dairy and pantry staples to pick up',['fruit','vegetables','eggs','milk','yogurt','meat','pantry','frozen-foods']],
- ['bread','Bread & bakery','Bread, tortillas, bagels and baking',['bread','tortillas','bagels','baking']],
- ['breakfast','Breakfast','Cereal, oatmeal, granola, spreads and pancake mix',['cereal','peanut-butter','pancake']],
+ ['snacks','Snacks','Chips, chocolate, gummies, cookies, dried fruit and more',['all-snacks','fruit-snacks','gummies','chocolate','cookies','chips','crackers','granola-bars','dried-fruit','natural']],
+ ['groceries','Groceries','Fruit, vegetables, walnuts and almonds, eggs, dairy and pantry staples to pick up',['fruit','vegetables','nuts','eggs','milk','yogurt','meat','pantry','frozen-foods']],
+ ['flours','Flours & grains','Sprouted flours first, then spelt, einkorn, kamut, quinoa, teff, amaranth, rye, fonio and chickpea',['sprouted','spelt','einkorn','kamut','quinoa','teff','amaranth','rye','fonio','chickpea']],
+ ['bread','Bread & bakery','Spelt, einkorn and rye breads, tortillas, bagels and baking, all wheat-free and corn-free',['bread','tortillas','bagels','baking']],
+ ['breakfast','Breakfast','Cereal, oatmeal, granola, almond butter and pancake mix',['cereal','nut-butter','pancake']],
  ['drinks','Drinks','Juice, electrolytes, plant milk and tea',['drinks','plant-milk','tea']],
  ['frozen','Frozen treats','Ice cream and popsicles',['frozen','popsicles']]
 ];
 // Fresh items to pick up: each opens a store search for "organic <item>"
 const PICKUP = {
- fruit:['Bananas','Apples','Strawberries','Blueberries','Grapes','Avocados','Lemons','Oranges','Mangoes','Pears'],
+ fruit:['Apples','Bananas','Peaches','Pears','Grapes','Mangoes','Papaya','Strawberries','Blueberries','Raspberries','Blackberries'],
+ nuts:['Raw almonds','Raw walnuts','Almond butter','Walnut halves','Almond flour'],
  vegetables:['Baby spinach','Carrots','Broccoli','Cucumbers','Bell peppers','Sweet potatoes','Tomatoes','Salad mix','Yellow onions','Kale'],
  eggs:['Large brown eggs','Pasture-raised eggs'],
  milk:['Whole milk','2% milk','Butter','Cheddar cheese','Heavy cream'],
  yogurt:['Greek yogurt','Whole milk yogurt','Yogurt tubes'],
  meat:['Chicken breast','Chicken thighs','Ground beef','Ground turkey','Bacon'],
- pantry:['Brown rice','Pasta','Black beans','Olive oil','Rolled oats','Tomato sauce'],
- 'frozen-foods':['Frozen blueberries','Frozen strawberries','Frozen broccoli','Frozen mixed vegetables'],
- bread:['Whole wheat bread','Sprouted grain bread','Sourdough bread'],
- tortillas:['Flour tortillas','Corn tortillas'],
- bagels:['Bagels','English muffins']
+ pantry:['Brown rice','Quinoa pasta','Black beans','Extra virgin olive oil','Coconut oil','Grapeseed oil','Rolled oats','Tomato sauce'],
+ 'frozen-foods':['Frozen blueberries','Frozen strawberries','Frozen mango','Frozen peaches','Frozen mixed berries','Frozen broccoli','Frozen spinach'],
+ bread:['Sprouted spelt bread','Einkorn sourdough bread','100% rye bread'],
+ tortillas:['Spelt tortillas','Chickpea flour wraps'],
+ bagels:['Spelt bagels','Einkorn muffins'],
+ sprouted:['Sprouted spelt flour','Sprouted einkorn flour','Sprouted rye flour','Sprouted quinoa flour','Sprouted chickpea flour'],
+ spelt:['Sprouted spelt flour','Spelt flour','Spelt berries'], einkorn:['Sprouted einkorn flour','Einkorn flour','Einkorn berries'],
+ kamut:['Sprouted kamut flour','Kamut flour','Kamut berries'], quinoa:['Quinoa','Quinoa flour','Sprouted quinoa'],
+ teff:['Teff flour','Teff grain'], amaranth:['Amaranth','Amaranth flour'], rye:['Sprouted rye flour','Rye flour','Rye berries'],
+ fonio:['Fonio','Fonio flour'], chickpea:['Chickpea flour','Sprouted chickpea flour']
 };
 
 const OUTFITS = [
@@ -526,7 +539,34 @@ const COTTON = RAW.map((r, i) => {
 const DIRECT = DIRECT_PRODUCTS.map(p => reg({...p, id: 'd-' + p.id, kind: 'direct', store: 'PureFinds', type: 'Sold by PureFinds', fabricTags: [], styles: []}));
 const byHandle = h => REG.get('c-' + h);
 const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /certified/i.test(t) && /organic/i.test(t) ? 'Certified organic' : 'Organic (brand wording)';
-const FOODS = FOOD_RAW.map((r, i) => {
+/* ---------- PureFinds food rules ----------
+   Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries.
+   Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive and grapeseed only.
+   No corn and no wheat (the ancient grains spelt, einkorn and kamut are welcome). */
+const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn and no wheat (spelt, einkorn and kamut are welcome).';
+const BAD_FRUIT = /pineapple|coconut(?!\s*(oil|sugar|milk|cream|water|flour|nectar|aminos))|passion ?fruit|kiwi|\borange|cherr(y|ies)|guava|watermelon|melon|apricot|\bplums?\b|prune|\bfigs?\b|avocado(?!\s*oil)|\blemon(?!\s*(juice|essential))|\blime(?!\s*juice)|grapefruit|pomegranate|lychee|dragon ?fruit|tangerine|clementine/i;
+const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
+const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|avocado|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
+const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
+const BAD_WHEAT = /(?<!buck)wheat|semolina|durum|farina|bulgur|couscous|\b(enriched|unbleached|bleached|all[- ]purpose|white|bread) flour/i;
+const clean = t => String(t || '').replace(/(peanut|nut|tree nut|corn|wheat|gluten)[- ]free|free (from|of) [^,.;]*|no (peanuts|corn|wheat)[^,.;]*/gi, ' ');
+function ruleBreak(name, ing, fruitStrict){
+  const n = clean(name), i = clean(ing);
+  if (BAD_FRUIT.test(n)) return 'fruit';
+  if (fruitStrict && BAD_FRUIT.test(i)) return 'fruit';
+  const both = n + ' ' + i;
+  if (BAD_NUT.test(both)) return 'nuts';
+  if (BAD_OIL.test(both)) return 'oil';
+  if (BAD_CORN.test(both)) return 'corn';
+  if (BAD_WHEAT.test(both)) return 'wheat';
+  return '';
+}
+const FRUIT_CATS = ['fruit', 'fruit-snacks', 'dried-fruit', 'frozen-foods'];
+// Known rule breaks the ingredient text above doesn't show: Cheezmos puffs are made from corn,
+// and the brand's full list for these granola bars includes sunflower oil.
+const DROP = ['6ct-electrolyte-blends-one-time-add-on-copy', 'cowgirl-cheddar-cheezmos-puffs', 'jalapeno-cheddar-cheezmos-puffs', 'strawberry-granola-bars-30-count'];
+
+const FOODS = FOOD_RAW.filter(r => !DROP.includes(r[1]) && !ruleBreak(r[2], (ING_EXTRA[r[1]] || r[7]) + ' ' + r[6], r[5].split(' ').some(c => FRUIT_CATS.includes(c)))).map((r, i) => {
   const b = FOOD_BRANDS[r[0]], v = +((r[4].match(/v=(\d+)/) || [])[1] || 0);
   return reg({
     id: 'b-' + r[1], kind: 'food', src: 'brand', name: r[2], brand: b.brand, store: b.brand, stores: [b.brand], url: b.base + encodeURIComponent(r[1]),
@@ -611,7 +651,7 @@ async function offQuery(terms, label, sort, size){
   if (!raw) throw new Error('All Open Food Facts searches failed:\n' + offErrors.slice(-3).join('\n'));
   const items = raw.map(x => ({...x, product_name: txt(x.product_name) || txt(x.product_name_en), brands: txt(x.brands), stores: txt(x.stores),
     ingredients_text: txt(x.ingredients_text) || txt(x.ingredients_text_en), generic_name: txt(x.generic_name)}))
-    .filter(x => x.code && x.product_name).map(normFood);
+    .filter(x => x.code && x.product_name && !ruleBreak(x.product_name, x.ingredients_text, false)).map(normFood);
   const keys = Object.keys(cache);
   if (keys.length > 40) delete cache[keys[0]];
   cache[key] = {t: Date.now(), items};
@@ -653,7 +693,7 @@ function badges(it){
 }
 function card(it){
   const fav = !!favs[it.id];
-  const comp = it.kind === 'food' ? (it.ing ? 'Ingredients: ' + it.ing.replace(/^Begins: /, '') : 'Ingredients: not published online, printed on the package') : it.fabric ? 'Fabric: ' + it.fabric : '';
+  const comp = it.kind === 'food' ? (it.ing ? 'Ingredients: ' + it.ing.replace(/^Begins: /, '') : 'Ingredients not published online: check the package for oils, corn, wheat and nuts') : it.fabric ? 'Fabric: ' + it.fabric : '';
   const buy = it.src === 'brand' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View at ' + esc(it.brand)} ↗</a>`
     : it.kind === 'cotton' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a>`
     : it.kind === 'direct' ? `<button class="btn go" data-add="${esc(it.id)}">Add to cart</button>`
@@ -802,6 +842,7 @@ const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; retu
 
 function foodHub(){
   main.innerHTML = `<div class="pagehead"><h1>Food</h1><p>Organic and Non-GMO food. Every search looks for both labels automatically. Pick a section to start.</p></div>
+  <p class="note"><b>PureFinds food rules.</b> ${RULE_TEXT} Products that break a rule are left out. When a brand doesn't publish its ingredients, the card says so, so you can check the package.</p>
   <div class="hub">${FOOD_SECTIONS.map(([k, name, sub, cats], i) => {
     const items = cats.flatMap(brandFor); const pic = items.find(f => f.img);
     return hubTile({go: 'food-' + k, title: name, sub, item: pic}, i);
@@ -815,18 +856,20 @@ function foodSection(k){
   const key = state.sub[k], cat = FCATS[key];
   main.innerHTML = `<div class="pagehead">${crumb('food', 'Food', sec[1])}<h1>${esc(sec[1])}</h1><p>${esc(sec[2])}.</p></div>
   <div class="chips" role="group" aria-label="${esc(sec[1])} categories">${cats.map(c => `<button class="chip" data-sub="${c}" data-sec="${k}" aria-pressed="${c === key}">${esc(FCATS[c][0])}</button>`).join('')}</div>
+  <p class="note">${RULE_TEXT}</p>
   ${PICKUP[key] ? pickupPanel(key) : ''}
   <div id="live" class="note">Searching Open Food Facts for organic and Non-GMO ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
   loadFoodList(k, key);
 }
 async function loadFoodList(k, key){
-  const cat = FCATS[key], mine = brandFor(key).sort((a, b) => b.pop - a.pop);
+  const cat = FCATS[key], mine = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name)).sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const show = items => items.length ? mountList($('#list'), items, emptyMsg)
     : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${PICKUP[key] ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
   if (mine.length) show(mine);
   try {
-    const live = await offSearch(cat[1], {mode: cat[3] || 'both'});
+    const live = (await offSearch(cat[1], {mode: cat[3] || 'both'}))
+      .filter(it => (!cat[4] || cat[4].test(it.name)) && !(FRUIT_CATS.includes(key) && BAD_FRUIT.test(clean(it.ing))));
     if (state.sub[k] !== key || !$('#list')) return;
     show([...mine, ...live]);
     $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts with an organic or Non-GMO label`;
@@ -844,7 +887,7 @@ let plist = store.get('pick', []);
 function pickupPanel(key){
   return `<section class="pick" aria-label="Pickup">
     <div class="sh"><div><h2>Pick up today</h2><p>Each button opens that store's search for the organic item. Choose pickup at the store's checkout. Prices and stock depend on your nearest store.</p></div></div>
-    <div class="prow-list">${PICKUP[key].map(name => { const term = 'organic ' + name.toLowerCase(); const on = plist.includes(name);
+    <div class="prow-list">${PICKUP[key].map(name => { const term = 'organic ' + name.toLowerCase().replace(/^100% /, ''); const on = plist.includes(name);
       return `<div class="prow"><div class="pname"><b>${esc(name)}</b><small>Organic</small></div>
       <div class="plinks">${storeLinks(term).map(([s, u]) => `<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${s} ↗</a>`).join('')}</div>
       <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; }).join('')}</div>
