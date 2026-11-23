@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.7.0">
+<meta name="pf-version" content="1.7.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.7.0';
+const VERSION = '1.7.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -836,6 +836,8 @@ async function fetchDetails(it){
       ruledOut[it.url] = why; store.set('ruledOut2', ruledOut);
       const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1);
       box && box.insertAdjacentHTML('afterend', `<p class="note warn">Heads up: the full list has ${esc(RULE_REASON[why])}, so this doesn't fit your food rules. PureFinds will stop showing it.</p>`);
+      // Close the window so the product is not left on screen, and say why it was removed.
+      setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients include ${RULE_REASON[why]}.`, 6000); rerender(); }, 2500);
     }
   } catch (e){
     if (box && !it.ing) box.innerHTML = `Couldn't reach the product page just now.${errBox(e)}`;
@@ -849,7 +851,7 @@ let cart = store.get('cart', {});
 Object.values(favs).forEach(reg); recent.forEach(reg);
 const lite = it => { const o = {...it}; delete o.order; return o; };
 function counts(){ $('#favN').textContent = Object.keys(favs).length || ''; $('#cartN').textContent = Object.values(cart).reduce((a, b) => a + b, 0) || ''; }
-function toast(m){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), 1800); }
+function toast(m, ms){ const t = $('#toast'); t.textContent = m; t.classList.add('on'); clearTimeout(toast.t); toast.t = setTimeout(() => t.classList.remove('on'), ms || 1800); }
 
 /* ---------- cards ---------- */
 const heartSvg = '<svg viewBox="0 0 24 24"><path d="M12 20s-7-4.4-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.6-7 10-7 10z"/></svg>';
