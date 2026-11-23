@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.13.1">
+<meta name="pf-version" content="1.13.2">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -349,7 +349,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.13.1';
+const VERSION = '1.13.2';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -731,9 +731,15 @@ async function offQuery(terms, label, sort, size){
   if (hit && Date.now() - hit.t < 6 * 3600e3) return hit.items.filter(passesRules).map(reg);
   const tries = [
     async () => { // search-a-licious (Open Food Facts' new search service)
-      const q = [terms && terms.split(/\s+/).join(' AND '), label && `labels_tags:"${label}"`, `countries_tags:(${cs.map(c => `"${c}"`).join(' OR ')})`].filter(Boolean).join(' AND ');
-      const j = await offGet('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
-      return j.hits || [];
+      // one simple query per country (an OR group can silently return nothing), merged by barcode
+      const one = async c => {
+        const q = [terms && terms.split(/\s+/).join(' AND '), label && `labels_tags:"${label}"`, `countries_tags:"${c}"`].filter(Boolean).join(' AND ');
+        return (await offGet('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}))).hits || [];
+      };
+      const res = await Promise.allSettled(cs.slice(0, 3).map(one)), seen = new Set(), hits = [];
+      if (res.every(r => r.status === 'rejected')) throw res[0].reason;
+      for (const r of res) if (r.status === 'fulfilled') for (const h of r.value) if (h.code && !seen.has(h.code)) { seen.add(h.code); hits.push(h); }
+      return hits;
     },
     async () => { // classic full-text search
       const p = new URLSearchParams({search_terms: terms, search_simple: 1, action: 'process', json: 1, page_size: size, sort_by: sort, fields: OFF_FIELDS,
