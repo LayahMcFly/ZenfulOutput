@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.6.1';
+const VERSION = '1.6.2';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -46,6 +46,8 @@ const json = (o, status = 200, maxAge = 1800) => new Response(JSON.stringify(o),
   status, headers: {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': `public, max-age=${maxAge}`, ...CORS}
 });
 const UA = {'User-Agent': 'PureFinds/1.0 (personal shopping finder)', 'Accept': 'application/json,text/html'};
+// Product pages come back as a stripped-down shell (2 to 10 KB) when the visitor looks like a bot, so page reads use an ordinary browser's headers
+const PAGE_UA = {'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36', 'Accept': 'text/html,application/xhtml+xml', 'Accept-Language': 'en-US,en;q=0.9'};
 
 export default {
   async fetch(req, env){
@@ -250,7 +252,7 @@ async function details(target, env){
   // 2. the product page itself (ingredients are often in a tab or accordion)
   if (!out.ingredients){
     try {
-      const r = await fetch(target.href, {headers: UA, cf: {cacheTtl: 86400, cacheEverything: true}});
+      const r = await fetch(target.href, {headers: PAGE_UA, cf: {cacheTtl: 86400, cacheEverything: true, cacheKey: target.href + '#page2'}});
       if (!r.ok) throw new Error(`${d} page answered HTTP ${r.status}`);
       const html = await r.text(), text = plain(html);
       out.ingredients = findIngredients(plainList(html));
