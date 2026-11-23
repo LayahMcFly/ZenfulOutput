@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.9.1">
+<meta name="pf-version" content="1.10.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.9.1';
+const VERSION = '1.10.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -636,8 +636,10 @@ function normFood(p){
 }
 // Every food search asks for organic AND for Non-GMO labels (mode 'both'), then merges the two
 async function offSearch(terms, {mode = 'both', sort = 'unique_scans_n', size = 24} = {}){
-  const labels = mode === 'both' ? ['en:organic', 'en:no-gmos'] : mode === 'gmo' ? ['en:no-gmos'] : ['en:organic'];
-  const res = await Promise.allSettled(labels.map(l => offQuery(terms, l, sort, size)));
+  // PureFinds shows everything except what the food rules ban, so the default search has no label filter. A wide net (100 results)
+  // is needed because the ban list removes many of them. Organic and Non-GMO searches still run so those products rank first.
+  const labels = mode === 'both' ? [null, 'en:organic', 'en:no-gmos'] : mode === 'gmo' ? ['en:no-gmos'] : ['en:organic'];
+  const res = await Promise.allSettled(labels.map(l => offQuery(terms, l, sort, l ? size : Math.max(size, 100))));
   const ok = res.filter(r => r.status === 'fulfilled');
   if (!ok.length) throw res[0].reason;
   const seen = new Set(), out = [];
@@ -675,17 +677,17 @@ async function offQuery(terms, label, sort, size){
   if (hit && Date.now() - hit.t < 6 * 3600e3) return hit.items.filter(passesRules).map(reg);
   const tries = [
     async () => { // search-a-licious (Open Food Facts' new search service)
-      const q = [terms && terms.split(/\s+/).join(' AND '), `labels_tags:"${label}"`, 'countries_tags:"en:united-states"'].filter(Boolean).join(' AND ');
+      const q = [terms && terms.split(/\s+/).join(' AND '), label && `labels_tags:"${label}"`, 'countries_tags:"en:united-states"'].filter(Boolean).join(' AND ');
       const j = await offGet('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
       return j.hits || [];
     },
     async () => { // classic full-text search
       const p = new URLSearchParams({search_terms: terms, search_simple: 1, action: 'process', json: 1, page_size: size, sort_by: sort, fields: OFF_FIELDS,
-        tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: 'en:united-states'});
+        ...(label ? {tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: 'en:united-states'} : {tagtype_0: 'countries', tag_contains_0: 'contains', tag_0: 'en:united-states'})});
       return (await offGet('https://world.openfoodfacts.org/cgi/search.pl?' + p)).products || [];
     },
     async () => { // v2 API (label + country only, words matched afterwards)
-      const p = new URLSearchParams({labels_tags: label, countries_tags: 'en:united-states', sort_by: sort, page_size: 100, fields: OFF_FIELDS});
+      const p = new URLSearchParams({...(label ? {labels_tags: label} : {}), countries_tags: 'en:united-states', sort_by: sort, page_size: 100, fields: OFF_FIELDS});
       const all = (await offGet('https://world.openfoodfacts.org/api/v2/search?' + p)).products || [];
       const w = terms.toLowerCase().split(/\s+/).filter(Boolean);
       return all.filter(x => w.every(t => (txt(x.product_name) + ' ' + txt(x.generic_name)).toLowerCase().includes(t.replace(/s$/, '')))).slice(0, size);
@@ -1223,7 +1225,7 @@ function about(){
   <h2>Groceries for pickup</h2>
   <p>Fresh groceries change by store and zip code, so the Groceries section lists organic staples with buttons that open each store's search (Walmart, Instacart, Target, Kroger, Whole Foods). Choose pickup when you check out there. Showing live store prices here would need the Walmart affiliate API or the Instacart Developer Platform, which both require an approved account and key.</p>
   <h2>More organic food: live data</h2>
-  <p>Food results load live from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, a free, open product database. PureFinds asks only for products labeled organic and sold in the US. Certification shows as USDA Organic or EU Organic when that label is on file, and as "Organic label" when the record only says organic.</p>
+  <p>Food results load live from <a href="https://world.openfoodfacts.org" target="_blank" rel="noopener">Open Food Facts</a>, a free, open product database. PureFinds asks for products sold in the US and shows everything except what your food rules ban, with organic and Non-GMO products ranked first. Certification shows as USDA Organic or EU Organic when that label is on file, and as "Organic label" when the record only says organic.</p>
   <p>Ingredient lists, additives and store names are contributed by shoppers and brands, so they're labeled as coming from Open Food Facts. When there's no ingredient list, PureFinds says the product is unverified. Synthetic dyes and preservatives are flagged from the additive codes on file, and artificial flavors from the ingredient text.</p>
   <p>Open Food Facts doesn't carry prices or store links. Each food's details page shows the latest shopper-reported price from Open Prices when one exists, and its buttons open that product's search results at Target, Walmart, Amazon and Whole Foods.</p>
   <h2>100% cotton clothing: verified by hand</h2>
