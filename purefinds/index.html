@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.12.1">
+<meta name="pf-version" content="1.12.2">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -262,6 +262,16 @@ footer a{color:var(--sage-d)}
 .seg button.sel{background:var(--white);color:var(--sage-d);font-weight:600;box-shadow:0 2px 8px -4px rgba(70,50,30,.3)}
 .srclist{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px 14px;margin-top:10px}
 .srcline a{color:var(--sage-d);font-weight:600}
+
+.fold{background:var(--white);border:1px solid var(--line);border-radius:18px;margin:0 0 14px;overflow:hidden}
+.fold>summary{list-style:none;cursor:pointer;display:flex;align-items:center;justify-content:space-between;gap:10px;padding:14px 16px;min-height:48px;font-weight:600;color:var(--sage-d)}
+.fold>summary::-webkit-details-marker{display:none}
+.fold>summary::after{content:"";flex:none;width:8px;height:8px;border:solid var(--sage-d);border-width:0 2px 2px 0;transform:rotate(45deg);margin-top:-4px;transition:transform .2s}
+.fold[open]>summary::after{transform:rotate(-135deg);margin-top:4px}
+.fold>summary:focus-visible{outline:none;box-shadow:inset 0 0 0 3px var(--sage-l)}
+.fold>:not(summary){margin-left:16px;margin-right:16px}
+.fold>p{margin-top:0;color:var(--muted)}
+.fold>:last-child{margin-bottom:16px}
 /* Themed dropdowns: each select.field is shown as a button that opens a styled list. The real select stays hidden in the page. */
 .dd{position:relative;width:100%}
 .dd>select{position:absolute;inset:0;opacity:0;pointer-events:none;width:100%;height:100%}
@@ -332,7 +342,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.12.1';
+const VERSION = '1.12.2';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1147,7 +1157,7 @@ function foodHub(){ setTimeout(scanNote);
   main.innerHTML = `<div class="pagehead"><h1>Food</h1><p>Organic and Non-GMO food. Every search looks for both labels automatically. Pick a section to start.</p></div>
   ${srcLine()}
   <p class="note" id="scanNote" data-type="food" hidden></p>
-  <p class="note"><b>PureFinds food rules.</b> ${RULE_TEXT} Products that break a rule are left out. When a brand doesn't publish its ingredients, the card says so, so you can check the package.</p>
+  <details class="fold"><summary>PureFinds food rules</summary><p>${RULE_TEXT} Products that break a rule are left out. When a brand doesn't publish its ingredients, the card says so, so you can check the package.</p></details>
   <div class="hub">${FOOD_SECTIONS.map(([k, name, sub, cats], i) => {
     const items = cats.flatMap(brandFor); const pic = items.find(f => f.img);
     return hubTile({go: 'food-' + k, title: name, sub, item: pic}, i);
@@ -1161,7 +1171,7 @@ function foodSection(k){ setTimeout(scanNote);
   const key = state.sub[k], cat = FCATS[key];
   main.innerHTML = `<div class="pagehead">${crumb('food', 'Food', sec[1])}<h1>${esc(sec[1])}</h1><p>${esc(sec[2])}.</p></div>
   <div class="chips" role="group" aria-label="${esc(sec[1])} categories">${cats.map(c => `<button class="chip" data-sub="${c}" data-sec="${k}" aria-pressed="${c === key}">${esc(FCATS[c][0])}</button>`).join('')}</div>
-  <p class="note">${RULE_TEXT}</p>
+  <details class="fold"><summary>PureFinds food rules</summary><p>${RULE_TEXT}</p></details>
   <p class="note" id="scanNote" data-type="food" hidden></p>
   ${pickupPanel(key)}
   <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
@@ -1218,9 +1228,10 @@ function pickupPanel(key){
       <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; };
   return `<section class="pick" aria-label="Pickup">
     <div class="sh"><div><h2>Pick up today</h2><p>Each button opens that store's search for the organic item. Choose pickup at the store's checkout. Prices and stock depend on your nearest store.</p></div></div>
+    <details class="fold" id="pickfold"><summary>Show the ${total}-item pickup list</summary>
     ${total > 6 ? `<label class="pickq">Search these ${total} items<input class="field" id="pickq" type="search" placeholder="Try strawberries, spinach, almonds…" autocomplete="off"></label>` : ''}
     <div class="prow-list">${groups.map(([title, list]) => `<div class="pgroup">${title ? `<h3>${esc(title)}</h3>` : ''}${list.map(row).join('')}</div>`).join('')}</div>
-    <p class="meta" id="picknone" hidden>Nothing on the pickup list matches. Try another word, or use the search bar at the top to search all of PureFinds.</p>
+    <p class="meta" id="picknone" hidden>Nothing on the pickup list matches. Try another word, or use the search bar at the top to search all of PureFinds.</p></details>
     <div id="mylist">${myList()}</div></section>`;
 }
 document.addEventListener('input', e => {
