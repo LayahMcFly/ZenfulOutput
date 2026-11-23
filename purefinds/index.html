@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.10.1">
+<meta name="pf-version" content="1.11.0">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -245,6 +245,40 @@ footer{margin-top:50px;background:var(--beige);padding:30px 0;font-size:14px;col
 footer .wrap{display:flex;flex-wrap:wrap;gap:12px 30px;justify-content:space-between}
 footer a{color:var(--sage-d)}
 @media(prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+
+
+.srcreg{background:var(--white);border:1px solid var(--line);border-radius:20px;padding:16px;margin:0 0 14px;opacity:.75;transition:opacity .2s,border-color .2s}
+.srcreg.on{opacity:1;border-color:var(--sage)}
+.sw{display:flex;align-items:center;gap:12px;cursor:pointer;min-height:44px}
+.sw input{position:absolute;opacity:0;width:1px;height:1px}
+.sw .box{flex:none;width:24px;height:24px;border-radius:8px;border:1.5px solid var(--sand);background:var(--white);display:grid;place-items:center;transition:background .15s,border-color .15s}
+.sw input:checked+.box{background:var(--sage-d);border-color:var(--sage-d)}
+.sw input:checked+.box::after{content:"";width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg) translate(-1px,-1px)}
+.sw input:focus-visible+.box{box-shadow:0 0 0 3px var(--sage-l)}
+.sw b{display:block;font-size:17px}.sw small{display:block;color:var(--muted);font-size:14px}
+.sw.sm{min-height:40px}
+.seg{display:inline-flex;margin:10px 0 2px;padding:4px;background:var(--beige);border-radius:999px}
+.seg button{border:0;background:transparent;border-radius:999px;padding:8px 16px;font-size:15px;cursor:pointer;color:var(--muted);transition:background .2s,color .2s}
+.seg button.sel{background:var(--white);color:var(--sage-d);font-weight:600;box-shadow:0 2px 8px -4px rgba(70,50,30,.3)}
+.srclist{display:grid;grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:2px 14px;margin-top:10px}
+.srcline a{color:var(--sage-d);font-weight:600}
+/* Themed dropdowns: each select.field is shown as a button that opens a styled list. The real select stays hidden in the page. */
+.dd{position:relative;width:100%}
+.dd>select{position:absolute;inset:0;opacity:0;pointer-events:none;width:100%;height:100%}
+.ddb{width:100%;min-height:44px;display:flex;align-items:center;justify-content:space-between;gap:10px;text-align:left;border:1px solid var(--sand);background:var(--white);border-radius:14px;padding:9px 12px;font-size:16px;color:var(--ink);cursor:pointer;transition:border-color .2s,box-shadow .2s,background .2s}
+.ddb:hover{border-color:var(--sage)}
+.ddb:focus-visible,.ddb[aria-expanded=true]{outline:none;border-color:var(--sage);box-shadow:0 0 0 3px var(--sage-l)}
+.ddb span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ddb svg{flex:none;width:12px;height:8px;transition:transform .2s}
+.ddb[aria-expanded=true] svg{transform:rotate(180deg)}
+.ddl{position:fixed;z-index:9999;margin:0;padding:6px;list-style:none;background:var(--white);border:1px solid var(--sand);border-radius:16px;box-shadow:0 18px 40px -14px rgba(70,50,30,.35);overflow:auto;overscroll-behavior:contain;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top;transition:opacity .15s,transform .15s}
+.ddl.up{transform-origin:bottom;transform:translateY(6px) scale(.98)}
+.ddl.on{opacity:1;transform:none}
+.ddl li{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 12px;border-radius:10px;font-size:16px;cursor:pointer;color:var(--ink)}
+.ddl li.hi{background:var(--sage-l)}
+.ddl li[aria-selected=true]{font-weight:600;color:var(--sage-d)}
+.ddl li[aria-selected=true]::after{content:"";flex:none;width:7px;height:12px;border:solid var(--sage-d);border-width:0 2px 2px 0;transform:rotate(45deg) translate(-2px,-2px)}
+@media (prefers-reduced-motion:reduce){.ddl,.ddb svg{transition:none}}
 </style>
 </head>
 <body>
@@ -270,6 +304,7 @@ footer a{color:var(--sage-d)}
       <a href="#cotton">Cotton Closet</a>
       <a href="#favorites">Favorites</a>
       <a href="#recent">Recently viewed</a>
+      <a href="#sources">Sources</a>
       <a href="#about">How it works</a>
     </nav>
   </div>
@@ -296,7 +331,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.10.1';
+const VERSION = '1.11.0';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -672,22 +707,22 @@ async function offGet(url){
   }
 }
 async function offQuery(terms, label, sort, size){
-  const key = [terms, label, sort, size].join('|');
+  const cs = srcCountries(), key = [terms, label, sort, size, cs.join(',')].join('|');
   const cache = store.get('off3', {}), hit = cache[key];
   if (hit && Date.now() - hit.t < 6 * 3600e3) return hit.items.filter(passesRules).map(reg);
   const tries = [
     async () => { // search-a-licious (Open Food Facts' new search service)
-      const q = [terms && terms.split(/\s+/).join(' AND '), label && `labels_tags:"${label}"`, 'countries_tags:"en:united-states"'].filter(Boolean).join(' AND ');
+      const q = [terms && terms.split(/\s+/).join(' AND '), label && `labels_tags:"${label}"`, `countries_tags:(${cs.map(c => `"${c}"`).join(' OR ')})`].filter(Boolean).join(' AND ');
       const j = await offGet('https://search.openfoodfacts.org/search?' + new URLSearchParams({q, page_size: size, sort_by: '-' + sort, langs: 'en'}));
       return j.hits || [];
     },
     async () => { // classic full-text search
       const p = new URLSearchParams({search_terms: terms, search_simple: 1, action: 'process', json: 1, page_size: size, sort_by: sort, fields: OFF_FIELDS,
-        ...(label ? {tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: 'en:united-states'} : {tagtype_0: 'countries', tag_contains_0: 'contains', tag_0: 'en:united-states'})});
+        ...(label ? {tagtype_0: 'labels', tag_contains_0: 'contains', tag_0: label, tagtype_1: 'countries', tag_contains_1: 'contains', tag_1: cs[0]} : {tagtype_0: 'countries', tag_contains_0: 'contains', tag_0: cs[0]})});
       return (await offGet('https://world.openfoodfacts.org/cgi/search.pl?' + p)).products || [];
     },
     async () => { // v2 API (label + country only, words matched afterwards)
-      const p = new URLSearchParams({...(label ? {labels_tags: label} : {}), countries_tags: 'en:united-states', sort_by: sort, page_size: 100, fields: OFF_FIELDS});
+      const p = new URLSearchParams({...(label ? {labels_tags: label} : {}), countries_tags: cs[0], sort_by: sort, page_size: 100, fields: OFF_FIELDS});
       const all = (await offGet('https://world.openfoodfacts.org/api/v2/search?' + p)).products || [];
       const w = terms.toLowerCase().split(/\s+/).filter(Boolean);
       return all.filter(x => w.every(t => (txt(x.product_name) + ' ' + txt(x.generic_name)).toLowerCase().includes(t.replace(/s$/, '')))).slice(0, size);
@@ -986,14 +1021,62 @@ const main = $('#main');
 let state = {sub: {}, cottonCat: '', style: 'soft-girl', q: store.get('q', '')};
 const seed = (() => { const d = new Date(); return d.getFullYear() * 1e4 + (d.getMonth() + 1) * 100 + d.getDate(); })();
 const pick = (arr, n, s = seed) => { const a = [...arr]; let x = s; for (let i = a.length - 1; i > 0; i--){ x = (x * 9301 + 49297) % 233280; const j = Math.floor(x / 233280 * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a.slice(0, n); };
+
+/* ---------- sources: regions and stores ---------- */
+const REGIONS = [['americas', 'Americas', 'United States and Canada'], ['europe', 'Europe', 'United Kingdom and the European Union'], ['asia', 'Asia and Pacific', 'Japan, Australia and nearby'], ['other', 'Other and unlisted', 'Stores PureFinds has no location for']];
+const OFF_COUNTRIES = {americas: ['en:united-states', 'en:canada'], europe: ['en:united-kingdom', 'en:france', 'en:germany', 'en:spain', 'en:italy'], asia: ['en:japan', 'en:australia'], other: []};
+// Where each store ships from. Stores not listed here count as "Other and unlisted".
+const STORE_REGION = {'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
+  'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas',
+  'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'europe', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
+  'YumEarth': 'americas', 'Theo Chocolate': 'americas', 'LesserEvil': 'americas', 'Mavuno Harvest': 'americas', "Mary's Gone Crackers": 'americas', 'Purely Elizabeth': 'americas', 'Once Upon a Farm': 'americas',
+  'Alter Eco': 'americas', 'Made Good': 'americas', 'Hu Kitchen': 'americas', "Janie's Mill": 'americas', 'Jovial': 'americas', 'Yolélé': 'americas', 'Wilderness Poets': 'americas'};
+const SRC_DEFAULT = {on: ['americas', 'other'], pick: {}};
+let SRC = (() => { const s = store.get('src2', null); return s && Array.isArray(s.on) && s.on.length ? {on: s.on, pick: s.pick || {}} : JSON.parse(JSON.stringify(SRC_DEFAULT)); })();
+const storeOf = it => it.store || (it.stores && it.stores[0]) || it.brand || '';
+const regionOf = it => STORE_REGION[storeOf(it)] || 'other';
+const inSrc = it => {
+  if (it.kind === 'food' && it.src !== 'brand') return true; // Open Food Facts items are filtered by country when searched
+  const r = regionOf(it); if (!SRC.on.includes(r)) return false;
+  const pk = SRC.pick[r]; return !pk || pk.includes(storeOf(it));
+};
+const cottonV = () => COTTON.filter(inSrc), foodsV = () => FOODS.filter(inSrc);
+const srcCountries = () => { const c = [...new Set(SRC.on.flatMap(r => OFF_COUNTRIES[r] || []))]; return c.length ? c : ['en:united-states']; };
+function srcStores(){ // every store PureFinds knows, grouped by region
+  const m = new Map();
+  for (const n of Object.keys(STORE_REGION)) m.set(n, STORE_REGION[n]);
+  for (const it of [...COTTON, ...FOODS]) { const n = storeOf(it); if (n && it.src !== 'off' && !m.has(n) && it.src !== undefined && it.kind) m.set(n, regionOf(it)); }
+  const out = {}; REGIONS.forEach(([k]) => out[k] = []);
+  for (const [n, r] of m) if (!/\.$/.test(n)) out[r].push(n);
+  for (const k in out) out[k].sort((a, b) => a.localeCompare(b));
+  return out;
+}
+const srcSave = () => { store.set('src2', SRC); bestPool = foodsV(); };
+function srcSummary(){
+  const names = REGIONS.filter(([k]) => SRC.on.includes(k)).map(([k, n]) => SRC.pick[k] ? `${n} (${SRC.pick[k].length} store${SRC.pick[k].length === 1 ? '' : 's'})` : n);
+  return names.join(', ');
+}
+const srcLine = () => `<p class="note srcline">Showing stores in: <b>${esc(srcSummary())}</b>. <a href="#sources">Change sources</a></p>`;
+function sourcesView(){
+  const by = srcStores();
+  main.innerHTML = `<div class="pagehead"><h1>Sources</h1><p>Pick where you shop. PureFinds only shows products from the regions and stores you choose, and asks Open Food Facts for products sold in those countries.</p></div>
+  <div id="srcv">${REGIONS.map(([k, name, sub]) => {
+    const on = SRC.on.includes(k), pk = SRC.pick[k], list = by[k] || [];
+    return `<section class="srcreg ${on ? 'on' : ''}" data-reg="${k}">
+      <label class="sw"><input type="checkbox" data-srcreg="${k}" ${on ? 'checked' : ''}><span class="box"></span><span><b>${name}</b><small>${sub}${list.length ? ` · ${list.length} store${list.length === 1 ? '' : 's'}` : ''}</small></span></label>
+      ${on && list.length ? `<div class="seg" role="group" aria-label="${name} stores"><button type="button" class="${pk ? '' : 'sel'}" data-srcmode="all" data-reg="${k}">All stores</button><button type="button" class="${pk ? 'sel' : ''}" data-srcmode="pick" data-reg="${k}">Specific stores</button></div>
+      ${pk ? `<div class="srclist">${list.map(n => `<label class="sw sm"><input type="checkbox" data-srcstore="${esc(n)}" data-reg="${k}" ${pk.includes(n) ? 'checked' : ''}><span class="box"></span><span>${esc(n)}</span></label>`).join('')}</div>` : ''}` : ''}
+    </section>`; }).join('')}</div>
+  <p class="note">Your choice is saved in this browser. At least one region stays on.</p>`;
+}
 const sh = (title, sub, more) => `<div class="sh"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div>${more || ''}</div>`;
 const errText = e => String((e && (e.message || e)) || 'Unknown error');
 const errBox = e => `<span class="err"><code>${esc(errText(e))}</code><button class="btn sm" type="button" data-copy="${esc(errText(e))}">Copy error</button></span>`;
 
 function home(){
-  const hero = pick(COTTON, 6);
-  const cute = COTTON.filter(c => c.styles.some(s => ['casual-cute', 'soft-girl', 'coquette'].includes(s)));
-  const newest = [...COTTON, ...FOODS].sort((a, b) => b.created - a.created).slice(0, 12);
+  const hero = pick(cottonV(), 6);
+  const cute = cottonV().filter(c => c.styles.some(s => ['casual-cute', 'soft-girl', 'coquette'].includes(s)));
+  const newest = [...cottonV(), ...foodsV()].sort((a, b) => b.created - a.created).slice(0, 12);
   main.innerHTML = `
   <section class="hero">
     <h1>Real finds, made of <i>real materials</i></h1>
@@ -1001,26 +1084,26 @@ function home(){
     <div class="collage">${hero.map((c, i) => `<figure data-open="${c.id}" style="animation-delay:${i * .08}s">${img(c)}</figure>`).join('')}</div>
   </section>
   <section class="blk">${sh('Two ways to shop')}<div class="hub two">
-    ${hubTile({go: 'food', title: 'Food', sub: 'Organic and Non-GMO snacks, groceries, bread and drinks', item: FOODS[5]}, 1)}
+    ${hubTile({go: 'food', title: 'Food', sub: 'Organic and Non-GMO snacks, groceries, bread and drinks', item: foodsV()[5]}, 1)}
     ${hubTile({go: 'cotton', title: 'Cotton Closet', sub: 'Verified 100% cotton clothing, aesthetics and outfits', item: byHandle('the-simple-dawn-dress-cascading-daisy')}, 2)}</div></section>
   <section class="blk" id="daily-s">${sh('Daily discovery', 'Two fresh picks every day: one to wear, one to snack on.', '<button class="link" data-shuffle>Show me different ones</button>')}<div class="daily" id="daily"></div></section>
-  <section class="blk">${sh('Best Organic Snacks', 'Certified and organic-labeled snacks from brand stores, plus the most-scanned organic snacks on Open Food Facts.', '<a class="link" href="#food-snacks">All snacks →</a>')}<div class="rail" id="best">${pick(FOODS.filter(f => f.price != null && f.cert && f.ing), 12, seed + 3).map(card).join('')}</div></section>
+  <section class="blk">${sh('Best Organic Snacks', 'Certified and organic-labeled snacks from brand stores, plus the most-scanned organic snacks on Open Food Facts.', '<a class="link" href="#food-snacks">All snacks →</a>')}<div class="rail" id="best">${pick(foodsV().filter(f => f.price != null && f.cert && f.ing), 12, seed + 3).map(card).join('')}</div></section>
   <section class="blk">${sh('Cute Finds', 'Casual cute, soft girl and coquette pieces. All 100% cotton.', '<a class="link" href="#cotton-aesthetics">Browse aesthetics →</a>')}<div class="rail">${cute.map(card).join('')}</div></section>
   <section class="blk">${sh('New Finds', 'The most recently updated organic snacks and cotton pieces at their stores.')}<div class="rail" id="newf">${newest.map(card).join('')}</div></section>
-  <section class="blk">${sh('100% Cotton Only', `${COTTON.length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Cotton Closet →</a>')}<div class="rail">${pick(COTTON, 10, seed + 7).map(card).join('')}</div></section>
+  <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Cotton Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
   <section class="blk">${sh('Pinterest Outfit Finds', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
   loadHomeFood();
 }
-let bestPool = FOODS;
+let bestPool = foodsV();
 async function loadHomeFood(){
   const daily = () => {
-    const c = pick(COTTON, 1, seed + dshift)[0], f = pick(bestPool.filter(x => x.ing), 1, seed + dshift)[0];
+    const c = pick(cottonV(), 1, seed + dshift)[0], f = pick(bestPool.filter(x => x.ing), 1, seed + dshift)[0];
     const d = $('#daily'); if (!d) return;
-    d.innerHTML = dcard(c) + (f ? dcard(f) : `<div class="empty" style="margin:0"><h3>Snack pick loading</h3><p>Waiting on live food data.</p></div>`);
+    d.innerHTML = (c ? dcard(c) : '') + (f ? dcard(f) : `<div class="empty" style="margin:0"><h3>Snack pick loading</h3><p>Waiting on live food data.</p></div>`);
   };
   daily();
-  try { const live = await offSearch('snack'); bestPool = [...FOODS, ...live]; const b = $('#best'); if (b && live.length) b.insertAdjacentHTML('beforeend', live.slice(0, 10).map(card).join('')); }
+  try { const live = await offSearch('snack'); bestPool = [...foodsV(), ...live]; const b = $('#best'); if (b && live.length) b.insertAdjacentHTML('beforeend', live.slice(0, 10).map(card).join('')); }
   catch(e){}
   try {
     const nf = await offSearch('', {mode: 'organic', sort: 'created_t', size: 12});
@@ -1037,7 +1120,7 @@ function dcard(it){
    <div class="acts"><button class="btn" data-open="${it.id}">Details</button>${f && it.src !== 'brand' ? '' : `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View'} ↗</a>`}<button class="heart" style="position:static" data-fav="${it.id}" aria-pressed="${!!favs[it.id]}" aria-label="Save to favorites">${heartSvg}</button></div></div></article>`;
 }
 function tile([k, n]){
-  const items = COTTON.filter(c => c.styles.includes(k)); const c = items[0];
+  const items = cottonV().filter(c => c.styles.includes(k)); const c = items[0];
   return `<button class="tile" data-style="${k}">${c ? img(c, n) : ''}<span>${n}<small>${items.length} ${items.length === 1 ? 'piece' : 'pieces'}</small></span></button>`;
 }
 function outfit([title, style, ids]){
@@ -1055,17 +1138,18 @@ function hubTile({go, cot, title, sub, item, n}, i){
     <span><b>${esc(title)}</b>${sub ? `<small>${esc(sub)}</small>` : ''}${n != null ? `<em>${n}</em>` : ''}</span></button>`;
 }
 const crumb = (root, rootName, here) => `<p class="crumb"><a href="#${root}">${rootName}</a> <span aria-hidden="true">/</span> ${esc(here)}</p>`;
-const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; return FOODS.filter(f => !ruledOut[f.url] && f.cats.some(x => want.includes(x))); };
+const brandFor = key => { const c = FCATS[key]; const want = c[2] || [key]; return foodsV().filter(f => !ruledOut[f.url] && f.cats.some(x => want.includes(x))); };
 
 function foodHub(){ setTimeout(scanNote);
   main.innerHTML = `<div class="pagehead"><h1>Food</h1><p>Organic and Non-GMO food. Every search looks for both labels automatically. Pick a section to start.</p></div>
+  ${srcLine()}
   <p class="note" id="scanNote" data-type="food" hidden></p>
   <p class="note"><b>PureFinds food rules.</b> ${RULE_TEXT} Products that break a rule are left out. When a brand doesn't publish its ingredients, the card says so, so you can check the package.</p>
   <div class="hub">${FOOD_SECTIONS.map(([k, name, sub, cats], i) => {
     const items = cats.flatMap(brandFor); const pic = items.find(f => f.img);
     return hubTile({go: 'food-' + k, title: name, sub, item: pic}, i);
   }).join('')}</div>
-  <section class="blk">${sh('Popular right now', 'Organic and Non-GMO snacks from brand stores.')}<div class="rail">${pick(FOODS.filter(f => f.price != null), 12, seed + 11).map(card).join('')}</div></section>`;
+  <section class="blk">${sh('Popular right now', 'Organic and Non-GMO snacks from brand stores.')}<div class="rail">${pick(foodsV().filter(f => f.price != null), 12, seed + 11).map(card).join('')}</div></section>`;
 }
 function foodSection(k){ setTimeout(scanNote);
   const sec = FOOD_SECTIONS.find(s => s[0] === k); if (!sec) return foodHub();
@@ -1140,13 +1224,14 @@ function myList(){
     <div class="acts"><button class="btn go sm" data-copylist>Copy list</button><button class="btn sm" data-clearlist>Clear list</button></div></div>`;
 }
 function cottonHub(){
-  const types = COTTON_CATS.map(t => [t, COTTON.filter(c => c.type === t)]).filter(([, a]) => a.length);
+  const types = COTTON_CATS.map(t => [t, cottonV().filter(c => c.type === t)]).filter(([, a]) => a.length);
   main.innerHTML = `<div class="pagehead"><h1>Cotton Closet</h1><p>Only clothing whose fabric is stated as 100% cotton on the brand's own product page. No polyester, nylon, acrylic, spandex or blends. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
+  ${srcLine()}
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
-    ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: COTTON.find(c => c.styles.includes('coquette'))}, 0)}
+    ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: cottonV().find(c => c.styles.includes('coquette'))}, 0)}
     ${hubTile({go: 'cotton-outfits', title: 'Pinterest outfit finds', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
-    ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every piece, hand-checked and found by the scanner', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), n: COTTON.length}, 2)}
+    ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every piece, hand-checked and found by the scanner', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), n: cottonV().length}, 2)}
     ${types.map(([t, a], i) => hubTile({go: 'cotton-shop', cot: t, title: t, item: a[Math.min(1, a.length - 1)], n: a.length}, i + 3)).join('')}
   </div>
   ${['Cardigans', 'Shorts', 'Jackets'].some(t => !types.find(x => x[0] === t)) ? `<p class="meta" style="margin-top:14px">Not in the closet yet: ${['Cardigans', 'Shorts', 'Jackets'].filter(t => !types.find(x => x[0] === t)).join(', ').toLowerCase()}. None found so far were 100% cotton.</p>` : ''}`;
@@ -1154,7 +1239,7 @@ function cottonHub(){
 }
 function cottonShop(){ setTimeout(scanNote);
   const cat = state.cottonCat;
-  const items = cat ? COTTON.filter(c => c.type === cat) : COTTON;
+  const items = cat ? cottonV().filter(c => c.type === cat) : cottonV();
   main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Cotton Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="chips" role="group" aria-label="Clothing types"><button class="chip" data-cot="" aria-pressed="${!cat}">All</button>${COTTON_CATS.map(c => `<button class="chip" data-cot="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join('')}</div>
@@ -1171,7 +1256,7 @@ function styles(){
 function showStyle(k, scroll = true){
   state.style = k; F = blankF();
   const el = $('#sty'); if (!el) return;
-  const items = COTTON.filter(c => c.styles.includes(k));
+  const items = cottonV().filter(c => c.styles.includes(k));
   el.innerHTML = `<div class="sh" id="sty-h"><div><h2>${esc(STYLE_NAME[k])}</h2><p>${items.length} cotton ${items.length === 1 ? 'piece' : 'pieces'}</p></div></div><div id="list"></div>`;
   items.length ? mountList($('#list'), items) : ($('#list').innerHTML = '<div class="empty"><h3>No pieces yet</h3><p>Nothing verified in this aesthetic so far.</p></div>');
   if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
@@ -1205,8 +1290,8 @@ function searchView(){
   main.innerHTML = `<div class="pagehead"><h1>${q ? `Results for “${esc(q)}”` : 'Search PureFinds'}</h1><p>Clothing comes from the verified cotton catalog. Food is searched live in Open Food Facts for organic-labeled products sold in the US.</p></div><div id="list"><div class="grid">${skeletons(6)}</div></div>`;
   if (!q) { $('#list').innerHTML = `<div class="empty"><h3>What are you looking for?</h3><p>Try one of these:</p><div class="chips" style="justify-content:center">${['dark chocolate', 'gummies', 'granola', 'dress', 'hoodie', 'Kotn', 'cottagecore'].map(s => `<button class="chip" data-q="${s}">${s}</button>`).join('')}</div></div>`; return; }
   const words = q.toLowerCase().split(/\s+/);
-  const cot = COTTON.filter(c => { const hay = [c.name, c.brand, c.fabric, c.type, c.colors.join(' '), c.styles.map(s => STYLE_NAME[s]).join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
-  const fd = FOODS.filter(c => { const hay = [c.name, c.brand, c.cats.join(' '), c.ing, c.certText, c.claims.join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+  const cot = cottonV().filter(c => { const hay = [c.name, c.brand, c.fabric, c.type, c.colors.join(' '), c.styles.map(s => STYLE_NAME[s]).join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+  const fd = foodsV().filter(c => { const hay = [c.name, c.brand, c.cats.join(' '), c.ing, c.certText, c.claims.join(' ')].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
   const done = (foodItems, err) => {
     if (state.q.trim() !== q || !$('#list')) return;
     const all = [...cot, ...fd, ...foodItems];
@@ -1219,7 +1304,7 @@ function searchView(){
 function about(){
   main.innerHTML = `<div class="pagehead"><h1>How PureFinds works</h1></div><div class="prose">
   <h2>Organic food from brand stores</h2>
-  <p>${FOODS.length} organic foods were checked on the brands' own stores on ${CHECKED}: YumEarth, Theo Chocolate, LesserEvil, Mavuno Harvest, Mary's Gone Crackers, Purely Elizabeth, Once Upon a Farm, Alter Eco, Made Good and Hu Kitchen. Each shows the brand's own organic wording, and Buy Now opens the product's page on that brand's store. Items whose page doesn't state organic are marked unverified.</p>
+  <p>${foodsV().length} organic foods were checked on the brands' own stores on ${CHECKED}: YumEarth, Theo Chocolate, LesserEvil, Mavuno Harvest, Mary's Gone Crackers, Purely Elizabeth, Once Upon a Farm, Alter Eco, Made Good and Hu Kitchen. Each shows the brand's own organic wording, and Buy Now opens the product's page on that brand's store. Items whose page doesn't state organic are marked unverified.</p>
   <h2>Non-GMO</h2>
   <p>Every live food search runs twice, once for an organic label and once for a Non-GMO label, and merges the results. Products show a Non-GMO badge when the record or the brand says so. USDA Organic rules also don't allow GMOs.</p>
   <h2>Groceries for pickup</h2>
@@ -1363,7 +1448,7 @@ document.addEventListener('click', e => {
   if (d.clear !== undefined){ F = blankF(); const l = $('#list'); if (l) mountList(l, pool); return; }
   if (t.id === 'resetF'){ F = blankF(); mountList($('#list'), pool); return; }
   if (d.retry){ return route(); }
-  if (d.shuffle !== undefined){ dshift++; const c = pick(COTTON, 1, seed + dshift)[0], fi = bestPool.length ? pick(bestPool, 1, seed + dshift)[0] : null; $('#daily').innerHTML = dcard(c) + (fi ? dcard(fi) : ''); return; }
+  if (d.shuffle !== undefined){ dshift++; const c = pick(cottonV(), 1, seed + dshift)[0], fi = bestPool.length ? pick(bestPool, 1, seed + dshift)[0] : null; $('#daily').innerHTML = dcard(c) + (fi ? dcard(fi) : ''); return; }
   if (d.clearrecent !== undefined){ recent = []; store.set('recent', recent); return savedView('recent'); }
   if (d.add){ cart[d.add] = (cart[d.add] || 0) + 1; store.set('cart', cart); counts(); toast('Added to cart'); return; }
   if (d.qty){ cart[d.qty] = Math.max(0, (cart[d.qty] || 0) + +d.d); if (!cart[d.qty]) delete cart[d.qty]; store.set('cart', cart); counts(); return cartView(); }
@@ -1394,7 +1479,7 @@ $('#searchForm').addEventListener('submit', e => { e.preventDefault(); state.q =
 
 /* ---------- router ---------- */
 const VIEWS = {home, food: foodHub, cotton: cottonHub, 'cotton-shop': cottonShop, 'cotton-aesthetics': styles, 'cotton-outfits': outfitsView,
-  ...Object.fromEntries(FOOD_SECTIONS.map(([k]) => ['food-' + k, () => foodSection(k)])), favorites: () => savedView('fav'), recent: () => savedView('recent'), cart: cartView, search: searchView, about};
+  ...Object.fromEntries(FOOD_SECTIONS.map(([k]) => ['food-' + k, () => foodSection(k)])), favorites: () => savedView('fav'), recent: () => savedView('recent'), sources: sourcesView, cart: cartView, search: searchView, about};
 function route(){
   const v = location.hash.slice(1);
   const name = VIEWS[v] ? v : 'home';
@@ -1406,6 +1491,74 @@ function route(){
   window.scrollTo(0, 0);
 }
 window.addEventListener('hashchange', route);
+
+document.addEventListener('change', e => {
+  const t = e.target; if (!t.closest || !t.closest('#srcv')) return;
+  if (t.dataset.srcreg){
+    const k = t.dataset.srcreg;
+    if (t.checked) { if (!SRC.on.includes(k)) SRC.on.push(k); }
+    else { if (SRC.on.length <= 1) { t.checked = true; toast('At least one region stays on'); return; } SRC.on = SRC.on.filter(x => x !== k); }
+  } else if (t.dataset.srcstore){
+    const k = t.dataset.reg, cur = new Set(SRC.pick[k] || []);
+    t.checked ? cur.add(t.dataset.srcstore) : cur.delete(t.dataset.srcstore);
+    SRC.pick[k] = [...cur];
+  } else return;
+  srcSave(); const y = scrollY; sourcesView(); scrollTo(0, y);
+});
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-srcmode]'); if (!b) return;
+  const k = b.dataset.reg;
+  if (b.dataset.srcmode === 'all') delete SRC.pick[k]; else SRC.pick[k] = srcStores()[k].slice();
+  srcSave(); const y = scrollY; sourcesView(); scrollTo(0, y);
+});
+
+/* ---------- themed dropdowns ---------- */
+(() => {
+  let open = null;
+  const ARROW = '<svg viewBox="0 0 12 8" aria-hidden="true"><path d="M1 1l5 5 5-5" stroke="#56704f" stroke-width="1.8" fill="none" stroke-linecap="round"/></svg>';
+  const label = sel => (sel.options[sel.selectedIndex] || {}).text || '';
+  const close = (focus) => { if (!open) return; const {list, btn} = open; open = null; btn.setAttribute('aria-expanded', 'false'); list.classList.remove('on'); setTimeout(() => list.remove(), 160); if (focus) btn.focus(); };
+  const choose = (sel, btn, i) => { sel.selectedIndex = i; btn.firstChild.textContent = label(sel); sel.dispatchEvent(new Event('change', {bubbles: true})); close(true); };
+  function show(sel, btn){
+    if (open) { const same = open.btn === btn; close(); if (same) return; }
+    const list = document.createElement('ul'); list.className = 'ddl'; list.setAttribute('role', 'listbox');
+    [...sel.options].forEach((o, i) => { const li = document.createElement('li'); li.setAttribute('role', 'option'); li.textContent = o.text; li.dataset.i = i; if (i === sel.selectedIndex) li.setAttribute('aria-selected', 'true'); list.appendChild(li); });
+    document.body.appendChild(list);
+    const r = btn.getBoundingClientRect(), below = innerHeight - r.bottom - 12, above = r.top - 12, up = below < 220 && above > below;
+    const h = Math.min(list.scrollHeight + 2, Math.max(140, up ? above : below), 320);
+    Object.assign(list.style, {left: r.left + 'px', width: r.width + 'px', maxHeight: h + 'px', top: up ? (r.top - h - 6) + 'px' : (r.bottom + 6) + 'px'});
+    if (up) list.classList.add('up');
+    requestAnimationFrame(() => list.classList.add('on'));
+    btn.setAttribute('aria-expanded', 'true'); open = {list, btn, sel}; let hi = sel.selectedIndex;
+    const mark = (n, scroll) => { hi = Math.max(0, Math.min(list.children.length - 1, n)); [...list.children].forEach((c, k) => c.classList.toggle('hi', k === hi)); if (scroll) list.children[hi].scrollIntoView({block: 'nearest'}); };
+    mark(hi, true); open.mark = mark; open.get = () => hi;
+    list.addEventListener('mousemove', e => { const li = e.target.closest('li'); if (li) mark(+li.dataset.i); });
+    list.addEventListener('click', e => { const li = e.target.closest('li'); if (li) choose(sel, btn, +li.dataset.i); });
+  }
+  function enhance(sel){
+    if (sel.dataset.dd || sel.multiple) return; sel.dataset.dd = '1';
+    const wrap = document.createElement('div'); wrap.className = 'dd'; sel.parentNode.insertBefore(wrap, sel); wrap.appendChild(sel);
+    sel.tabIndex = -1; sel.setAttribute('aria-hidden', 'true');
+    const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'ddb'; btn.setAttribute('aria-haspopup', 'listbox'); btn.setAttribute('aria-expanded', 'false');
+    btn.innerHTML = '<span></span>' + ARROW; btn.firstChild.textContent = label(sel); wrap.insertBefore(btn, sel);
+    btn.addEventListener('click', () => show(sel, btn));
+    btn.addEventListener('keydown', e => {
+      if (!open || open.btn !== btn) { if (['ArrowDown', 'ArrowUp'].includes(e.key)) { e.preventDefault(); show(sel, btn); } return; }
+      if (e.key === 'ArrowDown') { e.preventDefault(); open.mark(open.get() + 1, true); }
+      else if (e.key === 'ArrowUp') { e.preventDefault(); open.mark(open.get() - 1, true); }
+      else if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); choose(sel, btn, open.get()); }
+      else if (e.key === 'Escape') { e.preventDefault(); close(true); }
+      else if (e.key === 'Tab') close();
+    });
+    sel.addEventListener('change', () => { btn.firstChild.textContent = label(sel); });
+  }
+  const scan = root => (root.matches && root.matches('select.field') ? [root] : []).concat([...(root.querySelectorAll ? root.querySelectorAll('select.field') : [])]).forEach(enhance);
+  document.addEventListener('mousedown', e => { if (open && !open.list.contains(e.target) && !open.btn.contains(e.target)) close(); });
+  window.addEventListener('scroll', e => { if (open && !open.list.contains(e.target)) close(); }, true);
+  window.addEventListener('resize', () => close());
+  new MutationObserver(ms => ms.forEach(m => m.addedNodes.forEach(n => n.nodeType === 1 && scan(n)))).observe(document.body, {childList: true, subtree: true});
+  scan(document.body);
+})();
 $('#ver').textContent = VERSION;
 counts(); route();
 scanType('cotton'); scanType('food');
