@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.5.8">
+<meta name="pf-version" content="1.5.9">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.5.8';
+const VERSION = '1.5.9';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -497,7 +497,7 @@ const PICKUP = {
  milk:['Whole milk','2% milk','Butter','Cheddar cheese','Heavy cream'],
  yogurt:['Greek yogurt','Whole milk yogurt','Yogurt tubes'],
  meat:['Chicken breast','Chicken thighs','Ground beef','Ground turkey','Bacon'],
- pantry:['Brown rice','Quinoa pasta','Black beans','Extra virgin olive oil','Coconut oil','Grapeseed oil','Quinoa flakes','Tomato sauce'],
+ pantry:['Quinoa','Quinoa pasta','Black beans','Extra virgin olive oil','Coconut oil','Grapeseed oil','Quinoa flakes','Tomato sauce'],
  'frozen-foods':['Frozen blueberries','Frozen strawberries','Frozen mango','Frozen peaches','Frozen mixed berries','Frozen broccoli','Frozen spinach'],
  bread:['Sprouted spelt bread','Einkorn sourdough bread','100% rye bread'],
  tortillas:['Spelt tortillas','Chickpea flour wraps'],
@@ -560,11 +560,12 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive and grapeseed only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate.';
+const RULE_TEXT = 'Fruits: apples, bananas, peaches, pears, grapes, mango, papaya and berries. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Cocoa and cacao instead of chocolate. No brown rice, pumpkin, sunflower or flax.';
 const BAD_FRUIT = /pineapple|coconut(?!\s*(oil|sugar|milk|cream|water|flour|nectar|aminos))|passion ?fruit|kiwi|\borange|cherr(y|ies)|guava|watermelon|melon|apricot|\bplums?\b|prune|\bfigs?\b|avocado(?!\s*oil)|\blemon(?!\s*(juice|essential))|\blime(?!\s*juice)|grapefruit|pomegranate|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|avocado|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
 const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
+const BAD_BANNED = /brown\s+rice|pumpkin|sunflower|flax/i;
 const BAD_OAT = /\boat(s|meal|\s+(flour|milk|bran|fiber|syrup|beta)|\b)/i;
 const BAD_WHEAT = /(?<!buck)wheat|semolina|durum|farina|bulgur|couscous|\b(enriched|unbleached|bleached|all[- ]purpose|white|bread) flour/i;
 const clean = t => String(t || '').replace(/(peanut|nut|tree nut|corn|wheat|oat|gluten)[- ]free|free (from|of) [^,.;]*|no (peanuts|corn|wheat|oats)[^,.;]*/gi, ' ');
@@ -578,6 +579,7 @@ function ruleBreak(name, ing, fruitStrict){
   if (BAD_CORN.test(both)) return 'corn';
   if (BAD_WHEAT.test(both)) return 'wheat';
   if (BAD_OAT.test(both)) return 'oats';
+  if (BAD_BANNED.test(both)) return 'banned';
   if (/chocolate/i.test(n)) return 'chocolate';
   return '';
 }
@@ -706,7 +708,7 @@ try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledO
 let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
-const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
+const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower or flax', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 
 function clothingType(t){
   const s = t.toLowerCase();
@@ -848,7 +850,7 @@ function badges(it){
 }
 function card(it){
   const fav = !!favs[it.id];
-  const comp = it.kind === 'food' ? (it.ing ? 'Ingredients: ' + it.ing.replace(/^Begins: /, '') : 'Ingredients not published online: check the package for oils, corn, wheat, oats and nuts') : it.fabric ? 'Fabric: ' + it.fabric : '';
+  const comp = it.kind === 'food' ? (it.ing ? 'Ingredients: ' + it.ing.replace(/^Begins: /, '') : 'Ingredients not published online: check the package against your food rules') : it.fabric ? 'Fabric: ' + it.fabric : '';
   const buy = it.src === 'brand' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View at ' + esc(it.brand)} ↗</a>`
     : it.kind === 'cotton' ? `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a>`
     : it.kind === 'direct' ? `<button class="btn go" data-add="${esc(it.id)}">Add to cart</button>`
