@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.10.0">
+<meta name="pf-version" content="1.10.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -296,7 +296,7 @@ footer a{color:var(--sage-d)}
 
 <script>
 {
-const VERSION = '1.10.0';
+const VERSION = '1.10.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -847,7 +847,7 @@ async function scanType(type){
 }
 function scanNote(){
   const el = document.getElementById('scanNote'); if (!el) return;
-  const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? '100% cotton pieces' : 'organic and Non-GMO foods';
+  const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? '100% cotton pieces' : 'foods that fit your rules';
   if (st.status === 'off' || st.status === 'idle') { el.hidden = true; return; }
   el.hidden = false;
   if (st.status === 'loading') el.innerHTML = `Checking ${st.stores || 'the'} store catalogs for more ${what}… ${st.done}${st.stores ? ' of ' + st.stores : ''} done, ${st.added} added so far.`;
@@ -1077,7 +1077,7 @@ function foodSection(k){ setTimeout(scanNote);
   <p class="note">${RULE_TEXT}</p>
   <p class="note" id="scanNote" data-type="food" hidden></p>
   ${pickupPanel(key)}
-  <div id="live" class="note">Searching Open Food Facts for organic and Non-GMO ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
+  <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
   loadFoodList(k, key);
 }
 async function loadFoodList(k, key){
@@ -1096,7 +1096,7 @@ async function loadFoodList(k, key){
       .filter(it => (!cat[4] || cat[4].test(it.name)) && !(FRUIT_CATS.includes(key) && BAD_FRUIT.test(clean(it.ing))));
     if (state.sub[k] !== key || !$('#list')) return;
     show([...mine, ...live]);
-    $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts with an organic or Non-GMO label`;
+    $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts, all checked against your food rules`;
   } catch(e){
     if (!$('#live') || state.sub[k] !== key) return;
     $('#live').innerHTML = `${mine.length ? `Showing ${mine.length} ${mine.length === 1 ? 'find' : 'finds'} from brand stores, checked ${CHECKED}. ` : ''}The live Open Food Facts search didn't load, so more results are missing.${viewerNote()}${errBox(e)}`;
@@ -1231,7 +1231,7 @@ function about(){
   <h2>100% cotton clothing: verified by hand</h2>
   <p>Each clothing item was checked on the brand's own product page on ${CHECKED}, and the fabric line is quoted exactly. Anything that listed a blend (polyester, nylon, acrylic, spandex, viscose) or didn't state "100%" was left out. Buy Now opens the exact product page on the brand's official store, where you choose size and color and check out.</p>
   <h2>Store scanner</h2>
-  <p>The scanner is a small free Cloudflare Worker that reads the online catalogs of the brand stores listed in its code. It keeps only clothing whose listing says 100% cotton, with no blends, and only food labeled organic or Non-GMO that fits your food rules. When you open a food, it also reads the product's own page for the full ingredient list, then checks Open Food Facts by barcode if the page doesn't have one.</p>
+  <p>The scanner is a small free Cloudflare Worker that reads the online catalogs of the brand stores listed in its code. It keeps only clothing whose listing says 100% cotton, with no blends, and every food that fits your food rules. It reads each product's page for the full ingredient list, then checks Open Food Facts by barcode if the page doesn't have one.</p>
   <form class="filters" id="scanForm" onsubmit="return false" style="align-items:end">
     <label style="flex:3 1 260px">Scanner address<input class="field" id="scanInput" type="url" inputmode="url" placeholder="https://purefinds.yourname.workers.dev" value="${esc(scanUrl)}"></label>
     <button class="btn go" type="button" id="scanSave">Save and test</button>

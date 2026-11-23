@@ -3,14 +3,14 @@
 //
 //   /stores                     the store list
 //   /store?d=kotn.com&type=cotton   one store's 100% cotton clothing
-//   /store?d=lesserevil.com&type=food   one store's organic or Non-GMO food
+//   /store?d=lesserevil.com&type=food   one store's food (the site applies the food rules)
 //   /details?url=<product page>  ingredients (or fabric) read from the product's own page,
 //                                with Open Food Facts as a backup when the page doesn't list them
 //
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.2.1';
+const VERSION = '1.3.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -181,7 +181,6 @@ function foodItem(d, p){
   const text = plain(p.body_html), b = base(d, p), all = `${title} ${text} ${b.tags.join(' ')}`;
   const organic = /usda[- ]organic/i.test(all) ? 'USDA Organic' : /certified organic/i.test(all) ? 'Certified organic' : /\borganic\b/i.test(all) ? 'Organic (brand wording)' : '';
   const nonGmo = /non[- ]?gmo project/i.test(all) ? 'Non-GMO Project Verified' : /non[- ]?gmo/i.test(all) ? 'Non-GMO (brand claim)' : '';
-  if (!organic && !nonGmo) return null;
   return {...b, organic, nonGmo, ing: findIngredients(text), desc: text.slice(0, 400), barcode: barcodeOf(p)};
 }
 function barcodeOf(p){
