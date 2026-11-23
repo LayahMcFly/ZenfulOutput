@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.0">
+<meta name="pf-version" content="1.17.1">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -365,7 +365,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.0';
+const VERSION = '1.17.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -524,7 +524,7 @@ const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pan
 
 // key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
 const FCATS = {
- 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','crackers','granola-bars','dried-fruit']],
+ 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','crackers','granola-bars','dried-fruit','natural']],
  'fruit-snacks':['Fruit snacks','fruit snacks'], gummies:['Gummies & candy','gummies'], cocoa:['Cocoa & cacao','cocoa powder',null,null,/cocoa|cacao/i], cookies:['Cookies','cookies'],
  chips:['Chips & puffs','chips'], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
  'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',null,'gmo'],
@@ -539,6 +539,13 @@ const FCATS = {
  kamut:['Kamut (khorasan)','kamut',null,null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',null,null,/quinoa/i], teff:['Teff','teff',null,null,/teff/i],
  amaranth:['Amaranth','amaranth',null,null,/amaranth/i], rye:['Rye','rye flour',null,null,/\brye\b/i], fonio:['Fonio','fonio',null,null,/fonio/i],
  chickpea:['Chickpea flour','chickpea flour',null,null,/chickpea|garbanzo/i]
+};
+// Extra live searches by allowed flour, so baked goods made with einkorn, spelt or rye are found outside the flour section
+const FLOUR_QUERIES = {
+ cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
+ pancake: ['einkorn pancake', 'spelt pancake', 'spelt waffle'], bread: ['spelt bread', 'einkorn bread', 'rye bread'],
+ tortillas: ['spelt tortilla', 'einkorn tortilla'], bagels: ['spelt muffin', 'einkorn bagel'], baking: ['spelt baking mix', 'einkorn baking'],
+ cereal: ['spelt cereal', 'einkorn cereal'], 'granola-bars': ['spelt bar', 'einkorn bar'], chips: ['spelt chips']
 };
 const FOOD_SECTIONS = [
  ['snacks','Snacks','Cocoa and cacao, chips, gummies, cookies, dried fruit and more',['all-snacks','fruit-snacks','gummies','cocoa','cookies','chips','crackers','granola-bars','dried-fruit','natural']],
@@ -818,10 +825,13 @@ const okIng = (t, src) => {
   if (!looksLikeIngredients(t)) return false;
   if (/Open Food Facts|USDA/i.test(src || '')) return true; // shopper-entered and government lists are lenient
   t = String(t);
+  if (t.split(/\s+/).length <= 6 && /\b(list|label|below|tab|click|here)\b/i.test(t)) return false; // page words like "list and", not ingredients
   if (/[a-z)]\.\s+[A-Z*]/.test(t) || MARKETING.test(t)) return false;
   const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
   return parts.length >= 1 && parts.every(x => x.split(/\s+/).length <= 9) && !/^and\b/i.test(parts[0]);
 };
+// Removes page leftovers from an ingredient list: a trailing "Allergens" heading and doubled dots ("Organic, Roasted Almonds . Allergens")
+const tidyIng = t => String(t || '').replace(/[\s.]*\ballergens?\b[\s:.]*$/i, '').replace(/\s+\.(?=\s|$)/g, '.').replace(/\.{2,}/g, '.').replace(/\s{2,}/g, ' ').trim();
 try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledOut'); } catch(e){}
 let ingCache = store.get('ingCache2', {});
 let ruledOut = store.get('ruledOut2', {});
@@ -833,7 +843,7 @@ const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc ||
 const SHOW_NOING = store.get('showNoIng', false); // optional: keep foods whose ingredient list can't be read (marked unverified)
 const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
 if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
-for (const u in ingCache) if (!okIng(ingCache[u].ing, ingCache[u].src)) delete ingCache[u];
+for (const u in ingCache){ if (!okIng(ingCache[u].ing, ingCache[u].src)) delete ingCache[u]; else ingCache[u].ing = tidyIng(ingCache[u].ing); }
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
 const RULE_REASON = {fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
 
@@ -902,7 +912,7 @@ async function resolveOne(f){
   try {
     const r = await getJSON(`${scanBase()}/details?v=3&url=${encodeURIComponent(f.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
-    f.ing = r.ingredients; f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
+    f.ing = tidyIng(r.ingredients); f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
     const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
     if (why){ ruledOut[f.url] = why; store.set('ruledOut2', ruledOut); const i = FOODS.indexOf(f); if (i >= 0) FOODS.splice(i, 1); rs.banned++; logRemoved(f.name, f.store, f.url, f.cats, 'banned: ' + why, f.ing); return true; }
     rs.kept++; return false;
@@ -1289,9 +1299,13 @@ async function loadFoodList(k, key){
   const mine = [...base, ...textMatches(key).filter(f => !base.includes(f))].sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const sec = FOOD_SECTIONS.find(x => x[0] === k), related = () => { const seen = new Set(); return (sec ? sec[3] : []).flatMap(c => FCATS[c] ? brandFor(c) : []).filter(f => !seen.has(f.id) && seen.add(f.id)); };
-  const show = items => items.length ? mountList($('#list'), items, emptyMsg)
-    : related().length ? (mountList($('#list'), related(), emptyMsg), setTimeout(() => $('#live') && $('#live').insertAdjacentHTML('beforeend', ` Nothing matched ${esc(cat[0].toLowerCase())} exactly, so this shows everything else PureFinds found in ${esc(sec ? sec[1].toLowerCase() : 'this section')}.`), 0))
-    : ($('#list').innerHTML = `<div class="empty"><h3>No packaged ${esc(cat[0].toLowerCase())} found</h3><p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : 'The brand stores PureFinds checked don\'t sell this, and the live database didn\'t return any either. Try another category.'}</p></div>`);
+  // Nothing is shown under a category unless it belongs there. Other finds from the same section are offered, never mixed in.
+  const show = items => {
+    if (items.length) return mountList($('#list'), items, emptyMsg);
+    const rel = related(), gone = removedLog.filter(x => (x.cats || []).some(c => c === key) || catWords(key).some(w => x.name.toLowerCase().includes(w)));
+    $('#list').innerHTML = `<div class="empty"><h3>No ${esc(cat[0].toLowerCase())} that pass your food rules</h3><p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : 'None of the brand stores or Open Food Facts results passed your food rules.'}${gone.length ? ` ${gone.length} ${gone.length === 1 ? 'was' : 'were'} removed: ${gone.slice(0, 4).map(x => esc(x.name + ' (' + x.reason + ')')).join('; ')}.` : ''}</p>${rel.length ? `<button class="btn" type="button" id="showRel">Show the ${rel.length} other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds</button>` : ''}</div>`;
+    const b = $('#showRel'); if (b) b.onclick = () => mountList($('#list'), rel, emptyMsg);
+  };
   if (mine.length) show(mine);
   if (!cat[1]){
     $('#live').textContent = mine.length ? `${mine.length} from brand stores. Pick a category above for live results too.` : 'Pick a category above for live results, or use the pickup lists.';
@@ -1299,11 +1313,14 @@ async function loadFoodList(k, key){
     return;
   }
   try {
-    const live = (await offSearch(cat[1], {mode: cat[3] || 'both'}))
-      .filter(it => (!cat[4] || cat[4].test(it.name)) && !BAD_FRUIT.test(clean(it.ing)));
+    // Baked goods also get searches by the flours you allow, so cookies, crackers, pancake mix and bread made with einkorn, spelt or rye turn up
+    const flourSearch = Promise.allSettled((FLOUR_QUERIES[key] || []).map(q => offSearch(q, {mode: 'both', size: 24}))).then(rs2 => rs2.flatMap(r => r.status === 'fulfilled' ? r.value : []));
+    const [main1, flourHits] = await Promise.all([offSearch(cat[1], {mode: cat[3] || 'both'}), flourSearch]);
+    const seen = new Set(mine.map(m => m.id)), live = [];
+    for (const it of [...main1, ...flourHits]) if (!seen.has(it.id) && (!cat[4] || cat[4].test(it.name)) && !BAD_FRUIT.test(clean(it.ing))) { seen.add(it.id); live.push(it); }
     if (state.sub[k] !== key || !$('#list')) return;
     show([...mine, ...live]);
-    $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts, all checked against your food rules`;
+    $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts${flourHits.length ? ` (${flourHits.length} from flour searches)` : ''}, all checked against your food rules`;
   } catch(e){
     if (!$('#live') || state.sub[k] !== key) return;
     $('#live').innerHTML = `${mine.length ? `Showing ${mine.length} ${mine.length === 1 ? 'find' : 'finds'} from brand stores, checked ${CHECKED}. ` : ''}The live Open Food Facts search didn't load, so more results are missing.${viewerNote()}${errBox(e)}`;
