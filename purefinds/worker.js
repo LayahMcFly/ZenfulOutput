@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.4.0';
+const VERSION = '1.5.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -94,6 +94,8 @@ const plain = h => String(h || '')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&(#39|rsquo|lsquo);/g, "'").replace(/&(quot|ldquo|rdquo);/g, '"')
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/&[a-z]+;/g, ' ')
   .replace(/\s+/g, ' ').trim();
+// Same as plain(), but list items are joined with commas, so an ingredient list built as <li> items still reads as "a, b, c"
+const plainList = h => plain(String(h || '').replace(/<\/li>/gi, ', ').replace(/<li\b[^>]*>/gi, ' '));
 const optionValues = (p, re) => ((p.options || []).find(o => re.test(o.name)) || {}).values || [];
 const available = p => (p.variants || []).some(v => v.available !== false);
 const minPrice = p => { const ps = (p.variants || []).map(v => +v.price).filter(n => n > 0); return ps.length ? Math.min(...ps) : null; };
@@ -186,7 +188,7 @@ async function etsySearch(q, key){
 
 /* ---------- organic or Non-GMO food ---------- */
 const NOT_FOOD = /gift ?card|bundle|sampler|merch|tote|t-shirt|sweatshirt|\bhat\b|\bmug\b|apron|subscription box|e-?gift/i;
-const ING_STOP = /\s(?:contains|allergen|allergy|nutrition facts|directions|how to use|storage|store in|net wt|suggested use|manufactured|produced in|made in a facility|may contain|frequently asked|reviews|you may also|add to cart|shipping|distributed by)\b/i;
+const ING_STOP = /\s(?:contains|allergen|allergy|nutrition facts|directions|how to use|storage|store in|net wt|suggested use|manufactured|produced in|made in a facility|may contain|frequently asked|reviews|you may also|add to cart|shipping|distributed by|product testing|find in store|where to buy|customer reviews|write a review|add to bag|free shipping|you might also like|related products|nutrition|how to|faq)\b/i;
 // Real ingredient lists are plain words and commas, never page code or store data
 const looksLikeIngredients = t => {
   t = String(t || '').trim();
@@ -196,23 +198,27 @@ const looksLikeIngredients = t => {
   const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
   return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 4 && !/\.\s*$/.test(t));
 };
+const NAV_WORD = /\b(shop|cart|login|log in|sign in|account|search|menu|subscribe|contact|about us|our story|blog|careers|press|privacy|terms|shipping|returns|wholesale|store locator|recipes)\b/i;
 function findIngredients(text){
-  const re = /ingredients?\s*[:\-–]\s*/gi; let m;
+  // The heading is often "Ingredients:", but accordions show just "Ingredients" followed by + or −, with no colon at all
+  const re = /\bingredients?\b[\s:\-–—+−×▼▲>|]*/gi; let m;
   while ((m = re.exec(text))){
-    let rest = text.slice(m.index + m[0].length, m.index + m[0].length + 900);
+    let rest = text.slice(m.index + m[0].length, m.index + m[0].length + 1200);
     const stop = rest.search(ING_STOP); if (stop > 0) rest = rest.slice(0, stop);
-    rest = rest.replace(/\s*\.\s*$/, '').trim();
-    if (rest.length > 6 && looksLikeIngredients(rest) && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6)) return rest.slice(0, 700);
+    rest = rest.replace(/^[\s,.:;+−\-–]+|[\s,.:;+−\-–]+$/g, '').replace(/\s*,\s*(,\s*)+/g, ', ').replace(/\s+/g, ' ');
+    const parts = rest.split(/,/).map(x => x.trim()).filter(Boolean);
+    if (rest.length > 6 && looksLikeIngredients(rest) && !NAV_WORD.test(rest) && parts.length <= 70 && parts.every(x => x.split(' ').length <= 14)
+        && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6)) return rest.slice(0, 900);
   }
   return '';
 }
 function foodItem(d, p){
   const title = p.title || '';
   if (NOT_FOOD.test(`${title} ${p.product_type || ''}`) || !available(p)) return null;
-  const text = plain(p.body_html), b = base(d, p), all = `${title} ${text} ${b.tags.join(' ')}`;
+  const text = plain(p.body_html), b = base(d, p), all = `${title} ${text} ${b.tags.join(' ')}`, listText = plainList(p.body_html);
   const organic = /usda[- ]organic/i.test(all) ? 'USDA Organic' : /certified organic/i.test(all) ? 'Certified organic' : /\borganic\b/i.test(all) ? 'Organic (brand wording)' : '';
   const nonGmo = /non[- ]?gmo project/i.test(all) ? 'Non-GMO Project Verified' : /non[- ]?gmo/i.test(all) ? 'Non-GMO (brand claim)' : '';
-  return {...b, organic, nonGmo, ing: findIngredients(text), desc: text.slice(0, 400), barcode: barcodeOf(p)};
+  return {...b, organic, nonGmo, ing: findIngredients(listText), desc: text.slice(0, 400), barcode: barcodeOf(p)};
 }
 function barcodeOf(p){
   const v = (p.variants || []).find(v => /^\d{8,14}$/.test(String(v.barcode || '')));
@@ -229,7 +235,7 @@ async function details(target, env){
   if (handle) try {
     const p = (await getJSON(`https://${d}/products/${handle}.json`)).product || {};
     const text = plain(p.body_html);
-    out.ingredients = findIngredients(text); out.fabric = (text.match(COTTON_LINE) || [''])[0].trim(); out.barcode = barcodeOf(p);
+    out.ingredients = findIngredients(plainList(p.body_html)); out.fabric = (text.match(COTTON_LINE) || [''])[0].trim(); out.barcode = barcodeOf(p);
     if (out.ingredients) out.ingredientsSource = 'Product description';
   } catch (e){ out.tried.push(String(e.message || e)); }
   // 2. the product page itself (ingredients are often in a tab or accordion)
@@ -238,7 +244,7 @@ async function details(target, env){
       const r = await fetch(target.href, {headers: UA, cf: {cacheTtl: 86400, cacheEverything: true}});
       if (!r.ok) throw new Error(`${d} page answered HTTP ${r.status}`);
       const html = await r.text(), text = plain(html);
-      out.ingredients = findIngredients(text);
+      out.ingredients = findIngredients(plainList(html));
       if (out.ingredients) out.ingredientsSource = 'Product page';
       if (!out.fabric) out.fabric = (text.match(COTTON_LINE) || [''])[0].trim();
       if (!out.barcode){ const m = html.match(/"(?:gtin1[234]|gtin|barcode)"\s*:\s*"(\d{8,14})"/); if (m) out.barcode = m[1]; }
