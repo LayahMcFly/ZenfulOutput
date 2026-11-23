@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.13.2">
+<meta name="pf-version" content="1.14.1">
 <title>PureFinds · Organic food & 100% cotton finds</title>
 <meta name="description" content="Discover real organic foods and verified 100% cotton clothing from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -279,6 +279,16 @@ footer a{color:var(--sage-d)}
 @keyframes caretHue{0%{caret-color:#56704f}20%{caret-color:#c98682}40%{caret-color:#8ea888}60%{caret-color:#e08a5b}80%{caret-color:#8a7fb8}100%{caret-color:#56704f}}
 input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) infinite}
 @media (prefers-reduced-motion:reduce){input,textarea,.field{animation:none}}
+
+.rules{display:grid;gap:12px;margin:10px 0}
+.rrow{background:var(--white);border:1px solid var(--line);border-radius:18px;padding:14px 16px;display:grid;gap:10px}
+.rrow h3{font-size:24px}
+.rrow p{margin:2px 0 0;font-size:15px;line-height:1.5}
+.rok,.rno{border-radius:12px;padding:10px 12px}
+.rok{background:var(--sage-l)}.rno{background:var(--pink)}
+.rok b{color:var(--sage-d)}.rno b{color:#9a4f4b}
+.rok b,.rno b{font-size:12px;letter-spacing:.08em;text-transform:uppercase}
+@media(min-width:720px){.rrow{grid-template-columns:150px 1fr 1fr;align-items:start}}
 /* Themed dropdowns: each select.field is shown as a button that opens a styled list. The real select stays hidden in the page. */
 .dd{position:relative;width:100%}
 .dd>select{position:absolute;inset:0;opacity:0;pointer-events:none;width:100%;height:100%}
@@ -349,7 +359,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.13.2';
+const VERSION = '1.14.1';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -800,8 +810,9 @@ let ruledOut = store.get('ruledOut2', {});
 let noIng = store.get('noIng1', {});
 for (const u in noIng) if (Date.now() - noIng[u] > 7 * 864e5) delete noIng[u];
 const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`);
-const markNoIng = it => { noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
-for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
+const SHOW_NOING = store.get('showNoIng', false); // optional: keep foods whose ingredient list can't be read (marked unverified)
+const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
+if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
 for (const u in ingCache) if (!looksLikeIngredients(ingCache[u].ing)) delete ingCache[u];
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
 const RULE_REASON = {fruit: 'a fruit that isn’t on your list', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive or grapeseed', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, flax, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, beans, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate (PureFinds shows cocoa and cacao instead)'};
@@ -836,7 +847,7 @@ function addScanned(type, rows){
   let n = 0;
   for (const r of rows){
     const id = 's-' + r.domain + '-' + r.handle;
-    if (REG.has(id) || ruledOut[r.url] || noIng[r.url]) continue;
+    if (REG.has(id) || ruledOut[r.url] || (!SHOW_NOING && noIng[r.url])) continue;
     if (type === 'cotton'){
       if (COTTON.some(c => c.url === r.url)) continue;
       const t = clothingType(`${r.name} ${r.ptype}`);
@@ -1093,6 +1104,7 @@ function sourcesView(){
       ${on && list.length ? `<div class="seg" role="group" aria-label="${name} stores"><button type="button" class="${pk ? '' : 'sel'}" data-srcmode="all" data-reg="${k}">All stores</button><button type="button" class="${pk ? 'sel' : ''}" data-srcmode="pick" data-reg="${k}">Specific stores</button></div>
       ${pk ? `<div class="srclist">${list.map(n => `<label class="sw sm"><input type="checkbox" data-srcstore="${esc(n)}" data-reg="${k}" ${pk.includes(n) ? 'checked' : ''}><span class="box"></span><span>${esc(n)}</span></label>`).join('')}</div>` : ''}` : ''}
     </section>`; }).join('')}</div>
+  <section class="srcreg on"><label class="sw"><input type="checkbox" data-noing ${SHOW_NOING ? 'checked' : ''}><span class="box"></span><span><b>Also show foods with no readable ingredients</b><small>Off by default. When on, these foods appear marked "unverified", because the brand's page doesn't list ingredients. Foods with a banned ingredient in the name or ingredient list are still removed.</small></span></label></section>
   <p class="note">Your choice is saved in this browser. At least one region stays on.</p>`;
 }
 const sh = (title, sub, more) => `<div class="sh"><div><h2>${title}</h2>${sub ? `<p>${sub}</p>` : ''}</div>${more || ''}</div>`;
@@ -1340,8 +1352,22 @@ function searchView(){
   };
   offSearch(q, {size: 30}).then(r => done(r), () => done([], true));
 }
+
+const RULES_TABLE = [
+  ['Fruit', 'Apples, bananas, peaches, pears, grapes, mango, papaya, all berries (strawberries, blueberries, raspberries, blackberries), blackcurrant', 'Cranberries, pineapple, coconut (the fruit), oranges, lemons, limes, grapefruit, cherries, kiwi, melons, apricots, plums and prunes, figs, avocado, guava, pomegranate, lychee, passion fruit, dragon fruit, tangerines, clementines'],
+  ['Nuts and seeds', 'Walnuts and almonds (including almond butter, almond meal and almond flour), chia seeds', 'Peanuts, cashews, hazelnuts, pecans, pistachios, macadamias, Brazil nuts, pine nuts, sunflower seeds, pumpkin seeds (pepitas), flax'],
+  ['Oils', 'Coconut oil, olive oil, grapeseed oil', 'Sunflower, canola, safflower, palm, soybean, vegetable, corn, rice bran, cottonseed, avocado, peanut, sesame and high-oleic oils'],
+  ['Grains and flours', 'Spelt, einkorn, kamut, quinoa, quinoa flakes, teff, amaranth, rye, buckwheat, fonio, chickpea flour, sprouted flours', 'Wheat (including enriched, all-purpose and bread flour, semolina, durum, bulgur, couscous), oats and oatmeal, corn and popcorn (cornstarch, corn syrup, cornmeal, polenta, grits), brown rice'],
+  ['Vegetables and other', 'Vegetables not listed as banned, eggs, dairy, meat', 'Potatoes (sweet potato too), cassava, pumpkin, carrots, spinach, cauliflower, beans (cocoa, cacao and vanilla beans are fine), soy and soy lecithin, edamame'],
+  ['Sweeteners', 'Maple syrup, maple sugar, date syrup, date sugar, coconut sugar, unsweetened foods', 'White sugar, cane sugar, honey, agave, other syrups, molasses, glucose, dextrose, fructose, maltodextrin, stevia, monk fruit, sugar alcohols (erythritol, xylitol), artificial sweeteners'],
+  ['Flavor, chocolate and tea', 'Cocoa and cacao, vanilla extract, cinnamon, sea salt, herbal teas (ginger, chaga, raspberry, rosemary, chamomile and others)', 'Natural flavor, peppermint, green tea, matcha (and other Japanese green teas)']
+];
+const rulesTable = () => `<div class="rules">${RULES_TABLE.map(([t, ok, no]) => `<div class="rrow"><h3>${t}</h3><div class="rok"><b>Allowed</b><p>${ok}</p></div><div class="rno"><b>Not allowed</b><p>${no}</p></div></div>`).join('')}</div>
+  <p class="meta">Any product with a banned item in its name or ingredient list is left out. Wording like "soy-free" or "no natural flavors" is ignored.</p>`;
 function about(){
   main.innerHTML = `<div class="pagehead"><h1>How PureFinds works</h1></div><div class="prose">
+  <h2>Your food rules</h2>
+  ${rulesTable()}
   <h2>Organic food from brand stores</h2>
   <p>${foodsV().length} organic foods were checked on the brands' own stores on ${CHECKED}: YumEarth, Theo Chocolate, LesserEvil, Mavuno Harvest, Mary's Gone Crackers, Purely Elizabeth, Once Upon a Farm, Alter Eco, Made Good and Hu Kitchen. Each shows the brand's own organic wording, and Buy Now opens the product's page on that brand's store. Items whose page doesn't state organic are marked unverified.</p>
   <h2>Non-GMO</h2>
@@ -1540,7 +1566,7 @@ async function runDebug(){
     let t = performance.now(), list = [];
     try { const j = await getJSON(scanBase() + '/stores?t=' + Date.now(), 12000); list = j.stores.food || []; log(`\n[Scanner /stores] OK ${ms(t)} · Worker v${j.version} · ${list.length} food stores, ${(j.stores.cotton || []).length} clothing stores`); }
     catch (e){ log(`\n[Scanner /stores] FAILED ${ms(t)}: ${errText(e)}`); }
-    let sample = null;
+    let sample = null; const miss = [];
     for (const [d, name] of list){
       t = performance.now();
       try {
@@ -1548,12 +1574,18 @@ async function runDebug(){
         const withIng = it.filter(x => looksLikeIngredients(x.ing)).length, banned = it.filter(x => ruleBreak(x.name, x.ing, false)).length;
         log(`  ${name}: ${it.length} items (${withIng} with ingredients on the page, ${banned} break rules) ${ms(t)}`);
         if (!sample && it.length) sample = it[0];
+        if (miss.length < 4) it.filter(x => !looksLikeIngredients(x.ing)).slice(0, 1).forEach(x => miss.push(x));
       } catch (e){ log(`  ${name}: FAILED ${ms(t)}: ${errText(e)}`); }
     }
     if (sample){
       t = performance.now();
       try { const r = await getJSON(`${scanBase()}/details?v=2&url=${encodeURIComponent(sample.url)}`, 20000); log(`\n[Scanner /details] ${sample.name}: ${r.ingredients ? 'ingredients found (' + (r.ingredientsSource || '?') + '): ' + String(r.ingredients).slice(0, 90) : 'no ingredients found'} ${ms(t)}`); }
       catch (e){ log(`\n[Scanner /details] FAILED ${ms(t)}: ${errText(e)}`); }
+    }
+    log('\n[Products whose page had no ingredients: what the scanner tried]');
+    for (const m of miss){
+      try { const r = await getJSON(`${scanBase()}/details?v=2&url=${encodeURIComponent(m.url)}`, 20000); log(`  ${m.store} · ${m.name}: ${r.ingredients ? 'found via ' + r.ingredientsSource : 'still none'}${r.barcode ? ' · barcode ' + r.barcode : ' · no barcode'}${(r.tried || []).length ? ' · problems: ' + r.tried.join(' | ') : ''}`); }
+      catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
   const cs = srcCountries();
@@ -1587,7 +1619,8 @@ function route(){
 window.addEventListener('hashchange', route);
 
 document.addEventListener('change', e => {
-  const t = e.target; if (!t.closest || !t.closest('#srcv')) return;
+  const t = e.target; if (t.dataset && t.dataset.noing !== undefined){ store.set('showNoIng', t.checked); toast('Reloading with your new choice…'); return setTimeout(() => location.reload(), 700); }
+  if (!t.closest || !t.closest('#srcv')) return;
   if (t.dataset.srcreg){
     const k = t.dataset.srcreg;
     if (t.checked) { if (!SRC.on.includes(k)) SRC.on.push(k); }
