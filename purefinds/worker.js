@@ -10,7 +10,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.1.1';
+const VERSION = '1.1.2';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -47,7 +47,7 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, {headers: CORS});
     const u = new URL(req.url);
     try {
-      if (u.pathname === '/' || u.pathname === '/stores') return json({version: VERSION, stores: STORES}, 200, 3600);
+      if (u.pathname === '/' || u.pathname === '/stores') return json({version: VERSION, stores: STORES}, 200, 300);
       if (u.pathname === '/store'){
         const d = (u.searchParams.get('d') || '').toLowerCase(), type = u.searchParams.get('type');
         if (!ALLOWED.has(d)) return json({error: 'This store is not on the PureFinds list: ' + d}, 400);
