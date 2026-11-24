@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.18.7">
+<meta name="pf-version" content="1.18.8">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -379,7 +379,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.7';
+const VERSION = '1.18.8';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1985,6 +1985,8 @@ function beautyCard(it){
     <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
 }
 function beautyPaint(){
+  const hub = document.getElementById('bhub');
+  if (hub){ const sig = BEAUTY_GROUPS.map(g => BEAUTY.ok.filter(x => g[3].includes(x.kindB) && x.img).slice(0, 6).map(x => x.url).join('|')).join('~'); if (sig !== beautyTileSig){ beautyTileSig = sig; hub.innerHTML = beautyTiles(); } }
   const list = document.getElementById('blist'); if (!list) return;
   const items = BEAUTY.ok.filter(x => beautyIn(x.kindB) && (BEAUTY.cert === 'any' || (BEAUTY.cert === 'organic' && x.isOrg) || (BEAUTY.cert === 'nongmo' && x.isNG) || (BEAUTY.cert === 'both' && x.isOrg && x.isNG)));
   const left = BEAUTY.raw.filter(x => !x.done && (beautyIn(beautyKind(x)))).length;
@@ -1996,13 +1998,15 @@ function beautyPaint(){
   const more = document.getElementById('bmore'); if (more) more.hidden = BEAUTY.resolving || !left;
 }
 const beautyCertChips = () => `<div class="chips" role="group" aria-label="Organic or Non-GMO">${[['any', 'All products'], ['organic', 'Organic'], ['nongmo', 'Non-GMO'], ['both', 'Organic and Non-GMO']].map(([k, n]) => `<button class="chip" data-bcert="${k}" aria-pressed="${k === BEAUTY.cert}">${n}</button>`).join('')}</div>`;
+const beautyTiles = () => BEAUTY_GROUPS.map(([k, name, sub, kinds], i) => { const pics = BEAUTY.ok.filter(x => kinds.includes(x.kindB) && x.img).slice(0, 6);
+  return hubTile({go: 'beauty-' + k, title: name, sub, items: pics}, i); }).join('');
+let beautyTileSig = '';
 function beautyHub(){
-  BEAUTY.kinds = null; BEAUTY.sub = 'all';
+  BEAUTY.kinds = null; BEAUTY.sub = 'all'; beautyTileSig = '';
   main.innerHTML = `<div class="pagehead"><h1>Beauty Closet</h1><p>Skin care, face care, hair care, castor oil for lashes and brows, and nail care, checked ingredient by ingredient. Pick a section to start.</p></div>
   <details class="fold"><summary>Beauty Closet rules</summary><p>${BEAUTY_RULE_TEXT}</p></details>
   <p class="note" id="bnote">Starting the store scan…</p><div id="blist" hidden></div>
-  <div class="hub">${BEAUTY_GROUPS.map(([k, name, sub, kinds], i) => { const pics = BEAUTY.ok.filter(x => kinds.includes(x.kindB) && x.img);
-    return hubTile({go: 'beauty-' + k, title: name, sub, items: pics}, i); }).join('')}</div>`;
+  <div class="hub" id="bhub">${beautyTiles()}</div>`;
   beautyPaint(); beautyScan(); if (BEAUTY.started && !BEAUTY.resolving) beautyResolve();
 }
 function beautySection(k){
