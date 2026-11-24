@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.15">
+<meta name="pf-version" content="1.18.16">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -397,7 +397,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.15';
+const VERSION = '1.18.16';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2197,13 +2197,14 @@ function settleVersion(){
 // several minutes after an update, so the file is read straight from the GitHub repository first.
 const REPO_FILE = 'https://api.github.com/repos/LayahMcFly/ZenfulOutput/contents/purefinds/index.html?ref=main';
 let lastCheck = 0, checkState = '';
+const fetchT = (url, opts, ms = 7000) => { const ac = new AbortController(), t = setTimeout(() => ac.abort(), ms); return fetch(url, {...opts, signal: ac.signal}).finally(() => clearTimeout(t)); };
 async function latestVersion(){
   try {
-    const r = await fetch(REPO_FILE + '&t=' + Date.now(), {cache: 'no-store', headers: {Accept: 'application/vnd.github.raw'}});
+    const r = await fetchT(REPO_FILE + '&t=' + Date.now(), {cache: 'no-store', headers: {Accept: 'application/vnd.github.raw'}});
     if (r.ok){ const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/); if (m) return m[1]; }
   } catch(e){}
   try { // backup: the website itself
-    const r = await fetch(location.pathname + '?check=' + Date.now(), {cache: 'no-store'});
+    const r = await fetchT(location.pathname + '?check=' + Date.now(), {cache: 'no-store'});
     const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/); if (m) return m[1];
   } catch(e){}
   return '';
@@ -2227,6 +2228,7 @@ function footerVersion(){
 settleVersion();
 footerVersion();
 checkVersion(true);
+setTimeout(() => { if (!checkState){ checkState = 'unknown'; footerVersion(); } }, 20000);
 setInterval(() => checkVersion(), 5 * 60e3);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
 window.addEventListener('focus', () => checkVersion());
