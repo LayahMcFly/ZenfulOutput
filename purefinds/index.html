@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.14">
+<meta name="pf-version" content="1.17.15">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.14';
+const VERSION = '1.17.15';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -528,11 +528,11 @@ const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pan
 
 // key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
 const FCATS = {
- 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','dried-fruit','natural']],
+ 'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','cereal','dried-fruit','natural']],
  'fruit-snacks':['Fruit snacks','fruit snacks'], gummies:['Gummies & candy','gummies'], cocoa:['Cocoa, cacao & chocolate','cocoa',null,null,/cocoa|cacao|chocolate/i], cookies:['Cookies','cookies'],
  chips:['Chips & puffs','chips'], plantain:['Plantain chips & snacks','plantain',null,null,/plantain/i], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
  'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',null,'gmo'],
- cereal:['Cereal & granola','cereal'], 'nut-butter':['Almond & walnut butter','almond butter',null,null,/almond|walnut/i], pancake:['Pancake & waffle mix','pancake mix'],
+ cereal:['Cereal & granola','cereal',null,null,/cereal|granola|muesli|puffed|flake|crisp|crunch|porridge|clusters|o'?s\b/i], 'nut-butter':['Almond & walnut butter','almond butter',null,null,/almond|walnut/i], pancake:['Pancake & waffle mix','pancake mix'],
  bread:['Bread','bread'], tortillas:['Tortillas & wraps','tortilla'], bagels:['Bagels & muffins','bagel'], baking:['Baking','baking'],
  fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
  nuts:['Walnuts & almonds','almonds',null,null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
@@ -549,14 +549,14 @@ const FLOUR_QUERIES = {
  cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
  pancake: ['einkorn pancake', 'spelt pancake', 'spelt waffle'], bread: ['spelt bread', 'einkorn bread', 'rye bread'],
  tortillas: ['spelt tortilla', 'einkorn tortilla'], bagels: ['spelt muffin', 'einkorn bagel'], baking: ['spelt baking mix', 'einkorn baking'],
- cereal: ['spelt cereal', 'einkorn cereal'], 'granola-bars': ['spelt bar', 'einkorn bar'], chips: ['spelt chips']
+ cereal: ['grain free granola', 'grain free cereal', 'puffed quinoa', 'puffed amaranth', 'puffed kamut', 'quinoa flakes', 'spelt flakes', 'buckwheat cereal'], 'granola-bars': ['spelt bar', 'einkorn bar'], chips: ['spelt chips']
 };
 const FOOD_SECTIONS = [
- ['snacks','Snacks','Cocoa, cacao and chocolate, chips, plantain chips, gummies, cookies, dried fruit and more',['all-snacks','fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','dried-fruit','natural']],
+ ['snacks','Snacks','Cocoa, cacao and chocolate, chips, plantain chips, gummies, cookies, cereal and granola, dried fruit and more',['all-snacks','fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','cereal','dried-fruit','natural']],
  ['groceries','Groceries','Fruit, vegetables, walnuts and almonds, eggs, dairy and pantry staples to pick up',['fruit','vegetables','nuts','eggs','milk','yogurt','meat','pantry','frozen-foods']],
  ['flours','Flours & grains','Sprouted flours first, then spelt, einkorn, kamut, quinoa, teff, amaranth, rye, fonio and chickpea',['sprouted','spelt','einkorn','kamut','quinoa','teff','amaranth','rye','fonio','chickpea']],
  ['bread','Bread & bakery','Spelt, einkorn and rye breads, tortillas, bagels and baking, all wheat-free and corn-free',['bread','tortillas','bagels','baking']],
- ['breakfast','Breakfast','Oat-free cereal and granola, almond butter and pancake mix',['cereal','nut-butter','pancake']],
+ ['breakfast','Breakfast','Oat-free cereal, grain-free granola, puffed and flaked grains, almond butter and pancake mix',['cereal','nut-butter','pancake']],
  ['drinks','Drinks','Juice, almond milk, ginger and chaga, raspberry, rosemary and other herbal teas',['drinks','plant-milk','ginger-tea','raspberry-tea','rosemary-tea','herbal-tea','tea']],
  ['frozen','Frozen treats','Ice cream and popsicles',['frozen','popsicles']]
 ];
@@ -571,6 +571,7 @@ for (const sec of FOOD_SECTIONS){
 }
 // Fresh items to pick up: each opens a store search for "organic <item>"
 const PICKUP = {
+ cereal:['Puffed kamut','Puffed quinoa','Puffed amaranth','Quinoa flakes','Spelt flakes','Grain-free granola','Buckwheat groats','Puffed millet'],
  frozen:['Coconut milk ice cream','Vanilla ice cream','Chocolate ice cream','Mango sorbet','Strawberry sorbet','Raspberry sorbet','Frozen banana soft serve','Coconut ice cream bars'],
  popsicles:['Fruit bars','Mango popsicles','Strawberry popsicles','Blueberry popsicles','Watermelon popsicles','Coconut water popsicles'],
  fruit:['Apples','Bananas','Plantains','Peaches','Pears','Grapes','Mangoes','Papaya','Strawberries','Blueberries','Raspberries','Blackberries'],
@@ -646,13 +647,13 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive, grapeseed and avocado only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya, berries, blackcurrant, coconut, limes, grapefruit, cherries, kiwi, melons, apricots, plums, prunes, figs, avocado, guava and pomegranate are fine. Not allowed: cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines and clementines. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Chocolate only when its ingredients list cocoa or cacao. No brown rice, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar, coconut sugar and agave, never white or cane sugar.';
+const RULE_TEXT = 'Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya, berries, blackcurrant, coconut, limes, grapefruit, cherries, kiwi, melons, apricots, plums, prunes, figs, avocado, guava and pomegranate are fine. Not allowed: cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines and clementines. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Chocolate only when its ingredients list cocoa or cacao. No beets (beet sugar and beet juice too), no brown rice, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar, coconut sugar and agave, never white or cane sugar.';
 const FRUIT_PART = /\b(pineapple|passion ?fruit|orange|lemon|lychee|dragon ?fruit|tangerine|clementine)\s+(essential\s+)?(oils?|peels?|zests?|extracts?|flavou?rs?|blossom|flower\s+water|rind)\b/gi;
 const BAD_FRUIT = /pineapple|passion ?fruit|\borange|\blemon(?!\s*(juice|essential))|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
 const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
-const BAD_BANNED = /brown\s+rice|pumpkin|pepitas?|cauliflower|sunflower|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?|peppermint|carrots?|spinach|\bsoy(a|beans?)?\b/i;
+const BAD_BANNED = /\bbeets?\b|beetroot|brown\s+rice|pumpkin|pepitas?|cauliflower|sunflower|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?|peppermint|carrots?|spinach|\bsoy(a|beans?)?\b/i;
 const BEAN_OK = /\b(vanilla|cocoa|cacao|coffee|tonka)\s+beans?\b/gi, BAD_BEAN = /\bsoybeans?\b|edamame/i;
 const BAD_TEA = /green\s+tea|matcha|sencha|genmaicha|gyokuro/i;
 const BAD_OAT = /\boat(s|meal|\s+(flour|milk|bran|fiber|syrup|beta)|\b)/i;
@@ -862,7 +863,7 @@ const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); st
 if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
 for (const u in ingCache){ if (!okIng(ingCache[u].ing, ingCache[u].src)) delete ingCache[u]; else ingCache[u].ing = tidyIng(ingCache[u].ing); }
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
-const RULE_REASON = {fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'brown rice, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate without cocoa or cacao in its ingredients'};
+const RULE_REASON = {fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'beets, brown rice, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate without cocoa or cacao in its ingredients'};
 
 function clothingType(t){
   const s = t.toLowerCase();
@@ -876,7 +877,7 @@ function clothingType(t){
 const FOOD_MAP = [
   [/cacao|cocoa|chocolate/, 'cocoa'], [/gumm|candy|lollipop|\bchews?\b|caramel/, 'gummies'], [/fruit snack|fruit bite|fruit leather/, 'fruit-snacks'],
   [/cookie|biscuit/, 'cookies'], [/\bchips?\b|\bpuffs?\b|crisps/, 'chips'], [/plantain/, 'plantain'], [/cracker/, 'crackers'], [/granola bar|\bbars?\b|\bbites\b/, 'granola-bars'],
-  [/dried|freeze[- ]dried/, 'dried-fruit'], [/cereal|oatmeal|\boats\b|granola|muesli|porridge|clusters/, 'cereal'],
+  [/dried|freeze[- ]dried/, 'dried-fruit'], [/cereal|oatmeal|\boats\b|granola|muesli|porridge|clusters|\bpuffed\b|cereal puffs|(?<!(dulse|kelp|coconut|chili|pepper|salt|nori|seaweed)\s)\bflakes\b|little crispies|\bo'?s\b/, 'cereal'],
   [/(almond|walnut) butter|nut butter/, 'nut-butter'], [/pancake|waffle/, 'pancake'], [/\bbread\b|\bloaf\b/, 'bread'], [/tortilla|\bwraps?\b/, 'tortillas'],
   [/bagel|muffin/, 'bagels'], [/baking|cake mix|brownie mix/, 'baking'], [/sprouted/, 'sprouted'], [/spelt/, 'spelt'], [/einkorn/, 'einkorn'],
   [/kamut|khorasan/, 'kamut'], [/quinoa/, 'quinoa'], [/\bteff\b/, 'teff'], [/amaranth/, 'amaranth'], [/\brye\b/, 'rye'], [/fonio/, 'fonio'],
@@ -1190,7 +1191,7 @@ const STORE_REGION = {'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the 
   'Alter Eco': 'americas', 'Made Good': 'americas', 'Hu Kitchen': 'americas', "Janie's Mill": 'americas', 'Jovial': 'americas', 'Yolélé': 'americas', 'Wilderness Poets': 'americas',
   'Kowtow': 'asia', 'Lucy & Yak': 'europe', 'LoveShackFancy': 'americas', 'Known Supply': 'americas',
   'Navitas Organics': 'americas', 'Terrasoul Superfoods': 'americas', 'Barnana': 'americas', "Anthony's Goods": 'americas', 'Sunfood': 'americas',
-  'Lark Ellen Farm': 'americas', 'Elmhurst 1925': 'americas', 'Paleonola': 'americas', 'Maine Coast Sea Vegetables': 'americas', 'Daily Crunch': 'americas'};
+  'Lark Ellen Farm': 'americas', 'Elmhurst 1925': 'americas', 'Paleonola': 'americas', 'Seven Sundays': 'americas', 'Maine Coast Sea Vegetables': 'americas', 'Daily Crunch': 'americas'};
 const SRC_DEFAULT = {on: ['americas', 'other'], pick: {}};
 let SRC = (() => { const s = store.get('src2', null); return s && Array.isArray(s.on) && s.on.length ? {on: s.on, pick: s.pick || {}} : JSON.parse(JSON.stringify(SRC_DEFAULT)); })();
 const storeOf = it => it.store || (it.stores && it.stores[0]) || it.brand || '';
