@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.18.11">
+<meta name="pf-version" content="1.18.12">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -379,7 +379,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.11';
+const VERSION = '1.18.12';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1199,6 +1199,11 @@ function applyF(items){
   const s = F.sort;
   out = [...out].sort((a, b) => s === 'cheap' ? (a.price ?? 1e9) - (b.price ?? 1e9) : s === 'new' ? b.created - a.created
     : (b.pop || 0) - (a.pop || 0) || (a.order ?? 0) - (b.order ?? 0));
+  // default order: take turns between brands so one store (like Kotn) can't fill the whole page
+  if ((!s || s === 'pop') && !F.brand && !F.store){
+    const groups = new Map(); for (const it of out){ const k = it.brand || it.store || ''; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(it); }
+    if (groups.size > 1){ const lists = [...groups.values()], mixed = []; for (let i = 0; mixed.length < out.length; i++) for (const l of lists) if (i < l.length) mixed.push(l[i]); out = mixed; }
+  }
   return out;
 }
 function filterBar(items){
