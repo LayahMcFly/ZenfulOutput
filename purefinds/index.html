@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.34">
+<meta name="pf-version" content="1.17.35">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -378,7 +378,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.34';
+const VERSION = '1.17.35';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -959,11 +959,13 @@ function addScanned(type, rows){
       if (r.store === 'Traditional Medicinals' && /\btea\b/i.test(r.name)) cats = ['herbal-tea']; // the whole range is herbal tea, whatever the product is called
       const cached0 = ingCache[r.url], cached = cached0 && okIng(cached0.ing, cached0.src) ? cached0 : null, fromName = !r.ing && !(cached && cached.ing) && (singleIngredient(r.name) || !!singleProduce(r.name));
       r.ing = dropBadges(r.ing); const ing = (okIng(r.ing, r.ingSrc || 'Brand listing') && r.ing) || (cached && cached.ing) || (fromName ? (singleIngredient(r.name) ? r.name.replace(/\s*[-–|]\s*\d.*$/, '').trim() : singleProduce(r.name)) : '');
-      if (!ing && (r.store === 'Etsy' || r.store === 'Kroger')){ logRemoved(r.name, r.store, r.url, cats, 'no readable ingredients'); continue; }
+      // Small Etsy bakers rarely write an ingredient list. When the title itself says the product is made from einkorn, spelt or kamut and nothing in it breaks a rule, keep it, clearly marked as judged from the title
+      const titleVouched = !ing && r.store === 'Etsy' && /\b(einkorn|spelt|kamut|khorasan)\b/i.test(r.name) && !ruleBreak(r.name, '', false);
+      if (!ing && !titleVouched && (r.store === 'Etsy' || r.store === 'Kroger')){ logRemoved(r.name, r.store, r.url, cats, 'no readable ingredients'); continue; }
       { const why = ruleBreak(r.name, ing, cats.some(c => FRUIT_CATS.includes(c))); if (why){ logRemoved(r.name, r.store, r.url, cats, 'banned: ' + why, ing); continue; } } // marketing text isn't checked: "soy-free" or "no natural flavors" would wrongly remove good products
       FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
         price: r.price, img: sized(r.img), cats, certText: r.organic || r.nonGmo, cert: r.organic, nonGmo: r.nonGmo, ing,
-        ingSrc: r.ing && ing === r.ing ? (r.ingSrc || 'Brand listing') : cached ? cached.src : fromName ? 'Single-ingredient product (its name is the ingredient)' : '', claims: claimsFrom(r.desc || ''), note: '', created: Date.parse(r.created) || 0,
+        ingSrc: r.ing && ing === r.ing ? (r.ingSrc || 'Brand listing') : cached ? cached.src : fromName ? 'Single-ingredient product (its name is the ingredient)' : titleVouched ? 'Not listed by the seller: judged from the title, ask the seller before you buy' : '', titleVouched, claims: claimsFrom(r.desc || ''), note: '', created: Date.parse(r.created) || 0,
         pop: ing ? 1 : 0, order: 1000 + FOODS.length, fabricTags: [], styles: [],
         desc: r.store === 'Kroger' ? `${r.vendor || 'Kroger'} product sold at Kroger family stores. Ingredients come from the Open Food Facts record for its barcode.` : r.store === 'Etsy' ? `Sold by ${r.vendor || 'an Etsy seller'} on Etsy. PureFinds found it in an Etsy search and checked it against your food rules.${r.origName ? ` Translated to English automatically. Original title: “${r.origName}”.` : ''}` : `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
     }
@@ -982,7 +984,7 @@ const rs = {total: 0, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0};
 async function resolveOne(f){
   try {
     const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(f.url)}`, 20000);
-    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
+    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (f.titleVouched){ rs.kept++; return false; } if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
     f.ing = tidyIng(r.ingredients); f.ingSrc = r.ingredientsSource; f.pop = 1; ingCache[f.url] = {ing: f.ing, src: f.ingSrc};
     const why = ruleBreak(f.name, f.ing, (f.cats || []).some(c => FRUIT_CATS.includes(c)));
     if (why){ ruledOut[f.url] = why; store.set('ruledOut2', ruledOut); const i = FOODS.indexOf(f); if (i >= 0) FOODS.splice(i, 1); rs.banned++; logRemoved(f.name, f.store, f.url, f.cats, 'banned: ' + why, f.ing); return true; }
@@ -1108,7 +1110,7 @@ async function fetchDetails(it){
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
     const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(it.url)}`, 20000);
-    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.ing || !ingFull(it)){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
+    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = it.titleVouched ? 'The seller doesn’t list ingredients. The title says it is made from einkorn, spelt or kamut and nothing in it breaks your rules, so ask the seller what else is in it before you buy.' : `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.titleVouched && (!it.ing || !ingFull(it))){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
     it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
     ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache2', ingCache);
     if (box) box.textContent = it.ing;
