@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.18.8">
+<meta name="pf-version" content="1.18.9">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -379,7 +379,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.8';
+const VERSION = '1.18.9';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1179,13 +1179,17 @@ const skeletons = n => Array.from({length: n}, (_, i) => `<div class="skel" styl
 
 /* ---------- filters ---------- */
 let pool = [], F = {}, listMode = '';
-const blankF = () => ({gmo: '', sort: 'pop', brand: '', store: '', min: '', max: '', style: '', fabric: '', cert: '', kind: ''});
+const EBT_CHAINS = /kroger|ralphs|fred meyer|king soopers|harris teeter|smith'?s|fry'?s|walmart|target|aldi|whole foods|sprouts|safeway|albertsons|publix|trader joe|amazon fresh|meijer|wegmans|h-?e-?b|giant|stop & shop|food lion/i;
+const NOT_SNAP = /\b(supplements?|vitamins?|capsules?|tinctures?|probiotics?|collagen|protein powder|alcohol|wine|beer|hot (food|meal)s?)\b/i;
+const ebtOk = it => it.kind === 'food' && !NOT_SNAP.test(it.name || '') && [it.store, ...(it.stores || [])].some(x => EBT_CHAINS.test(String(x || '')));
+const blankF = () => ({ebt: store.get('ebt', ''), gmo: '', sort: 'pop', brand: '', store: '', min: '', max: '', style: '', fabric: '', cert: '', kind: ''});
 const opts = (arr, sel, all) => `<option value="">${all}</option>` + [...new Set(arr)].filter(Boolean).sort().map(v => `<option ${v === sel ? 'selected' : ''}>${esc(v)}</option>`).join('');
 function applyF(items){
   let out = items.filter(it => (it.kind !== 'food' || passesRules(it)) &&
     (!F.kind || it.kind === F.kind) && (!F.brand || it.brand === F.brand) &&
     (!F.store || it.store === F.store || (it.stores || []).includes(F.store)) &&
     (!F.style || it.styles.includes(F.style)) && (!F.fabric || it.fabricTags.includes(F.fabric)) &&
+    (!F.ebt || it.kind !== 'food' || ebtOk(it)) &&
     (!F.gmo || (F.gmo === 'label' ? !!it.nonGmo : F.gmo === 'both' ? !!(it.nonGmo && it.cert) : !!(it.nonGmo || it.cert))) &&
     (!F.cert || (F.cert === 'Not labeled organic' ? !it.cert : (it.cert || '').startsWith(F.cert))) &&
     (F.min === '' || (it.price != null && it.price >= +F.min)) && (F.max === '' || (it.price != null && it.price <= +F.max)));
@@ -1207,6 +1211,7 @@ function filterBar(items){
     <label>Store<select class="field" name="store">${opts(items.flatMap(i => i.stores || [i.store]), F.store, 'All stores')}</select></label>
     ${hasCot ? `<label>Aesthetic<select class="field" name="style"><option value="">All aesthetics</option>${STYLES.map(([k, n]) => `<option value="${k}" ${F.style === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label>Fabric<select class="field" name="fabric">${opts(items.flatMap(i => i.fabricTags), F.fabric, 'Any fabric')}</select></label>` : ''}
+    ${hasFood ? `<label>EBT / SNAP<select class="field" name="ebt"><option value="">EBT off (show everything)</option><option value="on" ${F.ebt === 'on' ? 'selected' : ''}>EBT on (only stores that take EBT)</option></select></label>` : ''}
     ${hasFood ? `<label>Organic / Non-GMO<select class="field" name="gmo"><option value="">Organic or Non-GMO</option><option value="both" ${F.gmo === 'both' ? 'selected' : ''}>Organic AND Non-GMO</option><option value="label" ${F.gmo === 'label' ? 'selected' : ''}>Non-GMO label only</option></select></label>` : ''}
     <label>Organic certification<select class="field" name="cert"><option value="">Any</option>${certs.map(c => `<option ${F.cert === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
     ${items.some(i => i.price != null) ? `<label class="pr">Price ($)<div><input class="field" name="min" type="number" min="0" inputmode="decimal" placeholder="Min" value="${esc(F.min)}"><input class="field" name="max" type="number" min="0" inputmode="decimal" placeholder="Max" value="${esc(F.max)}"></div></label>` : ''}
@@ -1279,7 +1284,7 @@ function mountList(el, items, emptyMsg){
   paint();
 }
 document.addEventListener('input', e => { const f = e.target.closest('#fb'); if (!f) return; F[e.target.name] = e.target.value; paint(); });
-document.addEventListener('change', e => { const f = e.target.closest('#fb'); if (!f) return; F[e.target.name] = e.target.value; paint(); });
+document.addEventListener('change', e => { const f = e.target.closest('#fb'); if (!f) return; F[e.target.name] = e.target.value; if (e.target.name === 'ebt') store.set('ebt', e.target.value); paint(); });
 
 /* ---------- views ---------- */
 const main = $('#main');

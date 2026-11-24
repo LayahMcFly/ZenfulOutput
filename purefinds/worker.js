@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.2';
+const VERSION = '1.9.3';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -27,7 +27,7 @@ const STORES = {
     ['organicbasics.com', 'Organic Basics'], ['merzbschwanen.com', 'Merz b. Schwanen'], ['babaa.es', 'Babaà'],
     ['tradlands.com', 'Tradlands'], ['outerknown.com', 'Outerknown'],
     ['www.kowtowclothing.com', 'Kowtow'], ['lucyandyak.com', 'Lucy & Yak'], ['www.loveshackfancy.com', 'LoveShackFancy'],
-    ['knownsupply.com', 'Known Supply']
+    ['knownsupply.com', 'Known Supply'], ['pyneandsmith.com', 'Pyne & Smith'], ['slipsilk.com', 'Slip'], ['primary.com', 'Primary']
   ],
   food: [
     ['yumearth.com', 'YumEarth'], ['www.theochocolate.com', 'Theo Chocolate'], ['lesserevil.com', 'LesserEvil'],
