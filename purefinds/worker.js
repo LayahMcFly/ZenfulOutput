@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.8.1';
+const VERSION = '1.8.2';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -73,6 +73,14 @@ export default {
         const r = await fetch(target.toString(), {headers: UA, cf: {cacheTtl: 3600, cacheEverything: true}});
         if (!r.ok) return json({error: `Open Food Facts answered HTTP ${r.status}`}, 502, 0);
         return json(await r.json(), 200, 3600);
+      }
+      if (u.pathname === '/translate'){
+        const q = (u.searchParams.get('q') || '').slice(0, 500).trim();
+        if (!q) return json({error: 'Add text to translate, for example /translate?q=chips de bananes'}, 400);
+        const r = await fetch('https://translate.googleapis.com/translate_a/single?' + new URLSearchParams({client: 'gtx', sl: 'auto', tl: 'en', dt: 't', q}), {headers: UA, cf: {cacheTtl: 604800, cacheEverything: true}});
+        if (!r.ok) return json({error: `Translation answered HTTP ${r.status}`}, 502, 0);
+        const j = await r.json();
+        return json({text: (j[0] || []).map(x => x[0]).join(''), from: j[2] || ''}, 200, 604800);
       }
       if (u.pathname === '/kroger'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();

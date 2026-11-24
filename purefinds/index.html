@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.26">
+<meta name="pf-version" content="1.17.27">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.26';
+const VERSION = '1.17.27';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -935,7 +935,7 @@ function addScanned(type, rows){
         price: r.price, img: sized(r.img), cats, certText: r.organic || r.nonGmo, cert: r.organic, nonGmo: r.nonGmo, ing,
         ingSrc: r.ing && ing === r.ing ? (r.ingSrc || 'Brand listing') : cached ? cached.src : fromName ? 'Single-ingredient product (its name is the ingredient)' : '', claims: claimsFrom(r.desc || ''), note: '', created: Date.parse(r.created) || 0,
         pop: ing ? 1 : 0, order: 1000 + FOODS.length, fabricTags: [], styles: [],
-        desc: r.store === 'Kroger' ? `${r.vendor || 'Kroger'} product sold at Kroger family stores. Ingredients come from the Open Food Facts record for its barcode.` : r.store === 'Etsy' ? `Sold by ${r.vendor || 'an Etsy seller'} on Etsy. PureFinds found it in an Etsy search and checked it against your food rules.` : `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
+        desc: r.store === 'Kroger' ? `${r.vendor || 'Kroger'} product sold at Kroger family stores. Ingredients come from the Open Food Facts record for its barcode.` : r.store === 'Etsy' ? `Sold by ${r.vendor || 'an Etsy seller'} on Etsy. PureFinds found it in an Etsy search and checked it against your food rules.${r.origName ? ` Translated to English automatically. Original title: “${r.origName}”.` : ''}` : `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
     }
     n++;
   }
@@ -971,11 +971,32 @@ async function resolveIngredients(){
 const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
 const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
+// Automatic English translation. Listings in other languages are translated before the food rules run, so a banned ingredient can't hide in another language.
+const FOREIGN = /[\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u06FF\u0900-\u0DFF\u0E00-\u0E7F\u3040-\u30FF\u3400-\u9FFF\uAC00-\uD7AF]|\b(de|du|des|aux|avec|sans|pour|artisanal|artisanale|naturel|naturelle|con|sin|und|mit|f\u00fcr|ohne|della|senza|zonder|voor|biologico|biologique|ecologico)\b/i;
+const trCache = store.get('tr1', {});
+async function translateText(text){
+  const t = String(text || '').trim().slice(0, 500); if (!t) return t;
+  if (trCache[t] != null) return trCache[t];
+  let out = '';
+  const q = encodeURIComponent(t);
+  try { if (scanBase()) out = (await getJSON(`${scanBase()}/translate?q=${q}`, 15000)).text || ''; } catch (e){}
+  if (!out) try { const j = await getJSON(`https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=en&dt=t&q=${q}`, 15000); out = (j[0] || []).map(x => x[0]).join(''); } catch (e){}
+  if (!out) return t;
+  trCache[t] = out; store.set('tr1', trCache); return out;
+}
+async function translateRows(rows){
+  const todo = rows.filter(r => FOREIGN.test(`${r.name} ${r.ing || ''}`)); let i = 0;
+  await Promise.all(Array.from({length: 4}, async () => { while (i < todo.length){ const r = todo[i++];
+    try { const nm = await translateText(r.name); if (nm && nm !== r.name){ r.origName = r.name; r.name = nm; }
+      if (r.ing && FOREIGN.test(r.ing)) r.ing = await translateText(r.ing); } catch (e){}
+  } }));
+  return rows;
+}
 async function scanEtsy(st, type = 'cotton'){
   for (const q of (type === 'food' ? ETSY_FOOD_QUERIES : ETSY_QUERIES)){
-    const key = `etsy4|${type}|${q}`, hit = store.get(key, null); let rows = [];
+    const key = `etsy5|${type}|${q}`, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/etsy?v=2&type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    else try { rows = await translateRows((await getJSON(`${scanBase()}/etsy?v=2&type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []); store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
     etsySeen += rows.length; const n = addScanned(type, rows); etsyAdded += n; st.added += n;
   }
