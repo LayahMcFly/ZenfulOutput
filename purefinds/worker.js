@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.1';
+const VERSION = '1.9.2';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -236,7 +236,8 @@ async function etsySearch(q, key, type){
       if (!/skin|face|facial|nail|polish|lacquer|hair|serum|cream|lotion|balm|moisturi|cleanser|toner|mask|scrub|oil|butter|shampoo|conditioner|lip|sunscreen|deodorant|soap/i.test(kind)) continue;
       const mats = (l.materials || []).map(String).filter(Boolean);
       const ing = findIngredients(plainList(l.description), true) || (mats.length >= 3 ? mats.join(', ') : '');
-      out.push({...row, ing, ingSrc: ing ? 'Etsy listing' : '', desc: desc.slice(0, 300)});
+      const pureCastor = !ing && /\b(100% )?(pure|organic|cold[- ]pressed)\b[^,]{0,30}\bcastor oil\b/i.test(title) && !/\b(blend|with|infused|serum|mix|\+|&)\b/i.test(title) ? 'Castor oil (Ricinus communis seed oil)' : '';
+      out.push({...row, ing: ing || pureCastor, ingSrc: (ing || pureCastor) ? 'Etsy listing' : '', desc: desc.slice(0, 300)});
       continue;
     }
     const f = pureFabric(desc) || pureFabric(title);
