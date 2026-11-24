@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.9">
+<meta name="pf-version" content="1.17.10">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -368,7 +368,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.9';
+const VERSION = '1.17.10';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -895,7 +895,8 @@ function addScanned(type, rows){
         desc: `${SINGULAR[t] || 'Piece'} from ${r.store}, found in its online catalog. The listing says “${r.fabric}”, with no other fabric mentioned.`}));
     } else {
       if (FOODS.some(f => f.url === r.url)) continue;
-      const cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
+      let cats = foodCats(`${r.name} ${r.ptype}`);
+      if (cats.length === 1 && cats[0] === 'natural') cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
       const cached = ingCache[r.url], ing = (okIng(r.ing, 'Brand listing') && r.ing) || (cached && cached.ing) || '';
       { const why = ruleBreak(r.name, ing, cats.some(c => FRUIT_CATS.includes(c))); if (why){ logRemoved(r.name, r.store, r.url, cats, 'banned: ' + why, ing); continue; } } // marketing text isn't checked: "soy-free" or "no natural flavors" would wrongly remove good products
       FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
@@ -1336,7 +1337,8 @@ async function loadFoodList(k, key){
       <p>${pickupGroups(key).length ? 'Use the pickup links above to shop fresh items at a store near you.' : `PureFinds found no ${esc(word)} that follow your food rules.`}</p>
       ${gone.length ? `<p>${gone.length} ${esc(word)} ${gone.length === 1 ? 'was' : 'were'} hidden:</p><ul style="text-align:left;margin:6px auto;max-width:460px">${gone.slice(0, 6).map(x => `<li>${esc(x.name)}: ${esc(reasonText(x.reason))}</li>`).join('')}</ul>` : `<p>None were found in the stores PureFinds checks, so nothing was hidden either.</p>`}
       ${rel.length ? `<button class="btn" type="button" id="showRel">See the ${rel.length} other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds instead</button>` : ''}</div>`;
-    const b = $('#showRel'); if (b) b.onclick = () => mountList($('#list'), rel, emptyMsg);
+    const b = $('#showRel'); if (b) b.onclick = () => { mountList($('#list'), rel, emptyMsg);
+      $('#list').insertAdjacentHTML('afterbegin', `<p class="note warn">These are <b>not ${esc(word)}</b>. No ${esc(word)} passed your food rules, so this shows the other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds instead. <button class="link" type="button" data-sub="${esc(key)}" data-sec="${esc(k)}">Back to ${esc(word)}</button></p>`); };
   };
   if (mine.length) show(mine);
   if (!cat[1]){
