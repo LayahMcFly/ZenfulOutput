@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.30">
+<meta name="pf-version" content="1.17.31">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -378,7 +378,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.30';
+const VERSION = '1.17.31';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -547,7 +547,7 @@ const FCATS = {
  nuts:['Walnuts & almonds','almonds',null,null,/almond|walnut/i], meat:['Meat & poultry','chicken'], pantry:['Pasta, rice & beans','pasta'], 'frozen-foods':['Frozen fruit & veggies','frozen vegetables'],
  drinks:['Juice & kids drinks','juice'], 'plant-milk':['Almond milk','almond milk',null,null,/almond/i], 'ginger-tea':['Ginger & chaga tea','ginger chaga tea',null,null,/ginger|chaga/i], 'raspberry-tea':['Raspberry tea','raspberry tea',null,null,/raspberr/i], 'rosemary-tea':['Rosemary tea','rosemary tea',null,null,/rosemary/i],
  'herbal-tea':['Herbal tea','herbal tea',null,null,/herbal|chamomile|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden/i], tea:['Other tea & coffee','tea'],
- frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle'],
+ frozen:['Ice cream','ice cream'], popsicles:['Popsicles','popsicle'], 'freeze-dried':['Freeze-dried','freeze dried'],
  sprouted:['Sprouted flours','sprouted flour',null,null,/sprout/i], spelt:['Spelt','spelt',null,null,/spelt/i], einkorn:['Einkorn','einkorn',null,null,/einkorn/i],
  kamut:['Kamut (khorasan)','kamut',null,null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',null,null,/quinoa/i], teff:['Teff','teff',null,null,/teff/i],
  amaranth:['Amaranth','amaranth',null,null,/amaranth/i], rye:['Rye','rye flour',null,null,/\brye\b/i], fonio:['Fonio','fonio',null,null,/fonio/i],
@@ -555,6 +555,7 @@ const FCATS = {
 };
 // Extra live searches by allowed flour, so baked goods made with einkorn, spelt or rye are found outside the flour section
 const FLOUR_QUERIES = {
+ 'freeze-dried': ['freeze dried strawberries', 'freeze dried fruit', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana'],
  'dried-fruit': ['dried mango', 'raisins', 'dried apricots', 'apple chips', 'banana chips', 'freeze dried strawberries'],
  'fruit-snacks': ['fruit leather', 'fruit bites'],
  cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
@@ -569,7 +570,7 @@ const FOOD_SECTIONS = [
  ['bread','Bread & bakery','Spelt, einkorn and rye breads, tortillas, bagels and baking, all wheat-free and corn-free',['bread','tortillas','bagels','baking']],
  ['breakfast','Breakfast','Oat-free cereal, grain-free granola, puffed and flaked grains, almond butter and pancake mix',['cereal','nut-butter','pancake']],
  ['drinks','Drinks','Juice, almond milk, ginger and chaga, raspberry, rosemary and other herbal teas',['drinks','plant-milk','ginger-tea','raspberry-tea','rosemary-tea','herbal-tea','tea']],
- ['frozen','Frozen treats','Ice cream and popsicles',['frozen','popsicles']]
+ ['frozen','Frozen treats','Ice cream, popsicles, freeze-dried fruit and treats, and frozen fruit and veggies',['frozen','popsicles','freeze-dried','frozen-foods']]
 ];
 // Every section starts with an "All" option that shows everything in it.
 // Live search words for each section's All (null = brand stores and pickup lists only).
@@ -583,11 +584,14 @@ for (const sec of FOOD_SECTIONS){
 // Strict name rules for categories whose words are common elsewhere ("butter" in butternut or body butter, "cream" in body cream, "frozen" in frozen vegetables)
 FCATS.milk[4] = /^(?!.*\b(body|hand|face|skin|belly|whipped|shea|cocoa|cacao|moisturi[sz]\w*|lotion|soap|wax|candle|butternut|butterfly|squash|baby|toddler|pouch|creamies|snacks?|bars?|bites|cookies?|granola|cereal|chocolate|candy|powder|concentrate|yogh?urt|ice cream|apple|tomato|chicken|turkey|beef|broth|banana|strawberry|mango|smoothie|latte|coffee|tea|pancake|mix|bread|dip|dressing|sauce|soup|pizza|crackers?|chips|puffs|oats?|peanut|cashew|pistachio|pecan|macadamia|hazelnut|pine nut|hemp|seeds?|sunflower|soy|rice|collagen|oils?|yeast|eggnog)\b)(?!.*\b(almond|walnut)\s+butter).*\b(milk|cheeses?|butter|ghee|cream|kefir|half and half)\b/i;
 const FROZEN_RX = /^(?!.*\b(body|soap|wax|candle|lotion|cookies?|cake|freeze[- ]dried|astronaut|vegetables?|veggies?|fruit blend|spinach|kale|broccoli|cauliflower|squash|peas|corn|bread|pizza|burrito|chicken|baby)\b).*\b(ice cream|gelato|sorbet|sherbet|frozen (yogh?urt|dessert|treat)s?|popsicles?|ice pops?|freezer pops?|frozen pops?|fruit bars?|ice bars?|cream bars?|pops)\b/i;
-FCATS.frozen[4] = FROZEN_RX; FCATS.popsicles[4] = FROZEN_RX; FCATS['all-frozen'][4] = FROZEN_RX;
+FCATS.frozen[4] = FROZEN_RX; FCATS.popsicles[4] = FROZEN_RX; FCATS['freeze-dried'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|pet|dog|cat)\b).*freeze[- ]dried/i;
+FCATS['frozen-foods'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|freeze[- ]dried)\b).*\bfrozen\b/i;
+FCATS['all-frozen'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|pet|dog|cat)\b).*(\bfrozen\b|freeze[- ]dried|\b(ice cream|gelato|sorbet|sherbet|popsicles?|ice pops?)\b)/i;
 // Fresh items to pick up: each opens a store search for "organic <item>"
 const PICKUP = {
  cereal:['Puffed kamut','Puffed quinoa','Puffed amaranth','Quinoa flakes','Spelt flakes','Grain-free granola','Buckwheat groats','Puffed millet'],
  frozen:['Coconut milk ice cream','Vanilla ice cream','Chocolate ice cream','Mango sorbet','Strawberry sorbet','Raspberry sorbet','Frozen banana soft serve','Coconut ice cream bars'],
+ 'freeze-dried':['Freeze dried strawberries','Freeze dried mango','Freeze dried apple','Freeze dried banana','Freeze dried blueberries'],
  popsicles:['Fruit bars','Mango popsicles','Strawberry popsicles','Blueberry popsicles','Watermelon popsicles','Coconut water popsicles'],
  fruit:['Apples','Bananas','Plantains','Peaches','Pears','Grapes','Mangoes','Papaya','Strawberries','Blueberries','Raspberries','Blackberries'],
  nuts:['Raw almonds','Raw walnuts','Almond butter','Walnut halves','Almond flour'],
@@ -910,13 +914,13 @@ const FOOD_MAP = [
   [/(ginger|chaga)[a-z ,&-]*\b(tea|infusion|brew)\b|\b(tea|infusion)\b[a-z ,&-]*(ginger|chaga)/, 'ginger-tea'], [/raspberr[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*raspberr/, 'raspberry-tea'], [/rosemary[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*rosemary/, 'rosemary-tea'],
   [/herbal|(chamomile|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden)[a-z ]*\b(tea|infusion)\b/, 'herbal-tea'],
   [/juice|smoothie|electrolyte|lemonade|\bdrinks?\b/, 'drinks'], [/(oat|almond|plant) milk/, 'plant-milk'], [/\btea\b|coffee/, 'tea'],
-  [/ice cream/, 'frozen'], [/popsicle|frozen pop/, 'popsicles']
+  [/ice cream/, 'frozen'], [/popsicle|frozen pop/, 'popsicles'], [/freeze[- ]dried/, 'freeze-dried'], [/\bfrozen\b/, 'frozen-foods']
 ];
 const foodCats = t => { const s = t.toLowerCase(), c = FOOD_MAP.filter(([re]) => re.test(s)).map(([, k]) => k); return c.length ? [...new Set(c)] : ['natural']; };
 const claimsFrom = t => [[/no preservatives|preservative[- ]free/i, 'No preservatives'], [/no artificial (colors|dyes)|no artificial/i, 'No artificial colors or flavors'],
   [/gluten[- ]free/i, 'Gluten-free'], [/\bvegan\b/i, 'Vegan'], [/no added sugar/i, 'No added sugar']].filter(([re]) => re.test(t)).map(([, c]) => c);
 
-const ETSY_NOT_FOOD = /\b(powders?|tea|leaf|leaves|saplings?|trees?|plants?|scionwood|sticks?|candy|candies|taffy|ice cream|marshmallows?|skittles|sk\*ttles|astronaut|sourdough starter|herbal|herbs?|spices?|amch(?:o)?ur|mango seeds?|altar|crafts?|incense|essential oils?|soap|lotion|fertilizer)\b/i;
+const ETSY_NOT_FOOD = /\b(powders?|tea|leaf|leaves|saplings?|trees?|plants?|scionwood|sticks?|candy|candies|taffy|marshmallows?|skittles|sk\*ttles|sourdough starter|herbal|herbs?|spices?|amch(?:o)?ur|mango seeds?|altar|crafts?|incense|essential oils?|soap|lotion|fertilizer)\b/i;
 function addScanned(type, rows){
   let n = 0;
   for (const r of rows){
