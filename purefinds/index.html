@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.32">
+<meta name="pf-version" content="1.17.34">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -378,7 +378,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.32';
+const VERSION = '1.17.34';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -555,6 +555,9 @@ const FCATS = {
 };
 // Extra live searches by allowed flour, so baked goods made with einkorn, spelt or rye are found outside the flour section
 const FLOUR_QUERIES = {
+ 'all-frozen': ['ice cream', 'popsicle', 'sorbet', 'frozen strawberries', 'frozen blueberries', 'frozen mango', 'frozen peaches', 'frozen mixed berries', 'frozen broccoli', 'frozen green beans', 'frozen peas', 'frozen zucchini', 'frozen kale', 'freeze dried fruit', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple'],
+ 'frozen-foods': ['frozen strawberries', 'frozen blueberries', 'frozen mango', 'frozen peaches', 'frozen broccoli', 'frozen green beans', 'frozen peas', 'frozen zucchini'],
+ frozen: ['organic ice cream', 'coconut milk ice cream', 'sorbet'], popsicles: ['fruit popsicles', 'frozen fruit bars'],
  'freeze-dried': ['freeze dried strawberries', 'freeze dried fruit', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana'],
  'dried-fruit': ['dried mango', 'raisins', 'dried apricots', 'apple chips', 'banana chips', 'freeze dried strawberries'],
  'fruit-snacks': ['fruit leather', 'fruit bites'],
@@ -886,6 +889,15 @@ const singleIngredient = name => {
   const words = String(name || '').toLowerCase().replace(/\(.*?\)/g, ' ').replace(/\d+(\.\d+)?\s*(lb|lbs|oz|g|kg|pound|pounds|ct|count|pack|bags?)\b/g, ' ').split(/[^a-z]+/).filter(Boolean);
   return words.length > 0 && words.length <= 9 && words.some(w => SINGLE_CORE.test(w)) && words.every(w => SINGLE_CORE.test(w) || SINGLE_OK.test(w));
 };
+// "Freeze Dried Strawberries | Crunchy Fruit Snack…": when the first part of the title is only a fruit or vegetable plus words like dried, frozen or organic, the produce is the whole ingredient list
+const PRODUCE = /^(strawberry|strawberries|mango|mangoes|mangos|banana|bananas|apple|apples|apricot|apricots|blueberry|blueberries|raspberry|raspberries|blackberry|blackberries|peach|peaches|pear|pears|grape|grapes|papaya|fig|figs|kale|zucchini|peas|broccoli|plantain|plantains|coconut|dates|mulberries|cherries|kiwi|watermelon|melon)$/;
+const PRODUCE_OK = /^(organic|freeze|dried|dry|frozen|dehydrated|sliced|slices|whole|pieces|chunks|strips|unsweetened|unsulphured|unsulfured|sun|natural|raw|bulk|crunchy|real|fruit|and|mix|green|beans|bean|non|gmo)$/;
+const singleProduce = name => {
+  const seg = String(name || '').split(/\s*[|–—]\s*|\s+-\s+/)[0].toLowerCase().replace(/\(.*?\)/g, ' ');
+  const words = seg.split(/[^a-z]+/).filter(Boolean), prod = words.filter(w => PRODUCE.test(w));
+  if (!prod.length || prod.length > 3 || words.length > 8 || !words.every(w => PRODUCE.test(w) || PRODUCE_OK.test(w))) return '';
+  return (/\borganic\b/.test(seg) ? 'Organic ' : '') + prod.join(', ');
+};
 const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`);
 const SHOW_NOING = store.get('showNoIng', false); // optional: keep foods whose ingredient list can't be read (marked unverified)
 const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
@@ -944,8 +956,9 @@ function addScanned(type, rows){
       { const dup = FOODS.find(f => f.url === r.url); if (dup){ if (!dup.ing && r.ing && okIng(r.ing, r.ingSrc || 'Brand listing') && !ruleBreak(dup.name, r.ing, (dup.cats || []).some(c => FRUIT_CATS.includes(c)))){ dup.ing = r.ing; dup.ingSrc = r.ingSrc || 'Brand listing'; dup.pop = 1; } continue; } }
       let cats = foodCats(`${r.name} ${r.ptype}`);
       if (cats.length === 1 && cats[0] === 'natural') cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
-      const cached0 = ingCache[r.url], cached = cached0 && okIng(cached0.ing, cached0.src) ? cached0 : null, fromName = !r.ing && !(cached && cached.ing) && singleIngredient(r.name);
-      r.ing = dropBadges(r.ing); const ing = (okIng(r.ing, r.ingSrc || 'Brand listing') && r.ing) || (cached && cached.ing) || (fromName ? r.name.replace(/\s*[-–|]\s*\d.*$/, '').trim() : '');
+      if (r.store === 'Traditional Medicinals' && /\btea\b/i.test(r.name)) cats = ['herbal-tea']; // the whole range is herbal tea, whatever the product is called
+      const cached0 = ingCache[r.url], cached = cached0 && okIng(cached0.ing, cached0.src) ? cached0 : null, fromName = !r.ing && !(cached && cached.ing) && (singleIngredient(r.name) || !!singleProduce(r.name));
+      r.ing = dropBadges(r.ing); const ing = (okIng(r.ing, r.ingSrc || 'Brand listing') && r.ing) || (cached && cached.ing) || (fromName ? (singleIngredient(r.name) ? r.name.replace(/\s*[-–|]\s*\d.*$/, '').trim() : singleProduce(r.name)) : '');
       if (!ing && (r.store === 'Etsy' || r.store === 'Kroger')){ logRemoved(r.name, r.store, r.url, cats, 'no readable ingredients'); continue; }
       { const why = ruleBreak(r.name, ing, cats.some(c => FRUIT_CATS.includes(c))); if (why){ logRemoved(r.name, r.store, r.url, cats, 'banned: ' + why, ing); continue; } } // marketing text isn't checked: "soy-free" or "no natural flavors" would wrongly remove good products
       FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
@@ -985,7 +998,7 @@ async function resolveIngredients(){
 
 // Etsy: the scanner searches Etsy. Clothing must say 100% cotton (or another pure fabric) with no blend; food goes through every
 // PureFinds food rule like any other store. Needs the ETSY_KEY and ETSY_SECRET secrets on the Worker.
-const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
+const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana', 'freeze dried blueberries', 'freeze dried raspberries', 'frozen fruit organic', 'organic dried apricots', 'organic dried figs', 'organic dates', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
 const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 // Automatic English translation. Listings in other languages are translated before the food rules run, so a banned ingredient can't hide in another language.
@@ -1022,8 +1035,9 @@ async function scanEtsy(st, type = 'cotton'){
 // Kroger family stores (Kroger, Ralphs, Fred Meyer, King Soopers, Harris Teeter, Smith's and more): the scanner searches Kroger's catalog,
 // keeps organic or Non-GMO items, and finds each one's ingredients on Open Food Facts by barcode. Needs KROGER_ID and KROGER_SECRET on the Worker.
 let krogerNote = '', krogerAdded = 0, krogerSeen = 0;
+const KROGER_EXTRA = ['organic frozen strawberries', 'organic frozen blueberries', 'organic frozen mango', 'organic frozen peaches', 'organic frozen mixed berries', 'organic frozen broccoli', 'organic frozen green beans', 'organic frozen peas', 'organic frozen zucchini', 'organic frozen kale', 'organic ice cream', 'organic fruit pops', 'organic sorbet', 'organic freeze dried fruit', 'organic dried mango', 'organic raisins', 'organic dried apricots', 'organic dates'];
 async function scanKroger(st){
-  const terms = [...new Set(Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t))];
+  const terms = [...new Set([...Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t), ...KROGER_EXTRA])];
   let i = 0;
   await Promise.all(Array.from({length: 3}, async () => { while (i < terms.length){ const q = terms[i++];
     const key = 'kroger3|' + q, hit = store.get(key, null); let rows = [];
@@ -1269,7 +1283,7 @@ const pick = (arr, n, s = seed) => { const a = [...arr]; let x = s; for (let i =
 const REGIONS = [['americas', 'Americas', 'United States and Canada'], ['europe', 'Europe', 'United Kingdom and the European Union'], ['asia', 'Asia and Pacific', 'Japan, Australia and nearby'], ['other', 'Other and unlisted', 'Stores PureFinds has no location for']];
 const OFF_COUNTRIES = {americas: ['en:united-states', 'en:canada'], europe: ['en:united-kingdom', 'en:france', 'en:germany', 'en:spain', 'en:italy'], asia: ['en:japan', 'en:australia'], other: []};
 // Where each store ships from. Stores not listed here count as "Other and unlisted".
-const STORE_REGION = {'Etsy': 'americas', 'Kroger': 'americas', 'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
+const STORE_REGION = {'Etsy': 'americas', 'Kroger': 'americas', 'Traditional Medicinals': 'americas', 'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
   'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas', 'Etsy': 'other',
   'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'americas', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
   'YumEarth': 'americas', 'Theo Chocolate': 'americas', 'LesserEvil': 'americas', 'Mavuno Harvest': 'americas', "Mary's Gone Crackers": 'americas', 'Purely Elizabeth': 'americas', 'Once Upon a Farm': 'americas',
@@ -1441,7 +1455,7 @@ function bakePanel(what){
 }
 async function loadFoodList(k, key){
   { const b = document.getElementById('bake'); if (b) b.innerHTML = BAKE_KEYS.includes(key) ? bakePanel(FCATS[key][0].replace(/^All /, '').toLowerCase()) : ''; }
-  const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name));
+  const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name) || f.store === 'Traditional Medicinals');
   const mine = [...base, ...textMatches(key).filter(f => !base.includes(f))].sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const sec = FOOD_SECTIONS.find(x => x[0] === k), related = () => { const seen = new Set(); return (sec ? sec[3] : []).flatMap(c => FCATS[c] ? brandFor(c) : []).filter(f => !seen.has(f.id) && seen.add(f.id)); };

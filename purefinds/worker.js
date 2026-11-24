@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.8.2';
+const VERSION = '1.8.3';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -35,7 +35,7 @@ const STORES = {
     ['purelyelizabeth.com', 'Purely Elizabeth'], ['onceuponafarmorganics.com', 'Once Upon a Farm'],
     ['www.alterecofoods.com', 'Alter Eco'], ['madegoodfoods.com', 'Made Good'], ['hukitchen.com', 'Hu Kitchen'],
     ['janiesmill.com', "Janie's Mill"], ['jovialfoods.com', 'Jovial'], ['yolele.com', 'Yolélé'],
-    ['wildernesspoets.com', 'Wilderness Poets'], ['www.navitasorganics.com', 'Navitas Organics'],
+    ['www.traditionalmedicinals.com', 'Traditional Medicinals'], ['wildernesspoets.com', 'Wilderness Poets'], ['www.navitasorganics.com', 'Navitas Organics'],
     ['www.terrasoul.com', 'Terrasoul Superfoods'], ['barnana.com', 'Barnana'], ['anthonysgoods.com', "Anthony's Goods"],
     ['www.sunfood.com', 'Sunfood'], ['www.larkellenfarm.com', 'Lark Ellen Farm'], ['elmhurst1925.com', 'Elmhurst 1925'],
     ['www.paleonola.com', 'Paleonola'], ['sevensundays.com', 'Seven Sundays'], ['www.seaveg.com', 'Maine Coast Sea Vegetables'], ['dailycrunchsnacks.com', 'Daily Crunch']
