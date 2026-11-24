@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.8.0';
+const VERSION = '1.8.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -234,10 +234,17 @@ async function etsySearch(q, key, type){
 let krogerToken = null;
 async function krogerAuth(env){
   if (krogerToken && krogerToken.until > Date.now() + 60e3) return krogerToken.v;
-  const r = await fetch('https://api.kroger.com/v1/connect/oauth2/token', {method: 'POST',
-    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + btoa(`${env.KROGER_ID}:${env.KROGER_SECRET}`)},
+  const id = String(env.KROGER_ID || '').trim(), secret = String(env.KROGER_SECRET || '').trim();
+  const ask = host => fetch(`https://${host}/v1/connect/oauth2/token`, {method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + btoa(`${id}:${secret}`)},
     body: 'grant_type=client_credentials&scope=product.compact'});
-  if (!r.ok){ let why = ''; try { const j = await r.json(); why = ': ' + (j.error_description || j.error || ''); } catch (e){} throw new Error(`Kroger sign-in answered HTTP ${r.status}${why}. Check KROGER_ID and KROGER_SECRET.`); }
+  let r = await ask('api.kroger.com');
+  if (!r.ok){
+    let why = ''; try { const j = await r.json(); why = j.error_description || j.error || ''; } catch (e){}
+    let hint = ` (ID is ${id.length} characters starting "${id.slice(0, 10)}", secret is ${secret.length} characters)`;
+    if (r.status === 401){ try { const c = await ask('api-ce.kroger.com'); if (c.ok) hint = ' These keys work on Kroger\'s Certification (test) system, not Production. Make a new Kroger app and choose Production.'; } catch (e){} }
+    throw new Error(`Kroger sign-in answered HTTP ${r.status}: ${why}.${hint}`);
+  }
   const j = await r.json(); krogerToken = {v: j.access_token, until: Date.now() + (j.expires_in || 1800) * 1000}; return krogerToken.v;
 }
 // Kroger's 13-digit UPCs leave off the check digit; Open Food Facts needs it
