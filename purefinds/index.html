@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.7">
+<meta name="pf-version" content="1.17.8">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -368,7 +368,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.7';
+const VERSION = '1.17.8';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1287,7 +1287,7 @@ function foodSection(k){ setTimeout(scanNote);
   <details class="fold"><summary>PureFinds food rules</summary><p>${RULE_TEXT}</p></details>
   <p class="note" id="scanNote" data-type="food" hidden></p>
   ${pickupPanel(key)}
-  <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div>`;
+  <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div><div id="bake"></div>`;
   loadFoodList(k, key);
 }
 
@@ -1298,7 +1298,27 @@ const catWords = key => {
   return [...new Set([...labels, c[1]].filter(Boolean).join(' ').toLowerCase().replace(/\(.*?\)/g, ' ').split(/[^a-zé]+/).map(w => w.replace(/(ies)$/, 'y').replace(/s$/, '')).filter(w => w.length > 3 && !GENERIC.test(w)))];
 };
 const textMatches = key => { const ws = catWords(key); if (!ws.length) return []; return foodsV().filter(f => !ruledOut[f.url] && ws.some(w => (f.name + ' ' + (f.brand || '')).toLowerCase().includes(w))); };
+/* ---------- Bake your own ----------
+   Ready-made cookies, crackers, bread and the like rarely pass every food rule, so these sections (and searches
+   for baked goods) also show the flours and sweeteners that do: rules apply everywhere, whatever the section. */
+const BAKE_KEYS = ['cookies', 'crackers', 'granola-bars', 'bread', 'tortillas', 'bagels', 'baking', 'pancake', 'cereal', 'all-snacks', 'all-bread', 'all-breakfast'];
+const BAKE_WORDS = /cookie|cracker|bread|pancake|waffle|muffin|bagel|tortilla|wrap|cake|brownie|biscuit|bake|baking|flour|granola|cereal|bar\b/i;
+const BAKE_PICKUP = ['Sprouted spelt flour', 'Sprouted einkorn flour', 'Einkorn flour', 'Spelt flour', 'Rye flour', 'Kamut flour', 'Almond flour', 'Chickpea flour', 'Teff flour', 'Maple sugar', 'Coconut sugar', 'Date sugar', 'Maple syrup'];
+function bakePanel(what){
+  const flourCats = (FOOD_SECTIONS.find(x => x[0] === 'flours') || [, , , []])[3].filter(c => !c.startsWith('all-'));
+  const seen = new Set(), flours = flourCats.flatMap(c => brandFor(c)).filter(f => !seen.has(f.id) && seen.add(f.id) && passesRules(f));
+  const row = name => { const on = plist.includes(name);
+    return `<div class="prow" data-name="${esc(name.toLowerCase())}"><div class="pname"><b>${esc(name)}</b><small>Organic</small></div>
+      <div class="plinks">${storeLinks('organic ' + name.toLowerCase()).map(([st, u]) => `<a class="btn sm" href="${esc(u)}" target="_blank" rel="noopener">${st} ↗</a>`).join('')}</div>
+      <button class="btn sm ${on ? 'pk' : ''}" data-plist="${esc(name)}" aria-pressed="${on}">${on ? 'On my list' : '+ My list'}</button></div>`; };
+  return `<section class="pick" aria-label="Bake your own">
+    <div class="sh"><div><h2>Bake your own</h2><p>Ready-made ${esc(what)} that follow every one of your food rules are rare, so here are flours and sweeteners that do. Everything here is checked against the same rules.</p></div>
+    <a class="link" href="#food-flours">All flours &amp; grains →</a></div>
+    ${flours.length ? `<div class="rail">${flours.slice(0, 12).map(card).join('')}</div>` : ''}
+    <div class="prow-list"><div class="pgroup"><h3>Pick up flours and sweeteners</h3>${BAKE_PICKUP.map(row).join('')}</div></div></section>`;
+}
 async function loadFoodList(k, key){
+  { const b = document.getElementById('bake'); if (b) b.innerHTML = BAKE_KEYS.includes(key) ? bakePanel(FCATS[key][0].replace(/^All /, '').toLowerCase()) : ''; }
   const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || cat[4].test(f.name));
   const mine = [...base, ...textMatches(key).filter(f => !base.includes(f))].sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
@@ -1447,8 +1467,10 @@ function searchView(){
   const done = (foodItems, err) => {
     if (state.q.trim() !== q || !$('#list')) return;
     const all = [...cot, ...fd, ...foodItems];
+    if (!all.length && BAKE_WORDS.test(q)) { $('#list').innerHTML = `<div class="empty"><h3>No ready-made ${esc(q)} follow your food rules yet</h3><p>Here's what you can bake them with instead.</p></div>` + bakePanel(q.toLowerCase()); return; }
     if (!all.length) { $('#list').innerHTML = `<div class="empty"><h3>No matches for “${esc(q)}”</h3><p>${err ? 'Live food search was unavailable, and no' : 'No'} clothing or organic food matched. Try a broader word like “snack”, “tee” or a brand name.</p><div class="chips" style="justify-content:center">${['snack', 'chocolate', 'tee', 'dress'].map(s => `<button class="chip" data-q="${s}">${s}</button>`).join('')}</div></div>`; return; }
     mountList($('#list'), all);
+    if (BAKE_WORDS.test(q)) $('#list').insertAdjacentHTML('beforeend', bakePanel(q.toLowerCase()));
     if (err) $('#list').insertAdjacentHTML('afterbegin', '<p class="note">The live Open Food Facts search didn\'t respond, so these results come from PureFinds\' checked brand stores only.</p>');
   };
   offSearch(q, {size: 30}).then(r => done(r), () => done([], true));
