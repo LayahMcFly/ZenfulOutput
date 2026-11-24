@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.21">
+<meta name="pf-version" content="1.17.22">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.21';
+const VERSION = '1.17.22';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -546,6 +546,8 @@ const FCATS = {
 };
 // Extra live searches by allowed flour, so baked goods made with einkorn, spelt or rye are found outside the flour section
 const FLOUR_QUERIES = {
+ 'dried-fruit': ['dried mango', 'raisins', 'dried apricots', 'apple chips', 'banana chips', 'freeze dried strawberries'],
+ 'fruit-snacks': ['fruit leather', 'fruit bites'],
  cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
  pancake: ['einkorn pancake', 'spelt pancake', 'spelt waffle'], bread: ['spelt bread', 'einkorn bread', 'rye bread'],
  tortillas: ['spelt tortilla', 'einkorn tortilla'], bagels: ['spelt muffin', 'einkorn bagel'], baking: ['spelt baking mix', 'einkorn baking'],
