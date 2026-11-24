@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.16">
+<meta name="pf-version" content="1.18.17">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -397,7 +397,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.16';
+const VERSION = '1.18.17';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1254,7 +1254,7 @@ const curSection = () => { const m = (location.hash || '').match(/^#food-([a-z-]
 function sectionGroups(items){
   const sec = curSection(); if (!sec) return null;
   const cats = sec[3].filter(c => !c.startsWith('all-') && FCATS[c]);
-  const inCat = (it, c) => { const want = FCATS[c][2] || [c]; return (it.cats || []).some(x => want.includes(x)) && (!FCATS[c][4] || catNameOk(FCATS[c], it)); };
+  const inCat = (it, c) => { const want = FCATS[c][2] || [c]; return (it.cats || []).some(x => want.includes(x)) && (!FCATS[c][4] || catNameOk(FCATS[c], it, c)); };
   const rows = cats.map(c => [c, FCATS[c][0], items.filter(it => inCat(it, c)).length]);
   const other = items.filter(it => !cats.some(c => inCat(it, c))).length;
   return {sec, rows, other};
@@ -1474,8 +1474,11 @@ const catWords = key => {
   return [...new Set([...labels, c[1]].filter(Boolean).join(' ').toLowerCase().replace(/\(.*?\)/g, ' ').split(/[^a-zé]+/).map(w => w.replace(/(ies)$/, 'y').replace(/s$/, '')).filter(w => w.length > 3 && !GENERIC.test(w)))];
 };
 // a product belongs in a category if its name says so, or the store filed it under that product type (a cookie called "Maple Crunch" listed as type Cookies)
-const catNameOk = (cat, f) => cat[4].test(f.name) || (!!f.kindText && cat[4].test(`${f.name} ${f.kindText}`));
-const textMatches = key => { const ws = catWords(key); if (!ws.length) return []; return foodsV().filter(f => !ruledOut[f.url] && ws.some(w => (f.name + ' ' + (f.brand || '')).toLowerCase().includes(w)) && (!FCATS[key] || !FCATS[key][4] || catNameOk(FCATS[key], f))); };
+const TITLE_JUNK = /\b(soaps?|wax|candles?|perfume|shampoo|lotion|shirts?|tee|cutters?|body|creamers?|stamps?|molds?|moulds?|printable|pattern|sticker)\b/i;
+// if the title itself says it is a cookie (or bread, cereal, and so on), it goes in that section, whatever else the strict filter would say
+const titleSays = (key, name) => { const m = FOOD_MAP.find(([, k]) => k === key); return !!m && m[0].test(String(name || '').toLowerCase()) && !TITLE_JUNK.test(name); };
+const catNameOk = (cat, f, key) => (key && titleSays(key, f.name)) || cat[4].test(f.name) || (!!f.kindText && cat[4].test(`${f.name} ${f.kindText}`));
+const textMatches = key => { const ws = catWords(key); if (!ws.length) return []; return foodsV().filter(f => !ruledOut[f.url] && ws.some(w => (f.name + ' ' + (f.brand || '')).toLowerCase().includes(w)) && (!FCATS[key] || !FCATS[key][4] || catNameOk(FCATS[key], f, key))); };
 /* ---------- Bake your own ----------
    Ready-made cookies, crackers, bread and the like rarely pass every food rule, so these sections (and searches
    for baked goods) also show the flours and sweeteners that do: rules apply everywhere, whatever the section. */
@@ -1497,7 +1500,7 @@ function bakePanel(what){
 }
 async function loadFoodList(k, key){
   { const b = document.getElementById('bake'); if (b) b.innerHTML = BAKE_KEYS.includes(key) ? bakePanel(FCATS[key][0].replace(/^All /, '').toLowerCase()) : ''; }
-  const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || catNameOk(cat, f) || f.store === 'Traditional Medicinals');
+  const cat = FCATS[key], base = brandFor(key).filter(f => !cat[4] || catNameOk(cat, f, key) || f.store === 'Traditional Medicinals');
   const mine = [...base, ...textMatches(key).filter(f => !base.includes(f))].sort((a, b) => b.pop - a.pop);
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const sec = FOOD_SECTIONS.find(x => x[0] === k), related = () => { const seen = new Set(); return (sec ? sec[3] : []).flatMap(c => FCATS[c] ? brandFor(c) : []).filter(f => !seen.has(f.id) && seen.add(f.id)); };
@@ -1526,7 +1529,7 @@ async function loadFoodList(k, key){
     const flourSearch = Promise.allSettled((FLOUR_QUERIES[key] || []).map(q => offSearch(q, {mode: 'both', size: 24}))).then(rs2 => rs2.flatMap(r => r.status === 'fulfilled' ? r.value : []));
     const [main1, flourHits] = await Promise.all([offSearch(cat[1], {mode: cat[3] || 'both'}), flourSearch]);
     const seen = new Set(mine.map(m => m.id)), live = [];
-    for (const it of [...main1, ...flourHits]) if (!seen.has(it.id) && (!cat[4] || cat[4].test(it.name)) && !BAD_FRUIT.test(clean(it.ing))) { seen.add(it.id); live.push(it); }
+    for (const it of [...main1, ...flourHits]) if (!seen.has(it.id) && (!cat[4] || cat[4].test(it.name) || titleSays(key, it.name)) && !BAD_FRUIT.test(clean(it.ing))) { seen.add(it.id); live.push(it); }
     if (state.sub[k] !== key || !$('#list')) return;
     show([...mine, ...live]);
     $('#live').textContent = `${mine.length ? mine.length + ' from brand stores, checked ' + CHECKED + ' · ' : ''}${live.length} live from Open Food Facts${flourHits.length ? ` (${flourHits.length} from flour searches)` : ''}, all checked against your food rules`;
