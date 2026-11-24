@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.35">
+<meta name="pf-version" content="1.17.36">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -378,7 +378,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.35';
+const VERSION = '1.17.36';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -587,6 +587,7 @@ for (const sec of FOOD_SECTIONS){
 // Strict name rules for categories whose words are common elsewhere ("butter" in butternut or body butter, "cream" in body cream, "frozen" in frozen vegetables)
 FCATS.milk[4] = /^(?!.*\b(body|hand|face|skin|belly|whipped|shea|cocoa|cacao|moisturi[sz]\w*|lotion|soap|wax|candle|butternut|butterfly|squash|baby|toddler|pouch|creamies|snacks?|bars?|bites|cookies?|granola|cereal|chocolate|candy|powder|concentrate|yogh?urt|ice cream|apple|tomato|chicken|turkey|beef|broth|banana|strawberry|mango|smoothie|latte|coffee|tea|pancake|mix|bread|dip|dressing|sauce|soup|pizza|crackers?|chips|puffs|oats?|peanut|cashew|pistachio|pecan|macadamia|hazelnut|pine nut|hemp|seeds?|sunflower|soy|rice|collagen|oils?|yeast|eggnog)\b)(?!.*\b(almond|walnut)\s+butter).*\b(milk|cheeses?|butter|ghee|cream|kefir|half and half)\b/i;
 const FROZEN_RX = /^(?!.*\b(body|soap|wax|candle|lotion|cookies?|cake|freeze[- ]dried|astronaut|vegetables?|veggies?|fruit blend|spinach|kale|broccoli|cauliflower|squash|peas|corn|bread|pizza|burrito|chicken|baby)\b).*\b(ice cream|gelato|sorbet|sherbet|frozen (yogh?urt|dessert|treat)s?|popsicles?|ice pops?|freezer pops?|frozen pops?|fruit bars?|ice bars?|cream bars?|pops)\b/i;
+FCATS.baking[4] = /^(?!.*\b(strawberr\w*|mango|freeze[- ]dried|turmeric|maca|goldenberr\w*|salt|cinnamon|ginger|cumin|seeds?|hemp|chia|goji|mulberr\w*|acai|pitaya|maqui|pomegranate|nutritional yeast|cutters?|shirts?|scarf|couche|olive oil|vinegar|nuts?|raisins?|walnuts?)\b).*\b(flours?|baking (mix|mixes|chips|kit|kits|bar|bars|cocoa|chocolate)|mix|maple (sugar|syrup)|coconut (sugar|flakes|shreds?|shredded|flour)|date (sugar|syrup|paste)|cocoa powder|cacao powder|chocolate chips|chips|cacao nibs|arrowroot|tapioca|carob|psyllium|extract|yeast|almond meal|starch)\b/i;
 FCATS.frozen[4] = FROZEN_RX; FCATS.popsicles[4] = FROZEN_RX; FCATS['freeze-dried'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|pet|dog|cat)\b).*freeze[- ]dried/i;
 FCATS['frozen-foods'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|freeze[- ]dried)\b).*\bfrozen\b/i;
 FCATS['all-frozen'][4] = /^(?!.*\b(body|soap|wax|candle|lotion|skin|face|hair|pet|dog|cat)\b).*(\bfrozen\b|freeze[- ]dried|\b(ice cream|gelato|sorbet|sherbet|popsicles?|ice pops?)\b)/i;
@@ -857,7 +858,7 @@ const looksLikeIngredients = t => {
 };
 // Text from a brand's own page must read like an ingredient list, not a sentence ("real fuel for kids on the move. Refrigerated for freshness…", "authentic flavor, and wholesome")
 const MARKETING = /\b(wholesome|authentic|fuel|kids?|refrigerat\w*|freshness|on the (go|move)|up to a week|good for|made with love|nutritious|goodness|snack time|lunchbox|family|tastes?|taste buds|deliver\w*|packed with|free from|contains no|see (nutrition|package|label))\b|\*\s*see\b/i;
-const NOT_ING = /\b(diagnose|intended\s+to|prevent\s+any\s+disease|nothing\s+added|used\s+to\s+add|not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
+const NOT_ING = /^only$|\b(suitable\s+for|educational|recipe\s+preparation|diagnose|intended\s+to|prevent\s+any\s+disease|nothing\s+added|used\s+to\s+add|not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
 const BADGE_PART = /^(no|non|free|why|learn|made|gluten|vegan|kosher|certified|usda|paleo|keto|dairy|nut|soy|grain|plant)\b/i;
 const dropBadges = t => { if (!t) return t; const parts = String(t).split(/\s*,\s*/); while (parts.length > 1 && BADGE_PART.test(parts[parts.length - 1].trim())) parts.pop(); return parts.join(', '); };
 const okIng = (t, src) => {
@@ -933,11 +934,12 @@ const claimsFrom = t => [[/no preservatives|preservative[- ]free/i, 'No preserva
   [/gluten[- ]free/i, 'Gluten-free'], [/\bvegan\b/i, 'Vegan'], [/no added sugar/i, 'No added sugar']].filter(([re]) => re.test(t)).map(([, c]) => c);
 
 const ETSY_NOT_FOOD = /\b(powders?|tea|leaf|leaves|saplings?|trees?|plants?|scionwood|sticks?|candy|candies|taffy|marshmallows?|skittles|sk\*ttles|sourdough starter|herbal|herbs?|spices?|amch(?:o)?ur|mango seeds?|altar|crafts?|incense|essential oils?|soap|lotion|fertilizer)\b/i;
+const ETSY_BAKING_POWDER = /\b(flour|sugar|meal|almonds?|teff|dates?|maple|coconut|cacao|cocoa|einkorn|spelt)\b/i;
 function addScanned(type, rows){
   let n = 0;
   for (const r of rows){
     if (type === 'food' && r.store === 'Etsy'){
-      if (ETSY_NOT_FOOD.test(r.name || '')){ logRemoved(r.name, r.store, r.url, null, 'not a food product (powder, tea, candy, plant or craft)'); continue; }
+      if ((ETSY_NOT_FOOD.test(r.name || '') && !(/powder/i.test(r.name) && ETSY_BAKING_POWDER.test(r.name) && !/\b(tea|leaf|leaves|amch\w+|herbs?|spices?|candy|candies|taffy|seeds?|plants?)\b/i.test(r.name))) || /\b(cutters?|shirts?|tins?|decor|canisters?|guides?|recipes?|ebooks?|pdf|templates?|printables?|stamps?|sweatshirt|mug)\b/i.test(r.name || '')){ logRemoved(r.name, r.store, r.url, null, 'not a food product (powder, tea, candy, plant or craft)'); continue; }
       if (/materials/i.test(r.ingSrc || '')) r.ing = ''; // Etsy's "materials" box holds search tags, not ingredients
     }
     const id = 's-' + r.domain + '-' + r.handle;

@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.8.3';
+const VERSION = '1.8.4';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -212,7 +212,7 @@ async function etsySearch(q, key, type){
   for (const l of full){
     if (l.state && l.state !== 'active') continue;
     const title = plain(l.title), desc = plain(l.description), kind = `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`;
-    const price = l.price && l.price.divisor ? l.price.amount / l.price.divisor : null;
+    const price = l.price && l.price.divisor && (!l.price.currency_code || l.price.currency_code === 'USD') ? l.price.amount / l.price.divisor : null; // other currencies (rupees, lira) would show as dollars
     const row = {
       domain: 'etsy.com', store: 'Etsy', vendor: (l.shop && l.shop.shop_name) || 'Etsy seller', handle: String(l.listing_id), name: title,
       url: String(l.url || `https://www.etsy.com/listing/${l.listing_id}`).split('?')[0], img: ((l.images || [])[0] || {}).url_570xN || '', price,
