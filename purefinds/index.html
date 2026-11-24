@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.12">
+<meta name="pf-version" content="1.17.13">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -352,7 +352,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <footer>
   <div class="wrap">
-    <div>PureFinds · v<span id="ver"></span> · Made by Leia</div>
+    <div>PureFinds · v<span id="ver"></span><span id="verstate"></span> · Made by Leia</div>
     <div><a href="#debug">Debug report</a></div>
     <div>Food data live from <a href="https://world.openfoodfacts.org" rel="noopener" target="_blank">Open Food Facts</a> (ODbL). Clothing details checked on each brand's own product page.</div>
   </div>
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.12';
+const VERSION = '1.17.13';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1675,7 +1675,7 @@ document.addEventListener('click', e => {
     }, e => { out.innerHTML = `Couldn't reach the scanner at that address.${errBox(e)}`; });
     return;
   }
-  if (t.id === 'reload'){
+  if (t.id === 'reload' || t.id === 'reload2'){
     // Count the try, then load a fresh copy with a new address so no saved copy is reused
     lsSet('pf_reload_tries', String((+lsGet('pf_reload_tries') || 0) + 1));
     location.replace(location.pathname + '?v=' + encodeURIComponent(newVersion || '') + '&r=' + Date.now() + location.hash);
@@ -1889,19 +1889,43 @@ function settleVersion(){
   lsSet('pf_latest', ''); lsSet('pf_reload_tries', ''); $('#update').classList.remove('on');
   return false;
 }
-async function checkVersion(){
-  if (!/^https?:/.test(location.protocol)) return;
+// Where the newest version is read from. GitHub Pages' servers can hand out an old copy of the page for
+// several minutes after an update, so the file is read straight from the GitHub repository first.
+const REPO_FILE = 'https://api.github.com/repos/LayahMcFly/ZenfulOutput/contents/purefinds/index.html?ref=main';
+let lastCheck = 0, checkState = '';
+async function latestVersion(){
   try {
-    const r = await fetch(location.pathname + '?check=' + Date.now(), {cache: 'no-store'});
-    const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/);
-    if (m) lsSet('pf_latest', isNewer(m[1], VERSION) ? m[1] : '');
+    const r = await fetch(REPO_FILE + '&t=' + Date.now(), {cache: 'no-store', headers: {Accept: 'application/vnd.github.raw'}});
+    if (r.ok){ const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/); if (m) return m[1]; }
   } catch(e){}
-  settleVersion();
+  try { // backup: the website itself
+    const r = await fetch(location.pathname + '?check=' + Date.now(), {cache: 'no-store'});
+    const m = (await r.text()).match(/name="pf-version" content="([^"]+)"/); if (m) return m[1];
+  } catch(e){}
+  return '';
+}
+async function checkVersion(force){
+  if (!/^https?:/.test(location.protocol)) return;
+  if (!force && Date.now() - lastCheck < 4 * 60e3) return; // the GitHub check allows about 60 looks an hour
+  lastCheck = Date.now();
+  const v = await latestVersion();
+  if (v){ lsSet('pf_latest', isNewer(v, VERSION) ? v : ''); checkState = isNewer(v, VERSION) ? 'old' : 'latest'; }
+  else checkState = 'unknown';
+  settleVersion(); footerVersion();
+}
+// The footer says whether this is the newest version, so you can always tell
+function footerVersion(){
+  const el = document.getElementById('verstate'); if (!el) return;
+  const latest = lsGet('pf_latest');
+  el.innerHTML = latest && isNewer(latest, VERSION) ? ` · <b>v${esc(latest)} is out</b>, <button class="link" type="button" id="reload2">reload</button>`
+    : checkState === 'latest' ? ' · newest version' : checkState === 'unknown' ? ' · couldn’t check for updates' : ' · checking for updates…';
 }
 settleVersion();
-checkVersion();
-setInterval(checkVersion, 60e3);
+footerVersion();
+checkVersion(true);
+setInterval(() => checkVersion(), 5 * 60e3);
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkVersion(); });
+window.addEventListener('focus', () => checkVersion());
 }
 </script>
 </body>
