@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.23">
+<meta name="pf-version" content="1.17.24">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.23';
+const VERSION = '1.17.24';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -967,9 +967,9 @@ const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajam
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 async function scanEtsy(st, type = 'cotton'){
   for (const q of (type === 'food' ? ETSY_FOOD_QUERIES : ETSY_QUERIES)){
-    const key = `etsy2|${type}|${q}`, hit = store.get(key, null); let rows = [];
+    const key = `etsy3|${type}|${q}`, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/etsy?type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    else try { rows = (await getJSON(`${scanBase()}/etsy?v=2&type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
     etsySeen += rows.length; const n = addScanned(type, rows); etsyAdded += n; st.added += n;
   }
@@ -982,10 +982,10 @@ async function scanKroger(st){
   const terms = [...new Set(Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t))];
   let i = 0;
   await Promise.all(Array.from({length: 3}, async () => { while (i < terms.length){ const q = terms[i++];
-    const key = 'kroger1|' + q, hit = store.get(key, null); let rows = [];
+    const key = 'kroger2|' + q, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else { if (/not set up|501/.test(krogerNote)) return;
-      try { rows = (await getJSON(`${scanBase()}/kroger?q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+      try { rows = (await getJSON(`${scanBase()}/kroger?v=2&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
       catch (e){ krogerNote = errText(e); continue; } }
     krogerSeen += rows.length; const n = addScanned('food', rows); krogerAdded += n; st.added += n;
   } }));
@@ -1790,8 +1790,8 @@ async function runDebug(){
       catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
-  if (scanBase()){ const t = performance.now(); try { const j = await getJSON(`${scanBase()}/etsy?q=${encodeURIComponent('100% cotton dress')}`, 25000); log(`\n[Etsy] OK ${ms(t)} · ${(j.items || []).length} listings that say 100% cotton`); } catch (e){ log(`\n[Etsy] ${errText(e)}`); }
-    const t2 = performance.now(); try { const j = await getJSON(`${scanBase()}/kroger?q=${encodeURIComponent('organic dried mango')}`, 25000); log(`\n[Kroger] OK ${ms(t2)} · ${(j.items || []).length} organic or Non-GMO products, ${(j.items || []).filter(x => x.ing).length} with ingredients`); } catch (e){ log(`\n[Kroger] ${errText(e)}`); } }
+  if (scanBase()){ const t = performance.now(); try { const j = await getJSON(`${scanBase()}/etsy?v=2&q=${encodeURIComponent('100% cotton dress')}`, 25000); log(`\n[Etsy] OK ${ms(t)} · ${(j.items || []).length} listings that say 100% cotton`); } catch (e){ log(`\n[Etsy] ${errText(e)}`); }
+    const t2 = performance.now(); try { const j = await getJSON(`${scanBase()}/kroger?v=2&q=${encodeURIComponent('organic dried mango')}`, 25000); log(`\n[Kroger] OK ${ms(t2)} · ${(j.items || []).length} organic or Non-GMO products, ${(j.items || []).filter(x => x.ing).length} with ingredients`); } catch (e){ log(`\n[Kroger] ${errText(e)}`); } }
   const cs = srcCountries();
   log(`\n[Open Food Facts] countries asked for: ${cs.join(', ')}`);
   const tests = [
