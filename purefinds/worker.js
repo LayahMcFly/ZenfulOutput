@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.7.0';
+const VERSION = '1.8.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -73,6 +73,12 @@ export default {
         const r = await fetch(target.toString(), {headers: UA, cf: {cacheTtl: 3600, cacheEverything: true}});
         if (!r.ok) return json({error: `Open Food Facts answered HTTP ${r.status}`}, 502, 0);
         return json(await r.json(), 200, 3600);
+      }
+      if (u.pathname === '/kroger'){
+        const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
+        if (!q) return json({error: 'Add a search, for example /kroger?q=organic dried mango'}, 400);
+        if (!env.KROGER_ID || !env.KROGER_SECRET) return json({error: 'Kroger is not set up yet: add Worker secrets KROGER_ID (your client ID) and KROGER_SECRET (your client secret).'}, 501, 0);
+        return json({items: await krogerSearch(q, env)}, 200, 21600);
       }
       if (u.pathname === '/etsy'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
@@ -218,6 +224,58 @@ async function etsySearch(q, key, type){
     const f = pureFabric(desc) || pureFabric(title);
     if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc}`) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '')) continue;
     out.push({...row, fabric: f.line, material: f.material, sizes: [], colors: []});
+  }
+  return out;
+}
+
+/* ---------- Kroger (Kroger, Ralphs, Fred Meyer, King Soopers, Harris Teeter, Smith's and the rest of the family) ----------
+   Public Products API, client-credentials sign-in. Kroger doesn't publish ingredient lists through its API, so each product's
+   barcode is looked up on Open Food Facts in one batch. Prices only come back for a store: add a KROGER_LOCATION secret for that. */
+let krogerToken = null;
+async function krogerAuth(env){
+  if (krogerToken && krogerToken.until > Date.now() + 60e3) return krogerToken.v;
+  const r = await fetch('https://api.kroger.com/v1/connect/oauth2/token', {method: 'POST',
+    headers: {'Content-Type': 'application/x-www-form-urlencoded', 'Authorization': 'Basic ' + btoa(`${env.KROGER_ID}:${env.KROGER_SECRET}`)},
+    body: 'grant_type=client_credentials&scope=product.compact'});
+  if (!r.ok){ let why = ''; try { const j = await r.json(); why = ': ' + (j.error_description || j.error || ''); } catch (e){} throw new Error(`Kroger sign-in answered HTTP ${r.status}${why}. Check KROGER_ID and KROGER_SECRET.`); }
+  const j = await r.json(); krogerToken = {v: j.access_token, until: Date.now() + (j.expires_in || 1800) * 1000}; return krogerToken.v;
+}
+// Kroger's 13-digit UPCs leave off the check digit; Open Food Facts needs it
+const upcCandidates = raw => {
+  const d = String(raw || '').replace(/\D/g, ''); if (!d) return [];
+  const body = d.replace(/^0+/, '').padStart(11, '0').slice(-11);
+  let sum = 0; for (let i = 0; i < 11; i++) sum += (+body[i]) * (i % 2 === 0 ? 3 : 1);
+  const upcA = body + ((10 - sum % 10) % 10);
+  return [...new Set([upcA, '0' + upcA, d, d.replace(/^0+/, '')])].filter(x => x.length >= 8);
+};
+async function krogerSearch(q, env){
+  const token = await krogerAuth(env);
+  const p = new URLSearchParams({'filter.term': q, 'filter.limit': '50'}); if (env.KROGER_LOCATION) p.set('filter.locationId', env.KROGER_LOCATION);
+  const r = await fetch('https://api.kroger.com/v1/products?' + p, {headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + token}, cf: {cacheTtl: 21600, cacheEverything: true}});
+  if (!r.ok){ if (r.status === 401) krogerToken = null; throw new Error(`Kroger answered HTTP ${r.status}`); }
+  const list = (await r.json()).data || [];
+  // one Open Food Facts request for every barcode in the batch
+  const codes = new Map(); for (const k of list) for (const c of upcCandidates(k.upc)) codes.set(c, k.productId);
+  const off = new Map();
+  if (codes.size) try {
+    const j = await getJSON('https://world.openfoodfacts.org/api/v2/search?' + new URLSearchParams({code: [...codes.keys()].join(','), page_size: '200', fields: 'code,ingredients_text_en,ingredients_text,labels_tags'}));
+    for (const pr of j.products || []){ const id = codes.get(String(pr.code)); if (id && !off.has(id)) off.set(id, pr); }
+  } catch (e){}
+  const out = [];
+  for (const k of list){
+    const name = plain(k.description), brand = plain(k.brand) || 'Kroger';
+    if (!name || NOT_FOOD.test(name) || NOT_FOOD_THING.test(name)) continue;
+    const o = off.get(k.productId) || {}, L = o.labels_tags || [];
+    const organic = /organic/i.test(`${name} ${brand}`) || L.some(t => /organic/.test(t)) ? (L.includes('en:usda-organic') ? 'USDA Organic' : 'Organic (label wording)') : '';
+    const nonGmo = L.some(t => /non-gmo-project/.test(t)) ? 'Non-GMO Project Verified' : L.some(t => /gmo/.test(t)) || /non[- ]?gmo/i.test(name) ? 'Non-GMO label' : '';
+    if (!organic && !nonGmo) continue; // PureFinds only lists organic or Non-GMO food
+    const ing = plain(o.ingredients_text_en || o.ingredients_text || '');
+    const im = (k.images || []).find(i => i.perspective === 'front') || (k.images || [])[0] || {};
+    const size = (im.sizes || []).find(s => s.size === 'large') || (im.sizes || []).find(s => s.size === 'medium') || (im.sizes || [])[0] || {};
+    const it = (k.items || [])[0] || {}, pr = it.price || it.nationalPrice || {};
+    out.push({domain: 'kroger.com', store: 'Kroger', vendor: brand, handle: String(k.productId), name, url: k.productPageURI ? 'https://www.kroger.com' + k.productPageURI : `https://www.kroger.com/p/item/${k.productId}`,
+      img: size.url || '', price: pr.promo || pr.regular || null, ptype: (k.categories || []).join(' '), tags: [], created: '', organic, nonGmo,
+      ing, ingSrc: ing ? 'Open Food Facts record for this barcode' : '', desc: `${brand} · ${it.size || ''}`, barcode: String(k.upc || '')});
   }
   return out;
 }

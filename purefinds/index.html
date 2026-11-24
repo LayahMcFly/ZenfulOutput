@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.20">
+<meta name="pf-version" content="1.17.21">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.20';
+const VERSION = '1.17.21';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -927,7 +927,7 @@ function addScanned(type, rows){
         price: r.price, img: sized(r.img), cats, certText: r.organic || r.nonGmo, cert: r.organic, nonGmo: r.nonGmo, ing,
         ingSrc: r.ing && ing === r.ing ? (r.ingSrc || 'Brand listing') : cached ? cached.src : fromName ? 'Single-ingredient product (its name is the ingredient)' : '', claims: claimsFrom(r.desc || ''), note: '', created: Date.parse(r.created) || 0,
         pop: ing ? 1 : 0, order: 1000 + FOODS.length, fabricTags: [], styles: [],
-        desc: r.store === 'Etsy' ? `Sold by ${r.vendor || 'an Etsy seller'} on Etsy. PureFinds found it in an Etsy search and checked it against your food rules.` : `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
+        desc: r.store === 'Kroger' ? `${r.vendor || 'Kroger'} product sold at Kroger family stores. Ingredients come from the Open Food Facts record for its barcode.` : r.store === 'Etsy' ? `Sold by ${r.vendor || 'an Etsy seller'} on Etsy. PureFinds found it in an Etsy search and checked it against your food rules.` : `Sold on ${r.store}'s own website. PureFinds found it automatically in the store's catalog.`}));
     }
     n++;
   }
@@ -953,7 +953,7 @@ async function resolveOne(f){
 }
 async function resolveIngredients(){
   if (!scanBase() || resolving) return; resolving = true;
-  const todo = FOODS.filter(f => f.src === 'brand' && !ingFull(f) && !/etsy\.com/.test(f.url)); let i = 0, changed = false; Object.assign(rs, {total: todo.length, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0});
+  const todo = FOODS.filter(f => f.src === 'brand' && !ingFull(f) && !/etsy\.com|kroger\.com/.test(f.url)); let i = 0, changed = false; Object.assign(rs, {total: todo.length, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0});
   await Promise.all(Array.from({length: 3}, async () => { while (i < todo.length){ if (await resolveOne(todo[i++])) changed = true; rs.done++; if (rs.done % 10 === 0) scanNote(); } }));
   store.set('ingCache2', ingCache); resolving = false; scanNote(); if (changed) rerender();
 }
@@ -972,6 +972,22 @@ async function scanEtsy(st, type = 'cotton'){
     st.added += addScanned(type, rows);
   }
   if (!etsyNote) etsyNote = 'ok';
+}
+// Kroger family stores (Kroger, Ralphs, Fred Meyer, King Soopers, Harris Teeter, Smith's and more): the scanner searches Kroger's catalog,
+// keeps organic or Non-GMO items, and finds each one's ingredients on Open Food Facts by barcode. Needs KROGER_ID and KROGER_SECRET on the Worker.
+let krogerNote = '';
+async function scanKroger(st){
+  const terms = [...new Set(Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t))];
+  let i = 0;
+  await Promise.all(Array.from({length: 3}, async () => { while (i < terms.length){ const q = terms[i++];
+    const key = 'kroger1|' + q, hit = store.get(key, null); let rows = [];
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else { if (/not set up|501/.test(krogerNote)) return;
+      try { rows = (await getJSON(`${scanBase()}/kroger?q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+      catch (e){ krogerNote = errText(e); continue; } }
+    st.added += addScanned('food', rows);
+  } }));
+  if (!krogerNote) krogerNote = 'ok';
 }
 async function scanType(type){
   const st = scanState[type];
@@ -998,6 +1014,7 @@ async function scanType(type){
     }
   }));
   await scanEtsy(st, type);
+  if (type === 'food') await scanKroger(st);
   st.status = 'done'; scanNote(); rerender();
   if (type === 'food') resolveIngredients();
 }
@@ -1019,7 +1036,7 @@ function rerender(){
 // When a listing is opened: read its ingredients from the product's own page (through the scanner)
 async function fetchDetails(it){
   const partial = !it.ing || /partial|^Begins|^Includes/.test(`${it.ingSrc || ''} ${it.ing}`);
-  if (it.kind !== 'food' || it.src !== 'brand' || !partial || !scanBase() || /etsy\.com/.test(it.url)) return;
+  if (it.kind !== 'food' || it.src !== 'brand' || !partial || !scanBase() || /etsy\.com|kroger\.com/.test(it.url)) return;
   const box = document.querySelector('#modal .ing'), src = document.getElementById('ingsrc');
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
@@ -1123,7 +1140,7 @@ function filterBar(items){
 }
 
 /* ---------- results bar: counts by source and group, and a copyable report ---------- */
-const srcLabel = it => it.store === 'Etsy' ? 'Etsy' : it.kind === 'cotton' ? (it.store === 'Etsy' ? 'Etsy' : it.src === 'scan' ? 'Brand store (scanner)' : 'Brand store (hand-checked)')
+const srcLabel = it => it.store === 'Etsy' ? 'Etsy' : it.store === 'Kroger' ? 'Kroger' : it.kind === 'cotton' ? (it.store === 'Etsy' ? 'Etsy' : it.src === 'scan' ? 'Brand store (scanner)' : 'Brand store (hand-checked)')
   : it.code ? 'Open Food Facts' : it.scan ? 'Brand store (scanner)' : 'Brand store (hand-checked)';
 const groupOf = it => it.kind === 'cotton' ? [it.type || 'Other'] : (it.cats || []).map(c => (FCATS[c] && FCATS[c][0]) || c);
 // Groups follow the section you're in: the same categories as its buttons (Cookies, Fruit snacks…), in the same order
@@ -1199,7 +1216,7 @@ const pick = (arr, n, s = seed) => { const a = [...arr]; let x = s; for (let i =
 const REGIONS = [['americas', 'Americas', 'United States and Canada'], ['europe', 'Europe', 'United Kingdom and the European Union'], ['asia', 'Asia and Pacific', 'Japan, Australia and nearby'], ['other', 'Other and unlisted', 'Stores PureFinds has no location for']];
 const OFF_COUNTRIES = {americas: ['en:united-states', 'en:canada'], europe: ['en:united-kingdom', 'en:france', 'en:germany', 'en:spain', 'en:italy'], asia: ['en:japan', 'en:australia'], other: []};
 // Where each store ships from. Stores not listed here count as "Other and unlisted".
-const STORE_REGION = {'Etsy': 'americas', 'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
+const STORE_REGION = {'Etsy': 'americas', 'Kroger': 'americas', 'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
   'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas', 'Etsy': 'other',
   'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'americas', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
   'YumEarth': 'americas', 'Theo Chocolate': 'americas', 'LesserEvil': 'americas', 'Mavuno Harvest': 'americas', "Mary's Gone Crackers": 'americas', 'Purely Elizabeth': 'americas', 'Once Upon a Farm': 'americas',
@@ -1764,7 +1781,8 @@ async function runDebug(){
       catch (e){ log(`  ${m.name}: FAILED ${errText(e)}`); }
     }
   }
-  if (scanBase()){ const t = performance.now(); try { const j = await getJSON(`${scanBase()}/etsy?q=${encodeURIComponent('100% cotton dress')}`, 25000); log(`\n[Etsy] OK ${ms(t)} · ${(j.items || []).length} listings that say 100% cotton`); } catch (e){ log(`\n[Etsy] ${errText(e)}`); } }
+  if (scanBase()){ const t = performance.now(); try { const j = await getJSON(`${scanBase()}/etsy?q=${encodeURIComponent('100% cotton dress')}`, 25000); log(`\n[Etsy] OK ${ms(t)} · ${(j.items || []).length} listings that say 100% cotton`); } catch (e){ log(`\n[Etsy] ${errText(e)}`); }
+    const t2 = performance.now(); try { const j = await getJSON(`${scanBase()}/kroger?q=${encodeURIComponent('organic dried mango')}`, 25000); log(`\n[Kroger] OK ${ms(t2)} · ${(j.items || []).length} organic or Non-GMO products, ${(j.items || []).filter(x => x.ing).length} with ingredients`); } catch (e){ log(`\n[Kroger] ${errText(e)}`); } }
   const cs = srcCountries();
   log(`\n[Open Food Facts] countries asked for: ${cs.join(', ')}`);
   const tests = [
