@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.18">
+<meta name="pf-version" content="1.18.19">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -95,6 +95,9 @@ nav.tabs a[aria-current=page]{background:var(--sage-l);color:var(--sage-d);font-
 .collage figure:nth-child(odd){aspect-ratio:3/4.2}.collage figure:nth-child(even){aspect-ratio:3/3.6;margin-bottom:28px}
 .collage img{width:100%;height:100%;object-fit:cover;transition:transform .6s}
 .collage figure:hover img{transform:scale(1.05)}
+.collage figure{position:relative}
+.collage figcaption{position:absolute;left:10px;bottom:10px;background:rgba(255,253,249,.92);color:var(--sage-d);font-size:12px;font-weight:500;padding:4px 10px;border-radius:999px;box-shadow:0 2px 8px -4px rgba(58,51,43,.4)}
+.collage .art{width:100%;height:100%}
 @media(max-width:760px){.collage{grid-template-columns:repeat(3,minmax(0,1fr))}.collage figure:nth-child(n+4){display:none}}
 @keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
 
@@ -406,7 +409,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.18';
+const VERSION = '1.18.19';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1388,15 +1391,28 @@ const sh = (title, sub, more) => `<div class="sh"><div><h2>${title}</h2>${sub ? 
 const errText = e => String((e && (e.message || e)) || 'Unknown error');
 const errBox = e => `<span class="err"><code>${esc(errText(e))}</code><button class="btn sm" type="button" data-copy="${esc(errText(e))}">Copy error</button></span>`;
 
+// beauty pictures for the top row: from a beauty store scan already saved on this device, or one quick fetch (these are only pictures that open the Beauty Closet, not product claims)
+async function homeBeautyPics(){
+  const slots = [...document.querySelectorAll('[data-hbeauty]')]; if (!slots.length || !scanBase()) return;
+  let rows = []; for (const [d] of BEAUTY_STORES){ const hit = store.get('beauty1|' + d, null); if (hit && hit.items) rows = rows.concat(hit.items.filter(r => r.img)); }
+  if (rows.length < 2) try { rows = ((await getJSON(`${scanBase()}/store?d=${BEAUTY_STORES[0][0]}&type=beauty&v=1`, 15000)).items || []).filter(r => r.img); } catch(e){}
+  const picks = pick(rows, 2, seed + 23);
+  slots.forEach((el, i) => { const r = picks[i]; if (r && el.isConnected){ const a = el.querySelector('.art'); if (a) a.outerHTML = `<img src="${esc(sized(r.img))}" alt="Beauty Closet" loading="lazy">`; } });
+}
 function home(){
-  const hero = pick(cottonV(), 6);
+  // the top picture row shows all three shops: clothes, food and beauty, in turn
+  const heroC = pick(cottonV(), 2, seed + 21), heroF = pick(foodsV().filter(f => f.img), 2, seed + 22);
+  const heroTiles = [0, 1].flatMap(i => [
+    heroC[i] && `<figure data-open="${heroC[i].id}" style="animation-delay:${(i * 3) * .08}s">${img(heroC[i])}<figcaption>Natural Closet</figcaption></figure>`,
+    heroF[i] && `<figure data-open="${heroF[i].id}" style="animation-delay:${(i * 3 + 1) * .08}s">${img(heroF[i])}<figcaption>Food</figcaption></figure>`,
+    `<figure data-go="beauty" data-hbeauty="${i}" style="animation-delay:${(i * 3 + 2) * .08}s"><div class="art a${i + 1}"></div><figcaption>Beauty Closet</figcaption></figure>`]).filter(Boolean).join('');
   const cute = cottonV().filter(c => c.styles.some(s => ['casual-cute', 'soft-girl', 'coquette'].includes(s)));
   const newest = [...cottonV(), ...foodsV()].sort((a, b) => b.created - a.created).slice(0, 12);
   main.innerHTML = `
   <section class="hero">
     <h1>Real finds, made of <i>real materials</i></h1>
     <p>Organic snacks from the brands' own stores and the Open Food Facts database, plus clothing checked to be 100% cotton on each brand's product page.</p>
-    <div class="collage">${hero.map((c, i) => `<figure data-open="${c.id}" style="animation-delay:${i * .08}s">${img(c)}</figure>`).join('')}</div>
+    <div class="collage">${heroTiles}</div>
   </section>
   <section class="blk">${sh('Three ways to shop')}<div class="hub">
     ${hubTile({go: 'food', title: 'Food', sub: 'Organic and Non-GMO snacks, groceries, bread and drinks', item: foodsV()[5], items: foodsV().filter(f => f.img)}, 1)}
@@ -1409,6 +1425,7 @@ function home(){
   <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Natural Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
   <section class="blk">${sh('Outfit Ideas', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
+  homeBeautyPics();
   loadHomeFood();
 }
 let bestPool = foodsV();
