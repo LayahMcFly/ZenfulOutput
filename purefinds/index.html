@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.18.3">
+<meta name="pf-version" content="1.18.4">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -379,7 +379,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.3';
+const VERSION = '1.18.4';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1005,7 +1005,7 @@ async function resolveIngredients(){
 // Etsy: the scanner searches Etsy. Clothing must say 100% cotton (or another pure fabric) with no blend; food goes through every
 // PureFinds food rule like any other store. Needs the ETSY_KEY and ETSY_SECRET secrets on the Worker.
 const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'maple sugar cookies', 'date sweetened cookies', 'einkorn shortbread', 'sprouted spelt cookies', 'coconut macaroons', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana', 'freeze dried blueberries', 'freeze dried raspberries', 'frozen fruit organic', 'organic dried apricots', 'organic dried figs', 'organic dates', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips', 'spelt tortillas', 'einkorn tortillas', 'coconut wraps', 'almond flour tortillas', 'sprouted spelt wraps', 'sourdough tortillas', 'plantain tortillas', 'chickpea flour wraps', 'teff wraps'];
-const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
+const ETSY_QUERIES = ['100% cotton socks', 'organic cotton socks', '100% merino wool socks', '100% wool socks', '100% silk socks', '100% linen socks', 'handknit wool socks', 'cotton crew socks', 'cotton ankle socks', 'cotton underwear 100%', '100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 // Automatic English translation. Listings in other languages are translated before the food rules run, so a banned ingredient can't hide in another language.
 const FOREIGN = /[\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u06FF\u0900-\u0DFF\u0E00-\u0E7F\u3040-\u30FF\u3400-\u9FFF\uAC00-\uD7AF]|\b(de|du|des|aux|avec|sans|pour|artisanal|artisanale|naturel|naturelle|con|sin|und|mit|f\u00fcr|ohne|della|senza|zonder|voor|biologico|biologique|ecologico)\b/i;
