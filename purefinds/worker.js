@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.6.6';
+const VERSION = '1.7.0';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -77,8 +77,10 @@ export default {
       if (u.pathname === '/etsy'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
         if (!q) return json({error: 'Add a search, for example /etsy?q=100% cotton dress'}, 400);
-        if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add a Worker secret named ETSY_KEY (keystring:sharedsecret).'}, 501, 0);
-        return json({items: await etsySearch(q, env.ETSY_KEY)}, 200, 21600);
+        const etype = u.searchParams.get('type') === 'food' ? 'food' : 'cotton';
+        if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add Worker secrets ETSY_KEY (your keystring) and ETSY_SECRET (your shared secret).'}, 501, 0);
+        const ekey = env.ETSY_KEY.includes(':') ? env.ETSY_KEY : `${env.ETSY_KEY}:${env.ETSY_SECRET || ''}`;
+        return json({items: await etsySearch(q, ekey, etype)}, 200, 21600);
       }
       if (u.pathname === '/details'){
         const target = new URL(u.searchParams.get('url') || '');
@@ -182,22 +184,40 @@ function cottonItem(d, p){
 }
 
 /* ---------- Etsy (clothing that is 100% cotton, silk, wool or linen) ---------- */
-async function etsySearch(q, key){
-  const url = 'https://openapi.etsy.com/v3/application/listings/active?' + new URLSearchParams({keywords: q, limit: '100', sort_on: 'score', includes: 'Images,Shop'});
-  const r = await fetch(url, {headers: {...UA, 'x-api-key': key}, cf: {cacheTtl: 21600, cacheEverything: true}});
-  if (!r.ok){ let why = ''; try { why = ': ' + (await r.json()).error; } catch (e){} throw new Error(`Etsy answered HTTP ${r.status}${why}`); }
+// Etsy Open API v3: search active listings, then read them in one batch with photos and shop names.
+// The x-api-key header is "keystring:sharedsecret" (required by Etsy since Feb 2026).
+async function etsySearch(q, key, type){
+  const H = {...UA, 'x-api-key': key}, cf = {cacheTtl: 21600, cacheEverything: true};
+  const ask = async url => { const r = await fetch(url, {headers: H, cf}); if (!r.ok){ let why = ''; try { const j = await r.json(); why = ': ' + (j.error || j.message || ''); } catch (e){} throw new Error(`Etsy answered HTTP ${r.status}${why}`); } return r.json(); };
+  const found = await ask('https://openapi.etsy.com/v3/application/listings/active?' + new URLSearchParams({keywords: q, limit: '100', sort_on: 'score'}));
+  const ids = (found.results || []).map(l => l.listing_id).filter(Boolean);
+  if (!ids.length) return [];
+  let full = found.results;
+  try { full = (await ask('https://openapi.etsy.com/v3/application/listings/batch?' + new URLSearchParams({listing_ids: ids.join(','), includes: 'Images,Shop'}))).results || full; } catch (e){}
   const out = [];
-  for (const l of (await r.json()).results || []){
-    const text = plain(`${l.title} ${l.description}`), kind = `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`;
-    const f = pureFabric(plain(l.description)) || pureFabric(plain(l.title));
-    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(text) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '') || (l.state && l.state !== 'active')) continue;
+  for (const l of full){
+    if (l.state && l.state !== 'active') continue;
+    const title = plain(l.title), desc = plain(l.description), kind = `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`;
     const price = l.price && l.price.divisor ? l.price.amount / l.price.divisor : null;
-    out.push({
-      domain: 'etsy.com', store: 'Etsy', vendor: (l.shop && l.shop.shop_name) || 'Etsy seller', handle: String(l.listing_id), name: plain(l.title),
+    const row = {
+      domain: 'etsy.com', store: 'Etsy', vendor: (l.shop && l.shop.shop_name) || 'Etsy seller', handle: String(l.listing_id), name: title,
       url: String(l.url || `https://www.etsy.com/listing/${l.listing_id}`).split('?')[0], img: ((l.images || [])[0] || {}).url_570xN || '', price,
-      ptype: (l.taxonomy_path || []).join(' '), tags: l.tags || [], created: l.creation_timestamp ? new Date(l.creation_timestamp * 1000).toISOString() : '',
-      fabric: f.line, material: f.material, sizes: [], colors: []
-    });
+      ptype: (l.taxonomy_path || []).join(' '), tags: l.tags || [], created: l.creation_timestamp ? new Date(l.creation_timestamp * 1000).toISOString() : ''
+    };
+    if (type === 'food'){
+      if (NOT_FOOD.test(title) || NOT_FOOD_THING.test(`${title} ${row.ptype}`) || /\b(digital|printable|pattern|svg|png|pdf|download|template|charm|earrings?|necklace|keychain|soap|candle|bath|scrub|lotion|balm|toy|plush|dog|cat|pet)\b/i.test(kind)) continue;
+      if (!/food|baked|cookie|snack|candy|granola|bread|cracker|flour|sugar|syrup|spice|fruit|nut|almond|walnut|maple|date|cacao|cocoa|chocolate/i.test(kind)) continue;
+      // Etsy sellers often put the ingredients in the "materials" field; otherwise look in the description
+      const mats = (l.materials || []).map(String).filter(Boolean);
+      const ing = findIngredients(plainList(l.description)) || (mats.length >= 2 ? mats.join(', ') : '');
+      const all = `${title} ${desc} ${(l.tags || []).join(' ')}`;
+      out.push({...row, organic: /usda[- ]organic/i.test(all) ? 'USDA Organic' : /certified organic/i.test(all) ? 'Certified organic' : /\borganic\b/i.test(all) ? 'Organic (seller wording)' : '',
+        nonGmo: /non[- ]?gmo/i.test(all) ? 'Non-GMO (seller claim)' : '', ing, ingSrc: ing ? (findIngredients(plainList(l.description)) ? 'Etsy listing' : 'Etsy listing (materials)') : '', desc: desc.slice(0, 400), barcode: ''});
+      continue;
+    }
+    const f = pureFabric(desc) || pureFabric(title);
+    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc}`) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '')) continue;
+    out.push({...row, fabric: f.line, material: f.material, sizes: [], colors: []});
   }
   return out;
 }
