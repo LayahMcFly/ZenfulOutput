@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.28">
+<meta name="pf-version" content="1.17.29">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.28';
+const VERSION = '1.17.29';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -571,11 +571,10 @@ for (const sec of FOOD_SECTIONS){
   FCATS[key] = ['All ' + sec[1].toLowerCase(), ALL_TERMS[sec[0]], [...sec[3]]];
   sec[3].unshift(key);
 }
-FCATS['all-frozen'][4] = FROZEN_RX;
 // Strict name rules for categories whose words are common elsewhere ("butter" in butternut or body butter, "cream" in body cream, "frozen" in frozen vegetables)
 FCATS.milk[4] = /^(?!.*\b(body|hand|face|skin|belly|whipped|shea|cocoa|cacao|moisturi[sz]\w*|lotion|soap|wax|candle|butternut|butterfly|squash|baby|toddler|pouch|creamies|snacks?|bars?|bites|cookies?|granola|cereal|chocolate|candy|powder|concentrate|yogh?urt|ice cream|apple|tomato|chicken|turkey|beef|broth|banana|strawberry|mango|smoothie|latte|coffee|tea|pancake|mix|bread|dip|dressing|sauce|soup|pizza|crackers?|chips|puffs|oats?|peanut|cashew|pistachio|pecan|macadamia|hazelnut|pine nut|hemp|seeds?|sunflower|soy|rice|collagen|oils?|yeast|eggnog)\b)(?!.*\b(almond|walnut)\s+butter).*\b(milk|cheeses?|butter|ghee|cream|kefir|half and half)\b/i;
 const FROZEN_RX = /^(?!.*\b(body|soap|wax|candle|lotion|cookies?|cake|freeze[- ]dried|astronaut|vegetables?|veggies?|fruit blend|spinach|kale|broccoli|cauliflower|squash|peas|corn|bread|pizza|burrito|chicken|baby)\b).*\b(ice cream|gelato|sorbet|sherbet|frozen (yogh?urt|dessert|treat)s?|popsicles?|ice pops?|freezer pops?|frozen pops?|fruit bars?|ice bars?|cream bars?|pops)\b/i;
-FCATS.frozen[4] = FROZEN_RX; FCATS.popsicles[4] = FROZEN_RX;
+FCATS.frozen[4] = FROZEN_RX; FCATS.popsicles[4] = FROZEN_RX; FCATS['all-frozen'][4] = FROZEN_RX;
 // Fresh items to pick up: each opens a store search for "organic <item>"
 const PICKUP = {
  cereal:['Puffed kamut','Puffed quinoa','Puffed amaranth','Quinoa flakes','Spelt flakes','Grain-free granola','Buckwheat groats','Puffed millet'],
