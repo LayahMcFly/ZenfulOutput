@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.10">
+<meta name="pf-version" content="1.17.11">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -368,7 +368,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.10';
+const VERSION = '1.17.11';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1155,9 +1155,12 @@ const OFF_COUNTRIES = {americas: ['en:united-states', 'en:canada'], europe: ['en
 // Where each store ships from. Stores not listed here count as "Other and unlisted".
 const STORE_REGION = {'Kotn': 'americas', 'Christy Dawn': 'americas', 'MATE the Label': 'americas', 'MATE the Label.': 'americas', 'Lady White Co.': 'americas', 'Cottonique': 'americas', 'Los Angeles Apparel': 'americas',
   'Jenni Kayne': 'americas', 'DÔEN': 'americas', 'Hill House Home': 'americas', 'Printfresh': 'americas', 'Sleepy Jones': 'americas', 'Harvest & Mill': 'americas', 'Tradlands': 'americas', 'Outerknown': 'americas', 'Etsy': 'other',
-  'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'europe', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
+  'Colorful Standard': 'europe', 'The Classic T-Shirt Company': 'americas', 'Organic Basics': 'europe', 'Merz b. Schwanen': 'europe', 'Babaà': 'europe',
   'YumEarth': 'americas', 'Theo Chocolate': 'americas', 'LesserEvil': 'americas', 'Mavuno Harvest': 'americas', "Mary's Gone Crackers": 'americas', 'Purely Elizabeth': 'americas', 'Once Upon a Farm': 'americas',
-  'Alter Eco': 'americas', 'Made Good': 'americas', 'Hu Kitchen': 'americas', "Janie's Mill": 'americas', 'Jovial': 'americas', 'Yolélé': 'americas', 'Wilderness Poets': 'americas'};
+  'Alter Eco': 'americas', 'Made Good': 'americas', 'Hu Kitchen': 'americas', "Janie's Mill": 'americas', 'Jovial': 'americas', 'Yolélé': 'americas', 'Wilderness Poets': 'americas',
+  'Kowtow': 'asia', 'Lucy & Yak': 'europe', 'LoveShackFancy': 'americas', 'Known Supply': 'americas',
+  'Navitas Organics': 'americas', 'Terrasoul Superfoods': 'americas', 'Barnana': 'americas', "Anthony's Goods": 'americas', 'Sunfood': 'americas',
+  'Lark Ellen Farm': 'americas', 'Elmhurst 1925': 'americas', 'Paleonola': 'americas', 'Maine Coast Sea Vegetables': 'americas', 'Daily Crunch': 'americas'};
 const SRC_DEFAULT = {on: ['americas', 'other'], pick: {}};
 let SRC = (() => { const s = store.get('src2', null); return s && Array.isArray(s.on) && s.on.length ? {on: s.on, pick: s.pick || {}} : JSON.parse(JSON.stringify(SRC_DEFAULT)); })();
 const storeOf = it => it.store || (it.stores && it.stores[0]) || it.brand || '';

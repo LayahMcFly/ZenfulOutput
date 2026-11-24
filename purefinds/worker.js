@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.6.3';
+const VERSION = '1.6.4';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -25,7 +25,9 @@ const STORES = {
     ['printfresh.com', 'Printfresh'], ['sleepyjones.com', 'Sleepy Jones'], ['colorfulstandard.com', 'Colorful Standard'],
     ['harvestandmill.com', 'Harvest & Mill'], ['theclassictshirt.com', 'The Classic T-Shirt Company'],
     ['organicbasics.com', 'Organic Basics'], ['merzbschwanen.com', 'Merz b. Schwanen'], ['babaa.es', 'Babaà'],
-    ['tradlands.com', 'Tradlands'], ['outerknown.com', 'Outerknown']
+    ['tradlands.com', 'Tradlands'], ['outerknown.com', 'Outerknown'],
+    ['www.kowtowclothing.com', 'Kowtow'], ['lucyandyak.com', 'Lucy & Yak'], ['www.loveshackfancy.com', 'LoveShackFancy'],
+    ['knownsupply.com', 'Known Supply']
   ],
   food: [
     ['yumearth.com', 'YumEarth'], ['www.theochocolate.com', 'Theo Chocolate'], ['lesserevil.com', 'LesserEvil'],
@@ -33,7 +35,10 @@ const STORES = {
     ['purelyelizabeth.com', 'Purely Elizabeth'], ['onceuponafarmorganics.com', 'Once Upon a Farm'],
     ['www.alterecofoods.com', 'Alter Eco'], ['madegoodfoods.com', 'Made Good'], ['hukitchen.com', 'Hu Kitchen'],
     ['janiesmill.com', "Janie's Mill"], ['jovialfoods.com', 'Jovial'], ['yolele.com', 'Yolélé'],
-    ['wildernesspoets.com', 'Wilderness Poets']
+    ['wildernesspoets.com', 'Wilderness Poets'], ['www.navitasorganics.com', 'Navitas Organics'],
+    ['www.terrasoul.com', 'Terrasoul Superfoods'], ['barnana.com', 'Barnana'], ['anthonysgoods.com', "Anthony's Goods"],
+    ['www.sunfood.com', 'Sunfood'], ['www.larkellenfarm.com', 'Lark Ellen Farm'], ['elmhurst1925.com', 'Elmhurst 1925'],
+    ['www.paleonola.com', 'Paleonola'], ['www.seaveg.com', 'Maine Coast Sea Vegetables'], ['dailycrunchsnacks.com', 'Daily Crunch']
     // Removed: To Your Health Sprouted Flour, Shiloh Farms, One Degree and Bob's Red Mill.
     // Their websites don't publish a product list the scanner can read.
   ]
