@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.24">
+<meta name="pf-version" content="1.17.26">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.24';
+const VERSION = '1.17.26';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -531,7 +531,7 @@ const FCATS = {
  'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','cereal','dried-fruit','natural']],
  'fruit-snacks':['Fruit snacks','fruit snacks',null,null,/^(?!.*\b(powders?|pectin|spreads?|jams?|jelly|preserves|purees?|sauce|juices?|smoothies?|blends?|pouch(es)?|baby|meals?|drink|concentrate|extract|seasoning)\b).*\b(snacks?|bites|leathers?|gummies|gummy|chews?|strips?|rolls?|twists?|chips|crisps|dried|freeze[- ]dried|slices|rings|bars?)\b/i], gummies:['Gummies & candy','gummies'], cocoa:['Cocoa, cacao & chocolate','cocoa',null,null,/cocoa|cacao|chocolate/i], cookies:['Cookies','cookies'],
  chips:['Chips & puffs','chips'], plantain:['Plantain chips & snacks','plantain',null,null,/plantain/i], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
- 'dried-fruit':['Dried fruit','dried fruit'], natural:['Natural snacks','snack',null,'gmo'],
+ 'dried-fruit':['Dried fruit','dried fruit',null,null,/^(?!.*\b(powders?|tea|leaf|leaves|candy|candies|taffy|shortcake|cheesecake|ice cream|marshmallows?|yogurt|chocolate|dipped|covered|juice|smoothie|frozen|fresh|each|lbs?|seeds?|nuts?|walnuts?|almonds?|cashews?|sugar(?!\s*(added|free))|sweetener|flour|spice|herbs?|sauce|puree|cereal|granola|pouch|baby|bars?|bites?|trail mix|snack mix|sourdough|starter|sticks?|cake|cookies?|bread|chamoy|pinwheels?|bon bons?|kelp|dulse|seaweed|sea vegetable)\b).*\b(dried|dehydrated|freeze[- ]dried|sun[- ]dried|mango(es)?|dates?|figs?|apricots?|prunes?|raisins?|cherries|mulberr(y|ies)|goji|golden berr(y|ies)|bananas?|apples?|papaya|jackfruit|coconut|pineapple|pears?|peaches|strawberr(y|ies)|blueberr(y|ies)|currants?|persimmons?|kiwi|plantains?)\b/i], natural:['Natural snacks','snack',null,'gmo'],
  cereal:['Cereal & granola','cereal',null,null,/^(?!.*\b(yeast|bars?|dark\s+chocolate|milk\s+chocolate|chocolate\s+bar|seasoning|sea\s+vegetable|seaweed|dulse|moss|chips?)\b).*\b(cereal|granola|muesli|puffed|flakes?|crisp(y|ies)?|crunch|porridge|clusters|o'?s)\b/i], 'nut-butter':['Almond & walnut butter','almond butter',null,null,/^(?!.*\b(cups?|cookies?|bars?|granola|cereal|clusters|bites|puffs|oats?|muesli|chocolate|crackers?)\b).*\b(almond|walnut)s?\b[^,]*?\bbutter\b/i], pancake:['Pancake & waffle mix','pancake mix'],
  bread:['Bread','bread'], tortillas:['Tortillas & wraps','tortilla'], bagels:['Bagels & muffins','bagel'], baking:['Baking','baking'],
  fruit:['Fruit','fruit'], vegetables:['Vegetables','vegetables'], eggs:['Eggs','eggs'], milk:['Milk, butter & cheese','milk'], yogurt:['Yogurt','yogurt'],
@@ -837,7 +837,7 @@ const looksLikeIngredients = t => {
 };
 // Text from a brand's own page must read like an ingredient list, not a sentence ("real fuel for kids on the move. Refrigerated for freshness…", "authentic flavor, and wholesome")
 const MARKETING = /\b(wholesome|authentic|fuel|kids?|refrigerat\w*|freshness|on the (go|move)|up to a week|good for|made with love|nutritious|goodness|snack time|lunchbox|family|tastes?|taste buds|deliver\w*|packed with|free from|contains no|see (nutrition|package|label))\b|\*\s*see\b/i;
-const NOT_ING = /\b(not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
+const NOT_ING = /\b(diagnose|intended\s+to|prevent\s+any\s+disease|nothing\s+added|used\s+to\s+add|not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
 const BADGE_PART = /^(no|non|free|why|learn|made|gluten|vegan|kosher|certified|usda|paleo|keto|dairy|nut|soy|grain|plant)\b/i;
 const dropBadges = t => { if (!t) return t; const parts = String(t).split(/\s*,\s*/); while (parts.length > 1 && BADGE_PART.test(parts[parts.length - 1].trim())) parts.pop(); return parts.join(', '); };
 const okIng = (t, src) => {
@@ -903,9 +903,14 @@ const foodCats = t => { const s = t.toLowerCase(), c = FOOD_MAP.filter(([re]) =>
 const claimsFrom = t => [[/no preservatives|preservative[- ]free/i, 'No preservatives'], [/no artificial (colors|dyes)|no artificial/i, 'No artificial colors or flavors'],
   [/gluten[- ]free/i, 'Gluten-free'], [/\bvegan\b/i, 'Vegan'], [/no added sugar/i, 'No added sugar']].filter(([re]) => re.test(t)).map(([, c]) => c);
 
+const ETSY_NOT_FOOD = /\b(powders?|tea|leaf|leaves|saplings?|trees?|plants?|scionwood|sticks?|candy|candies|taffy|ice cream|marshmallows?|skittles|sk\*ttles|astronaut|sourdough starter|herbal|herbs?|spices?|amch(?:o)?ur|mango seeds?|altar|crafts?|incense|essential oils?|soap|lotion|fertilizer)\b/i;
 function addScanned(type, rows){
   let n = 0;
   for (const r of rows){
+    if (type === 'food' && r.store === 'Etsy'){
+      if (ETSY_NOT_FOOD.test(r.name || '')){ logRemoved(r.name, r.store, r.url, null, 'not a food product (powder, tea, candy, plant or craft)'); continue; }
+      if (/materials/i.test(r.ingSrc || '')) r.ing = ''; // Etsy's "materials" box holds search tags, not ingredients
+    }
     const id = 's-' + r.domain + '-' + r.handle;
     if (type === 'food' && NOT_A_SNACK.test(r.name || '')) { logRemoved(r.name, r.store, r.url, null, 'not a food item (gift set, merch or bundle)'); continue; }
     if (type === 'food' && NOT_FOOD_THING.test(`${r.name || ''} ${r.ptype || ''}`)) { logRemoved(r.name, r.store, r.url, null, 'not food (kitchen tool, book or merch)'); continue; }
@@ -919,11 +924,12 @@ function addScanned(type, rows){
         note: 'Found automatically in the store’s catalog. The fabric line is quoted from its listing, so check the store page for each color.',
         desc: `${SINGULAR[t] || 'Piece'} from ${r.store}, found in its online catalog. The listing says “${r.fabric}”, with no other fabric mentioned.`}));
     } else {
-      if (FOODS.some(f => f.url === r.url)) continue;
+      { const dup = FOODS.find(f => f.url === r.url); if (dup){ if (!dup.ing && r.ing && okIng(r.ing, r.ingSrc || 'Brand listing') && !ruleBreak(dup.name, r.ing, (dup.cats || []).some(c => FRUIT_CATS.includes(c)))){ dup.ing = r.ing; dup.ingSrc = r.ingSrc || 'Brand listing'; dup.pop = 1; } continue; } }
       let cats = foodCats(`${r.name} ${r.ptype}`);
       if (cats.length === 1 && cats[0] === 'natural') cats = foodCats(`${r.name} ${r.ptype} ${(r.tags || []).join(' ')}`);
       const cached0 = ingCache[r.url], cached = cached0 && okIng(cached0.ing, cached0.src) ? cached0 : null, fromName = !r.ing && !(cached && cached.ing) && singleIngredient(r.name);
       r.ing = dropBadges(r.ing); const ing = (okIng(r.ing, r.ingSrc || 'Brand listing') && r.ing) || (cached && cached.ing) || (fromName ? r.name.replace(/\s*[-–|]\s*\d.*$/, '').trim() : '');
+      if (!ing && (r.store === 'Etsy' || r.store === 'Kroger')){ logRemoved(r.name, r.store, r.url, cats, 'no readable ingredients'); continue; }
       { const why = ruleBreak(r.name, ing, cats.some(c => FRUIT_CATS.includes(c))); if (why){ logRemoved(r.name, r.store, r.url, cats, 'banned: ' + why, ing); continue; } } // marketing text isn't checked: "soy-free" or "no natural flavors" would wrongly remove good products
       FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
         price: r.price, img: sized(r.img), cats, certText: r.organic || r.nonGmo, cert: r.organic, nonGmo: r.nonGmo, ing,
@@ -967,7 +973,7 @@ const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajam
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 async function scanEtsy(st, type = 'cotton'){
   for (const q of (type === 'food' ? ETSY_FOOD_QUERIES : ETSY_QUERIES)){
-    const key = `etsy3|${type}|${q}`, hit = store.get(key, null); let rows = [];
+    const key = `etsy4|${type}|${q}`, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else try { rows = (await getJSON(`${scanBase()}/etsy?v=2&type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
@@ -982,7 +988,7 @@ async function scanKroger(st){
   const terms = [...new Set(Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t))];
   let i = 0;
   await Promise.all(Array.from({length: 3}, async () => { while (i < terms.length){ const q = terms[i++];
-    const key = 'kroger2|' + q, hit = store.get(key, null); let rows = [];
+    const key = 'kroger3|' + q, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else { if (/not set up|501/.test(krogerNote)) return;
       try { rows = (await getJSON(`${scanBase()}/kroger?v=2&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
@@ -1120,7 +1126,7 @@ function applyF(items){
     (!F.kind || it.kind === F.kind) && (!F.brand || it.brand === F.brand) &&
     (!F.store || it.store === F.store || (it.stores || []).includes(F.store)) &&
     (!F.style || it.styles.includes(F.style)) && (!F.fabric || it.fabricTags.includes(F.fabric)) &&
-    (!F.gmo || (F.gmo === 'label' ? !!it.nonGmo : !!(it.nonGmo || it.cert))) &&
+    (!F.gmo || (F.gmo === 'label' ? !!it.nonGmo : F.gmo === 'both' ? !!(it.nonGmo && it.cert) : !!(it.nonGmo || it.cert))) &&
     (!F.cert || (F.cert === 'Not labeled organic' ? !it.cert : (it.cert || '').startsWith(F.cert))) &&
     (F.min === '' || (it.price != null && it.price >= +F.min)) && (F.max === '' || (it.price != null && it.price <= +F.max)));
   const s = F.sort;
@@ -1141,7 +1147,7 @@ function filterBar(items){
     <label>Store<select class="field" name="store">${opts(items.flatMap(i => i.stores || [i.store]), F.store, 'All stores')}</select></label>
     ${hasCot ? `<label>Aesthetic<select class="field" name="style"><option value="">All aesthetics</option>${STYLES.map(([k, n]) => `<option value="${k}" ${F.style === k ? 'selected' : ''}>${n}</option>`).join('')}</select></label>
     <label>Fabric<select class="field" name="fabric">${opts(items.flatMap(i => i.fabricTags), F.fabric, 'Any fabric')}</select></label>` : ''}
-    ${hasFood ? `<label>Non-GMO<select class="field" name="gmo"><option value="">Organic or Non-GMO</option><option value="label" ${F.gmo === 'label' ? 'selected' : ''}>Non-GMO label only</option></select></label>` : ''}
+    ${hasFood ? `<label>Organic / Non-GMO<select class="field" name="gmo"><option value="">Organic or Non-GMO</option><option value="both" ${F.gmo === 'both' ? 'selected' : ''}>Organic AND Non-GMO</option><option value="label" ${F.gmo === 'label' ? 'selected' : ''}>Non-GMO label only</option></select></label>` : ''}
     <label>Organic certification<select class="field" name="cert"><option value="">Any</option>${certs.map(c => `<option ${F.cert === c ? 'selected' : ''}>${c}</option>`).join('')}</select></label>
     ${items.some(i => i.price != null) ? `<label class="pr">Price ($)<div><input class="field" name="min" type="number" min="0" inputmode="decimal" placeholder="Min" value="${esc(F.min)}"><input class="field" name="max" type="number" min="0" inputmode="decimal" placeholder="Max" value="${esc(F.max)}"></div></label>` : ''}
     <button class="reset" type="button" id="resetF">Clear filters</button>
