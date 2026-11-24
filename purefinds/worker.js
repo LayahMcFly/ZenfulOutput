@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.8.4';
+const VERSION = '1.9.1';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -43,8 +43,10 @@ const STORES = {
     // Their websites don't publish a product list the scanner can read.
   ]
 };
+// Beauty Closet: skin, face, nail and hair care. Each is a Shopify store (checked); ingredient lists are read from the product pages.
+STORES.beauty = [['carolsdaughter.com', "Carol's Daughter"], ['anua.com', 'ANUA'], ['herbivorebotanicals.com', 'Herbivore'], ['www.100percentpure.com', '100% Pure']];
 const ALLOWED = new Map();
-for (const [domain, name] of [...STORES.cotton, ...STORES.food]) ALLOWED.set(domain, name);
+for (const [domain, name] of [...STORES.cotton, ...STORES.food, ...STORES.beauty]) ALLOWED.set(domain, name);
 
 const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'};
 const json = (o, status = 200, maxAge = 1800) => new Response(JSON.stringify(o), {
@@ -63,7 +65,7 @@ export default {
       if (u.pathname === '/store'){
         const d = (u.searchParams.get('d') || '').toLowerCase(), type = u.searchParams.get('type');
         if (!ALLOWED.has(d)) return json({error: 'This store is not on the PureFinds list: ' + d}, 400);
-        if (type !== 'cotton' && type !== 'food') return json({error: 'type must be cotton or food'}, 400);
+        if (type !== 'cotton' && type !== 'food' && type !== 'beauty') return json({error: 'type must be cotton, food or beauty'}, 400);
         const items = await scan(d, type);
         return json({store: ALLOWED.get(d), domain: d, type, count: items.length, checked: new Date().toISOString(), items}, 200, 21600);
       }
@@ -86,12 +88,12 @@ export default {
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
         if (!q) return json({error: 'Add a search, for example /kroger?q=organic dried mango'}, 400);
         if (!env.KROGER_ID || !env.KROGER_SECRET) return json({error: 'Kroger is not set up yet: add Worker secrets KROGER_ID (your client ID) and KROGER_SECRET (your client secret).'}, 501, 0);
-        return json({items: await krogerSearch(q, env)}, 200, 21600);
+        return json({items: await krogerSearch(q, env, u.searchParams.get('type') === 'beauty' ? 'beauty' : 'food')}, 200, 21600);
       }
       if (u.pathname === '/etsy'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
         if (!q) return json({error: 'Add a search, for example /etsy?q=100% cotton dress'}, 400);
-        const etype = u.searchParams.get('type') === 'food' ? 'food' : 'cotton';
+        const etype = u.searchParams.get('type') === 'food' ? 'food' : u.searchParams.get('type') === 'beauty' ? 'beauty' : 'cotton';
         if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add Worker secrets ETSY_KEY (your keystring) and ETSY_SECRET (your shared secret).'}, 501, 0);
         const ekey = env.ETSY_KEY.includes(':') ? env.ETSY_KEY : `${env.ETSY_KEY}:${env.ETSY_SECRET || ''}`;
         return json({items: await etsySearch(q, ekey, etype)}, 200, 21600);
@@ -99,7 +101,7 @@ export default {
       if (u.pathname === '/details'){
         const target = new URL(u.searchParams.get('url') || '');
         if (!ALLOWED.has(target.hostname) || target.protocol !== 'https:') return json({error: 'Only product pages from PureFinds stores can be read.'}, 400);
-        return json(await details(target, env), 200, 86400);
+        return json(await details(target, env, u.searchParams.get('long') === '1'), 200, 86400);
       }
       return json({error: 'Not found'}, 404);
     } catch (e){
@@ -132,7 +134,7 @@ async function getJSON(url){
 
 // Shopify stores first, then WooCommerce (WordPress) stores, which publish a public product list too
 async function scan(d, type){
-  const keep = ps => ps.map(p => type === 'cotton' ? cottonItem(d, p) : foodItem(d, p)).filter(Boolean);
+  const keep = ps => ps.map(p => type === 'cotton' ? cottonItem(d, p) : type === 'beauty' ? beautyItem(d, p) : foodItem(d, p)).filter(Boolean);
   let shopifyErr;
   try {
     const out = [];
@@ -229,6 +231,14 @@ async function etsySearch(q, key, type){
         nonGmo: /non[- ]?gmo/i.test(all) ? 'Non-GMO (seller claim)' : '', ing, ingSrc: ing ? (findIngredients(plainList(l.description)) ? 'Etsy listing' : 'Etsy listing (materials)') : '', desc: desc.slice(0, 400), barcode: ''});
       continue;
     }
+    if (type === 'beauty'){
+      if (NOT_BEAUTY.test(title) || /\b(digital|printable|pattern|svg|png|pdf|download|template|charm|earrings?|necklace|keychain|candle|wax|melt|toy|plush|dog|cat|pet|incense|cutter|stencil|sticker|decal|nail (art|wraps?|stickers?|tips|files?|clippers?)|press[- ]on|fake nails|jewelry)\b/i.test(kind)) continue;
+      if (!/skin|face|facial|nail|polish|lacquer|hair|serum|cream|lotion|balm|moisturi|cleanser|toner|mask|scrub|oil|butter|shampoo|conditioner|lip|sunscreen|deodorant|soap/i.test(kind)) continue;
+      const mats = (l.materials || []).map(String).filter(Boolean);
+      const ing = findIngredients(plainList(l.description), true) || (mats.length >= 3 ? mats.join(', ') : '');
+      out.push({...row, ing, ingSrc: ing ? 'Etsy listing' : '', desc: desc.slice(0, 300)});
+      continue;
+    }
     const f = pureFabric(desc) || pureFabric(title);
     if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc}`) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '')) continue;
     out.push({...row, fabric: f.line, material: f.material, sizes: [], colors: []});
@@ -263,27 +273,28 @@ const upcCandidates = raw => {
   const upcA = body + ((10 - sum % 10) % 10);
   return [...new Set([upcA, '0' + upcA, d, d.replace(/^0+/, '')])].filter(x => x.length >= 8);
 };
-async function krogerSearch(q, env){
+async function krogerSearch(q, env, type){
   const token = await krogerAuth(env);
   const p = new URLSearchParams({'filter.term': q, 'filter.limit': '50'}); if (env.KROGER_LOCATION) p.set('filter.locationId', env.KROGER_LOCATION);
-  const r = await fetch('https://api.kroger.com/v1/products?' + p, {headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + token}, cf: {cacheTtl: 21600, cacheEverything: true}});
+  let r = await fetch('https://api.kroger.com/v1/products?' + p, {headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + token}, cf: {cacheTtl: 21600, cacheEverything: true}});
+  for (let t = 0; t < 2 && r.status >= 500; t++){ await new Promise(ok => setTimeout(ok, 700 * (t + 1))); r = await fetch('https://api.kroger.com/v1/products?' + p, {headers: {'Accept': 'application/json', 'Authorization': 'Bearer ' + token}}); }
   if (!r.ok){ if (r.status === 401) krogerToken = null; throw new Error(`Kroger answered HTTP ${r.status}`); }
   const list = (await r.json()).data || [];
   // one Open Food Facts request for every barcode in the batch
   const codes = new Map(); for (const k of list) for (const c of upcCandidates(k.upc)) codes.set(c, k.productId);
   const off = new Map();
   if (codes.size) try {
-    const j = await getJSON('https://world.openfoodfacts.org/api/v2/search?' + new URLSearchParams({code: [...codes.keys()].join(','), page_size: '200', fields: 'code,ingredients_text_en,ingredients_text,labels_tags'}));
+    const j = await getJSON(`https://world.${type === 'beauty' ? 'openbeautyfacts' : 'openfoodfacts'}.org/api/v2/search?` + new URLSearchParams({code: [...codes.keys()].join(','), page_size: '200', fields: 'code,ingredients_text_en,ingredients_text,labels_tags'}));
     for (const pr of j.products || []){ const id = codes.get(String(pr.code)); if (id && !off.has(id)) off.set(id, pr); }
   } catch (e){}
   const out = [];
   for (const k of list){
     const name = plain(k.description), brand = plain(k.brand) || 'Kroger';
-    if (!name || NOT_FOOD.test(name) || NOT_FOOD_THING.test(name)) continue;
+    if (!name || (type === 'beauty' ? NOT_BEAUTY.test(name) : (NOT_FOOD.test(name) || NOT_FOOD_THING.test(name)))) continue;
     const o = off.get(k.productId) || {}, L = o.labels_tags || [];
     const organic = /organic/i.test(`${name} ${brand}`) || L.some(t => /organic/.test(t)) ? (L.includes('en:usda-organic') ? 'USDA Organic' : 'Organic (label wording)') : '';
     const nonGmo = L.some(t => /non-gmo-project/.test(t)) ? 'Non-GMO Project Verified' : L.some(t => /gmo/.test(t)) || /non[- ]?gmo/i.test(name) ? 'Non-GMO label' : '';
-    if (!organic && !nonGmo) continue; // PureFinds only lists organic or Non-GMO food
+    if (type !== 'beauty' && !organic && !nonGmo) continue; // PureFinds only lists organic or Non-GMO food; beauty is judged by its ingredients instead
     const ing = plain(o.ingredients_text_en || o.ingredients_text || '');
     const im = (k.images || []).find(i => i.perspective === 'front') || (k.images || [])[0] || {};
     const size = (im.sizes || []).find(s => s.size === 'large') || (im.sizes || []).find(s => s.size === 'medium') || (im.sizes || [])[0] || {};
@@ -300,35 +311,35 @@ const NOT_FOOD = /gift ?card|bundle|sampler|merch|tote|t-shirt|sweatshirt|\bhat\
 const NOT_FOOD_THING = /\b(baking\s+scale|kitchen\s+scale|scales?|pans?|sheet\s+pan|baking\s+(sheet|stone|mat|dish|tray)|trays?|molds?|moulds?|(cake|muffin|baking|loaf|pie)\s+tins?|ramekins?|whisks?|spatulas?|rolling\s+pins?|spoons?|ladles?|tongs|knives|knife|cutting\s+boards?|boards?|bowls?|mugs?|cups?\s+set|measuring\s+(cups?|spoons?)|thermometers?|timers?|bannetons?|proofing\s+baskets?|baskets?|lames?|scrapers?|sifters?|strainers?|colanders?|graters?|peelers?|grinders?|grain\s+mills?|blenders?|mixers?|machines?|appliances?|kettles?|teapots?|infusers?|tumblers?|water\s+bottles?|jars?\s+(set|only)|storage\s+(canisters?|containers?)|towels?|cloths?|aprons?|oven\s+mitts?|pot\s+holders?|cookbooks?|books?|recipe\s+cards?|posters?|prints?|stickers?|magnets?|candles?|ornaments?|gift\s+cards?|e-?gift|totes?|bags?\s+(reusable|canvas|cotton)|t-?shirts?|hoodies?|hats?|socks|merch|subscriptions?|memberships?|classes?|workshops?|vouchers?)\b/i; // kitchen tools, books and merch sold next to the food
 const ING_STOP = /\s(?:contains|allergen|allergy|nutrition facts|directions|how to use|storage|store in|net wt|suggested use|manufactured|produced in|made in a facility|may contain|frequently asked|reviews|you may also|add to cart|shipping|distributed by|product testing|find in store|where to buy|customer reviews|write a review|add to bag|free shipping|you might also like|related products|nutrition|how to|faq)\b/i;
 // Real ingredient lists are plain words and commas, never page code or store data
-const looksLikeIngredients = t => {
+const looksLikeIngredients = (t, long) => {
   t = String(t || '').trim();
-  if (!t || /[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) || t.split(/\s+/).length > 160) return false;
+  if (!t || /[{}\[\]"<>=_\\|]|https?:|\b(sku|variant|price|product_id|compare_at|handle|json|null|true|false)\b/i.test(t) || t.split(/\s+/).length > (long ? 700 : 160)) return false;
   // marketing sentences are not ingredient lists ("each selected for maximum deliciousness")
   if (/\b(delicious\w*|selected|crafted|enjoy\w*|perfect\w*|our|we|you\w*|maximum|favorite|love\w*|each)\b/i.test(t)) return false;
   const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
   return parts.length >= 2 || (parts.length === 1 && t.split(/\s+/).length <= 8 && !/\.\s*$/.test(t));
 };
 const NAV_WORD = /\b(shop|cart|login|log in|sign in|account|search|menu|subscribe|contact|about us|our story|blog|careers|press|privacy|terms|shipping|returns|wholesale|store locator|recipes)\b/i;
-function findIngredients(text){
+function findIngredients(text, long){
   // The heading is often "Ingredients:", but accordions show just "Ingredients" followed by + or −, with no colon at all.
   // "Simple Ingredients" and "Full Ingredients" headings work the same way.
   const re = /\bingredients?\b[\s:\-–—+−×▼▲>|]*/gi; let m;
   const tidy = s => s.replace(/^[\s,.:;+−\-–]+|[\s,.:;+−\-–]+$/g, '').replace(/\s*,\s*(,\s*)+/g, ', ').replace(/\s+/g, ' ');
   const good = rest => {
     const parts = rest.split(/,/).map(x => x.trim()).filter(Boolean);
-    return rest.length > 2 && looksLikeIngredients(rest) && !NAV_WORD.test(rest) && parts.length <= 70 && parts.every(x => x.split(' ').length <= 14)
+    return rest.length > 2 && looksLikeIngredients(rest, long) && !NAV_WORD.test(rest) && parts.length <= (long ? 220 : 70) && parts.every(x => x.split(' ').length <= (long ? 18 : 14))
       && (rest.includes(',') || /organic/i.test(rest) || rest.split(' ').length <= 6);
   };
   while ((m = re.exec(text))){
-    let rest = text.slice(m.index + m[0].length, m.index + m[0].length + 1200);
+    let rest = text.slice(m.index + m[0].length, m.index + m[0].length + (long ? 4500 : 1200));
     const stop = rest.search(ING_STOP); if (stop > 0) rest = rest.slice(0, stop);
     rest = tidy(rest);
-    if (rest.length > 6 && good(rest)) return rest.slice(0, 900);
+    if (rest.length > 6 && good(rest)) return rest.slice(0, long ? 3500 : 900);
     // The list often runs straight into the next part of the page. Try it as one sentence, then two, so the page text after it is dropped.
     const sents = rest.split(/(?<=[.!?])\s+/).map(s => tidy(s)).filter(Boolean);
     for (const n of [1, 2]){
       const cand = tidy(sents.slice(0, n).join('. '));
-      if (cand.length > 2 && good(cand)) return cand.slice(0, 900);
+      if (cand.length > 2 && good(cand)) return cand.slice(0, long ? 3500 : 900);
     }
   }
   return '';
@@ -341,6 +352,14 @@ function foodItem(d, p){
   const nonGmo = /non[- ]?gmo project/i.test(all) ? 'Non-GMO Project Verified' : /non[- ]?gmo/i.test(all) ? 'Non-GMO (brand claim)' : '';
   return {...b, organic, nonGmo, ing: findIngredients(listText), desc: text.slice(0, 400), barcode: barcodeOf(p)};
 }
+/* ---------- beauty: skin, face, nail and hair care ---------- */
+const NOT_BEAUTY = /gift ?card|e-?gift|\b(sets?|kits?|bundles?|duos?|trios?|discovery|collection|sampler|samples?|subscription|refill pouch)\b|\b(brush(es)?|sponges?|applicators?|tote|bag|pouch|headband|scrunchie|bonnet|mirror|tool|comb|roller|gua sha|candle|sticker|t-?shirt|hoodie|merch|cap|hat)\b/i;
+function beautyItem(d, p){
+  const title = p.title || '';
+  if (NOT_BEAUTY.test(`${title} ${p.product_type || ''}`) || !available(p)) return null;
+  const text = plain(p.body_html), b = base(d, p), listText = plainList(p.body_html);
+  return {...b, ing: findIngredients(listText, true), desc: text.slice(0, 300)};
+}
 function barcodeOf(p){
   const v = (p.variants || []).find(v => /^\d{8,14}$/.test(String(v.barcode || '')));
   if (v) return String(v.barcode);
@@ -349,14 +368,14 @@ function barcodeOf(p){
 }
 
 /* ---------- details for one product (opened when a listing is tapped) ---------- */
-async function details(target, env){
+async function details(target, env, long){
   const d = target.hostname, handle = target.pathname.startsWith('/products/') ? target.pathname.split('/')[2] : '';
   const out = {url: target.href, ingredients: '', ingredientsSource: '', fabric: '', barcode: '', tried: []};
   // 1. the product's data file (Shopify stores)
   if (handle) try {
     const p = (await getJSON(`https://${d}/products/${handle}.json`)).product || {};
     const text = plain(p.body_html);
-    out.ingredients = findIngredients(plainList(p.body_html)); out.fabric = ((pureFabric(text) || {}).line) || ''; out.barcode = barcodeOf(p);
+    out.ingredients = findIngredients(plainList(p.body_html), long); out.fabric = ((pureFabric(text) || {}).line) || ''; out.barcode = barcodeOf(p);
     if (out.ingredients) out.ingredientsSource = 'Product description';
   } catch (e){ out.tried.push(String(e.message || e)); }
   // 2. the product page itself (ingredients are often in a tab or accordion)
@@ -365,7 +384,7 @@ async function details(target, env){
       const r = await fetch(target.href, {headers: PAGE_UA, cf: {cacheTtl: 86400, cacheEverything: true, cacheKey: target.href + '#page2'}});
       if (!r.ok) throw new Error(`${d} page answered HTTP ${r.status}`);
       const html = await r.text(), text = plain(html);
-      out.ingredients = findIngredients(plainList(html));
+      out.ingredients = findIngredients(plainList(html), long);
       if (out.ingredients) out.ingredientsSource = 'Product page';
       // what the page held, so a missing list can be diagnosed from the Debug page
       out.page = {status: r.status, length: html.length, mentions: (text.match(/ingredients?/gi) || []).length, snippets: (text.match(/.{0,30}\bingredients?\b.{0,150}/gi) || []).slice(0, 3)};
