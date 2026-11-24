@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.18.9">
+<meta name="pf-version" content="1.18.10">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -379,7 +379,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.9';
+const VERSION = '1.18.10';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -529,7 +529,7 @@ const ING_EXTRA = {
 };
 
 const STYLES = [
- ['soft-girl','Soft girl'],['coquette','Coquette'],['old-money','Old money'],['pinterest','Pinterest aesthetic'],['clean-girl','Clean girl'],
+ ['soft-girl','Soft girl'],['coquette','Coquette'],['old-money','Old money'],['pinterest','Everyday classic'],['clean-girl','Clean girl'],
  ['cottagecore','Cottagecore'],['korean','Korean fashion'],['japanese-street','Japanese streetwear'],['minimalist','Minimalist'],['casual-cute','Casual cute'],
  ['vintage','Vintage'],['brown','Brown aesthetic'],['neutral','Neutral aesthetic'],['y2k','Y2K'],['cozy','Cozy aesthetic']
 ];
@@ -1366,7 +1366,7 @@ function home(){
   <section class="blk">${sh('Cute Finds', 'Casual cute, soft girl and coquette pieces. All 100% cotton.', '<a class="link" href="#cotton-aesthetics">Browse aesthetics →</a>')}<div class="rail">${cute.map(card).join('')}</div></section>
   <section class="blk">${sh('New Finds', 'The most recently updated organic snacks and cotton pieces at their stores.')}<div class="rail" id="newf">${newest.map(card).join('')}</div></section>
   <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Natural Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
-  <section class="blk">${sh('Pinterest Outfit Finds', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
+  <section class="blk">${sh('Outfit Ideas', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
   loadHomeFood();
 }
@@ -1553,7 +1553,7 @@ function cottonHub(){
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
     ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: cottonV().find(c => c.styles.includes('coquette')), items: cottonV().filter(c => c.styles.length)}, 0)}
-    ${hubTile({go: 'cotton-outfits', title: 'Pinterest outfit finds', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
+    ${hubTile({go: 'cotton-outfits', title: 'Outfit ideas', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
     ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every piece, hand-checked and found by the scanner', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), items: pick(cottonV(), 6, seed + 7), n: cottonV().length}, 2)}
     ${types.map(([t, a], i) => hubTile({go: 'cotton-shop', cot: t, title: t, item: a[Math.min(1, a.length - 1)], items: a, n: a.length}, i + 3)).join('')}
   </div>
@@ -1585,7 +1585,7 @@ function showStyle(k, scroll = true){
   if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
 }
 function outfitsView(){
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Outfit finds')}<h1>Pinterest Outfit Finds</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Outfit finds')}<h1>Outfit Ideas</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
 }
 function savedView(kind){
   const items = kind === 'fav' ? Object.values(favs).reverse() : recent;
