@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.17">
+<meta name="pf-version" content="1.18.18">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -38,6 +38,15 @@ document.body.appendChild(b);},3000);})();
 :root{--cream:#f8f3ea;--beige:#efe5d5;--sand:#e2d3bc;--ink:#3a332b;--muted:#7a6e61;--line:#e4d8c6;--sage:#8ea888;--sage-d:#56704f;--sage-l:#e3eadc;--pink:#f4dcd8;--pink-d:#c98682;--white:#fffdf9;--r:22px;--shadow:0 10px 30px -18px rgba(70,52,30,.45)}
 *{box-sizing:border-box;min-width:0}
 html{scroll-padding-top:150px}
+.loadscr{text-align:center;padding:48px 16px;color:var(--muted)}
+.loadscr h3{font-family:'Cormorant Garamond',Georgia,serif;font-size:26px;color:var(--sage-d);margin:10px 0 4px}
+.loadscr p{margin:4px 0}.loadscr .lline{font-size:14px;min-height:22px;transition:opacity .3s}
+.lbasket{position:relative;width:96px;height:80px;margin:0 auto}
+.lbasket svg{position:absolute;left:6px;bottom:0}
+.lb{position:absolute;bottom:24px;width:16px;height:16px;border-radius:50%;animation:lhop 1.2s ease-in-out infinite}
+.lb.a{left:22px;background:var(--pink-d)}.lb.b{left:40px;background:var(--sage);animation-delay:.2s}.lb.c{left:58px;background:var(--sand);animation-delay:.4s}
+@keyframes lhop{0%,100%{transform:translateY(0)}50%{transform:translateY(-26px)}}
+@media (prefers-reduced-motion:reduce){.lb{animation:none}}
 /* soft sage scroll bars that match the theme */
 *{scrollbar-width:thin;scrollbar-color:var(--sage) transparent}
 *::-webkit-scrollbar{width:10px;height:10px}
@@ -397,7 +406,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.17';
+const VERSION = '1.18.18';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1205,6 +1214,7 @@ const NOT_SNAP = /\b(supplements?|vitamins?|capsules?|tinctures?|probiotics?|col
 const ebtOk = it => it.kind === 'food' && !NOT_SNAP.test(it.name || '') && [it.store, ...(it.stores || [])].some(x => EBT_CHAINS.test(String(x || '')));
 const blankF = () => ({ebt: store.get('ebt', ''), gmo: '', sort: 'pop', brand: '', store: '', min: '', max: '', style: '', fabric: '', cert: '', kind: ''});
 const opts = (arr, sel, all) => `<option value="">${all}</option>` + [...new Set(arr)].filter(Boolean).sort().map(v => `<option ${v === sel ? 'selected' : ''}>${esc(v)}</option>`).join('');
+let scrambleSeed = 0;
 function applyF(items){
   let out = items.filter(it => (it.kind !== 'food' || passesRules(it)) &&
     (!F.kind || it.kind === F.kind) && (!F.brand || it.brand === F.brand) &&
@@ -1217,6 +1227,8 @@ function applyF(items){
   const s = F.sort;
   out = [...out].sort((a, b) => s === 'cheap' ? (a.price ?? 1e9) - (b.price ?? 1e9) : s === 'new' ? b.created - a.created
     : (b.pop || 0) - (a.pop || 0) || (a.order ?? 0) - (b.order ?? 0));
+  // while searching, the default order is shuffled (a new shuffle per search; it stays put while you filter)
+  if ((!s || s === 'pop') && scrambleSeed){ let x = scrambleSeed; const rnd = () => (x = (x * 1664525 + 1013904223) % 4294967296) / 4294967296; out = [...out]; for (let i = out.length - 1; i > 0; i--){ const j = Math.floor(rnd() * (i + 1)); [out[i], out[j]] = [out[j], out[i]]; } }
   // default order: take turns between brands so one store (like Kotn) can't fill the whole page
   if ((!s || s === 'pop') && !F.brand && !F.store){
     const groups = new Map(); for (const it of out){ const k = it.brand || it.store || ''; if (!groups.has(k)) groups.set(k, []); groups.get(k).push(it); }
@@ -1303,6 +1315,9 @@ function paint(){
   g.innerHTML = items.length ? items.map(card).join('') : '';
   $('#none').hidden = !!items.length; shownNow = items; resultsBar(items);
 }
+const LOAD_LINES = ['Picking out the good stuff…', 'Reading ingredient lists…', 'Checking everything against your rules…', 'Shaking the basket…'];
+const loadingScreen = what => `<div class="loadscr" role="status" aria-live="polite"><div class="lbasket" aria-hidden="true"><span class="lb a"></span><span class="lb b"></span><span class="lb c"></span><svg viewBox="0 0 64 40" width="84" height="52"><path d="M6 14h52l-6 22a4 4 0 0 1-4 3H16a4 4 0 0 1-4-3z" fill="#e2d3bc" stroke="#56704f" stroke-width="2.5" stroke-linejoin="round"/><path d="M20 14l8-10M44 14l-8-10" stroke="#56704f" stroke-width="2.5" stroke-linecap="round"/></svg></div><h3>Finding ${esc(what)}…</h3><p>Loading products for you. They’ll all appear at once.</p><p class="lline">${LOAD_LINES[0]}</p></div>`;
+setInterval(() => { const l = document.querySelector('.loadscr .lline'); if (l){ const i = (LOAD_LINES.indexOf(l.textContent) + 1) % LOAD_LINES.length; l.textContent = LOAD_LINES[i]; } }, 1800);
 function mountList(el, items, emptyMsg){
   pool = items;
   el.innerHTML = filterBar(items) + '<p class="count" id="count"></p><div class="rbar" id="rbar"></div><div class="grid" id="grid"></div>' +
@@ -1518,7 +1533,8 @@ async function loadFoodList(k, key){
     const b = $('#showRel'); if (b) b.onclick = () => { mountList($('#list'), rel, emptyMsg);
       $('#list').insertAdjacentHTML('afterbegin', `<p class="note warn">These are <b>not ${esc(word)}</b>. No ${esc(word)} passed your food rules, so this shows the other ${esc(sec ? sec[1].toLowerCase() : 'section')} finds instead. <button class="link" type="button" data-sub="${esc(key)}" data-sec="${esc(k)}">Back to ${esc(word)}</button></p>`); };
   };
-  if (mine.length) show(mine);
+  scrambleSeed = (Math.random() * 1e9) | 0; // a fresh shuffle for every search
+  if (cat[1]) $('#list').innerHTML = loadingScreen(cat[0].replace(/^All /, '').toLowerCase()); else if (mine.length) show(mine);
   if (!cat[1]){
     $('#live').textContent = mine.length ? `${mine.length} from brand stores. Pick a category above for live results too.` : 'Pick a category above for live results, or use the pickup lists.';
     if (!mine.length) show([]);
@@ -1527,7 +1543,7 @@ async function loadFoodList(k, key){
   try {
     // Baked goods also get searches by the flours you allow, so cookies, crackers, pancake mix and bread made with einkorn, spelt or rye turn up
     const flourSearch = Promise.allSettled((FLOUR_QUERIES[key] || []).map(q => offSearch(q, {mode: 'both', size: 24}))).then(rs2 => rs2.flatMap(r => r.status === 'fulfilled' ? r.value : []));
-    const [main1, flourHits] = await Promise.all([offSearch(cat[1], {mode: cat[3] || 'both'}), flourSearch]);
+    const [main1, flourHits] = await Promise.race([Promise.all([offSearch(cat[1], {mode: cat[3] || 'both'}), flourSearch]), new Promise((_, no) => setTimeout(() => no(new Error('The live search took too long (over 25 seconds).')), 25000))]);
     const seen = new Set(mine.map(m => m.id)), live = [];
     for (const it of [...main1, ...flourHits]) if (!seen.has(it.id) && (!cat[4] || cat[4].test(it.name) || titleSays(key, it.name)) && !BAD_FRUIT.test(clean(it.ing))) { seen.add(it.id); live.push(it); }
     if (state.sub[k] !== key || !$('#list')) return;
@@ -1536,7 +1552,7 @@ async function loadFoodList(k, key){
   } catch(e){
     if (!$('#live') || state.sub[k] !== key) return;
     $('#live').innerHTML = `${mine.length ? `Showing ${mine.length} ${mine.length === 1 ? 'find' : 'finds'} from brand stores, checked ${CHECKED}. ` : ''}The live Open Food Facts search didn't load, so more results are missing.${viewerNote()}${errBox(e)}`;
-    if (!mine.length) show([]);
+    show(mine);
   }
 }
 const storeLinks = term => { const q = encodeURIComponent(term); return [
@@ -1639,7 +1655,7 @@ function cartView(){
     <p class="note">Each item is paid for on Stripe's secure checkout page. Shipping and taxes are shown there before you pay.</p>`;
 }
 function searchView(){
-  const q = state.q.trim();
+  const q = state.q.trim(); scrambleSeed = (Math.random() * 1e9) | 0;
   $('#q').value = q;
   main.innerHTML = `<div class="pagehead"><h1>${q ? `Results for “${esc(q)}”` : 'Search PureFinds'}</h1><p>Clothing comes from the verified cotton catalog. Food is searched live in Open Food Facts for organic-labeled products sold in the US.</p></div><div id="list"><div class="grid">${skeletons(6)}</div></div>`;
   if (!q) { $('#list').innerHTML = `<div class="empty"><h3>What are you looking for?</h3><p>Try one of these:</p><div class="chips" style="justify-content:center">${['dark chocolate', 'gummies', 'granola', 'dress', 'hoodie', 'Kotn', 'cottagecore'].map(s => `<button class="chip" data-q="${s}">${s}</button>`).join('')}</div></div>`; return; }
@@ -2065,6 +2081,7 @@ document.addEventListener('click', e => {
 const VIEWS = {home, food: foodHub, beauty: beautyHub, ...Object.fromEntries(BEAUTY_GROUPS.map(([k]) => ['beauty-' + k, () => beautySection(k)])), cotton: cottonHub, 'cotton-shop': cottonShop, 'cotton-aesthetics': styles, 'cotton-outfits': outfitsView,
   ...Object.fromEntries(FOOD_SECTIONS.map(([k]) => ['food-' + k, () => foodSection(k)])), favorites: () => savedView('fav'), recent: () => savedView('recent'), sources: sourcesView, debug: debugView, cart: cartView, search: searchView, about};
 function route(){
+  scrambleSeed = 0; // shuffling only happens while searching
   const v = location.hash.slice(1);
   const name = VIEWS[v] ? v : 'home';
   F = blankF(); pool = [];
