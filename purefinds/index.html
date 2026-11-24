@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.22">
+<meta name="pf-version" content="1.17.23">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -369,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.22';
+const VERSION = '1.17.23';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -964,20 +964,20 @@ async function resolveIngredients(){
 // PureFinds food rule like any other store. Needs the ETSY_KEY and ETSY_SECRET secrets on the Worker.
 const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
 const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
-let etsyNote = '';
+let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 async function scanEtsy(st, type = 'cotton'){
   for (const q of (type === 'food' ? ETSY_FOOD_QUERIES : ETSY_QUERIES)){
     const key = `etsy2|${type}|${q}`, hit = store.get(key, null); let rows = [];
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else try { rows = (await getJSON(`${scanBase()}/etsy?type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
-    st.added += addScanned(type, rows);
+    etsySeen += rows.length; const n = addScanned(type, rows); etsyAdded += n; st.added += n;
   }
   if (!etsyNote) etsyNote = 'ok';
 }
 // Kroger family stores (Kroger, Ralphs, Fred Meyer, King Soopers, Harris Teeter, Smith's and more): the scanner searches Kroger's catalog,
 // keeps organic or Non-GMO items, and finds each one's ingredients on Open Food Facts by barcode. Needs KROGER_ID and KROGER_SECRET on the Worker.
-let krogerNote = '';
+let krogerNote = '', krogerAdded = 0, krogerSeen = 0;
 async function scanKroger(st){
   const terms = [...new Set(Object.values(FCATS).map(c => c[1]).filter(Boolean).map(t => /organic|non[- ]?gmo/i.test(t) ? t : 'organic ' + t))];
   let i = 0;
@@ -987,7 +987,7 @@ async function scanKroger(st){
     else { if (/not set up|501/.test(krogerNote)) return;
       try { rows = (await getJSON(`${scanBase()}/kroger?q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
       catch (e){ krogerNote = errText(e); continue; } }
-    st.added += addScanned('food', rows);
+    krogerSeen += rows.length; const n = addScanned('food', rows); krogerAdded += n; st.added += n;
   } }));
   if (!krogerNote) krogerNote = 'ok';
 }
@@ -1020,6 +1020,12 @@ async function scanType(type){
   st.status = 'done'; scanNote(); rerender();
   if (type === 'food') resolveIngredients();
 }
+// Kroger and Etsy aren't store catalogs, so they get their own line: how many products they sent and how many passed the rules
+function apiLine(type){
+  const one = (name, note, seen, added) => !note ? '' : note === 'ok' ? `${name}: ${seen} products found, ${added} passed your rules. ` : /not set up|501/.test(note) ? `${name}: not connected yet (add its keys to the scanner). ` : `${name}: ${esc(String(note).slice(0, 160))} `;
+  const k = type === 'food' ? one('Kroger', krogerNote, krogerSeen, krogerAdded) : '', e = one('Etsy', etsyNote, etsySeen, etsyAdded);
+  return k || e ? `<br>${k}${e}` : '';
+}
 function scanNote(){
   const el = document.getElementById('scanNote'); if (!el) return;
   const type = el.dataset.type, st = scanState[type], what = type === 'cotton' ? 'pieces (100% cotton, silk, wool or linen)' : 'foods that fit your rules';
@@ -1028,6 +1034,7 @@ function scanNote(){
   if (st.status === 'loading') el.innerHTML = `Checking ${st.stores || 'the'} store catalogs for more ${what}… ${st.done}${st.stores ? ' of ' + st.stores : ''} done, ${st.added} added so far.`;
   else if (st.status === 'unreachable') el.innerHTML = `The store scanner didn't answer, so only the hand-checked products show. If you just redeployed it, wait a minute and reload. Inside Claude's preview it can't connect at all; open PureFinds from its website. <a href="#about">Scanner settings</a>.${errBox(st.err)}`;
   else el.innerHTML = `${st.added} more ${what} found in ${st.stores} store catalogs. Store lists refresh every 6 hours.` + (type === 'food' && rs.total ? `<br>Reading ingredient lists: ${rs.done} of ${rs.total} checked. Kept ${rs.kept}; removed ${rs.noIng} with no readable ingredients and ${rs.banned} with banned ingredients${rs.unreached ? `; ${rs.unreached} couldn't be reached yet (the store scanner may need the latest Worker code)` : ''}.` : '') +
+    apiLine(type) +
     (st.errors.length ? `<details style="margin-top:6px"><summary>${st.errors.length} store${st.errors.length === 1 ? '' : 's'} didn't answer</summary>${st.errors.map(errBox).join('')}</details>` : '');
 }
 function rerender(){
