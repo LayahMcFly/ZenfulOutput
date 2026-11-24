@@ -12,7 +12,7 @@ document.body.appendChild(b);},3000);})();
 
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.37">
+<meta name="pf-version" content="1.17.38">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -378,7 +378,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.37';
+const VERSION = '1.17.38';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -538,7 +538,7 @@ const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pan
 // key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
 const FCATS = {
  'all-snacks':['All snacks','snack',['fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','cereal','dried-fruit','natural']],
- 'fruit-snacks':['Fruit snacks','fruit snacks',null,null,/^(?!.*\b(powders?|pectin|spreads?|jams?|jelly|preserves|purees?|sauce|juices?|smoothies?|blends?|pouch(es)?|baby|meals?|drink|concentrate|extract|seasoning)\b).*\b(snacks?|bites|leathers?|gummies|gummy|chews?|strips?|rolls?|twists?|chips|crisps|dried|freeze[- ]dried|slices|rings|bars?)\b/i], gummies:['Gummies & candy','gummies'], cocoa:['Cocoa, cacao & chocolate','cocoa',null,null,/cocoa|cacao|chocolate/i], cookies:['Cookies','cookies'],
+ 'fruit-snacks':['Fruit snacks','fruit snacks',null,null,/^(?!.*\b(powders?|pectin|spreads?|jams?|jelly|preserves|purees?|sauce|juices?|smoothies?|blends?|pouch(es)?|baby|meals?|drink|concentrate|extract|seasoning)\b).*\b(snacks?|bites|leathers?|gummies|gummy|chews?|strips?|rolls?|twists?|chips|crisps|dried|freeze[- ]dried|slices|rings|bars?)\b/i], gummies:['Gummies & candy','gummies'], cocoa:['Cocoa, cacao & chocolate','cocoa',null,null,/cocoa|cacao|chocolate/i], cookies:['Cookies','cookies',null,null,/^(?!.*\b(creamers?|ice cream|cereal|granola|bars?|cutters?|wax|perfume|soap|body|shampoo|lotion|tee|shirt|candle|seasoning|cropped|jersey)\b).*\b(cookies?|biscotti|shortbread|biscuits|macarons?|macaroons?|alfajores|snickerdoodles?)\b/i],
  chips:['Chips & puffs','chips'], plantain:['Plantain chips & snacks','plantain',null,null,/plantain/i], crackers:['Crackers','crackers'], 'granola-bars':['Granola bars','granola bar'],
  'dried-fruit':['Dried fruit','dried fruit',null,null,/^(?!.*\b(powders?|tea|leaf|leaves|candy|candies|taffy|shortcake|cheesecake|ice cream|marshmallows?|yogurt|chocolate|dipped|covered|juice|smoothie|frozen|fresh|each|lbs?|seeds?|nuts?|walnuts?|almonds?|cashews?|sugar(?!\s*(added|free))|sweetener|flour|spice|herbs?|sauce|puree|cereal|granola|pouch|baby|bars?|bites?|trail mix|snack mix|sourdough|starter|sticks?|cake|cookies?|bread|chamoy|pinwheels?|bon bons?|kelp|dulse|seaweed|sea vegetable)\b).*\b(dried|dehydrated|freeze[- ]dried|sun[- ]dried|mango(es)?|dates?|figs?|apricots?|prunes?|raisins?|cherries|mulberr(y|ies)|goji|golden berr(y|ies)|bananas?|apples?|papaya|jackfruit|coconut|pineapple|pears?|peaches|strawberr(y|ies)|blueberr(y|ies)|currants?|persimmons?|kiwi|plantains?)\b/i], natural:['Natural snacks','snack',null,'gmo'],
  cereal:['Cereal & granola','cereal',null,null,/^(?!.*\b(yeast|bars?|dark\s+chocolate|milk\s+chocolate|chocolate\s+bar|seasoning|sea\s+vegetable|seaweed|dulse|moss|chips?)\b).*\b(cereal|granola|muesli|puffed|flakes?|crisp(y|ies)?|crunch|porridge|clusters|o'?s)\b/i], 'nut-butter':['Almond & walnut butter','almond butter',null,null,/^(?!.*\b(cups?|cookies?|bars?|granola|cereal|clusters|bites|puffs|oats?|muesli|chocolate|crackers?)\b).*\b(almond|walnut)s?\b[^,]*?\bbutter\b/i], pancake:['Pancake & waffle mix','pancake mix'],
@@ -561,7 +561,7 @@ const FLOUR_QUERIES = {
  'freeze-dried': ['freeze dried strawberries', 'freeze dried fruit', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana'],
  'dried-fruit': ['dried mango', 'raisins', 'dried apricots', 'apple chips', 'banana chips', 'freeze dried strawberries'],
  'fruit-snacks': ['fruit leather', 'fruit bites'],
- cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
+ cookies: ['einkorn cookies', 'spelt cookies', 'rye cookies', 'sprouted spelt cookies', 'maple sugar cookies', 'date sweetened cookies', 'coconut flour cookies', 'almond flour cookies', 'coconut macaroons', 'einkorn shortbread', 'grain free cookies', 'cacao cookies'], crackers: ['einkorn crackers', 'spelt crackers', 'rye crackers'],
  pancake: ['einkorn pancake', 'spelt pancake', 'spelt waffle'], bread: ['spelt bread', 'einkorn bread', 'rye bread'],
  tortillas: ['spelt tortilla', 'einkorn tortilla', 'coconut wraps', 'almond flour tortillas', 'sprouted spelt wrap', 'teff wrap', 'plantain tortillas', 'sourdough tortillas', 'chickpea flour wrap'], bagels: ['spelt muffin', 'einkorn bagel'], baking: ['spelt baking mix', 'einkorn baking'],
  cereal: ['grain free granola', 'grain free cereal', 'puffed quinoa', 'puffed amaranth', 'puffed kamut', 'quinoa flakes', 'spelt flakes', 'buckwheat cereal'], 'granola-bars': ['spelt bar', 'einkorn bar'], chips: ['spelt chips']
@@ -858,7 +858,7 @@ const looksLikeIngredients = t => {
 };
 // Text from a brand's own page must read like an ingredient list, not a sentence ("real fuel for kids on the move. Refrigerated for freshness…", "authentic flavor, and wholesome")
 const MARKETING = /\b(wholesome|authentic|fuel|kids?|refrigerat\w*|freshness|on the (go|move)|up to a week|good for|made with love|nutritious|goodness|snack time|lunchbox|family|tastes?|taste buds|deliver\w*|packed with|free from|contains no|see (nutrition|package|label))\b|\*\s*see\b/i;
-const NOT_ING = /^only$|\b(suitable\s+for|educational|recipe\s+preparation|diagnose|intended\s+to|prevent\s+any\s+disease|nothing\s+added|used\s+to\s+add|not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
+const NOT_ING = /^only$|^discreetly$|^[^a-z0-9(]|\b(suitable\s+for|educational|recipe\s+preparation|diagnose|intended\s+to|prevent\s+any\s+disease|nothing\s+added|used\s+to\s+add|not\s+listed|n\/a|learn\s+more|read\s+more|see\s+(label|package|below|more)|click|tap|condiment|classically|real\s+food|full\s+of|packed\s+with|perfect\s+for|great\s+for|made\s+for|loaded\s+with|antioxidants?|super\s*grain|drought|protein\s+than|more\s+protein|delicious|tasty|yummy|crave)\b/i;
 const BADGE_PART = /^(no|non|free|why|learn|made|gluten|vegan|kosher|certified|usda|paleo|keto|dairy|nut|soy|grain|plant)\b/i;
 const dropBadges = t => { if (!t) return t; const parts = String(t).split(/\s*,\s*/); while (parts.length > 1 && BADGE_PART.test(parts[parts.length - 1].trim())) parts.pop(); return parts.join(', '); };
 const okIng = (t, src) => {
@@ -962,7 +962,7 @@ function addScanned(type, rows){
       const cached0 = ingCache[r.url], cached = cached0 && okIng(cached0.ing, cached0.src) ? cached0 : null, fromName = !r.ing && !(cached && cached.ing) && (singleIngredient(r.name) || !!singleProduce(r.name));
       r.ing = dropBadges(r.ing); const ing = (okIng(r.ing, r.ingSrc || 'Brand listing') && r.ing) || (cached && cached.ing) || (fromName ? (singleIngredient(r.name) ? r.name.replace(/\s*[-–|]\s*\d.*$/, '').trim() : singleProduce(r.name)) : '');
       // Small Etsy bakers rarely write an ingredient list. When the title itself says the product is made from einkorn, spelt or kamut and nothing in it breaks a rule, keep it, clearly marked as judged from the title
-      const titleVouched = !ing && r.store === 'Etsy' && /\b(einkorn|spelt|kamut|khorasan)\b/i.test(r.name) && !ruleBreak(r.name, '', false);
+      const titleVouched = !ing && r.store === 'Etsy' && (/\b(einkorn|spelt|kamut|khorasan)\b/i.test(r.name) || (/\b(maple|date|coconut)\s+(sugar|syrup|sweetened)\b/i.test(r.name) && /\b(almond flour|coconut flour|chickpea|teff|quinoa)\b/i.test(r.name))) && !ruleBreak(r.name, '', false);
       if (!ing && !titleVouched && (r.store === 'Etsy' || r.store === 'Kroger')){ logRemoved(r.name, r.store, r.url, cats, 'no readable ingredients'); continue; }
       { const why = ruleBreak(r.name, ing, cats.some(c => FRUIT_CATS.includes(c))); if (why){ logRemoved(r.name, r.store, r.url, cats, 'banned: ' + why, ing); continue; } } // marketing text isn't checked: "soy-free" or "no natural flavors" would wrongly remove good products
       FOODS.push(reg({id, kind: 'food', src: 'brand', scan: true, name: r.name, brand: r.vendor || r.store, store: r.store, stores: [r.store], url: r.url,
@@ -1002,7 +1002,7 @@ async function resolveIngredients(){
 
 // Etsy: the scanner searches Etsy. Clothing must say 100% cotton (or another pure fabric) with no blend; food goes through every
 // PureFinds food rule like any other store. Needs the ETSY_KEY and ETSY_SECRET secrets on the Worker.
-const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana', 'freeze dried blueberries', 'freeze dried raspberries', 'frozen fruit organic', 'organic dried apricots', 'organic dried figs', 'organic dates', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
+const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'maple sugar cookies', 'date sweetened cookies', 'einkorn shortbread', 'sprouted spelt cookies', 'coconut macaroons', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana', 'freeze dried blueberries', 'freeze dried raspberries', 'frozen fruit organic', 'organic dried apricots', 'organic dried figs', 'organic dates', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips'];
 const ETSY_QUERIES = ['100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 // Automatic English translation. Listings in other languages are translated before the food rules run, so a banned ingredient can't hide in another language.
