@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.13">
+<meta name="pf-version" content="1.18.14">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -38,6 +38,15 @@ document.body.appendChild(b);},3000);})();
 :root{--cream:#f8f3ea;--beige:#efe5d5;--sand:#e2d3bc;--ink:#3a332b;--muted:#7a6e61;--line:#e4d8c6;--sage:#8ea888;--sage-d:#56704f;--sage-l:#e3eadc;--pink:#f4dcd8;--pink-d:#c98682;--white:#fffdf9;--r:22px;--shadow:0 10px 30px -18px rgba(70,52,30,.45)}
 *{box-sizing:border-box;min-width:0}
 html{scroll-padding-top:150px}
+/* soft sage scroll bars that match the theme */
+*{scrollbar-width:thin;scrollbar-color:var(--sage) transparent}
+*::-webkit-scrollbar{width:10px;height:10px}
+*::-webkit-scrollbar-track{background:transparent}
+*::-webkit-scrollbar-thumb{background:var(--sand);border-radius:999px;border:3px solid var(--cream);min-height:44px;transition:background .2s}
+*::-webkit-scrollbar-thumb:hover{background:var(--sage)}
+*::-webkit-scrollbar-thumb:active{background:var(--sage-d)}
+*::-webkit-scrollbar-corner{background:transparent}
+.modal::-webkit-scrollbar-thumb,.rail::-webkit-scrollbar-thumb{border-color:transparent}
 body{margin:0;background:var(--cream);color:var(--ink);font:16px/1.55 Jost,system-ui,sans-serif;overflow-x:clip}
 h1,h2,h3{font-family:"Cormorant Garamond",Georgia,serif;font-weight:600;line-height:1.08;margin:0;text-wrap:balance}
 a{color:inherit}
@@ -388,7 +397,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.13';
+const VERSION = '1.18.14';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
