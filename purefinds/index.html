@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<meta name="pf-version" content="1.17.11">
+<meta name="pf-version" content="1.17.12">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods and clothing that is 100% cotton, silk, wool or linen, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -229,6 +229,7 @@ dl.spec dt{color:var(--muted)}dl.spec dd{margin:0}
 .prose li{margin:4px 0}
 
 .note.warn{border-left-color:var(--pink-d);background:#fbeceb}
+button.rchip{border:0;font:inherit;cursor:pointer}button.rchip:hover{background:var(--sage-l)}.rchip.zero{opacity:.5}
 .preview{margin:14px 0 0;background:var(--pink);color:#6d3632;border-radius:16px;padding:12px 16px;font-size:15px}
 /* copy fallback */
 .copybox{position:fixed;inset:0;z-index:70;background:rgba(48,38,28,.45);display:none;align-items:center;justify-content:center;padding:16px}
@@ -368,7 +369,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.17.11';
+const VERSION = '1.17.12';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1098,13 +1099,24 @@ function filterBar(items){
 const srcLabel = it => it.kind === 'cotton' ? (it.store === 'Etsy' ? 'Etsy' : it.src === 'scan' ? 'Brand store (scanner)' : 'Brand store (hand-checked)')
   : it.code ? 'Open Food Facts' : it.scan ? 'Brand store (scanner)' : 'Brand store (hand-checked)';
 const groupOf = it => it.kind === 'cotton' ? [it.type || 'Other'] : (it.cats || []).map(c => (FCATS[c] && FCATS[c][0]) || c);
+// Groups follow the section you're in: the same categories as its buttons (Cookies, Fruit snacks…), in the same order
+const curSection = () => { const m = (location.hash || '').match(/^#food-([a-z-]+)/); return m ? FOOD_SECTIONS.find(x => x[0] === m[1]) : null; };
+function sectionGroups(items){
+  const sec = curSection(); if (!sec) return null;
+  const cats = sec[3].filter(c => !c.startsWith('all-') && FCATS[c]);
+  const inCat = (it, c) => { const want = FCATS[c][2] || [c]; return (it.cats || []).some(x => want.includes(x)) && (!FCATS[c][4] || FCATS[c][4].test(it.name)); };
+  const rows = cats.map(c => [c, FCATS[c][0], items.filter(it => inCat(it, c)).length]);
+  const other = items.filter(it => !cats.some(c => inCat(it, c))).length;
+  return {sec, rows, other};
+}
+const groupOfIn = it => { const g = sectionGroups([it]); return g ? [...g.rows.filter(r => r[2]).map(r => r[1]), ...(g.other ? ['Other'] : [])] : groupOf(it); };
 const tally = (items, fn) => { const m = {}; items.forEach(it => [].concat(fn(it)).forEach(k => m[k || 'Unknown'] = (m[k || 'Unknown'] || 0) + 1)); return Object.entries(m).sort((a, b) => b[1] - a[1]); };
 function resultsReport(items){
   const title = (document.querySelector('.pagehead h1') || {}).textContent || 'Results', sub = (document.querySelector('.chip[aria-pressed="true"]') || {}).textContent || '';
   const L = [`PureFinds results: ${title}${sub ? ' / ' + sub : ''}`, `v${VERSION} · ${new Date().toISOString()}`, `Showing ${items.length} of ${pool.length} found. Regions on: ${SRC.on.join(', ')}.`,
     'By source: ' + (tally(items, srcLabel).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'),
     'By store: ' + (tally(items, storeOf).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'),
-    'By group: ' + (tally(items, groupOf).map(([k, v]) => `${k} ${v}`).join(', ') || 'none'), ''];
+    'By group: ' + ((g => g ? [...g.rows.filter(r => r[2]).map(r => `${r[1]} ${r[2]}`), ...(g.other ? [`Other ${g.other}`] : [])] : tally(items, groupOf).map(([k, v]) => `${k} ${v}`))(sectionGroups(items)).join(', ') || 'none'), ''];
   const m = (location.hash || '').match(/^#food-([a-z-]+)/);
   if (m){
     const sec = FOOD_SECTIONS.find(x => x[0] === m[1]), key = sec && state.sub[m[1]], want = key && (FCATS[key][2] || [key]);
@@ -1114,17 +1126,24 @@ function resultsReport(items){
     L.push('');
   }
   items.forEach((it, i) => {
-    L.push(`${i + 1}. ${it.name}`, `   Source: ${srcLabel(it)} · Store: ${storeOf(it) || 'unknown'} · Group: ${groupOf(it).join(', ') || 'none'}${it.price != null ? ' · $' + it.price : ''}`);
+    L.push(`${i + 1}. ${it.name}`, `   Source: ${srcLabel(it)} · Store: ${storeOf(it) || 'unknown'} · Group: ${groupOfIn(it).join(', ') || 'none'}${it.price != null ? ' · $' + it.price : ''}`);
     L.push(it.kind === 'cotton' ? `   Fabric: ${it.fabric || 'not stated'}` : `   Ingredients: ${it.ing || 'not listed'}${it.ingSrc ? ' (' + it.ingSrc + ')' : ''}`, `   ${it.url || ''}`);
   });
   return L.join('\n');
+}
+function groupChips(items){
+  const g = sectionGroups(items);
+  if (!g) return tally(items, groupOf).map(([k, v]) => `<span class="rchip">${esc(k)} <b>${v}</b></span>`).join('');
+  // tap a group to open that category
+  return g.rows.map(([c, name, n]) => `<button type="button" class="rchip${n ? '' : ' zero'}" data-sub="${c}" data-sec="${g.sec[0]}">${esc(name)} <b>${n}</b></button>`).join('')
+    + (g.other ? `<span class="rchip">Other <b>${g.other}</b></span>` : '');
 }
 function resultsBar(items){
   const el = $('#rbar'); if (!el) return;
   const chips = rows => rows.map(([k, v]) => `<span class="rchip">${esc(k)} <b>${v}</b></span>`).join('');
   el.innerHTML = `<div class="rsum"><b>${items.length}</b> ${items.length === 1 ? 'result' : 'results'}<button class="btn sm" type="button" data-copyresults>Copy results</button></div>
     <div class="rrowc"><span>Sources</span>${chips(tally(items, srcLabel)) || '—'}</div>
-    <div class="rrowc"><span>Groups</span>${chips(tally(items, groupOf)) || '—'}</div>`;
+    <div class="rrowc"><span>Groups</span>${groupChips(items) || '—'}</div>`;
 }
 let shownNow = [];
 function paint(){
