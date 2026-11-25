@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.4';
+const VERSION = '1.9.7';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
