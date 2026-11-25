@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.20">
+<meta name="pf-version" content="1.18.21">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -409,7 +409,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.20';
+const VERSION = '1.18.21';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -666,10 +666,17 @@ const OUTFITS = [
 const $ = s => document.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 const money = n => n == null ? '' : '$' + Number(n).toFixed(2).replace(/\.00$/, '');
+/* Browser storage is one small allowance (about 5,000 KB) shared by every app on layahmcfly.github.io. Big copies of store catalogs
+   and search results are kept in memory only, never saved there, because they once filled the allowance and stopped other apps saving.
+   The scanner's own replies are already cached by the browser for six hours, so nothing is re-downloaded for no reason. */
+const MEMORY_ONLY = /^(scan|etsy|kroger|beauty|off)\d*(\||$)/, mem = new Map();
 const store = {
-  get(k, d){ try { const v = localStorage.getItem('pf_' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
-  set(k, v){ try { localStorage.setItem('pf_' + k, JSON.stringify(v)); } catch(e){} }
+  get(k, d){ if (MEMORY_ONLY.test(k)) return mem.has(k) ? mem.get(k) : d; try { const v = localStorage.getItem('pf_' + k); return v == null ? d : JSON.parse(v); } catch(e){ return d; } },
+  set(k, v){ if (MEMORY_ONLY.test(k)){ mem.set(k, v); return; } try { localStorage.setItem('pf_' + k, JSON.stringify(v)); } catch(e){} }
 };
+// One-time cleanup: remove the big saved copies that older versions of PureFinds left in the shared storage
+try { for (let i = localStorage.length - 1; i >= 0; i--){ const k = localStorage.key(i); if (k && k.startsWith('pf_') && MEMORY_ONLY.test(k.slice(3))) localStorage.removeItem(k); } } catch(e){}
+
 const REG = new Map();
 const reg = it => (REG.set(it.id, it), it);
 const sized = u => u && u.includes('cdn.shopify.com') ? u + (u.includes('?') ? '&' : '?') + 'width=700' : u;
