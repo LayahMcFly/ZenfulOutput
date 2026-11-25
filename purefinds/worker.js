@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.7';
+const VERSION = '1.9.9';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -95,7 +95,7 @@ export default {
       if (u.pathname === '/etsy'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
         if (!q) return json({error: 'Add a search, for example /etsy?q=100% cotton dress'}, 400);
-        const etype = u.searchParams.get('type') === 'food' ? 'food' : u.searchParams.get('type') === 'beauty' ? 'beauty' : 'cotton';
+        const etype = u.searchParams.get('type') === 'food' ? 'food' : u.searchParams.get('type') === 'beauty' ? 'beauty' : u.searchParams.get('type') === 'bags' ? 'bags' : u.searchParams.get('type') === 'orgonite' ? 'orgonite' : 'cotton';
         if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add Worker secrets ETSY_KEY (your keystring) and ETSY_SECRET (your shared secret).'}, 501, 0);
         const ekey = env.ETSY_KEY.includes(':') ? env.ETSY_KEY : `${env.ETSY_KEY}:${env.ETSY_SECRET || ''}`;
         return json({items: await etsySearch(q, ekey, etype)}, 200, 21600);
@@ -201,6 +201,40 @@ function cottonItem(d, p){
   return {...base(d, p), fabric: f.line, material: f.material, sizes: optionValues(p, /size/i), colors: optionValues(p, /colou?r/i)};
 }
 
+/* ---------- Bags: purses, handbags, backpacks and book bags made of ONE material: leather, cotton, hemp, linen or wool ---------- */
+const BAG_WORDS = /\b(bag|backpack|rucksack|purse|handbag|tote|satchel|crossbody|cross-body|clutch|messenger|duffel|duffle|bucket bag|shoulder bag|book ?bag|knapsack|pouch)s?\b/i;
+const NOT_BAG = /\b(digital|printable|pattern|svg|png|pdf|download|template|tutorial|sewing|charm|keychain|key ?ring|toy|doll|dolls|plush|miniature|dog|cat|pet|gift ?bag|paper bag|wrapping|bag (organizer|insert|liner|hanger|strap only)|strap only|replacement strap|zipper pull|fabric by|yarn|kit|supply|supplies|stencil|sticker|embroidery file)\b/i;
+const BAG_MATS = {leather: 'leather|suede|nubuck', cotton: 'cotton|canvas', hemp: 'hemp', linen: 'linen|flax', wool: 'wool|woolen|woollen|felted wool|lambswool|merino'};
+const BAG_BAD = /\b(pu|p\.u\.|faux|fake|vegan|pleather|synthetic|vinyl|pvc|polyester|nylon|polyamide|polyurethane|microfiber|microfibre|acrylic|rayon|viscose|plastic|leatherette|imitation|eco[- ]leather|bonded|recycled leather|cork|jute|bamboo|silk|satin|velvet|denim|fleece|tweed|polypropylene|rubber|neoprene|mesh|straw|raffia|rattan)\b/i;
+// Returns {line, material} only when the text claims one of the five materials, and mentions no other material at all (no lining, trim or blend)
+function pureBag(text){
+  const t = String(text || '');
+  const q = '(?:100\\s*%|genuine|real|full[- ]grain|top[- ]grain|vegetable[- ]tanned|veg[- ]tan(?:ned)?|natural|certified|organic|pure|heavy ?weight|raw|unbleached|handwoven|hand[- ]woven)';
+  let hit = null;
+  for (const [m, words] of Object.entries(BAG_MATS)){
+    const re = new RegExp('[^.;!?\\n]{0,40}\\b(?:100\\s*%\\s*(?:[a-z-]+\\s+){0,3}(?:' + words + ')|(?:' + q + '\\s+){1,3}(?:' + (m === 'leather' ? words : words.replace(/\|canvas/, '')) + '))\\b', 'i');
+    const x = re.exec(t); if (x && (m === 'leather' || /100\s*%/.test(x[0]))){ if (hit) return null; hit = {line: x[0].trim().slice(0, 120), material: m[0].toUpperCase() + m.slice(1)}; }
+  }
+  if (!hit) return null;
+  if (BAG_BAD.test(t)) return null;
+  const others = Object.entries(BAG_MATS).filter(([k]) => k !== hit.material.toLowerCase()).map(([, v]) => v).join('|');
+  if (new RegExp('\\b(' + others + ')\\b', 'i').test(t.replace(/\bcanvas\b/ig, hit.material === 'Cotton' ? '' : 'canvas'))) return null;
+  return hit;
+}
+const bagOrganic = (t, mat) => /gots|usda organic|certified organic/i.test(t) ? 'Certified organic' : new RegExp('organic\\s+(?:[a-z-]+\\s+){0,2}' + mat.toLowerCase(), 'i').test(t) || /vegetable[- ]tanned|veg[- ]tan/i.test(t) && mat === 'Leather' ? (mat === 'Leather' ? 'Vegetable-tanned' : 'Organic (seller wording)') : '';
+
+/* ---------- Orgonite jewelry with REAL stones (named natural stones, never glass, plastic or imitation) ---------- */
+const ORGO_WORD = /\borgon(?:ite|e)\b/i;
+const ORGO_JEWEL = /\b(pendant|necklace|bracelet|ring|earrings?|jewel(?:ry|lery)|choker|anklet|charm necklace|bangle|cuff|talisman|amulet|medallion)s?\b/i;
+const STONES = 'amethyst|clear quartz|rose quartz|smoky quartz|citrine|obsidian|black tourmaline|tourmaline|labradorite|moonstone|lapis lazuli|lapis|malachite|carnelian|jasper|agate|aventurine|selenite|fluorite|amazonite|sodalite|tiger.?s eye|turquoise|garnet|peridot|onyx|opal|sunstone|howlite|shungite|kyanite|apatite|aquamarine|emerald|ruby|sapphire|topaz|hematite|pyrite|rhodonite|rhodochrosite|moldavite|larimar|angelite|celestite|prehnite|unakite|bloodstone|charoite|iolite|sugilite|jade|quartz|gemstone|crystal point';
+const ORGO_FAKE = /\b(glass|plastic|acrylic|imitation|simulated|synthetic|lab[- ]?(?:created|grown|made)|faux|fake|man[- ]?made|reconstituted|cubic zirconia|cz|rhinestones?|resin beads?|crackle quartz glass|k9|cat.?s eye glass|opalite|opalite glass|swarovski|crystal glass|czech glass|murano|aura glass|glass beads?)\b/i;
+function realOrgonite(text){
+  const t = String(text || '');
+  if (ORGO_FAKE.test(t)) return null;
+  const m = new RegExp('\\b(' + STONES + ')\\b', 'i').exec(t); if (!m) return null;
+  return {stone: m[1].toLowerCase().replace(/^./, c => c.toUpperCase()), line: (new RegExp('[^.;!?\\n]{0,50}\\b' + m[1] + '\\b[^.;!?\\n]{0,40}', 'i').exec(t) || [m[0]])[0].trim().slice(0, 120)};
+}
+
 /* ---------- Etsy (clothing that is 100% cotton, silk, wool or linen) ---------- */
 // Etsy Open API v3: search active listings, then read them in one batch with photos and shop names.
 // The x-api-key header is "keystring:sharedsecret" (required by Etsy since Feb 2026).
@@ -231,6 +265,20 @@ async function etsySearch(q, key, type){
       const all = `${title} ${desc} ${(l.tags || []).join(' ')}`;
       out.push({...row, organic: /usda[- ]organic/i.test(all) ? 'USDA Organic' : /certified organic/i.test(all) ? 'Certified organic' : /\borganic\b/i.test(all) ? 'Organic (seller wording)' : '',
         nonGmo: /non[- ]?gmo/i.test(all) ? 'Non-GMO (seller claim)' : '', ing, ingSrc: ing ? (findIngredients(plainList(l.description)) ? 'Etsy listing' : 'Etsy listing (materials)') : '', desc: desc.slice(0, 400), barcode: ''});
+      continue;
+    }
+    if (type === 'orgonite'){
+      if (!ORGO_WORD.test(`${l.title} ${(l.tags || []).join(' ')}`) || !ORGO_JEWEL.test(`${l.title} ${(l.taxonomy_path || []).join(' ')} ${(l.tags || []).join(' ')}`) || /\b(digital|printable|pattern|svg|pdf|download|template|mold|mould|kit|supply|supplies|bulk|diy|loose|toy|plush|dog|cat|pet)\b/i.test(l.title)) continue;
+      const all = `${title}. ${desc}. ${(l.materials || []).join(', ')}`, f = realOrgonite(all);
+      if (!f) continue;
+      out.push({...row, fabric: f.line, material: f.stone, organic: '', desc: desc.slice(0, 300), ing: '', sizes: [], colors: []});
+      continue;
+    }
+    if (type === 'bags'){
+      if (!BAG_WORDS.test(`${l.title} ${(l.taxonomy_path || []).join(' ')}`) || NOT_BAG.test(`${l.title} ${(l.taxonomy_path || []).join(' ')}`)) continue;
+      const all = `${title}. ${desc}. ${(l.materials || []).join(', ')}`, f = pureBag(all);
+      if (!f) continue;
+      out.push({...row, fabric: f.line, material: f.material, organic: bagOrganic(all, f.material), desc: desc.slice(0, 300), ing: '', sizes: [], colors: []});
       continue;
     }
     if (type === 'beauty'){
