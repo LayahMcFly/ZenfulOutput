@@ -27,7 +27,9 @@ const STORES = {
     ['organicbasics.com', 'Organic Basics'], ['merzbschwanen.com', 'Merz b. Schwanen'], ['babaa.es', 'Babaà'],
     ['tradlands.com', 'Tradlands'], ['outerknown.com', 'Outerknown'],
     ['www.kowtowclothing.com', 'Kowtow'], ['lucyandyak.com', 'Lucy & Yak'], ['www.loveshackfancy.com', 'LoveShackFancy'],
-    ['knownsupply.com', 'Known Supply'], ['pyneandsmith.com', 'Pyne & Smith'], ['slipsilk.com', 'Slip'], ['primary.com', 'Primary'], ['selkiecollection.com', 'Selkie']
+    ['knownsupply.com', 'Known Supply'], ['pyneandsmith.com', 'Pyne & Smith'], ['slipsilk.com', 'Slip'], ['primary.com', 'Primary'], ['selkiecollection.com', 'Selkie'],
+    ['lemlem.com', 'lemlem'], ['thesleepshirt.com', 'The Sleep Shirt'], ['naploungewear.com', 'Nap Loungewear'], ['rawganique.com', 'Rawganique'],
+    ['amourvert.com', 'Amour Vert'], ['xirena.com', 'Xirena'], ['lunya.co', 'Lunya'], ['eberjey.com', 'Eberjey'], ['richerpoorer.com', 'Richer Poorer']
   ],
   food: [
     ['yumearth.com', 'YumEarth'], ['www.theochocolate.com', 'Theo Chocolate'], ['lesserevil.com', 'LesserEvil'],

@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.24">
+<meta name="pf-version" content="1.18.26">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -409,7 +409,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.24';
+const VERSION = '1.18.26';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1047,7 +1047,7 @@ async function resolveIngredients(){
 // Etsy: the scanner searches Etsy. Clothing must say 100% cotton (or another pure fabric) with no blend; food goes through every
 // PureFinds food rule like any other store. Needs the ETSY_KEY and ETSY_SECRET secrets on the Worker.
 const ETSY_FOOD_QUERIES = ['organic spelt cookies', 'einkorn cookies', 'spelt cookies maple syrup', 'coconut sugar cookies', 'maple sugar cookies', 'date sweetened cookies', 'einkorn shortbread', 'sprouted spelt cookies', 'coconut macaroons', 'almond flour cookies', 'einkorn bread', 'spelt sourdough bread', 'sprouted spelt crackers', 'einkorn crackers', 'grain free granola maple', 'quinoa granola', 'organic dried mango', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple', 'freeze dried banana', 'freeze dried blueberries', 'freeze dried raspberries', 'frozen fruit organic', 'organic dried apricots', 'organic dried figs', 'organic dates', 'raw almonds organic', 'walnuts organic', 'maple sugar', 'date sugar', 'organic cacao nibs', 'teff flour', 'einkorn flour', 'sprouted spelt flour', 'plantain chips', 'spelt tortillas', 'einkorn tortillas', 'coconut wraps', 'almond flour tortillas', 'sprouted spelt wraps', 'sourdough tortillas', 'plantain tortillas', 'chickpea flour wraps', 'teff wraps'];
-const ETSY_QUERIES = ['100% cotton socks', 'organic cotton socks', '100% merino wool socks', '100% wool socks', '100% silk socks', '100% linen socks', 'handknit wool socks', 'cotton crew socks', 'cotton ankle socks', 'cotton underwear 100%', '100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
+const ETSY_QUERIES = ['100% cotton corset top', '100% linen corset', '100% cotton bustier', '100% cotton milkmaid dress', '100% cotton prairie dress', '100% cotton maxi dress', '100% cotton mini dress', '100% linen maxi dress', '100% linen jumpsuit', '100% cotton romper', '100% linen romper', '100% cotton blouse puff sleeve', '100% linen blouse', '100% cotton button up shirt', '100% cotton skirt tiered', '100% linen skirt set', '100% linen two piece set', '100% cotton lounge set', '100% cotton nightgown', '100% silk slip dress', '100% silk blouse', '100% silk camisole', '100% silk skirt', '100% cotton cardigan', '100% wool cardigan', '100% merino wool dress', '100% wool skirt', '100% cotton overalls', '100% cotton wide leg pants', '100% linen shorts', '100% cotton tank top', '100% cotton apron dress', '100% cotton kimono robe', '100% linen duster', 'cottagecore cotton dress', 'coquette cotton blouse', 'old money linen set', '100% cotton bloomers', '100% cotton petticoat', '100% cotton vest', '100% wool coat', 'handmade 100% linen clothing', '100% cotton socks', 'organic cotton socks', '100% merino wool socks', '100% wool socks', '100% silk socks', '100% linen socks', 'handknit wool socks', 'cotton crew socks', 'cotton ankle socks', 'cotton underwear 100%', '100% cotton dress', '100% cotton top', '100% cotton pajamas', '100% cotton pants', '100% cotton sweater', '100% cotton skirt', '100% silk dress', '100% silk top', '100% silk pajamas', '100% linen dress', '100% linen shirt', '100% linen pants', '100% wool sweater', '100% merino wool cardigan'];
 let etsyNote = '', etsyAdded = 0, etsySeen = 0;
 // Automatic English translation. Listings in other languages are translated before the food rules run, so a banned ingredient can't hide in another language.
 const FOREIGN = /[\u00C0-\u024F\u0370-\u03FF\u0400-\u04FF\u0590-\u06FF\u0900-\u0DFF\u0E00-\u0E7F\u3040-\u30FF\u3400-\u9FFF\uAC00-\uD7AF]|\b(de|du|des|aux|avec|sans|pour|artisanal|artisanale|naturel|naturelle|con|sin|und|mit|f\u00fcr|ohne|della|senza|zonder|voor|biologico|biologique|ecologico)\b/i;
@@ -1197,6 +1197,7 @@ function img(it, alt){
   return it.img ? `<img loading="lazy" src="${esc(it.img)}" alt="${esc(alt || it.name)}" data-name="${esc(it.name)}">` : `<div class="noimg"><span>${esc(it.name)}</span></div>`;
 }
 function badges(it){
+  if (it.kind === 'beauty') return `<span class="bd">Clean-ingredient check passed</span>${it.isOrg ? '<span class="bd p">Organic</span>' : ''}${it.isNG ? '<span class="bd p">Non-GMO</span>' : ''}`;
   if (it.kind === 'cotton') return `<span class="bd">100% ${esc((it.material || 'Cotton').toLowerCase())} · ${it.src === 'scan' ? 'per listing' : 'verified'}</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
   if (it.kind === 'direct') return '<span class="bd p">Sold by PureFinds</span>';
   const g = it.nonGmo ? `<span class="bd p">${esc(it.nonGmo.replace(' (brand claim)', ''))}</span>` : '';
@@ -1764,6 +1765,22 @@ let lastFocus = null;
 function openItem(id){
   const it = REG.get(id); if (!it) return;
   recent = [lite(it), ...recent.filter(r => r.id !== id)].slice(0, 40); store.set('recent', recent);
+  if (it.kind === 'beauty'){
+    const fv = !!favs[id], sec = (BEAUTY_SECTIONS.find(s => s[0] === it.kindB) || [])[1] || '';
+    $('#modal').innerHTML = `<button class="x" data-close aria-label="Close">×</button>
+     <div class="mi">${img(it)}</div>
+     <div class="mb"><div class="badges" style="position:static;flex-direction:row;flex-wrap:wrap">${badges(it)}</div>
+       <h2 id="mt">${esc(it.name)}</h2><p class="meta" style="font-size:15px">${esc(it.brand)} · ${esc(sec)} · sold at ${esc(it.store)}</p>
+       ${it.price != null ? `<p class="price" style="font-size:24px;margin:0">${money(it.price)}</p>` : ''}
+       ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
+       <h3 style="font-size:22px">Ingredients</h3><div class="ing">${esc(it.ing)}</div>
+       <p class="meta" style="margin:0">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) + '. ' : ''}None of the left-out ingredients were found (${esc(BEAUTY_RULE_TEXT.split(' Pure single')[0].replace(/^Left out when the ingredient list includes /, '').replace(/\.$/, ''))}).</p>
+       <dl class="spec"><dt>Organic</dt><dd>${it.isOrg ? 'The listing says organic' : 'Not stated'}</dd><dt>Non-GMO</dt><dd>${it.isNG ? 'The listing says Non-GMO' : 'Not stated'}</dd></dl>
+       <p class="meta">Shipping and stock are on ${esc(it.store)}'s page.</p>
+       <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at ${esc(it.store)} ↗</a></div>
+       <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fv}">${fv ? '♥ Saved' : '♡ Save to favorites'}</button></div></div>`;
+    lastFocus = document.activeElement; $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; $('#modal').querySelector('.x').focus(); return;
+  }
   const f = it.kind === 'food', fav = !!favs[id];
   const flagRows = f ? (it.flags ? [
     [it.flags.dyes.length ? '⚠' : '✓', it.flags.dyes.length ? 'Synthetic dyes listed: ' + it.flags.dyes.join(', ') : 'No synthetic dyes listed'],
@@ -2015,7 +2032,7 @@ function beautyAccept(it){
   const txt = `${it.name} ${it.ptype || ''} ${(it.tags || []).join(' ')} ${it.desc || ''} ${it.ing}`;
   it.isOrg = !!it.organic || /\borganic\b|\busda\b|ecocert|cosmos[- ]organic|\bcertified organic/i.test(txt);
   it.isNG = !!it.nonGmo || /non[- ]?gmo|gmo[- ]free/i.test(txt);
-  it.kindB = beautyKind(it); BEAUTY.ok.push(it);
+  it.kindB = beautyKind(it); it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = it.claims || []; reg(it); BEAUTY.ok.push(it);
 }
 const BEAUTY_ETSY_QUERIES = ['organic rosemary oil', 'fenugreek oil hair', 'aloe vera oil', 'organic lavender oil', 'organic jojoba oil', 'vitamin e oil pure', 'rosemary oil hair growth', 'castor oil eyelashes', 'castor oil eyebrows', 'black castor oil hair growth', 'jamaican black castor oil', 'organic cold pressed castor oil', 'lash and brow growth serum natural', 'castor oil mascara spoolie', 'natural face serum', 'organic face cream', 'handmade face moisturizer', 'natural facial cleanser', 'organic body butter', 'whipped shea butter', 'natural hair oil', 'organic hair butter', 'natural shampoo bar', 'natural conditioner', 'natural nail polish', 'water based nail polish', 'nail strengthening oil', 'cuticle oil natural', 'natural lip balm', 'natural deodorant', 'organic face oil', 'rosewater toner', 'clay face mask natural', 'natural sugar scrub'];
 const BEAUTY_KROGER_QUERIES = ['castor oil', 'organic castor oil', 'black castor oil hair', 'organic face moisturizer', 'natural face cleanser', 'organic body lotion', 'natural shampoo', 'natural conditioner', 'natural hair oil', 'nail polish', 'natural deodorant', 'organic lip balm', 'natural sunscreen', 'face serum', 'shea butter'];
@@ -2068,13 +2085,16 @@ async function beautyResolve(){
   BEAUTY.resolving = false; beautyPaint();
 }
 function beautyCard(it){
-  return `<article class="card"><a class="ph" href="${esc(it.url)}" target="_blank" rel="noopener" aria-label="Open ${esc(it.name)} at ${esc(it.store)}">${img(it)}</a>
-    <div class="badges"><span class="bd">Clean-ingredient check passed</span></div>
-    <div class="cb"><p class="meta">${esc(it.brand)} · ${esc((BEAUTY_SECTIONS.find(s => s[0] === it.kindB) || [])[1] || '')}</p><h3>${esc(it.name)}</h3>
+  const fav = !!favs[it.id], sec = (BEAUTY_SECTIONS.find(s => s[0] === it.kindB) || [])[1] || '';
+  return `<article class="card beauty" data-bu="${esc(it.url)}"><button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
+    <div class="badges">${badges(it)}</div>
+    <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
+    <div class="cb"><p class="meta">${esc(it.brand)} · ${esc(sec)}</p><h3>${esc(it.name)}</h3>
     ${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}
     <p class="comp full"><b>Ingredients:</b> ${esc(it.ing)}</p><p class="rulechk">None of the left-out ingredients found.</p>
-    <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
+    <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
 }
+let beautyShown = {key: '', urls: new Set()};
 function beautyPaint(){
   const hub = document.getElementById('bhub');
   if (hub){ const sig = BEAUTY_GROUPS.map(g => BEAUTY.ok.filter(x => g[3].includes(x.kindB) && x.img).slice(0, 6).map(x => x.url).join('|')).join('~'); if (sig !== beautyTileSig){ beautyTileSig = sig; hub.innerHTML = beautyTiles(); } }
@@ -2084,8 +2104,17 @@ function beautyPaint(){
   const note = document.getElementById('bnote');
   if (note) note.innerHTML = BEAUTY.errors.length && !BEAUTY.ok.length && !BEAUTY.raw.length ? `The scanner didn’t answer: <span style="user-select:all">${esc(BEAUTY.errors[0])}</span>. If you just redeployed it, wait a minute and reload.`
     : `${BEAUTY.ok.length} products passed so far from ${BEAUTY_STORES.length} stores · ${BEAUTY.removed.length} left out${BEAUTY.resolving || left ? ` · reading ingredient lists (${left} left to read in this section)` : ''}${BEAUTY.errors.length ? ` · ${BEAUTY.errors.length} lookup problem${BEAUTY.errors.length > 1 ? 's' : ''}` : ''}`;
-  list.innerHTML = items.length ? `<div class="grid">${items.sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0)).map(beautyCard).join('')}</div>`
-    : `<div class="empty"><h3>${BEAUTY.resolving || left ? 'Reading ingredient lists…' : 'Nothing to show here yet'}</h3><p>${BEAUTY.resolving || left ? 'Products appear as their ingredients are read and checked.' : 'No product in this section passed the clean-ingredient check, or its ingredients could not be read.'}</p></div>`;
+  // Cards already on screen are never rebuilt: new products are added at the end, so nothing jumps while you tap
+  const key = BEAUTY.cert + '|' + (BEAUTY.kinds || []).join(','), grid = list.querySelector('.grid');
+  if (items.length && grid && beautyShown.key === key && list.contains(grid)){
+    const fresh = items.filter(x => !beautyShown.urls.has(x.url));
+    if (fresh.length){ grid.insertAdjacentHTML('beforeend', fresh.map(beautyCard).join('')); fresh.forEach(x => beautyShown.urls.add(x.url)); }
+  } else {
+    const sorted = [...items].sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0)); beautyShown = {key, urls: new Set(sorted.map(x => x.url))};
+    list.innerHTML = sorted.length ? `<div class="grid">${sorted.map(beautyCard).join('')}</div>`
+      : `<div class="empty"><h3>${BEAUTY.resolving || left ? 'Reading ingredient lists…' : 'Nothing to show here yet'}</h3><p>${BEAUTY.resolving || left ? 'Products appear as their ingredients are read and checked.' : 'No product in this section passed the clean-ingredient check, or its ingredients could not be read.'}</p></div>`;
+    if (!sorted.length) beautyShown.key = '';
+  }
   const more = document.getElementById('bmore'); if (more) more.hidden = BEAUTY.resolving || !left;
 }
 const beautyCertChips = () => `<div class="chips" role="group" aria-label="Organic or Non-GMO">${[['any', 'All products'], ['organic', 'Organic'], ['nongmo', 'Non-GMO'], ['both', 'Organic and Non-GMO']].map(([k, n]) => `<button class="chip" data-bcert="${k}" aria-pressed="${k === BEAUTY.cert}">${n}</button>`).join('')}</div>`;
