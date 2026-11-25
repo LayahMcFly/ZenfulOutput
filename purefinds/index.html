@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.35">
+<meta name="pf-version" content="1.18.36">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.35';
+const VERSION = '1.18.36';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -566,7 +566,7 @@ const STYLES = [
  ['vintage','Vintage'],['brown','Brown aesthetic'],['neutral','Neutral aesthetic'],['y2k','Y2K'],['cozy','Cozy aesthetic']
 ];
 const STYLE_NAME = Object.fromEntries(STYLES);
-const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pants','Dresses','Skirts','Pajamas & lounge','Underwear & base layers','Socks','Cardigans','Shorts','Jackets'];
+const COTTON_CATS = ['Tops','Sweaters','Hoodies & sweatshirts','Sweatpants & pants','Dresses','Skirts','Pajamas & lounge','Underwear & base layers','Socks','Cardigans','Shorts','Jackets','Bags & purses'];
 
 // key: [label, Open Food Facts search words, brand-store categories that belong here, label mode]
 const FCATS = {
@@ -693,7 +693,7 @@ function fabricTags(t, material = 'Cotton'){
   if (/combed/.test(s)) out.push('Combed cotton');
   return out;
 }
-const SINGULAR = {'Tops':'Top','Sweaters':'Sweater','Hoodies & sweatshirts':'Hoodie or sweatshirt','Sweatpants & pants':'Pants','Dresses':'Dress','Skirts':'Skirt','Pajamas & lounge':'Loungewear','Underwear & base layers':'Base layer','Socks':'Socks'};
+const SINGULAR = {'Tops':'Top','Sweaters':'Sweater','Hoodies & sweatshirts':'Hoodie or sweatshirt','Sweatpants & pants':'Pants','Dresses':'Dress','Skirts':'Skirt','Pajamas & lounge':'Loungewear','Underwear & base layers':'Base layer','Socks':'Socks','Bags & purses':'Bag'};
 const COTTON = RAW.map((r, i) => {
   const b = BRANDS[r[0]], v = +((r[8].match(/v=(\d+)/) || [])[1] || 0);
   return reg({
@@ -1679,9 +1679,9 @@ function myList(){
   return `<div class="mylist"><b>My pickup list (${plist.length})</b><p>${plist.map(esc).join(', ')}</p>
     <div class="acts"><button class="btn go sm" data-copylist>Copy list</button><button class="btn sm" data-clearlist>Clear list</button></div></div>`;
 }
-function cottonHub(){
+function cottonHub(){ bagScan();
   const types = COTTON_CATS.map(t => [t, cottonV().filter(c => c.type === t)]).filter(([, a]) => a.length);
-  main.innerHTML = `<div class="pagehead"><h1>Natural Closet</h1><p>Only clothing whose fabric is stated as 100% cotton, 100% silk, 100% wool or 100% linen on the brand's own product page. Never mixed, and no polyester, nylon, acrylic, spandex, viscose or any other fabric. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
+  main.innerHTML = `<div class="pagehead"><h1>Natural Closet</h1><p>Only clothing whose fabric is stated as 100% cotton, 100% silk, 100% wool or 100% linen on the brand's own product page. Never mixed, and no polyester, nylon, acrylic, spandex, viscose or any other fabric. Bags can also be 100% leather or hemp. Prices, sizes and colors were checked ${CHECKED}; the store's page has the current ones.</p></div>
   ${srcLine()}
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
@@ -1693,9 +1693,9 @@ function cottonHub(){
   ${['Cardigans', 'Shorts', 'Jackets'].some(t => !types.find(x => x[0] === t)) ? `<p class="meta" style="margin-top:14px">Not in the closet yet: ${['Cardigans', 'Shorts', 'Jackets'].filter(t => !types.find(x => x[0] === t)).join(', ').toLowerCase()}. None found so far were 100% cotton.</p>` : ''}`;
   scanNote();
 }
-function cottonShop(){ setTimeout(scanNote);
+function cottonShop(){ setTimeout(scanNote); bagScan();
   const cat = state.cottonCat;
-  const items = cat ? cottonV().filter(c => c.type === cat) : cottonV();
+  const items = cat ? cottonV().filter(c => c.type === cat) : cottonV().filter(c => c.type !== 'Bags & purses'); // leather and hemp bags live under their own button
   main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', cat || 'All 100% cotton')}<h1>${esc(cat || 'All 100% cotton')}</h1></div>
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="chips" role="group" aria-label="Clothing types"><button class="chip" data-cot="" aria-pressed="${!cat}">All</button>${COTTON_CATS.map(c => `<button class="chip" data-cot="${esc(c)}" aria-pressed="${c === cat}">${esc(c)}</button>`).join('')}</div>
@@ -2083,6 +2083,25 @@ function beautyAccept(it){
   it.isNG = !!it.nonGmo || /non[- ]?gmo|gmo[- ]free/i.test(txt);
   it.kindB = beautyKind(it); it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = it.claims || []; reg(it); BEAUTY.ok.push(it);
 }
+let bagScanStarted = false;
+async function bagScan(){
+  if (bagScanStarted || !scanBase()) return; bagScanStarted = true; const before = COTTON.length;
+  for (const q of BAG_QUERIES){
+    const key = 'bags1|' + q, hit = store.get(key, null); let rows;
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else try { rows = (await getJSON(`${scanBase()}/etsy?v=3&type=bags&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    catch (e){ const m = errText(e); if (/not set up|501/.test(m)) break; BEAUTY.errors.push(`Etsy bags: ${m}`); continue; }
+    rows.forEach(bagAccept); beautyPaint();
+  }
+  for (const q of ORGO_QUERIES){
+    const key = 'orgo1|' + q, hit = store.get(key, null); let rows;
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else try { rows = (await getJSON(`${scanBase()}/etsy?v=3&type=orgonite&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    catch (e){ const m = errText(e); if (/not set up|501/.test(m)) break; BEAUTY.errors.push(`Etsy orgonite: ${m}`); continue; }
+    rows.forEach(x => bagAccept(x, true)); beautyPaint();
+  }
+  if (COTTON.length > before && /^#cotton/.test(location.hash)) rerender();
+}
 const BAG_QUERIES = ['genuine leather backpack', 'full grain leather handbag', 'vegetable tanned leather purse', 'leather tote bag', 'leather crossbody bag', 'leather book bag', 'leather messenger bag', 'leather satchel', 'leather shoulder bag', 'leather bucket bag', 'leather clutch purse', '100% cotton tote bag', 'organic cotton tote bag', '100% cotton canvas backpack', '100% cotton crossbody bag', 'organic cotton purse', '100% cotton book bag', '100% hemp backpack', '100% hemp tote bag', 'hemp purse', 'hemp shoulder bag', '100% linen tote bag', '100% linen purse', '100% linen shoulder bag', '100% wool tote bag', '100% wool bag', 'felted wool purse', 'wool backpack', 'cotton market bag', 'natural fiber handbag'];
 const ORGO_QUERIES = ['orgonite pendant amethyst', 'orgonite necklace natural crystal', 'orgonite pendant clear quartz', 'orgonite pendant rose quartz', 'orgonite pendant black tourmaline', 'orgonite pendant obsidian', 'orgonite pendant citrine', 'orgonite bracelet gemstone', 'orgonite ring natural stone', 'orgonite earrings crystal', 'orgonite pendant labradorite', 'orgonite pendant lapis lazuli', 'orgonite jewelry real stones', 'orgonite pendant selenite', 'orgonite pendant shungite', 'orgonite pendant moonstone', 'orgonite pendant turquoise', 'orgonite pendant carnelian', 'orgonite necklace copper quartz', 'orgonite pendant tiger eye'];
 const bagKind = it => { const s = `${it.name} ${it.ptype || ''} ${(it.tags || []).join(' ')}`.toLowerCase();
@@ -2093,6 +2112,7 @@ function bagAccept(r, orgo){
   if (orgo){ if (!it.material || /\b(glass|plastic|acrylic|imitation|simulated|synthetic|faux|fake|lab)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'stones are not clearly real'); it.isOrg = false; it.isNG = false; it.kindB = 'orgonite'; it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Real stone: ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it); return; }
   if (!/^(Leather|Cotton|Hemp|Linen|Wool)$/.test(it.material || '') || /\b(pu|faux|vegan|pleather|synthetic|vinyl|polyester|nylon)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'material is not one pure leather, cotton, hemp, linen or wool');
   it.isOrg = !!r.organic; it.organicText = r.organic || ''; it.isNG = false; it.kindB = bagKind(it); it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Material: 100% ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it);
+  if (!COTTON.some(c => c.url === it.url)) COTTON.push(reg({id: 'cbag-' + it.url, kind: 'cotton', src: 'scan', name: it.name, brand: it.brand, store: 'Etsy', url: it.url, price: it.price, fabric: it.fabric, type: 'Bags & purses', sizes: [], colors: [], img: it.img, styles: [], order: 2000 + COTTON.length, created: 0, material: it.material, fabricTags: fabricTags(`${it.fabric} ${it.organicText}`, it.material), cert: it.organicText || '', note: 'Found on Etsy. The material line is quoted from the listing: one material only, no PU or faux leather, no mixing.', desc: `Bag from an Etsy seller. The listing says “${it.fabric}”, with no other material mentioned.`}));
 }
 const BEAUTY_ETSY_QUERIES = ['organic rosemary oil', 'fenugreek oil hair', 'aloe vera oil', 'organic lavender oil', 'organic jojoba oil', 'vitamin e oil pure', 'rosemary oil hair growth', 'castor oil eyelashes', 'castor oil eyebrows', 'black castor oil hair growth', 'jamaican black castor oil', 'organic cold pressed castor oil', 'lash and brow growth serum natural', 'castor oil mascara spoolie', 'natural face serum', 'organic face cream', 'handmade face moisturizer', 'natural facial cleanser', 'organic body butter', 'whipped shea butter', 'natural hair oil', 'organic hair butter', 'natural shampoo bar', 'natural conditioner', 'natural nail polish', 'water based nail polish', 'nail strengthening oil', 'cuticle oil natural', 'natural lip balm', 'natural deodorant', 'organic face oil', 'rosewater toner', 'clay face mask natural', 'natural sugar scrub'];
 const BEAUTY_KROGER_QUERIES = ['castor oil', 'organic castor oil', 'black castor oil hair', 'organic face moisturizer', 'natural face cleanser', 'organic body lotion', 'natural shampoo', 'natural conditioner', 'natural hair oil', 'nail polish', 'natural deodorant', 'organic lip balm', 'natural sunscreen', 'face serum', 'shea butter'];
@@ -2126,20 +2146,7 @@ async function beautyScan(){
       take(rows, kind, kind.toLowerCase() + '-');
     }
   }
-  for (const q of BAG_QUERIES){
-    const key = 'bags1|' + q, hit = store.get(key, null); let rows;
-    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/etsy?v=3&type=bags&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
-    catch (e){ const m = errText(e); if (/not set up|501/.test(m)) break; BEAUTY.errors.push(`Etsy bags: ${m}`); continue; }
-    rows.forEach(bagAccept); beautyPaint();
-  }
-  for (const q of ORGO_QUERIES){
-    const key = 'orgo1|' + q, hit = store.get(key, null); let rows;
-    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/etsy?v=3&type=orgonite&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
-    catch (e){ const m = errText(e); if (/not set up|501/.test(m)) break; BEAUTY.errors.push(`Etsy orgonite: ${m}`); continue; }
-    rows.forEach(x => bagAccept(x, true)); beautyPaint();
-  }
+  bagScan();
   beautyResolve();
 }
 async function beautyResolve(){
