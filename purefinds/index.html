@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.36">
+<meta name="pf-version" content="1.18.37">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.36';
+const VERSION = '1.18.37';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2091,7 +2091,7 @@ async function bagScan(){
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else try { rows = (await getJSON(`${scanBase()}/etsy?v=3&type=bags&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ const m = errText(e); if (/not set up|501/.test(m)) break; BEAUTY.errors.push(`Etsy bags: ${m}`); continue; }
-    rows.forEach(bagAccept); beautyPaint();
+    rows.forEach(x => bagAccept(x, false)); beautyPaint();
   }
   for (const q of ORGO_QUERIES){
     const key = 'orgo1|' + q, hit = store.get(key, null); let rows;
@@ -2106,10 +2106,10 @@ const BAG_QUERIES = ['genuine leather backpack', 'full grain leather handbag', '
 const ORGO_QUERIES = ['orgonite pendant amethyst', 'orgonite necklace natural crystal', 'orgonite pendant clear quartz', 'orgonite pendant rose quartz', 'orgonite pendant black tourmaline', 'orgonite pendant obsidian', 'orgonite pendant citrine', 'orgonite bracelet gemstone', 'orgonite ring natural stone', 'orgonite earrings crystal', 'orgonite pendant labradorite', 'orgonite pendant lapis lazuli', 'orgonite jewelry real stones', 'orgonite pendant selenite', 'orgonite pendant shungite', 'orgonite pendant moonstone', 'orgonite pendant turquoise', 'orgonite pendant carnelian', 'orgonite necklace copper quartz', 'orgonite pendant tiger eye'];
 const bagKind = it => { const s = `${it.name} ${it.ptype || ''} ${(it.tags || []).join(' ')}`.toLowerCase();
   return /book ?bag|school bag|bookbag|laptop bag|library bag/.test(s) ? 'bag-book' : /backpack|rucksack|knapsack|back pack/.test(s) ? 'bag-pack' : /crossbody|cross-body|cross body|messenger|sling/.test(s) ? 'bag-cross' : /clutch|pouch|wristlet|wallet|pochette/.test(s) ? 'bag-clutch' : /\btotes?\b|market bag|shopper|shopping bag/.test(s) ? 'bag-tote' : 'bag-purse'; };
-function bagAccept(r, orgo){
+function bagAccept(r, orgo = false){
   const it = {id: 'etsy-' + (orgo ? 'orgo-' : 'bag-') + (r.handle || r.url), name: r.name, brand: r.vendor || 'Etsy', store: 'Etsy', url: r.url, price: r.price, img: r.img, desc: r.desc || '', ing: '', material: r.material, fabric: r.fabric, ptype: r.ptype || '', tags: r.tags || []};
   if (BEAUTY.ok.some(x => x.url === it.url)) return;
-  if (orgo){ if (!it.material || /\b(glass|plastic|acrylic|imitation|simulated|synthetic|faux|fake|lab)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'stones are not clearly real'); it.isOrg = false; it.isNG = false; it.kindB = 'orgonite'; it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Real stone: ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it); return; }
+  if (orgo === true){ if (!it.material || !/orgon/i.test(it.name) || /\b(glass|plastic|acrylic|imitation|simulated|synthetic|faux|fake|lab)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'stones are not clearly real'); it.isOrg = false; it.isNG = false; it.kindB = 'orgonite'; it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Real stone: ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it); return; }
   if (!/^(Leather|Cotton|Hemp|Linen|Wool)$/.test(it.material || '') || /\b(pu|faux|vegan|pleather|synthetic|vinyl|polyester|nylon)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'material is not one pure leather, cotton, hemp, linen or wool');
   it.isOrg = !!r.organic; it.organicText = r.organic || ''; it.isNG = false; it.kindB = bagKind(it); it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Material: 100% ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it);
   if (!COTTON.some(c => c.url === it.url)) COTTON.push(reg({id: 'cbag-' + it.url, kind: 'cotton', src: 'scan', name: it.name, brand: it.brand, store: 'Etsy', url: it.url, price: it.price, fabric: it.fabric, type: 'Bags & purses', sizes: [], colors: [], img: it.img, styles: [], order: 2000 + COTTON.length, created: 0, material: it.material, fabricTags: fabricTags(`${it.fabric} ${it.organicText}`, it.material), cert: it.organicText || '', note: 'Found on Etsy. The material line is quoted from the listing: one material only, no PU or faux leather, no mixing.', desc: `Bag from an Etsy seller. The listing says “${it.fabric}”, with no other material mentioned.`}));
