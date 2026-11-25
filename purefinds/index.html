@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.27">
+<meta name="pf-version" content="1.18.28">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -410,7 +410,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.27';
+const VERSION = '1.18.28';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1142,7 +1142,8 @@ function scanNote(){
   else if (st.status === 'unreachable') el.innerHTML = `The store scanner didn't answer, so only the hand-checked products show. If you just redeployed it, wait a minute and reload. Inside Claude's preview it can't connect at all; open PureFinds from its website. <a href="#about">Scanner settings</a>.${errBox(st.err)}`;
   else el.innerHTML = `${st.added} more ${what} found in ${st.stores} store catalogs. Store lists refresh every 6 hours.` + (type === 'food' && rs.total ? `<br>Reading ingredient lists: ${rs.done} of ${rs.total} checked. Kept ${rs.kept}; removed ${rs.noIng} with no readable ingredients and ${rs.banned} with banned ingredients${rs.unreached ? `; ${rs.unreached} couldn't be reached yet (the store scanner may need the latest Worker code)` : ''}.` : '') +
     apiLine(type) +
-    (st.errors.length ? `<details style="margin-top:6px"><summary>${st.errors.length} store${st.errors.length === 1 ? '' : 's'} didn't answer</summary>${st.errors.map(errBox).join('')}</details>` : '') + `<div style="margin-top:8px"><button class="btn sm" type="button" data-copynote>Copy this message</button></div>`;
+    (st.errors.length ? `<details style="margin-top:6px"><summary>${st.errors.length} store${st.errors.length === 1 ? '' : 's'} didn't answer</summary>${st.errors.map(errBox).join('')}</details>` : '');
+  el.insertAdjacentHTML('beforeend', `<div style="margin-top:8px"><button class="btn sm" type="button" data-copynote>Copy this message</button></div>`);
 }
 let foodWaiting = 0; // while a food list waits for ingredient reading, nothing redraws it (one reveal, no flicker)
 const foodSettled = (maxMs = 90000) => new Promise(res => { const t0 = Date.now(); const tick = () => {
@@ -2104,7 +2105,7 @@ function beautyPaint(){
   const left = BEAUTY.raw.filter(x => !x.done && (beautyIn(beautyKind(x)))).length;
   const note = document.getElementById('bnote');
   if (note) note.innerHTML = BEAUTY.errors.length && !BEAUTY.ok.length && !BEAUTY.raw.length ? `The scanner didn’t answer: <span style="user-select:all">${esc(BEAUTY.errors[0])}</span>. If you just redeployed it, wait a minute and reload.`
-    : `${BEAUTY.ok.length} products passed so far from ${BEAUTY_STORES.length} stores · ${BEAUTY.removed.length} left out${BEAUTY.resolving || left ? ` · reading ingredient lists (${left} left to read in this section)` : ''}${BEAUTY.errors.length ? ` · ${BEAUTY.errors.length} lookup problem${BEAUTY.errors.length > 1 ? 's' : ''}` : ''}` + ` <button class="btn sm" type="button" data-copynote>Copy this message</button>`;
+    : `${BEAUTY.ok.length} products passed so far from ${BEAUTY_STORES.length} stores · ${BEAUTY.removed.length} left out${BEAUTY.resolving || left ? ` · reading ingredient lists (${left} left to read in this section)` : ''}${BEAUTY.errors.length ? ` · ${BEAUTY.errors.length} lookup problem${BEAUTY.errors.length > 1 ? 's' : ''}` : ''}`;
   // Cards already on screen are never rebuilt: new products are added at the end, so nothing jumps while you tap
   const key = BEAUTY.cert + '|' + (BEAUTY.kinds || []).join(','), grid = list.querySelector('.grid');
   if (items.length && grid && beautyShown.key === key && list.contains(grid)){
@@ -2116,6 +2117,7 @@ function beautyPaint(){
       : `<div class="empty"><h3>${BEAUTY.resolving || left ? 'Reading ingredient lists…' : 'Nothing to show here yet'}</h3><p>${BEAUTY.resolving || left ? 'Products appear as their ingredients are read and checked.' : 'No product in this section passed the clean-ingredient check, or its ingredients could not be read.'}</p></div>`;
     if (!sorted.length) beautyShown.key = '';
   }
+  if (note && !note.querySelector('[data-copynote]')) note.insertAdjacentHTML('beforeend', ' <button class="btn sm" type="button" data-copynote>Copy this message</button>');
   const more = document.getElementById('bmore'); if (more) more.hidden = BEAUTY.resolving || !left;
 }
 const beautyCertChips = () => `<div class="chips" role="group" aria-label="Organic or Non-GMO">${[['any', 'All products'], ['organic', 'Organic'], ['nongmo', 'Non-GMO'], ['both', 'Organic and Non-GMO']].map(([k, n]) => `<button class="chip" data-bcert="${k}" aria-pressed="${k === BEAUTY.cert}">${n}</button>`).join('')}</div>`;
