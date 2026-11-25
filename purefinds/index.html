@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.28">
+<meta name="pf-version" content="1.18.29">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -410,7 +410,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.28';
+const VERSION = '1.18.29';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -906,7 +906,7 @@ const BADGE_PART = /^(no|non|free|why|learn|made|gluten|vegan|kosher|certified|u
 const dropBadges = t => { if (!t) return t; const parts = String(t).split(/\s*,\s*/); while (parts.length > 1 && BADGE_PART.test(parts[parts.length - 1].trim())) parts.pop(); return parts.join(', '); };
 const okIng = (t, src) => {
   if (!looksLikeIngredients(t)) return false;
-  if (/Open Food Facts|USDA/i.test(src || '')) return true; // shopper-entered and government lists are lenient
+  if (/Open Food Facts|USDA|Pasted by you/i.test(src || '')) return true; // shopper-entered and government lists are lenient
   t = String(t);
   if (t.split(/\s+/).length <= 6 && /\b(list|label|below|tab|click|here)\b/i.test(t)) return false; // page words like "list and", not ingredients
   if (/[a-z)]\.\s+[A-Z*]/.test(t) || MARKETING.test(t)) return false;
@@ -920,6 +920,7 @@ const okIng = (t, src) => {
 const tidyIng = t => String(t || '').replace(/[\s.]*\ballergens?\b[\s:.]*$/i, '').replace(/\s+\.(?=\s|$)/g, '.').replace(/\.{2,}/g, '.').replace(/\s{2,}/g, ' ').trim();
 try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledOut'); } catch(e){}
 let ingCache = store.get('ingCache2', {});
+let userIng = store.get('userIng1', {}); // ingredient lists you pasted from a brand's official page: they win over anything the scanner reads
 let ruledOut = store.get('ruledOut2', {});
 // Products whose ingredients could not be read anywhere are not shown. They are tried again after a week.
 let noIng = store.get('noIng1', {});
@@ -987,10 +988,11 @@ function addScanned(type, rows){
       if (/materials/i.test(r.ingSrc || '')) r.ing = ''; // Etsy's "materials" box holds search tags, not ingredients
     }
     if (type === 'cotton' && r.store === 'Etsy' && ETSY_NOT_CLOTHES.test(`${r.name || ''}`)) continue;
+    if (type === 'food' && userIng[r.url]){ r.ing = userIng[r.url]; r.ingSrc = 'Pasted by you'; }
     const id = 's-' + r.domain + '-' + r.handle;
     if (type === 'food' && NOT_A_SNACK.test(r.name || '')) { logRemoved(r.name, r.store, r.url, null, 'not a food item (gift set, merch or bundle)'); continue; }
     if (type === 'food' && NOT_FOOD_THING.test(`${r.name || ''} ${r.ptype || ''}`)) { logRemoved(r.name, r.store, r.url, null, 'not food (kitchen tool, book or merch)'); continue; }
-    if (REG.has(id) || ruledOut[r.url] || (!SHOW_NOING && noIng[r.url])) { if (type === 'food' && !REG.has(id)) logRemoved(r.name, r.store, r.url, null, ruledOut[r.url] ? 'banned: ' + ruledOut[r.url] : 'no readable ingredients (checked earlier)'); continue; }
+    if (REG.has(id) || ruledOut[r.url] || (!SHOW_NOING && noIng[r.url] && !userIng[r.url])) { if (type === 'food' && !REG.has(id)) logRemoved(r.name, r.store, r.url, null, ruledOut[r.url] ? 'banned: ' + ruledOut[r.url] : 'no readable ingredients (checked earlier)'); continue; }
     if (type === 'cotton'){
       if (COTTON.some(c => c.url === r.url)) continue;
       const t = clothingType(`${r.name} ${r.ptype}`);
@@ -1024,6 +1026,40 @@ function addScanned(type, rows){
 let resolving = false;
 const removedLog = []; // foods taken out this session, with the reason, shown in the copied report
 const logRemoved = (name, store, url, cats, reason, ing) => { if (!removedLog.some(x => x.url === url)) removedLog.push({name, store, url, cats: cats || foodCats(name), reason, ing: String(ing || '').slice(0, 140)}); };
+function reportIngredients(url, name, cats, raw){
+  const text = tidyIng(String(raw || '').replace(/^\s*ingredients?\s*[:\-]?\s*/i, ''));
+  if (!text || !looksLikeIngredients(text)) { toast('That doesn’t look like an ingredient list. Paste the list exactly as the official page shows it.', 5000); return false; }
+  const fruit = (cats || foodCats(name)).some(c => FRUIT_CATS.includes(c)), why = ruleBreak(name, text, fruit), i = FOODS.findIndex(f => f.url === url), k = removedLog.findIndex(x => x.url === url);
+  if (why){
+    ruledOut[url] = why; store.set('ruledOut2', ruledOut); delete userIng[url]; store.set('userIng1', userIng);
+    if (i >= 0) FOODS.splice(i, 1);
+    if (k >= 0) removedLog[k] = {...removedLog[k], reason: 'banned: ' + why + ' (from the ingredients you pasted)', ing: text.slice(0, 140)}; else logRemoved(name, '', url, cats, 'banned: ' + why + ' (from the ingredients you pasted)', text);
+    toast(`Removed “${String(name).slice(0, 40)}”: it contains ${why}.`, 6000);
+  } else {
+    userIng[url] = text; store.set('userIng1', userIng); delete noIng[url]; store.set('noIng1', noIng); delete ruledOut[url]; store.set('ruledOut2', ruledOut);
+    if (k >= 0) removedLog.splice(k, 1);
+    if (i >= 0){ Object.assign(FOODS[i], {ing: text, ingSrc: 'Pasted by you', pop: 1, titleVouched: false}); toast('Added. No banned ingredient found, so it stays.', 4500); }
+    else { toast('Added. It passes your rules. Reloading to bring it back…', 4000); setTimeout(() => location.reload(), 1200); return true; }
+  }
+  if ($('#scrim').classList.contains('on')) closeModal();
+  rerender(); return true;
+}
+const reportBox = it => (it.kind === 'food' && it.src === 'brand' && (!it.ing || it.titleVouched || !ingFull(it)))
+  ? `<div class="note" style="margin:0"><b>Ingredients not found?</b> Open the official page, copy the ingredient list and paste it here. If it breaks no rule, this listing gets the ingredients. If it does, it is removed.
+     <textarea class="field" rows="3" data-rtext placeholder="Paste the ingredients exactly as the official page lists them" style="margin:8px 0;width:100%;resize:vertical"></textarea>
+     <button class="btn sm go" type="button" data-report="${esc(it.url)}" data-rname="${esc(it.name)}">Check these ingredients</button></div>` : '';
+const hiddenPanel = key => {
+  const cat = FCATS[key]; if (!cat) return '';
+  const rows = removedLog.filter(x => /no readable/.test(x.reason) && !ruledOut[x.url] && !TITLE_JUNK.test(x.name) && !NOT_FOOD_THING.test(x.name) && (!cat[4] || cat[4].test(x.name) || titleSays(key, x.name))).slice(0, 60);
+  if (!rows.length) return '';
+  return `<details class="fold" style="margin-top:14px"><summary>${rows.length} found but hidden because their ingredients couldn’t be read. Report them.</summary>
+    <p class="meta">Open the official page, copy the ingredient list and paste it under the product. No banned ingredient: it comes back. A banned one: it stays out for good.</p>
+    ${rows.map(x => `<div class="note" style="margin:8px 0"><b>${esc(x.name)}</b> <span class="meta">${esc(x.store || '')}</span> <a href="${esc(x.url)}" target="_blank" rel="noopener">Official page ↗</a>
+      <textarea class="field" rows="2" data-rtext placeholder="Paste the ingredients" style="margin:6px 0;width:100%;resize:vertical"></textarea>
+      <button class="btn sm go" type="button" data-report="${esc(x.url)}" data-rname="${esc(x.name)}">Check these ingredients</button></div>`).join('')}</details>`;
+};
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-report]'); if (!b) return; const ta = b.parentElement.querySelector('[data-rtext]'); reportIngredients(b.dataset.report, b.dataset.rname, null, ta ? ta.value : ''); });
+window.__pf = {get FOODS(){ return FOODS; }, get ruledOut(){ return ruledOut; }, get userIng(){ return userIng; }};
 const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscription|sampler|bundle|\bt-?shirt\b/i;
 // Kitchen tools, books and merch that stores sell next to their food (a baking scale, a banneton, a cookbook) are never food
 const NOT_FOOD_THING = /\b(baking\s+scale|kitchen\s+scale|scales?|pans?|sheet\s+pan|baking\s+(sheet|stone|mat|dish|tray)|trays?|molds?|moulds?|(cake|muffin|baking|loaf|pie)\s+tins?|ramekins?|whisks?|spatulas?|rolling\s+pins?|spoons?|ladles?|tongs|knives|knife|cutting\s+boards?|boards?|bowls?|mugs?|cups?\s+set|measuring\s+(cups?|spoons?)|thermometers?|timers?|bannetons?|proofing\s+baskets?|baskets?|lames?|scrapers?|sifters?|strainers?|colanders?|graters?|peelers?|grinders?|grain\s+mills?|blenders?|mixers?|machines?|appliances?|kettles?|teapots?|infusers?|tumblers?|water\s+bottles?|jars?\s+(set|only)|storage\s+(canisters?|containers?)|towels?|cloths?|aprons?|oven\s+mitts?|pot\s+holders?|cookbooks?|books?|recipe\s+cards?|posters?|prints?|stickers?|magnets?|candles?|ornaments?|gift\s+cards?|e-?gift|totes?|bags?\s+(reusable|canvas|cotton)|t-?shirts?|hoodies?|hats?|socks|merch|subscriptions?|memberships?|classes?|workshops?|vouchers?)\b/i;
@@ -1513,7 +1549,7 @@ function foodSection(k){ setTimeout(scanNote);
   <details class="fold"><summary>PureFinds food rules</summary><p>${RULE_TEXT}</p></details>
   <p class="note" id="scanNote" data-type="food" hidden></p>
   ${pickupPanel(key)}
-  <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div><div id="bake"></div>`;
+  <div id="live" class="note">Searching Open Food Facts for ${esc(cat[0].toLowerCase())}…</div><div id="list"></div><div id="hid"></div><div id="bake"></div>`;
   loadFoodList(k, key);
 }
 
@@ -1556,7 +1592,7 @@ async function loadFoodList(k, key){
   const emptyMsg = `No ${cat[0].toLowerCase()} match those filters. Clear a filter, or try another category.`;
   const sec = FOOD_SECTIONS.find(x => x[0] === k), related = () => { const seen = new Set(); return (sec ? sec[3] : []).flatMap(c => FCATS[c] ? brandFor(c) : []).filter(f => !seen.has(f.id) && seen.add(f.id)); };
   // Nothing is shown under a category unless it belongs there. Other finds from the same section are offered, never mixed in.
-  const show = items => {
+  const show = items => { const hd = $('#hid'); if (hd) hd.innerHTML = hiddenPanel(key);
     if (items.length) return mountList($('#list'), items, emptyMsg);
     const rel = related(), word = cat[0].toLowerCase(), ws = catWords(key);
     // only foods whose own name says they belong here (a cookie, a pancake mix), so the list never shows unrelated removals
@@ -1802,7 +1838,7 @@ function openItem(id){
      ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
      ${it.src === 'brand' ? `<h3 style="font-size:22px">Ingredients</h3>
        <div class="ing">${it.ing ? esc(it.ing.replace(/^Begins: /, '')) : `${esc(it.brand)} doesn’t publish this ingredient list online. It’s printed on the package, and the brand page may show it in a photo.`}</div>
-       <p class="meta" style="margin:0" id="ingsrc">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) : ''}</p>
+       <p class="meta" style="margin:0" id="ingsrc">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) : ''}</p>${reportBox(it)}
        <dl class="spec"><dt>Organic</dt><dd>${it.certText ? `${esc(it.cert)}: the brand says “${esc(it.certText)}”` : 'Unverified: the brand page doesn’t state organic certification'}</dd>
          <dt>Non-GMO</dt><dd>${esc(it.nonGmo || (it.cert ? 'Organic standards don’t allow GMOs' : 'Not stated'))}</dd>
          <dt>Brand says</dt><dd>${esc(it.claims.length ? it.claims.join(' · ') : 'Nothing about artificial colors, flavors or preservatives')}</dd></dl>
