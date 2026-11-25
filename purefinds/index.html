@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.39">
+<meta name="pf-version" content="1.18.40">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.39';
+const VERSION = '1.18.40';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -716,13 +716,13 @@ const foodCert = t => !t ? '' : /usda organic/i.test(t) ? 'USDA Organic' : /cert
    Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya and berries.
    Nuts: walnuts and almonds only, never peanuts. Oils: coconut, olive, grapeseed and avocado only.
    No corn (popcorn included), no wheat and no oats (the ancient grains spelt, einkorn and kamut are welcome). */
-const RULE_TEXT = 'Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya, berries, blackcurrant, coconut, limes, grapefruit, cherries, kiwi, melons, apricots, plums, prunes, figs, avocado, guava and pomegranate are fine. Not allowed: cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines and clementines. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Chocolate only when its ingredients list cocoa or cacao. No baking soda or baking powder (yeast is fine), no beets (beet sugar and beet juice too), no rice (white, brown, black and all other rice), pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, tomato, eggplant, navy beans, black beans, black pepper, soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar, coconut sugar and agave, never white or cane sugar.';
+const RULE_TEXT = 'Fruits: apples, bananas, plantains, peaches, pears, grapes, mango, papaya, berries, blackcurrant, coconut, limes, grapefruit, cherries, kiwi, melons, apricots, plums, prunes, figs, avocado, guava and pomegranate are fine. Not allowed: cranberries, pineapple, oranges, lemons, passion fruit, lychee, dragon fruit, tangerines and clementines. Nuts: walnuts and almonds only, no peanuts. Oils: coconut, olive and grapeseed only. No corn or popcorn, no wheat and no oats (spelt, einkorn and kamut are welcome). Chocolate only when its ingredients list cocoa or cacao. No baking soda or baking powder (yeast is fine), no beets (beet sugar and beet juice too), no rice (white, brown, black and all other rice), pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, tomato, eggplant, navy beans, black beans, kidney beans, black pepper, soy, peppermint or natural flavor. No green tea or matcha. Sweeteners: only maple syrup, maple sugar, date syrup, date sugar, coconut sugar and agave, never white or cane sugar.';
 const FRUIT_PART = /\b(pineapple|passion ?fruit|orange|lemon|lychee|dragon ?fruit|tangerine|clementine)\s+(essential\s+)?(oils?|peels?|zests?|extracts?|flavou?rs?|blossom|flower\s+water|rind)\b/gi;
 const BAD_FRUIT = /pineapple|passion ?fruit|\borange|\blemon(?!\s*(juice|essential))|lychee|dragon ?fruit|tangerine|clementine/i;
 const BAD_NUT = /peanut|cashew|hazelnut|pecan|pistachio|macadamia|brazil nut|pine nut/i;
 const BAD_OIL = /\b(sunflower|canola|safflower|palm(?:\s*kernel|\s*fruit)?|soybean|soy|vegetable|corn|rice bran|cottonseed|peanut|sesame|high[- ]oleic[a-z ]*?)\s+oils?\b|\bpalm\s+(kernel\s+)?(oil|fat)|shortening/i;
 const BAD_CORN = /\bcorn\b|cornstarch|corn ?syrup|cornmeal|maize|popcorn|polenta|\bgrits\b|\bmasa\b/i;
-const BAD_BANNED = /baking\s+(soda|powder)|(sodium|potassium|ammonium)\s+bicarbonate|bicarbonate\s+of\s+soda|\bbicarb\b|sodium\s+(acid\s+)?pyrophosphate|sodium\s+aluminum\s+(sulfate|phosphate)|monocalcium\s+phosphate|\bbeets?\b|beetroot|\brice\b|\bflax|linseed|pumpkin|pepitas?|cauliflower|sunflower|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?|peppermint|carrots?|spinach|\bsoy(a|beans?)?\b|\bnavy\s+beans?\b|\bblack\s+(turtle\s+)?beans?\b|\bturtle\s+beans?\b|\bblack\s+pepper(corns?)?\b|\bpepper,?\s+black\b|\bblack\s+peppercorns?\b|eggplants?|aubergines?|tomato(es)?\b/i;
+const BAD_BANNED = /baking\s+(soda|powder)|(sodium|potassium|ammonium)\s+bicarbonate|bicarbonate\s+of\s+soda|\bbicarb\b|sodium\s+(acid\s+)?pyrophosphate|sodium\s+aluminum\s+(sulfate|phosphate)|monocalcium\s+phosphate|\bbeets?\b|beetroot|\brice\b|\bflax|linseed|pumpkin|pepitas?|cauliflower|sunflower|potato|cassava|cranberr(y|ies)|natural\s+flavou?rs?|peppermint|carrots?|spinach|\bsoy(a|beans?)?\b|\bnavy\s+beans?\b|\bkidney\s+beans?\b|\bblack\s+(turtle\s+)?beans?\b|\bturtle\s+beans?\b|\bblack\s+pepper(corns?)?\b|\bpepper,?\s+black\b|\bblack\s+peppercorns?\b|eggplants?|aubergines?|tomato(es)?\b/i;
 const BEAN_OK = /\b(vanilla|cocoa|cacao|coffee|tonka)\s+beans?\b/gi, BAD_BEAN = /\bsoybeans?\b|edamame/i;
 const BAD_TEA = /green\s+tea|matcha|sencha|genmaicha|gyokuro/i;
 const BAD_OAT = /\boat(s|meal|\s+(flour|milk|bran|fiber|syrup|beta)|\b)/i;
@@ -955,7 +955,7 @@ const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); st
 if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
 for (const u in ingCache){ if (!okIng(ingCache[u].ing, ingCache[u].src)) delete ingCache[u]; else ingCache[u].ing = tidyIng(ingCache[u].ing); }
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
-const RULE_REASON = {language: 'ingredients not written in English, so they can’t be checked', fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'baking soda or baking powder, beets, rice (white, brown, black and all other rice), flax, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, black beans, black pepper, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate without cocoa or cacao in its ingredients'};
+const RULE_REASON = {language: 'ingredients not written in English, so they can’t be checked', fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'baking soda or baking powder, beets, rice (white, brown, black and all other rice), flax, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, black beans, kidney beans, black pepper, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate without cocoa or cacao in its ingredients'};
 
 function clothingType(t){
   const s = t.toLowerCase();
@@ -1491,7 +1491,7 @@ function home(){
   <section class="blk">${sh('Cute Finds', 'Casual cute, soft girl and coquette pieces. All 100% cotton.', '<a class="link" href="#cotton-aesthetics">Browse aesthetics →</a>')}<div class="rail">${cute.map(card).join('')}</div></section>
   <section class="blk">${sh('New Finds', 'The most recently updated organic snacks and cotton pieces at their stores.')}<div class="rail" id="newf">${newest.map(card).join('')}</div></section>
   <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Natural Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
-  <section class="blk">${sh('Outfit Ideas', 'Whole outfits built from verified cotton pieces.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${OUTFITS.slice(0, 3).map(outfit).join('')}</div></section>
+  <section class="blk">${sh('Outfit Ideas', 'Whole outfits built from verified cotton pieces on Etsy.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${outfitList().slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
   homeBeautyPics();
   loadHomeFood();
@@ -1524,8 +1524,26 @@ function tile([k, n]){
   const items = cottonV().filter(c => c.styles.includes(k)); const c = items[0];
   return `<button class="tile" data-style="${k}">${c ? img(c, n) : ''}<span>${n}<small>${items.length} ${items.length === 1 ? 'piece' : 'pieces'}</small></span></button>`;
 }
+const OUTFIT_WORDS = {'soft-girl': /soft|pastel|pink|ruffle|puff|bow|blush|lilac/i, coquette: /bow|lace|ruffle|ribbon|coquette|pink|eyelet|pointelle/i, 'old-money': /polo|cable|oxford|stripe|navy|classic|button|preppy|cardigan|trouser/i,
+  pinterest: /tee|crew|classic|basic|everyday|tank|henley/i, 'clean-girl': /white|rib|cream|tank|minimal|bodysuit|ivory/i, cottagecore: /prairie|cottage|floral|smock|puff|gingham|peasant|milkmaid|apron|pinafore/i,
+  korean: /oversized|cardigan|wide[- ]leg|pleated|school|boxy|cropped/i, 'japanese-street': /boxy|oversized|cargo|harajuku|japanese|kimono|haori|sashiko|indigo/i, minimalist: /minimal|plain|simple|solid|basic|essential/i,
+  'casual-cute': /cute|casual|ruffle|tee|shorts|romper|sundress/i, vintage: /vintage|retro|70s|80s|90s|1950|1940|1930|victorian|edwardian|handmade/i, brown: /brown|chocolate|coffee|mocha|tan\b|camel|khaki|rust|caramel/i,
+  neutral: /beige|cream|oat|natural|ivory|neutral|sand|off[- ]?white|ecru|undyed|stone/i, y2k: /y2k|baby tee|low[- ]rise|cropped|butterfly|90s|2000|halter|tube/i, cozy: /cozy|sweater|hoodie|sweatshirt|fleece|knit|cardigan|lounge|robe/i};
+// Outfits are put together from the Etsy pieces that were found; each style takes the best-matching top and bottom (or a dress), and the first listing with a photo wins
+function etsyOutfits(){
+  const pool = COTTON.filter(c => c.store === 'Etsy' && c.kind === 'cotton' && c.src === 'scan' && c.img), used = new Set(), out = [];
+  const TOP = /^(Tops|Sweaters|Hoodies & sweatshirts|Jackets|Cardigans)$/, BOT = /^(Sweatpants & pants|Shorts|Skirts)$/;
+  for (const [style, name] of STYLES){
+    const re = OUTFIT_WORDS[style], hit = x => re.test(`${x.name} ${(x.colors || []).join(' ')}`) && !used.has(x.url), pick = f => pool.find(x => f(x) && hit(x));
+    const dress = pick(x => x.type === 'Dresses'), top = pick(x => TOP.test(x.type)), bot = pick(x => BOT.test(x.type));
+    const items = dress && !(top && bot) ? [dress] : top && bot ? [top, bot] : top ? [top] : [];
+    if (!items.length) continue;
+    items.forEach(x => used.add(x.url)); out.push([name + ' look', style, items]);
+  }
+  return out;
+}
 function outfit([title, style, ids]){
-  const items = ids.map(byHandle).filter(Boolean);
+  const items = ids.map(i => typeof i === 'string' ? byHandle(i) : i).filter(Boolean);
   const total = items.reduce((a, b) => a + b.price, 0);
   return `<article class="outfit"><div class="ocol ${items.length === 2 ? 'two' : ''}">${items.map(i => `<button data-open="${i.id}" aria-label="${esc(i.name)}">${img(i)}</button>`).join('')}</div>
    <div class="cb"><p class="meta">${esc(STYLE_NAME[style])} · ${items.length} pieces</p><h3>${esc(title)}</h3><p class="comp" style="-webkit-line-clamp:3">${items.map(i => esc(i.brand + ' ' + i.name.split(' – ')[0])).join(' + ')}</p>
@@ -1722,8 +1740,9 @@ function showStyle(k, scroll = true){
   items.length ? mountList($('#list'), items) : ($('#list').innerHTML = '<div class="empty"><h3>No pieces yet</h3><p>Nothing verified in this aesthetic so far.</p></div>');
   if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
 }
+const outfitList = () => { const e = etsyOutfits(); return e.length ? e : OUTFITS; };
 function outfitsView(){
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Outfit finds')}<h1>Outfit Ideas</h1><p>Outfits put together from verified 100% cotton pieces. Tap a photo for details, or a piece's button to buy it from the brand.</p></div><div class="outfits" style="margin-top:18px">${OUTFITS.map(outfit).join('')}</div>`;
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Outfit finds')}<h1>Outfit Ideas</h1><p>Outfits put together from verified 100% cotton pieces found on Etsy. Tap a photo for details, or a piece's button to buy it from the seller.</p></div><div class="outfits" style="margin-top:18px">${outfitList().map(outfit).join('')}</div>`;
 }
 function savedView(kind){
   const items = kind === 'fav' ? Object.values(favs).reverse() : recent;
@@ -1770,7 +1789,7 @@ const RULES_TABLE = [
   ['Nuts and seeds', 'Walnuts and almonds (including almond butter, almond meal and almond flour), chia seeds, sesame seeds', 'Flax (flaxseed, linseed), peanuts, cashews, hazelnuts, pecans, pistachios, macadamias, Brazil nuts, pine nuts, sunflower seeds, pumpkin seeds (pepitas)'],
   ['Oils', 'Coconut oil, olive oil, grapeseed oil, avocado oil', 'Sunflower, canola, safflower, palm, soybean, vegetable, corn, rice bran, cottonseed, peanut, sesame and high-oleic oils'],
   ['Grains and flours', 'Spelt, einkorn, kamut, quinoa, quinoa flakes, teff, amaranth, rye, buckwheat, fonio, chickpea flour, sprouted flours', 'Wheat (including enriched, all-purpose and bread flour, semolina, durum, bulgur, couscous), oats and oatmeal, corn and popcorn (cornstarch, corn syrup, cornmeal, polenta, grits), brown rice'],
-  ['Vegetables and other', 'Vegetables not listed as banned, beans (kidney, green, cocoa, cacao, vanilla and others, but not black beans), eggs, dairy, meat', 'Potatoes (sweet potato too), cassava, pumpkin, carrots, spinach, cauliflower, tomato, eggplant, navy beans, black beans, black pepper, soy and soy lecithin (soybeans, edamame)'],
+  ['Vegetables and other', 'Vegetables not listed as banned, beans (green, cocoa, cacao, vanilla and others, but not black, kidney or navy beans), eggs, dairy, meat', 'Potatoes (sweet potato too), cassava, pumpkin, carrots, spinach, cauliflower, tomato, eggplant, navy beans, black beans, kidney beans, black pepper, soy and soy lecithin (soybeans, edamame)'],
   ['Sweeteners', 'Maple syrup, maple sugar, date syrup, date sugar, coconut sugar, agave, unsweetened foods', 'White sugar, cane sugar, honey, other syrups, molasses, glucose, dextrose, fructose, maltodextrin, stevia, monk fruit, sugar alcohols (erythritol, xylitol), artificial sweeteners'],
   ['Flavor, chocolate and tea', 'Cocoa and cacao, vanilla extract, cinnamon, sea salt, herbal teas (ginger, chaga, raspberry, rosemary, chamomile and others)', 'Natural flavor, peppermint, green tea, matcha (and other Japanese green teas)']
 ];
