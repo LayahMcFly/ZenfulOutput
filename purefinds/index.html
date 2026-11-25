@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.34">
+<meta name="pf-version" content="1.18.35">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.34';
+const VERSION = '1.18.35';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1236,7 +1236,7 @@ function img(it, alt){
   return it.img ? `<img loading="lazy" src="${esc(it.img)}" alt="${esc(alt || it.name)}" data-name="${esc(it.name)}">` : `<div class="noimg"><span>${esc(it.name)}</span></div>`;
 }
 function badges(it){
-  if (it.kind === 'beauty') return `<span class="bd">${it.kindB === 'bags' ? '100% ' + esc((it.material || '').toLowerCase()) : it.kindB === 'orgonite' ? 'Real stone' : 'Clean-ingredient check passed'}</span>${it.isOrg ? '<span class="bd p">Organic</span>' : ''}${it.isNG ? '<span class="bd p">Non-GMO</span>' : ''}`;
+  if (it.kind === 'beauty') return `<span class="bd">${/^bag-/.test(it.kindB) ? '100% ' + esc((it.material || '').toLowerCase()) : it.kindB === 'orgonite' ? 'Real stone' : 'Clean-ingredient check passed'}</span>${it.isOrg ? '<span class="bd p">Organic</span>' : ''}${it.isNG ? '<span class="bd p">Non-GMO</span>' : ''}`;
   if (it.kind === 'cotton') return `<span class="bd">100% ${esc((it.material || 'Cotton').toLowerCase())} · ${it.src === 'scan' ? 'per listing' : 'verified'}</span>${it.cert ? `<span class="bd p">${esc(it.cert.replace(' (brand claim)', ''))}</span>` : ''}`;
   if (it.kind === 'direct') return '<span class="bd p">Sold by PureFinds</span>';
   const g = it.nonGmo ? `<span class="bd p">${esc(it.nonGmo.replace(' (brand claim)', ''))}</span>` : '';
@@ -1820,9 +1820,9 @@ function openItem(id){
        <h2 id="mt">${esc(it.name)}</h2><p class="meta" style="font-size:15px">${esc(it.brand)} · ${esc(sec)} · sold at ${esc(it.store)}</p>
        ${it.price != null ? `<p class="price" style="font-size:24px;margin:0">${money(it.price)}</p>` : ''}
        ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
-       <h3 style="font-size:22px">${it.kindB === 'bags' ? 'Material' : it.kindB === 'orgonite' ? 'Stones' : 'Ingredients'}</h3><div class="ing">${esc(it.kindB === 'bags' ? '100% ' + (it.material || '').toLowerCase() + ' (' + (it.fabric || '') + ')' : it.kindB === 'orgonite' ? 'Real ' + (it.material || '').toLowerCase() + ': ' + (it.fabric || '') : it.ing)}</div>
-       ${it.kindB === 'bags' || it.kindB === 'orgonite' ? `<p class="meta" style="margin:0">${it.kindB === 'bags' ? 'Quoted from the seller’s listing. PureFinds keeps a bag only when it names one material (leather, cotton, hemp, linen or wool) and mentions no other: no PU or faux leather, no blends, no lining or trim in another fabric.' : 'Quoted from the seller’s listing. PureFinds keeps orgonite only when a real, named natural stone is listed and no glass, plastic or imitation stone is mentioned. Ask the seller to confirm before you buy.'}</p>` : `<p class="meta" style="margin:0">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) + '. ' : ''}None of the left-out ingredients were found (${esc(BEAUTY_RULE_TEXT.split(' Pure single')[0].replace(/^Left out when the ingredient list includes /, '').replace(/\.$/, ''))}).</p>`}
-       ${it.kindB === 'orgonite' ? '' : `<dl class="spec"><dt>Organic</dt><dd>${it.isOrg ? (it.organicText || 'The listing says organic') : 'Not stated'}</dd>${it.kindB === 'bags' ? '' : `<dt>Non-GMO</dt><dd>${it.isNG ? 'The listing says Non-GMO' : 'Not stated'}</dd>`}</dl>`}
+       <h3 style="font-size:22px">${/^bag-/.test(it.kindB) ? 'Material' : it.kindB === 'orgonite' ? 'Stones' : 'Ingredients'}</h3><div class="ing">${esc(/^bag-/.test(it.kindB) ? '100% ' + (it.material || '').toLowerCase() + ' (' + (it.fabric || '') + ')' : it.kindB === 'orgonite' ? 'Real ' + (it.material || '').toLowerCase() + ': ' + (it.fabric || '') : it.ing)}</div>
+       ${/^bag-/.test(it.kindB) || it.kindB === 'orgonite' ? `<p class="meta" style="margin:0">${/^bag-/.test(it.kindB) ? 'Quoted from the seller’s listing. PureFinds keeps a bag only when it names one material (leather, cotton, hemp, linen or wool) and mentions no other: no PU or faux leather, no blends, no lining or trim in another fabric.' : 'Quoted from the seller’s listing. PureFinds keeps orgonite only when a real, named natural stone is listed and no glass, plastic or imitation stone is mentioned. Ask the seller to confirm before you buy.'}</p>` : `<p class="meta" style="margin:0">${it.ingSrc ? 'Source: ' + esc(it.ingSrc) + '. ' : ''}None of the left-out ingredients were found (${esc(BEAUTY_RULE_TEXT.split(' Pure single')[0].replace(/^Left out when the ingredient list includes /, '').replace(/\.$/, ''))}).</p>`}
+       ${it.kindB === 'orgonite' ? '' : `<dl class="spec"><dt>Organic</dt><dd>${it.isOrg ? (it.organicText || 'The listing says organic') : 'Not stated'}</dd>${/^bag-/.test(it.kindB) ? '' : `<dt>Non-GMO</dt><dd>${it.isNG ? 'The listing says Non-GMO' : 'Not stated'}</dd>`}</dl>`}
        <p class="meta">Shipping and stock are on ${esc(it.store)}'s page.</p>
        <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at ${esc(it.store)} ↗</a></div>
        <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fv}">${fv ? '♥ Saved' : '♡ Save to favorites'}</button></div></div>`;
@@ -2039,10 +2039,10 @@ const BEAUTY_GROUPS = [
   ['hair', 'Hair care', 'Shampoo, conditioner, curl and scalp care, including Carol’s Daughter Goddess Strength', ['hair']],
   ['lash', 'Castor oil, lashes & brows', 'Castor oil and growth oils for eyelashes, eyebrows and hair', ['lash']],
   ['nail', 'Nail care', 'Nail polish, cuticle oil and nail strengtheners', ['nail']],
-  ['bags', 'Bags & purses', 'Backpacks, purses, handbags and book bags made of one material only: 100% leather, cotton, hemp, linen or wool', ['bags']],
+  ['bags', 'Bags & purses', 'Backpacks, purses, handbags and book bags made of one material only: 100% leather, cotton, hemp, linen or wool', ['bag-purse', 'bag-book', 'bag-pack', 'bag-tote', 'bag-cross', 'bag-clutch']],
   ['orgonite', 'Orgonite jewelry', 'Orgonite pendants, necklaces, bracelets, rings and earrings set with real, natural stones. No glass, plastic or imitation stones', ['orgonite']]];
-const beautyIn = k => BEAUTY.kinds ? BEAUTY.kinds.includes(k) : k !== 'bags' && k !== 'orgonite';
-const BEAUTY_SECTIONS = [['all', 'All beauty'], ['skin', 'Skin care'], ['face', 'Face care'], ['nail', 'Nail care'], ['hair', 'Hair care'], ['lash', 'Castor oil, lashes & brows'], ['bags', 'Bags & purses'], ['orgonite', 'Orgonite jewelry'], ['body', 'Body & bath'], ['lips', 'Lip care']];
+const beautyIn = k => BEAUTY.kinds ? BEAUTY.kinds.includes(k) : !/^bag-/.test(k) && k !== 'orgonite';
+const BEAUTY_SECTIONS = [['all', 'All beauty'], ['skin', 'Skin care'], ['face', 'Face care'], ['nail', 'Nail care'], ['hair', 'Hair care'], ['lash', 'Castor oil, lashes & brows'], ['bag-purse', 'Purses & handbags'], ['bag-book', 'Book bags'], ['bag-pack', 'Backpacks'], ['bag-tote', 'Totes'], ['bag-cross', 'Crossbody & messenger'], ['bag-clutch', 'Clutches & pouches'], ['orgonite', 'Orgonite jewelry'], ['body', 'Body & bath'], ['lips', 'Lip care']];
 const BEAUTY_STORES = [['carolsdaughter.com', "Carol's Daughter"], ['anua.com', 'ANUA'], ['herbivorebotanicals.com', 'Herbivore'], ['www.100percentpure.com', '100% Pure']];
 const BEAUTY_RULES = [
   [/\b(fragrance|parfum|perfume|aroma)\b/i, 'fragrance'],
@@ -2085,12 +2085,14 @@ function beautyAccept(it){
 }
 const BAG_QUERIES = ['genuine leather backpack', 'full grain leather handbag', 'vegetable tanned leather purse', 'leather tote bag', 'leather crossbody bag', 'leather book bag', 'leather messenger bag', 'leather satchel', 'leather shoulder bag', 'leather bucket bag', 'leather clutch purse', '100% cotton tote bag', 'organic cotton tote bag', '100% cotton canvas backpack', '100% cotton crossbody bag', 'organic cotton purse', '100% cotton book bag', '100% hemp backpack', '100% hemp tote bag', 'hemp purse', 'hemp shoulder bag', '100% linen tote bag', '100% linen purse', '100% linen shoulder bag', '100% wool tote bag', '100% wool bag', 'felted wool purse', 'wool backpack', 'cotton market bag', 'natural fiber handbag'];
 const ORGO_QUERIES = ['orgonite pendant amethyst', 'orgonite necklace natural crystal', 'orgonite pendant clear quartz', 'orgonite pendant rose quartz', 'orgonite pendant black tourmaline', 'orgonite pendant obsidian', 'orgonite pendant citrine', 'orgonite bracelet gemstone', 'orgonite ring natural stone', 'orgonite earrings crystal', 'orgonite pendant labradorite', 'orgonite pendant lapis lazuli', 'orgonite jewelry real stones', 'orgonite pendant selenite', 'orgonite pendant shungite', 'orgonite pendant moonstone', 'orgonite pendant turquoise', 'orgonite pendant carnelian', 'orgonite necklace copper quartz', 'orgonite pendant tiger eye'];
+const bagKind = it => { const s = `${it.name} ${it.ptype || ''} ${(it.tags || []).join(' ')}`.toLowerCase();
+  return /book ?bag|school bag|bookbag|laptop bag|library bag/.test(s) ? 'bag-book' : /backpack|rucksack|knapsack|back pack/.test(s) ? 'bag-pack' : /crossbody|cross-body|cross body|messenger|sling/.test(s) ? 'bag-cross' : /clutch|pouch|wristlet|wallet|pochette/.test(s) ? 'bag-clutch' : /\btotes?\b|market bag|shopper|shopping bag/.test(s) ? 'bag-tote' : 'bag-purse'; };
 function bagAccept(r, orgo){
   const it = {id: 'etsy-' + (orgo ? 'orgo-' : 'bag-') + (r.handle || r.url), name: r.name, brand: r.vendor || 'Etsy', store: 'Etsy', url: r.url, price: r.price, img: r.img, desc: r.desc || '', ing: '', material: r.material, fabric: r.fabric, ptype: r.ptype || '', tags: r.tags || []};
   if (BEAUTY.ok.some(x => x.url === it.url)) return;
   if (orgo){ if (!it.material || /\b(glass|plastic|acrylic|imitation|simulated|synthetic|faux|fake|lab)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'stones are not clearly real'); it.isOrg = false; it.isNG = false; it.kindB = 'orgonite'; it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Real stone: ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it); return; }
   if (!/^(Leather|Cotton|Hemp|Linen|Wool)$/.test(it.material || '') || /\b(pu|faux|vegan|pleather|synthetic|vinyl|polyester|nylon)\b/i.test(`${it.name} ${it.fabric}`)) return beautyRemove(it, 'material is not one pure leather, cotton, hemp, linen or wool');
-  it.isOrg = !!r.organic; it.organicText = r.organic || ''; it.isNG = false; it.kindB = 'bags'; it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Material: 100% ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it);
+  it.isOrg = !!r.organic; it.organicText = r.organic || ''; it.isNG = false; it.kindB = bagKind(it); it.kind = 'beauty'; it.src = 'brand'; it.id = 'bty:' + it.url; it.claims = []; it.ing = `Material: 100% ${it.material.toLowerCase()}`; reg(it); BEAUTY.ok.push(it);
 }
 const BEAUTY_ETSY_QUERIES = ['organic rosemary oil', 'fenugreek oil hair', 'aloe vera oil', 'organic lavender oil', 'organic jojoba oil', 'vitamin e oil pure', 'rosemary oil hair growth', 'castor oil eyelashes', 'castor oil eyebrows', 'black castor oil hair growth', 'jamaican black castor oil', 'organic cold pressed castor oil', 'lash and brow growth serum natural', 'castor oil mascara spoolie', 'natural face serum', 'organic face cream', 'handmade face moisturizer', 'natural facial cleanser', 'organic body butter', 'whipped shea butter', 'natural hair oil', 'organic hair butter', 'natural shampoo bar', 'natural conditioner', 'natural nail polish', 'water based nail polish', 'nail strengthening oil', 'cuticle oil natural', 'natural lip balm', 'natural deodorant', 'organic face oil', 'rosewater toner', 'clay face mask natural', 'natural sugar scrub'];
 const BEAUTY_KROGER_QUERIES = ['castor oil', 'organic castor oil', 'black castor oil hair', 'organic face moisturizer', 'natural face cleanser', 'organic body lotion', 'natural shampoo', 'natural conditioner', 'natural hair oil', 'nail polish', 'natural deodorant', 'organic lip balm', 'natural sunscreen', 'face serum', 'shea butter'];
@@ -2163,7 +2165,7 @@ function beautyCard(it){
     <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
     <div class="cb"><p class="meta">${esc(it.brand)} · ${esc(sec)}</p><h3>${esc(it.name)}</h3>
     ${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}
-    <p class="comp full">${it.kindB === 'bags' ? `<b>Material:</b> 100% ${esc((it.material || '').toLowerCase())}` : it.kindB === 'orgonite' ? `<b>Real stone:</b> ${esc((it.material || '').toLowerCase())}` : `<b>Ingredients:</b> ${esc(it.ing)}`}</p><p class="rulechk">${it.kindB === 'bags' ? 'One material only, no mixing.' : it.kindB === 'orgonite' ? 'Named natural stone. No glass, plastic or imitation stones.' : 'None of the left-out ingredients found.'}</p>
+    <p class="comp full">${/^bag-/.test(it.kindB) ? `<b>Material:</b> 100% ${esc((it.material || '').toLowerCase())}` : it.kindB === 'orgonite' ? `<b>Real stone:</b> ${esc((it.material || '').toLowerCase())}` : `<b>Ingredients:</b> ${esc(it.ing)}`}</p><p class="rulechk">${/^bag-/.test(it.kindB) ? 'One material only, no mixing.' : it.kindB === 'orgonite' ? 'Named natural stone. No glass, plastic or imitation stones.' : 'None of the left-out ingredients found.'}</p>
     <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
 }
 let beautyShown = {key: '', urls: new Set()};
@@ -2212,7 +2214,7 @@ function beautyHub(){
 }
 function beautySection(k){
   const g = BEAUTY_GROUPS.find(x => x[0] === k); if (!g) return beautyHub();
-  const names = {skin: 'Skin care', body: 'Body & bath', lips: 'Lip care', face: 'Face care', hair: 'Hair care', lash: 'Castor oil, lashes & brows', nail: 'Nail care'};
+  const names = {skin: 'Skin care', body: 'Body & bath', lips: 'Lip care', face: 'Face care', hair: 'Hair care', lash: 'Castor oil, lashes & brows', nail: 'Nail care', 'bag-purse': 'Purses & handbags', 'bag-book': 'Book bags', 'bag-pack': 'Backpacks', 'bag-tote': 'Totes', 'bag-cross': 'Crossbody & messenger', 'bag-clutch': 'Clutches & pouches'};
   BEAUTY.kinds = g[3]; BEAUTY.sub = g[3].join(',');
   main.innerHTML = `<div class="pagehead">${crumb('beauty', 'Beauty Closet', g[1])}<h1>${esc(g[1])}</h1><p>${esc(g[2])}.</p></div>
   ${g[3].length > 1 ? `<div class="chips" role="group" aria-label="${esc(g[1])} groups"><button class="chip" data-bsub="${g[3].join(',')}" aria-pressed="true">All ${esc(g[1].toLowerCase())}</button>${g[3].map(c => `<button class="chip" data-bsub="${c}" aria-pressed="false">${esc(names[c])}</button>`).join('')}</div>` : ''}
