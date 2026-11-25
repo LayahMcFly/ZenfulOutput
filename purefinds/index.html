@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.31">
+<meta name="pf-version" content="1.18.32">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.31';
+const VERSION = '1.18.32';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1060,7 +1060,7 @@ const hiddenPanel = key => {
       <button class="btn sm go" type="button" data-report="${esc(x.url)}" data-rname="${esc(x.name)}">Check these ingredients</button></div>`).join('')}</details>`;
 };
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-report]'); if (!b) return; const ta = b.parentElement.querySelector('[data-rtext]'); reportIngredients(b.dataset.report, b.dataset.rname, null, ta ? ta.value : ''); });
-window.__pf = {get FOODS(){ return FOODS; }, get ruledOut(){ return ruledOut; }, get userIng(){ return userIng; }};
+window.__pf = {get scanState(){ return scanState; }, get FOODS(){ return FOODS; }, get ruledOut(){ return ruledOut; }, get userIng(){ return userIng; }};
 const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscription|sampler|bundle|\bt-?shirt\b/i;
 // Kitchen tools, books and merch that stores sell next to their food (a baking scale, a banneton, a cookbook) are never food
 const NOT_FOOD_THING = /\b(baking\s+scale|kitchen\s+scale|scales?|pans?|sheet\s+pan|baking\s+(sheet|stone|mat|dish|tray)|trays?|molds?|moulds?|(cake|muffin|baking|loaf|pie)\s+tins?|ramekins?|whisks?|spatulas?|rolling\s+pins?|spoons?|ladles?|tongs|knives|knife|cutting\s+boards?|boards?|bowls?|mugs?|cups?\s+set|measuring\s+(cups?|spoons?)|thermometers?|timers?|bannetons?|proofing\s+baskets?|baskets?|lames?|scrapers?|sifters?|strainers?|colanders?|graters?|peelers?|grinders?|grain\s+mills?|blenders?|mixers?|machines?|appliances?|kettles?|teapots?|infusers?|tumblers?|water\s+bottles?|jars?\s+(set|only)|storage\s+(canisters?|containers?)|towels?|cloths?|aprons?|oven\s+mitts?|pot\s+holders?|cookbooks?|books?|recipe\s+cards?|posters?|prints?|stickers?|magnets?|candles?|ornaments?|gift\s+cards?|e-?gift|totes?|bags?\s+(reusable|canvas|cotton)|t-?shirts?|hoodies?|hats?|socks|merch|subscriptions?|memberships?|classes?|workshops?|vouchers?)\b/i;
@@ -2255,7 +2255,10 @@ document.addEventListener('click', e => {
   }, 1400);
 })();
 
-document.addEventListener('click', e => { const cn = e.target.closest && e.target.closest('[data-copynote]'); if (cn){ const box = cn.closest('#scanNote, #bnote'); copyText(`PureFinds ${VERSION} · ${new Date().toISOString()}\n${(box ? box.innerText : '').replace(/Copy this message|Copy error/g, '').trim()}\nKroger: ${krogerNote || '-'}\nEtsy: ${etsyNote || '-'}`); } });
+document.addEventListener('click', e => { const cn = e.target.closest && e.target.closest('[data-copynote]'); if (cn){ const box = cn.closest('#scanNote, #bnote'); let body = '', errs = [];
+    if (box){ const c = box.cloneNode(true); c.querySelectorAll('details,button').forEach(x => x.remove()); c.querySelectorAll('br').forEach(x => x.replaceWith('\n')); body = c.textContent.replace(/[ \t]+/g, ' ').replace(/\n\s+/g, '\n').trim();
+      errs = box.id === 'bnote' ? BEAUTY.errors : ((scanState[box.dataset.type] || {}).errors || []); }
+    copyText(`PureFinds ${VERSION} · ${new Date().toISOString()}\n${body}\nKroger: ${krogerNote || '-'}\nEtsy: ${etsyNote || '-'}${errs.length ? `\n\n${errs.length} error${errs.length === 1 ? '' : 's'} (all of them, whether the list is open or not):\n` + errs.map((x, n) => `${n + 1}. ${x}`).join('\n') : ''}`); } });
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-copyresults]')) copyText(resultsReport(shownNow)); });
 
 /* ---------- themed dropdowns ---------- */
