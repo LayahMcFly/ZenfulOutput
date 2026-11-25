@@ -236,7 +236,8 @@ async function etsySearch(q, key, type){
       if (!/skin|face|facial|nail|polish|lacquer|hair|serum|cream|lotion|balm|moisturi|cleanser|toner|mask|scrub|oil|butter|shampoo|conditioner|lip|sunscreen|deodorant|soap/i.test(kind)) continue;
       const mats = (l.materials || []).map(String).filter(Boolean);
       const ing = findIngredients(plainList(l.description), true) || (mats.length >= 3 ? mats.join(', ') : '');
-      const pureCastor = !ing && /\b(100% )?(pure|organic|cold[- ]pressed)\b[^,]{0,30}\bcastor oil\b/i.test(title) && !/\b(blend|with|infused|serum|mix|\+|&)\b/i.test(title) ? 'Castor oil (Ricinus communis seed oil)' : '';
+      const pureOil = (() => { if (ing || /\b(blend|with|infused|serum|mix|\+|&|and|kit|set)\b/i.test(title)) return ''; const m = /\b(castor|rosemary|fenugreek|aloe vera|lavender|jojoba|vitamin e)\b[^,]{0,12}\boil\b/i.exec(title); return m && /\b(100%|pure|organic|cold[- ]pressed|unrefined)\b/i.test(title) ? m[1].replace(/^./, c => c.toUpperCase()) + ' oil' : ''; })();
+      const pureCastor = pureOil;
       out.push({...row, ing: ing || pureCastor, ingSrc: (ing || pureCastor) ? 'Etsy listing' : '', desc: desc.slice(0, 300)});
       continue;
     }

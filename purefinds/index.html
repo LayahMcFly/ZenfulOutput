@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.22">
+<meta name="pf-version" content="1.18.23">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -409,7 +409,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.22';
+const VERSION = '1.18.23';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1990,8 +1990,9 @@ const BEAUTY_RULES = [
   [/sodium lauryl sulfate|sodium laureth sulfate|ammonium lauryl sulfate|ammonium laureth sulfate|\bsls\b|\bsles\b/i, 'sulfates'],
   [/oxybenzone|benzophenone-\d|octinoxate|ethylhexyl methoxycinnamate|triclosan|\bbht\b|\bbha\b|butylated hydroxy(toluene|anisole)/i, 'oxybenzone, octinoxate, triclosan, BHA or BHT']
 ];
-const BEAUTY_RULE_TEXT = 'Left out when the ingredient list includes fragrance or parfum, parabens, formaldehyde or formaldehyde releasers, toluene, xylene, phthalates, TPHP, camphor, talc, sulfates (SLS, SLES), oxybenzone, octinoxate, triclosan, BHA or BHT. Products whose ingredients can’t be read are not shown.';
-const beautyOk = t => { t = String(t || '').trim(); if (/^(100% )?(pure |organic |cold[- ]pressed |jamaican black |black )*(castor|ricinus communis)[a-z ()]*(oil|seed oil)?[.)]?$/i.test(t.replace(/^ingredients?:\s*/i,'')) || /^(organic )?(ricinus communis|castor)[^,;]{0,40}(oil)?$/i.test(t)) return true; if (!t || /[{}\[\]<>=\\|]|https?:/.test(t)) return false; const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
+const BEAUTY_RULE_TEXT = 'Left out when the ingredient list includes fragrance or parfum, parabens, formaldehyde or formaldehyde releasers, toluene, xylene, phthalates, TPHP, camphor, talc, sulfates (SLS, SLES), oxybenzone, octinoxate, triclosan, BHA or BHT. Pure single oils (black castor, rosemary, fenugreek, aloe vera, lavender, jojoba and vitamin E) are allowed. Products whose ingredients can’t be read are not shown.';
+const SINGLE_OILS = /^(100% )?(pure |organic |cold[- ]pressed |unrefined |virgin |jamaican |black )*(castor|ricinus communis|rosemary|rosmarinus officinalis|fenugreek|trigonella foenum[- ]graecum|aloe vera|aloe barbadensis|lavender|lavandula angustifolia|jojoba|simmondsia chinensis|vitamin e|tocopherol)( leaf| seed| flower)?( oil| seed oil)?( (pure|organic|cold[- ]pressed|unrefined|virgin))*( \(.*?\))?[.)]?$/i;
+const beautyOk = t => { t = String(t || '').trim(); if (SINGLE_OILS.test(t.replace(/^ingredients?:\s*/i, ''))) return true; if (/^(100% )?(pure |organic |cold[- ]pressed |jamaican black |black )*(castor|ricinus communis)[a-z ()]*(oil|seed oil)?[.)]?$/i.test(t.replace(/^ingredients?:\s*/i,'')) || /^(organic )?(ricinus communis|castor)[^,;]{0,40}(oil)?$/i.test(t)) return true; if (!t || /[{}\[\]<>=\\|]|https?:/.test(t)) return false; const parts = t.split(/[,;]/).map(x => x.trim()).filter(Boolean);
   return parts.length >= 3 && parts.length <= 250 && parts.every(x => x.split(/\s+/).length <= 14) && !/\b(our|we|you|your|perfect|delicious|learn more|click|shop now)\b/i.test(t); };
 const beautyClean = t => String(t || '').replace(/\b(fragrance|paraben|sulfate|sulphate|phthalate|formaldehyde|talc|toluene|perfume)[- ]free\b/gi, ' ').replace(/\b(free of|free from|without)\s+[^.;]{0,90}/gi, ' ');
 const beautyBreak = ing => { const t = beautyClean(ing); for (const [re, why] of BEAUTY_RULES) if (re.test(t)) return why; return ''; };
@@ -2016,7 +2017,7 @@ function beautyAccept(it){
   it.isNG = !!it.nonGmo || /non[- ]?gmo|gmo[- ]free/i.test(txt);
   it.kindB = beautyKind(it); BEAUTY.ok.push(it);
 }
-const BEAUTY_ETSY_QUERIES = ['castor oil eyelashes', 'castor oil eyebrows', 'black castor oil hair growth', 'jamaican black castor oil', 'organic cold pressed castor oil', 'lash and brow growth serum natural', 'castor oil mascara spoolie', 'natural face serum', 'organic face cream', 'handmade face moisturizer', 'natural facial cleanser', 'organic body butter', 'whipped shea butter', 'natural hair oil', 'organic hair butter', 'natural shampoo bar', 'natural conditioner', 'natural nail polish', 'water based nail polish', 'nail strengthening oil', 'cuticle oil natural', 'natural lip balm', 'natural deodorant', 'organic face oil', 'rosewater toner', 'clay face mask natural', 'natural sugar scrub'];
+const BEAUTY_ETSY_QUERIES = ['organic rosemary oil', 'fenugreek oil hair', 'aloe vera oil', 'organic lavender oil', 'organic jojoba oil', 'vitamin e oil pure', 'rosemary oil hair growth', 'castor oil eyelashes', 'castor oil eyebrows', 'black castor oil hair growth', 'jamaican black castor oil', 'organic cold pressed castor oil', 'lash and brow growth serum natural', 'castor oil mascara spoolie', 'natural face serum', 'organic face cream', 'handmade face moisturizer', 'natural facial cleanser', 'organic body butter', 'whipped shea butter', 'natural hair oil', 'organic hair butter', 'natural shampoo bar', 'natural conditioner', 'natural nail polish', 'water based nail polish', 'nail strengthening oil', 'cuticle oil natural', 'natural lip balm', 'natural deodorant', 'organic face oil', 'rosewater toner', 'clay face mask natural', 'natural sugar scrub'];
 const BEAUTY_KROGER_QUERIES = ['castor oil', 'organic castor oil', 'black castor oil hair', 'organic face moisturizer', 'natural face cleanser', 'organic body lotion', 'natural shampoo', 'natural conditioner', 'natural hair oil', 'nail polish', 'natural deodorant', 'organic lip balm', 'natural sunscreen', 'face serum', 'shea butter'];
 async function beautyScan(){
   if (BEAUTY.started) return; BEAUTY.started = true;
