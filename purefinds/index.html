@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.55">
+<meta name="pf-version" content="1.18.56">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.55';
+const VERSION = '1.18.56';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2333,6 +2333,8 @@ function shopAccept(r, k, sub){
   if (k === 'kidsart' && /\b(vintage|antique|singer|retro|1[89]\d\d|19[0-9]0s)\b/i.test(`${r.name} ${r.ptype || ''}`)) return; // kids' crafts: no old adult machines
   SHOP.push(reg({id: 'shop-' + (r.domain || 'etsy') + '-' + (r.handle || r.url), kind: 'shop', group: k, sub: shopSubFor(k, r) || (sub && (SHOP_SUB_WORDS.find(x => x[0] === sub) || [, /./])[1].test(`${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`) ? sub : ''), name: r.name, brand: r.vendor || 'Etsy seller', store: r.store || 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
 }
+// A request that fails at the network level ("Failed to fetch") is tried once more after a short wait before it counts as an error
+const shopGet = async (url, ms) => { try { return await getJSON(url, ms); } catch (e){ if (/not set up|501|HTTP 4/.test(errText(e))) throw e; await new Promise(r => setTimeout(r, 1500)); return await getJSON(url, ms); } };
 async function shopScan(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g || SHOP_STATE.started[k]) return; SHOP_STATE.started[k] = true;
   if (!scanBase()){ SHOP_STATE.errors.push('The scanner address is not set.'); return shopPaint(k); }
@@ -2343,18 +2345,18 @@ async function shopScan(k){
   const etsyWorker = async () => { while (qi < queue.length && !stop){
     const [q, sub] = queue[qi++], key = 'etsy6|shop|' + q, hit = store.get(key, null); let rows;
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/etsy?v=4&type=shop&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    else try { rows = (await shopGet(`${scanBase()}/etsy?v=4&type=shop&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ const m = errText(e); SHOP_STATE.errors.push(`Etsy (${q}): ${m}`); if (/not set up|501/.test(m)) stop = true; continue; }
     rows.forEach(r => shopAccept(r, k, sub)); shopPaint(k);
   } };
   const brandWorker = async () => { for (const d of SHOP_STORES[k] || []){
     const key = 'scan2|shop|' + d, hit = store.get(key, null); let rows;
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
-    else try { rows = (await getJSON(`${scanBase()}/store?d=${encodeURIComponent(d)}&type=shop`, 30000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    else try { rows = (await shopGet(`${scanBase()}/store?d=${encodeURIComponent(d)}&type=shop`, 30000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ SHOP_STATE.errors.push(`${d}: ${errText(e)}`); shopPaint(k); continue; }
     rows.forEach(r => shopAccept(r, k)); shopPaint(k);
   } };
-  await Promise.all([etsyWorker(), etsyWorker(), etsyWorker(), brandWorker()]);
+  await Promise.all([etsyWorker(), etsyWorker(), brandWorker()]);
   SHOP_STATE.started[k] = 'done'; shopPaint(k);
 }
 function shopCard(it){

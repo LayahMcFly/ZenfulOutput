@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.15';
+const VERSION = '1.9.16';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -191,6 +191,7 @@ const FIBERS = {
   cotton: 'cotton', silk: 'silk', wool: 'wool|woolen|woollen|lambswool|merino', linen: 'linen|flax'
 };
 const OTHER_FIBERS = 'polyester|spandex|elastane|lycra|nylon|acrylic|rayon|viscose|lyocell|tencel|modal|cupro|cashmere|alpaca|mohair|angora|camel hair|hemp|bamboo|ramie|jute|lurex|metallic|polyamide|elasterell|polyurethane|faux fur|leather|down fill';
+const OTHER_FIBERS_RX = new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i'); // built once, not for every listing
 // Returns the fabric line and name ("Cotton", "Silk", "Wool" or "Linen") only when the text says 100% of one of them and mentions no other fiber at all
 function pureFabric(text){
   const m = String(text || '').match(FABRIC_LINE); if (!m) return null;
@@ -250,7 +251,7 @@ function shopFilter(row, title, desc, mats, kind){
   if (/\b(digital|printable|svg|png|pdf|download|template|instant download|pattern|tutorial|clipart|mockup|gift ?cards?)\b/i.test(`${title} ${row.ptype || ''}`)) return null;
   if (PLUSH_WORDS.test(kind)){
     const f = pureFabric(`${desc}. ${mats}`) || pureFabric(title);
-    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) return null;
+    if (!f || OTHER_FIBERS_RX.test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) return null;
     return {...row, fabric: f.line, material: f.material, plush: true, desc: desc.slice(0, 400)};
   }
   if (TOY_WORDS.test(kind)){
@@ -328,7 +329,7 @@ async function etsySearch(q, key, type){
       continue;
     }
     const f = pureFabric(desc) || pureFabric(title);
-    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc}`) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '')) continue;
+    if (!f || OTHER_FIBERS_RX.test(`${title} ${desc}`) || !CLOTHING.test(kind) || NOT_CLOTHING.test(l.title || '')) continue;
     out.push({...row, fabric: f.line, material: f.material, sizes: [], colors: []});
   }
   return out;
