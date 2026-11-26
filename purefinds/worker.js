@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.10';
+const VERSION = '1.9.11';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -238,6 +238,7 @@ function realOrgonite(text){
 /* ---------- Etsy (clothing that is 100% cotton, silk, wool or linen) ---------- */
 // Etsy Open API v3: search active listings, then read them in one batch with photos and shop names.
 // The x-api-key header is "keystring:sharedsecret" (required by Etsy since Feb 2026).
+const PLUSH_WORDS = /\b(plush(ie|ies)?|stuffed|stuffie|stuffy|teddy|soft toy|cuddly|amigurumi|rag doll|ragdoll|lovey|snuggle)\b/i;
 async function etsySearch(q, key, type){
   const H = {...UA, 'x-api-key': key}, cf = {cacheTtl: 21600, cacheEverything: true};
   const ask = async url => { const r = await fetch(url, {headers: H, cf}); if (!r.ok){ let why = ''; try { const j = await r.json(); why = ': ' + (j.error || j.message || ''); } catch (e){} throw new Error(`Etsy answered HTTP ${r.status}${why}`); } return r.json(); };
@@ -269,7 +270,15 @@ async function etsySearch(q, key, type){
     }
     if (type === 'shop'){
       if (/\b(digital|printable|svg|png|pdf|download|template|instant download|pattern|tutorial|clipart|mockup)\b/i.test(`${title} ${row.ptype}`)) continue;
-      out.push({...row, material: (l.materials || []).map(String).filter(Boolean).slice(0, 8).join(', '), desc: desc.slice(0, 400)});
+      const mats = (l.materials || []).map(String).filter(Boolean).slice(0, 8).join(', ');
+      // plushies follow the clothing rules: one natural fabric, 100%, and no other fiber (polyester fill included) named anywhere in the listing
+      if (PLUSH_WORDS.test(`${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`)){
+        const f = pureFabric(`${desc}. ${mats}`) || pureFabric(title);
+        if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) continue;
+        out.push({...row, fabric: f.line, material: f.material, plush: true, desc: desc.slice(0, 400)});
+        continue;
+      }
+      out.push({...row, material: mats, desc: desc.slice(0, 400)});
       continue;
     }
     if (type === 'orgonite'){
