@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.61">
+<meta name="pf-version" content="1.18.62">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -134,7 +134,7 @@ select.field{padding-right:34px;background-image:url("data:image/svg+xml,%3Csvg 
 
 /* grid + card */
 .grid{columns:4 230px;column-gap:18px}
-.pager{display:flex;gap:14px;align-items:center;justify-content:center;margin:22px 0}.pager{flex-wrap:wrap;gap:8px}.pager .pgn.on{background:var(--sage-d);color:#fff;border-color:var(--sage-d);pointer-events:none}.pager .btn[disabled]{opacity:.4;pointer-events:none}
+.pghide{display:none!important}.pager{display:flex;gap:14px;align-items:center;justify-content:center;margin:22px 0}.pager{flex-wrap:wrap;gap:8px}.pager .pgn.on{background:var(--sage-d);color:#fff;border-color:var(--sage-d);pointer-events:none}.pager .btn[disabled]{opacity:.4;pointer-events:none}
 .grid>.card{break-inside:avoid;margin:0 0 18px}
 .card{position:relative;background:var(--white);border-radius:var(--r);overflow:hidden;box-shadow:var(--shadow);transition:transform .25s,box-shadow .25s;animation:rise .5s both}
 .card:hover{transform:translateY(-4px);box-shadow:0 18px 36px -20px rgba(70,52,30,.55)}
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.61';
+const VERSION = '1.18.62';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1403,6 +1403,31 @@ document.addEventListener('change', e => { const f = e.target.closest('#fb'); if
 document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-page]'); if (!b || b.disabled) return; pageN = +b.dataset.page; paint(); const g = $('#grid'); if (g) g.scrollIntoView({behavior: 'auto', block: 'start'}); });
 
 /* ---------- views ---------- */
+/* Every product grid pages like the food lists: 24 per page (4 columns by 6 rows), with Previous / numbers / Next.
+   One observer does this for any `.grid` on any section, so new sections and lists are paged automatically.
+   (Food's own list pages itself in paint() and is skipped.) New products added by a scan land at the end, so the page you are on never jumps. */
+const PG = new WeakMap();
+function pageGrid(g){
+  if (!g || g.id === 'grid') return;
+  const st = PG.get(g) || {n: 0}; PG.set(g, st);
+  const cards = [...g.children].filter(c => !c.hidden), pages = Math.max(1, Math.ceil(cards.length / PAGE_SIZE));
+  if (st.n >= pages) st.n = pages - 1;
+  [...g.children].forEach(c => c.classList.remove('pghide'));
+  if (pages > 1) cards.forEach((c, i) => { if (i < st.n * PAGE_SIZE || i >= (st.n + 1) * PAGE_SIZE) c.classList.add('pghide'); });
+  let pg = g.nextElementSibling && g.nextElementSibling.classList.contains('pager') && g.nextElementSibling.dataset.auto ? g.nextElementSibling : null;
+  if (pages < 2){ if (pg) pg.remove(); return; }
+  if (!pg){ pg = document.createElement('div'); pg.className = 'pager'; pg.dataset.auto = '1'; g.insertAdjacentElement('afterend', pg); }
+  const lo = Math.max(0, st.n - 2), hi = Math.min(pages - 1, st.n + 2), nums = [];
+  if (lo > 0){ nums.push(0); if (lo > 1) nums.push('…'); } for (let n = lo; n <= hi; n++) nums.push(n); if (hi < pages - 1){ if (hi < pages - 2) nums.push('…'); nums.push(pages - 1); }
+  const html = `<button class="btn sm" type="button" data-pgp="${st.n - 1}" ${st.n ? '' : 'disabled'}>← Previous</button>${nums.map(n => n === '…' ? '<span class="meta">…</span>' : `<button class="btn sm pgn${n === st.n ? ' on' : ''}" type="button" data-pgp="${n}" ${n === st.n ? 'aria-current="page"' : ''}>${n + 1}</button>`).join('')}<button class="btn sm" type="button" data-pgp="${st.n + 1}" ${st.n < pages - 1 ? '' : 'disabled'}>Next →</button>`;
+  if (pg._html !== html){ pg._html = html; pg.innerHTML = html; } // compare to our own string: the browser re-serialises innerHTML, which would loop forever
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest && e.target.closest('[data-pgp]'); if (b && !b.disabled){ const pg = b.closest('.pager'), g = pg && pg.previousElementSibling; if (g){ PG.get(g).n = +b.dataset.pgp; pageGrid(g); g.scrollIntoView({behavior: 'auto', block: 'start'}); } return; }
+  if (e.target.closest && e.target.closest('.chip, [data-ssub], [data-bcert]')) document.querySelectorAll('#main .grid').forEach(g => { if (PG.has(g)) PG.get(g).n = 0; }); // a new filter starts on page 1
+});
+let pgQueued = false;
+new MutationObserver(() => { if (pgQueued) return; pgQueued = true; requestAnimationFrame(() => { pgQueued = false; document.querySelectorAll('#main .grid').forEach(pageGrid); }); }).observe(document.getElementById('main'), {childList: true, subtree: true, attributes: true, attributeFilter: ['hidden']});
 const main = $('#main');
 let state = {sub: {}, cottonCat: '', style: 'soft-girl', q: store.get('q', '')};
 const seed = (() => { const d = new Date(); return d.getFullYear() * 1e4 + (d.getMonth() + 1) * 100 + d.getDate(); })();
