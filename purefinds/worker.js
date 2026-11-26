@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.16';
+const VERSION = '1.9.17';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -50,7 +50,7 @@ STORES.beauty = [['carolsdaughter.com', "Carol's Daughter"], ['anua.com', 'ANUA'
 // The Little Shop: official brand stores for school things, art, sewing and knitting, and toys. Each is read as a Shopify store; any that can't be read show up in the front-end status note.
 STORES.shop = [['baronfig.com', 'Baron Fig'], ['blackwing602.com', 'Blackwing'], ['leuchtturm1917.us', 'Leuchtturm1917'],
   ['greenkidcrafts.com', 'Green Kid Crafts'], ['madelinetosh.com', 'Madelinetosh'], ['purlsoho.com', 'Purl Soho'],
-  ['bellalunatoys.com', 'Bella Luna Toys'], ['camdenrose.com', 'Camden Rose'], ['plantoysusa.com', 'PlanToys'], ['grimms.eu', 'Grimm’s'], ['haba-usa.com', 'HABA USA'], ['kinderfeets.com', 'Kinderfeets']];
+  ['bellalunatoys.com', 'Bella Luna Toys'], ['camdenrose.com', 'Camden Rose'], ['grimms.eu', 'Grimm’s'], ['kinderfeets.com', 'Kinderfeets']];
 const ALLOWED = new Map();
 for (const [domain, name] of [...STORES.cotton, ...STORES.food, ...STORES.beauty, ...STORES.shop]) ALLOWED.set(domain, name);
 
@@ -144,7 +144,7 @@ async function scan(d, type){
   let shopifyErr;
   try {
     const out = [];
-    for (let page = 1; page <= 4; page++){
+    for (let page = 1; page <= (type === 'shop' ? 2 : 4); page++){
       const ps = (await getJSON(`https://${d}/products.json?limit=250&page=${page}`)).products || [];
       out.push(...keep(ps));
       if (ps.length < 250) break;

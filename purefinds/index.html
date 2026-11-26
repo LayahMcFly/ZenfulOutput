@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.56">
+<meta name="pf-version" content="1.18.57">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.56';
+const VERSION = '1.18.57';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2316,13 +2316,16 @@ const SHOP_GROUPS = [
 ];
 // Official brand stores for each Little Shop section (read through the scanner, like the clothing and food stores)
 const SHOP_STORES = {school: ['baronfig.com', 'blackwing602.com', 'leuchtturm1917.us'], kidsart: ['greenkidcrafts.com'], art: ['madelinetosh.com', 'purlsoho.com'],
-  plush: ['bellalunatoys.com', 'camdenrose.com'], dolls: ['bellalunatoys.com', 'camdenrose.com', 'plantoysusa.com', 'grimms.eu', 'haba-usa.com', 'kinderfeets.com'], random: []};
+  plush: ['bellalunatoys.com', 'camdenrose.com'], dolls: ['bellalunatoys.com', 'camdenrose.com', 'grimms.eu', 'kinderfeets.com'], random: []};
 // Which chip a brand store's product belongs under, from the words in its name and type
 const SHOP_SUB_WORDS = [['bags', /bag|backpack|satchel|lunch/i], ['pencils', /pencil|eraser|sharpener/i], ['pens', /\bpens?\b|marker|highlighter/i], ['rulers', /ruler|protractor|compass|geometry|abacus|calculator/i], ['notebooks', /notebook|journal|planner|pad\b|sketchbook|index card/i],
   ['ink', /\bink\b|cartridge|toner|printer/i], ['machines', /sewing machine|serger/i], ['knit', /knit|crochet|loom|hook\b/i], ['sewing', /\bsew|needle|thread|embroider|felt|quilt/i], ['fabric', /fabric|yarn|\bwool\b|linen/i], ['dough', /clay|dough/i], ['paint', /paint|crayon|watercolor|brush|canvas|gouache/i], ['paper', /paper|glue|tape|cardstock|origami|sticker/i]];
 const SHOP_SUBS = {}; // filled from SHOP_GROUPS below
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
 const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic: 'Plastic', other: 'Other'}, TOY_RANK = {wood: 0, metal: 0, soft: 0, other: 1, plastic: 2};
+// Dolls & toys are for children: decor, adult puzzles, gifts, keepsakes, digital plans and listings written in other languages are left out
+const TOY_NOT = /\b(decor|decoration|shelf sitters?|keepsakes?|memorial|signs?|plaques?|desk|figurines?|statues?|christmas|xmas|halloween|nutcrackers?|gnomes?|ornaments?|photo|portrait|couple|anniversary|wedding|retirement|veteran|lovers?|gifts? for (him|her|dad|mom|grandpa|grandma|husband|wife|men|women|adults?)|for adults|adults?|escape room|brain teasers?|puzzle box(es)?|jewel(l)?ery|stamps?|printing|print set|apron|phone case|case for|svg|dxf|cnc|laser[- ]?cut|files|plans|digital|3d (wooden )?puzzle|model kit|book nook|miniature (house|kit)|diorama|tiered tray|wall (art|decor)|jigsaw|mechanical|shelf|bookcase|bookshelf|furniture)\b/i;
+const TOY_FOREIGN = /[äöüßñáéíóúàèìòùâêîôûçœæ]|\b(aus|für|mit|und|der|die|das|holz|bois|madera|bloques|bausatz|geschenk|personalisiert\w*|puppenhaus|spielzeug|holzpuzzle|puzzle en|pareja|para)\b/i;
 const CRAFT_NOT_SUPPLY = /\b(dress|dresses|shirts?|tees?|t-shirts?|blouses?|skirts?|pants|trousers|jackets?|coats?|sweaters?|cardigans?|hoodies?|socks?|scarf|scarves|shawls?|hats?|beanies?|gloves|mittens|bikinis?|swimsuits?|pajamas?|nightgowns?|robes?|jeans|shorts|rompers?|jumpsuits?|bras?|underwear|costumes?|jewelry|earrings?|necklaces?|bracelets?|rings?|toys?|dolls?|ornaments?|pillows?|blankets?|wall art|prints?|paintings?|tapestry|decor)\b/i;
 const CRAFT_SUPPLY = /\b(fabric|fabrics|yarn|yarns|skeins?|roving|felt sheets?|thread|fat quarters?|by the (yard|metre|meter)|batting|bolts?|remnants?|notions?|kits?|needles?|hooks?|supplies|supply|machines?|bobbins?|paint set|paints|brush(es)?|clay|dough|crayons?|beads?|loom|stitch markers?|serger|scissors|cardstock|craft paper|sketchbook|blank)\b/i;
 function shopSubFor(k, r){ const g = SHOP_GROUPS.find(x => x[0] === k), keys = g && g[5] ? g[5].map(x => x[0]) : []; const t = `${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`; const m = SHOP_SUB_WORDS.find(([sk, re]) => keys.includes(sk) && re.test(t)); return m ? m[0] : ''; }
@@ -2330,6 +2333,7 @@ function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
   // craft sections show supplies, not finished clothes, toys or jewelry: a listing that reads as a garment needs a supply word (fabric, yarn, kit, notions...) to stay
   if ((k === 'art' || k === 'kidsart') && CRAFT_NOT_SUPPLY.test(`${r.name} ${r.ptype || ''}`) && !CRAFT_SUPPLY.test(`${r.name} ${r.ptype || ''}`)) return;
+  if (k === 'dolls' && (TOY_NOT.test(`${r.name} ${r.ptype || ''}`) || TOY_FOREIGN.test(r.name || ''))) return;
   if (k === 'kidsart' && /\b(vintage|antique|singer|retro|1[89]\d\d|19[0-9]0s)\b/i.test(`${r.name} ${r.ptype || ''}`)) return; // kids' crafts: no old adult machines
   SHOP.push(reg({id: 'shop-' + (r.domain || 'etsy') + '-' + (r.handle || r.url), kind: 'shop', group: k, sub: shopSubFor(k, r) || (sub && (SHOP_SUB_WORDS.find(x => x[0] === sub) || [, /./])[1].test(`${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`) ? sub : ''), name: r.name, brand: r.vendor || 'Etsy seller', store: r.store || 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
 }
