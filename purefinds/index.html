@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.65">
+<meta name="pf-version" content="1.18.66">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.65';
+const VERSION = '1.18.66';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -916,7 +916,7 @@ const BADGE_PART = /^(no|non|free|why|learn|made|gluten|vegan|kosher|certified|u
 const dropBadges = t => { if (!t) return t; const parts = String(t).split(/\s*,\s*/); while (parts.length > 1 && BADGE_PART.test(parts[parts.length - 1].trim())) parts.pop(); return parts.join(', '); };
 const okIng = (t, src) => {
   if (!looksLikeIngredients(t)) return false;
-  if (/Open Food Facts|USDA|Pasted by you/i.test(src || '')) return true; // shopper-entered and government lists are lenient
+  if (/Open Food Facts|USDA|Pasted by you|Added to PureFinds/i.test(src || '')) return true; // shopper-entered and government lists are lenient
   t = String(t);
   if (t.split(/\s+/).length <= 6 && /\b(list|label|below|tab|click|here)\b/i.test(t)) return false; // page words like "list and", not ingredients
   if (/[a-z)]\.\s+[A-Z*]/.test(t) || MARKETING.test(t)) return false;
@@ -931,6 +931,9 @@ const tidyIng = t => String(t || '').replace(/[\s.]*\ballergens?\b[\s:.]*$/i, ''
 try { localStorage.removeItem('pf_ingCache'); localStorage.removeItem('pf_ruledOut'); } catch(e){}
 let ingCache = store.get('ingCache2', {});
 let userBan = store.get('userBan1', {}); // listings removed because of a list you pasted: kept so you can retry them
+// Ingredient lists everyone shares: you paste one with your passcode, the scanner stores it, and every visitor sees the result
+let sharedIng = {}, sharedBan = {}, sharedOn = false, ingPass = store.get('ingPass1', '');
+const sharedReady = (async () => { if (!scanBase()) return; try { const r = await getJSON(`${scanBase()}/shared`, 8000); sharedOn = !!r.on; for (const [u, v] of Object.entries(r.items || {})){ if (v.ban) sharedBan[u] = v.ban; else if (v.ing) sharedIng[u] = v.ing; } } catch (e){} })();
 let userIng = store.get('userIng1', {}); // ingredient lists you pasted from a brand's official page: they win over anything the scanner reads
 let ruledOut = store.get('ruledOut2', {});
 // Products whose ingredients could not be read anywhere are not shown. They are tried again after a week.
@@ -958,6 +961,9 @@ const ingFull = f => !!f.ing && !/partial|^Begins|^Includes/.test(`${f.ingSrc ||
 const SHOW_NOING = store.get('showNoIng', false); // optional: keep foods whose ingredient list can't be read (marked unverified)
 const markNoIng = it => { if (SHOW_NOING) return; noIng[it.url] = Date.now(); store.set('noIng1', noIng); const i = FOODS.indexOf(it); if (i >= 0) FOODS.splice(i, 1); };
 if (!SHOW_NOING) for (let i = FOODS.length - 1; i >= 0; i--) if (noIng[FOODS[i].url]) FOODS.splice(i, 1);
+sharedReady.then(() => { let ch = false; for (let i = FOODS.length - 1; i >= 0; i--){ const f = FOODS[i];
+  if (sharedBan[f.url]){ FOODS.splice(i, 1); ch = true; } else if (sharedIng[f.url] && !userIng[f.url] && f.ing !== sharedIng[f.url]){ Object.assign(f, {ing: sharedIng[f.url], ingSrc: 'Added to PureFinds', pop: 1, titleVouched: false}); ch = true; } }
+  if (ch) try { rerender(); } catch (e){} });
 for (const u in ingCache){ if (!okIng(ingCache[u].ing, ingCache[u].src)) delete ingCache[u]; else ingCache[u].ing = tidyIng(ingCache[u].ing); }
 FOODS.forEach(f => { const c = ingCache[f.url]; if (c && (!f.ing || /partial|^Begins|^Includes/.test(`${f.ingSrc || ''} ${f.ing}`))) { f.ing = c.ing; f.ingSrc = c.src; f.pop = 1; } });
 const RULE_REASON = {language: 'ingredients not written in English, so they can’t be checked', fruit: 'a fruit you don’t allow (cranberries, pineapple, oranges, lemons and a few others)', nuts: 'nuts other than walnuts and almonds', oil: 'an oil other than coconut, olive, grapeseed or avocado', corn: 'corn', wheat: 'wheat', oats: 'oats', banned: 'baking soda or baking powder, beets, rice (white, brown, black and all other rice), flax, pumpkin, sunflower, potato (sweet potato too), cassava, cranberries, carrots, spinach, cauliflower, black beans, kidney beans, black pepper, soy, peppermint or natural flavor', tea: 'green tea or matcha', sweetener: 'a sweetener other than maple, date or coconut sugar', chocolate: 'chocolate without cocoa or cacao in its ingredients'};
@@ -999,11 +1005,12 @@ function addScanned(type, rows){
       if (/materials/i.test(r.ingSrc || '')) r.ing = ''; // Etsy's "materials" box holds search tags, not ingredients
     }
     if (type === 'cotton' && r.store === 'Etsy' && ETSY_NOT_CLOTHES.test(`${r.name || ''}`)) continue;
-    if (type === 'food' && userIng[r.url]){ r.ing = userIng[r.url]; r.ingSrc = 'Pasted by you'; }
+    const ui = userIng[r.url] || sharedIng[r.url];
+    if (type === 'food' && ui){ r.ing = ui; r.ingSrc = userIng[r.url] ? 'Pasted by you' : 'Added to PureFinds'; }
     const id = 's-' + r.domain + '-' + r.handle;
     if (type === 'food' && NOT_A_SNACK.test(r.name || '')) { logRemoved(r.name, r.store, r.url, null, 'not a food item (gift set, merch or bundle)'); continue; }
     if (type === 'food' && NOT_FOOD_THING.test(`${r.name || ''} ${r.ptype || ''}`)) { logRemoved(r.name, r.store, r.url, null, 'not food (kitchen tool, book or merch)'); continue; }
-    if (REG.has(id) || ruledOut[r.url] || (!SHOW_NOING && noIng[r.url] && !userIng[r.url])) { if (type === 'food' && !REG.has(id)) logRemoved(r.name, r.store, r.url, null, ruledOut[r.url] ? 'banned: ' + ruledOut[r.url] : 'no readable ingredients (checked earlier)'); continue; }
+    if (REG.has(id) || ruledOut[r.url] || sharedBan[r.url] || (!SHOW_NOING && noIng[r.url] && !ui)) { if (type === 'food' && !REG.has(id)) logRemoved(r.name, r.store, r.url, null, (ruledOut[r.url] || sharedBan[r.url]) ? 'banned: ' + (ruledOut[r.url] || sharedBan[r.url]) : 'no readable ingredients (checked earlier)'); continue; }
     if (type === 'cotton'){
       if (COTTON.some(c => c.url === r.url)) continue;
       const t = clothingType(`${r.name} ${r.ptype}`);
@@ -1037,6 +1044,20 @@ function addScanned(type, rows){
 let resolving = false;
 const removedLog = []; // foods taken out this session, with the reason, shown in the copied report
 const logRemoved = (name, store, url, cats, reason, ing) => { if (!removedLog.some(x => x.url === url)) removedLog.push({name, store, url, cats: cats || foodCats(name), reason, ing: String(ing || '').slice(0, 140)}); };
+// Send a result to the scanner so every visitor gets it. Needs the passcode you set on the Worker (ING_PASS); without it the change stays on this device only.
+async function shareIng(url, body){
+  if (!scanBase() || !sharedOn){ toast('Saved on this device only: the shared storage isn’t set up on the scanner yet.', 5000); return false; }
+  if (!ingPass){ toast('Saved on this device only: enter the passcode to share it with everyone.', 5000); return false; }
+  try {
+    const r = await fetch(`${scanBase()}/shared`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify({pass: ingPass, url, ...body})});
+    const j = await r.json().catch(() => ({}));
+    if (r.status === 403){ ingPass = ''; store.set('ingPass1', ''); toast('That passcode was not accepted, so this stayed on this device only. Enter it again.', 6000); return false; }
+    if (!r.ok) throw new Error(j.error || 'HTTP ' + r.status);
+    if (body.clear){ delete sharedIng[url]; delete sharedBan[url]; } else if (body.ban){ sharedBan[url] = body.ban; delete sharedIng[url]; } else { sharedIng[url] = body.ing; delete sharedBan[url]; }
+    toast('Shared with everyone using PureFinds.', 4000); return true;
+  } catch (e){ toast('Saved on this device only. The scanner didn’t take it: ' + (e.message || e), 7000); return false; }
+}
+const passField = () => (sharedOn && !ingPass) ? `<input class="field" type="password" data-rpass autocomplete="off" placeholder="Passcode to share with everyone" style="margin:0 0 8px;width:100%">` : '';
 function reportIngredients(url, name, cats, raw){
   const text = tidyIng(String(raw || '').replace(/^\s*ingredients?\s*[:\-]?\s*/i, ''));
   if (!text || !looksLikeIngredients(text)) { toast('That doesn’t look like an ingredient list. Paste the list exactly as the official page shows it.', 5000); return false; }
@@ -1045,36 +1066,36 @@ function reportIngredients(url, name, cats, raw){
     ruledOut[url] = why; store.set('ruledOut2', ruledOut); delete userIng[url]; store.set('userIng1', userIng); userBan[url] = 1; store.set('userBan1', userBan);
     if (i >= 0) FOODS.splice(i, 1);
     if (k >= 0) removedLog[k] = {...removedLog[k], reason: 'banned: ' + why + ' (from the ingredients you pasted)', ing: text.slice(0, 140)}; else logRemoved(name, '', url, cats, 'banned: ' + why + ' (from the ingredients you pasted)', text);
-    toast(`Removed “${String(name).slice(0, 40)}”: it contains ${why}.`, 6000);
+    toast(`Removed “${String(name).slice(0, 40)}”: it contains ${why}.`, 6000); shareIng(url, {ban: why, ing: text.slice(0, 600)});
   } else {
     userIng[url] = text; store.set('userIng1', userIng); delete noIng[url]; store.set('noIng1', noIng); delete ruledOut[url]; store.set('ruledOut2', ruledOut); delete userBan[url]; store.set('userBan1', userBan);
     if (k >= 0) removedLog.splice(k, 1);
-    if (i >= 0){ Object.assign(FOODS[i], {ing: text, ingSrc: 'Pasted by you', pop: 1, titleVouched: false}); toast('Added. No banned ingredient found, so it stays.', 4500); }
-    else { toast('Added. It passes your rules. Reloading to bring it back…', 4000); setTimeout(() => location.reload(), 1200); return true; }
+    if (i >= 0){ Object.assign(FOODS[i], {ing: text, ingSrc: 'Pasted by you', pop: 1, titleVouched: false}); toast('Added. No banned ingredient found, so it stays.', 4500); shareIng(url, {ing: text}); }
+    else { toast('Added. It passes your rules. Reloading to bring it back…', 4000); shareIng(url, {ing: text}).then(() => setTimeout(() => location.reload(), 600)); return true; }
   }
   if ($('#scrim').classList.contains('on')) closeModal();
   rerender(); return true;
 }
-const reportBox = it => (it.kind === 'food' && it.ingSrc === 'Pasted by you')
-  ? `<div class="note" style="margin:0"><b>You pasted this list.</b> It is saved in this browser only, so nobody else sees it and it doesn’t change anything for anyone else. Wrong or incomplete? Fix the text and check it again, or undo it.
-     <textarea class="field" rows="3" data-rtext style="margin:8px 0;width:100%;resize:vertical">${esc(it.ing || '')}</textarea>
+const reportBox = it => (it.kind === 'food' && /^(Pasted by you|Added to PureFinds)$/.test(it.ingSrc || ''))
+  ? `<div class="note" style="margin:0"><b>${it.ingSrc === 'Pasted by you' ? 'You pasted this list.' : 'This list was added to PureFinds.'}</b> ${sharedIng[it.url] ? 'Everyone sees it.' : 'Saved in this browser until you share it with the passcode.'} Wrong or incomplete? Fix the text and check it again, or undo it.
+     <textarea class="field" rows="3" data-rtext style="margin:8px 0;width:100%;resize:vertical">${esc(it.ing || '')}</textarea>${passField()}
      <button class="btn sm go" type="button" data-report="${esc(it.url)}" data-rname="${esc(it.name)}">Check again</button> <button class="btn sm" type="button" data-undoing="${esc(it.url)}">Undo my ingredients</button></div>`
   : (it.kind === 'food' && it.src === 'brand' && (!it.ing || it.titleVouched || !ingFull(it)))
   ? `<div class="note" style="margin:0"><b>Ingredients not found?</b> Open the official page, copy the ingredient list and paste it here. If it breaks no rule, this listing gets the ingredients. If it does, it is removed.
-     <textarea class="field" rows="3" data-rtext placeholder="Paste the ingredients exactly as the official page lists them" style="margin:8px 0;width:100%;resize:vertical"></textarea>
+     <textarea class="field" rows="3" data-rtext placeholder="Paste the ingredients exactly as the official page lists them" style="margin:8px 0;width:100%;resize:vertical"></textarea>${passField()}
      <button class="btn sm go" type="button" data-report="${esc(it.url)}" data-rname="${esc(it.name)}">Check these ingredients</button></div>` : '';
 const hiddenPanel = key => {
   const cat = FCATS[key]; if (!cat) return '';
-  const rows = removedLog.filter(x => ((/no readable/.test(x.reason) && !ruledOut[x.url]) || /you pasted/.test(x.reason) || userBan[x.url]) && !TITLE_JUNK.test(x.name) && !NOT_FOOD_THING.test(x.name) && (!cat[4] || cat[4].test(x.name) || titleSays(key, x.name))).slice(0, 60);
+  const rows = removedLog.filter(x => ((/no readable/.test(x.reason) && !ruledOut[x.url]) || /you pasted/.test(x.reason) || userBan[x.url] || sharedBan[x.url]) && !TITLE_JUNK.test(x.name) && !NOT_FOOD_THING.test(x.name) && (!cat[4] || cat[4].test(x.name) || titleSays(key, x.name))).slice(0, 60);
   if (!rows.length) return '';
   return `<details class="fold" style="margin-top:14px"><summary>${rows.length} found but hidden because their ingredients couldn’t be read, or because a list you pasted broke a rule. Report or retry them.</summary>
     <p class="meta">Open the official page, copy the ingredient list and paste it under the product. No banned ingredient: it comes back. A banned one: it stays out until you paste a corrected list, so a wrong paste can be retried here. Your pastes are saved in this browser only.</p>
     ${rows.map(x => `<div class="note" style="margin:8px 0"><b>${esc(x.name)}</b> <span class="meta">${esc(x.store || '')}</span> <a href="${esc(x.url)}" target="_blank" rel="noopener">Official page ↗</a>
-      <textarea class="field" rows="2" data-rtext placeholder="Paste the ingredients" style="margin:6px 0;width:100%;resize:vertical"></textarea>
+      <textarea class="field" rows="2" data-rtext placeholder="Paste the ingredients" style="margin:6px 0;width:100%;resize:vertical"></textarea>${passField()}
       <button class="btn sm go" type="button" data-report="${esc(x.url)}" data-rname="${esc(x.name)}">Check these ingredients</button></div>`).join('')}</details>`;
 };
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-report]'); if (!b) return; const ta = b.parentElement.querySelector('[data-rtext]'); reportIngredients(b.dataset.report, b.dataset.rname, null, ta ? ta.value : ''); });
-document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-undoing]'); if (!b) return; const url = b.dataset.undoing; delete userIng[url]; store.set('userIng1', userIng); const f = FOODS.find(x => x.url === url); if (f){ delete f.ing; delete f.ingSrc; } delete ingCache[url]; store.set('ingCache2', ingCache); if ($('#scrim').classList.contains('on')) closeModal(); toast('Your pasted ingredients were removed. The listing is back to how it was.', 4500); rerender(); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-report]'); if (!b) return; const pf = b.parentElement.querySelector('[data-rpass]'); if (pf && pf.value.trim()){ ingPass = pf.value.trim(); store.set('ingPass1', ingPass); } const ta = b.parentElement.querySelector('[data-rtext]'); reportIngredients(b.dataset.report, b.dataset.rname, null, ta ? ta.value : ''); });
+document.addEventListener('click', e => { const b = e.target.closest && e.target.closest('[data-undoing]'); if (!b) return; const url = b.dataset.undoing; const pf = b.parentElement.querySelector('[data-rpass]'); if (pf && pf.value.trim()){ ingPass = pf.value.trim(); store.set('ingPass1', ingPass); } if (sharedIng[url] || sharedBan[url]) shareIng(url, {clear: 1}); delete userIng[url]; store.set('userIng1', userIng); const f = FOODS.find(x => x.url === url); if (f){ delete f.ing; delete f.ingSrc; } delete ingCache[url]; store.set('ingCache2', ingCache); if ($('#scrim').classList.contains('on')) closeModal(); toast('Your pasted ingredients were removed. The listing is back to how it was.', 4500); rerender(); });
 window.__pf = {get scanState(){ return scanState; }, get FOODS(){ return FOODS; }, get ruledOut(){ return ruledOut; }, get userIng(){ return userIng; }};
 const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscription|sampler|bundle|\bt-?shirt\b/i;
 // Kitchen tools, books and merch that stores sell next to their food (a baking scale, a banneton, a cookbook) are never food
@@ -1130,7 +1151,7 @@ async function scanEtsy(st, type = 'cotton'){
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else try { rows = await translateRows((await getJSON(`${scanBase()}/etsy?v=2&type=${type}&q=${encodeURIComponent(q)}`, 25000)).items || []); store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ etsyNote = errText(e); if (/not set up|501/.test(etsyNote)) return; continue; }
-    etsySeen += rows.length; const n = addScanned(type, rows); etsyAdded += n; st.added += n;
+    await sharedReady; etsySeen += rows.length; const n = addScanned(type, rows); etsyAdded += n; st.added += n;
   }
   if (!etsyNote) etsyNote = 'ok';
 }
@@ -1147,7 +1168,7 @@ async function scanKroger(st){
     else { if (/not set up|501/.test(krogerNote)) return;
       try { rows = (await getJSON(`${scanBase()}/kroger?v=2&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
       catch (e){ krogerNote = errText(e); continue; } }
-    krogerSeen += rows.length; const n = addScanned('food', rows); krogerAdded += n; st.added += n;
+    await sharedReady; krogerSeen += rows.length; const n = addScanned('food', rows); krogerAdded += n; st.added += n;
   } }));
   if (!krogerNote) krogerNote = 'ok';
 }
@@ -1172,7 +1193,7 @@ async function scanType(type){
         try { rows = (await getJSON(`${scanBase()}/store?d=${encodeURIComponent(d)}&type=${type}`, 30000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
         catch (e){ if (!/not on the PureFinds list/.test(errText(e))) st.errors.push(`${name}: ${errText(e)}`); }
       }
-      st.added += addScanned(type, rows); st.done++; scanNote();
+      await sharedReady; st.added += addScanned(type, rows); st.done++; scanNote();
     }
   }));
   await scanEtsy(st, type);

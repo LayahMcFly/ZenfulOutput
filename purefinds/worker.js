@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.17';
+const VERSION = '1.9.18';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -54,7 +54,7 @@ STORES.shop = [['baronfig.com', 'Baron Fig'], ['blackwing602.com', 'Blackwing'],
 const ALLOWED = new Map();
 for (const [domain, name] of [...STORES.cotton, ...STORES.food, ...STORES.beauty, ...STORES.shop]) ALLOWED.set(domain, name);
 
-const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'};
+const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, POST, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'};
 const json = (o, status = 200, maxAge = 1800) => new Response(JSON.stringify(o), {
   status, headers: {'Content-Type': 'application/json; charset=utf-8', 'Cache-Control': `public, max-age=${maxAge}`, ...CORS}
 });
@@ -67,6 +67,24 @@ export default {
     if (req.method === 'OPTIONS') return new Response(null, {headers: CORS});
     const u = new URL(req.url);
     try {
+      if (u.pathname === '/shared'){ // ingredient lists shared with every visitor: needs a KV binding named ING and a secret named ING_PASS
+        if (!env.ING) return json({on: false, items: {}}, 200, 0);
+        const all = JSON.parse((await env.ING.get('all')) || '{}');
+        if (req.method === 'GET') return json({on: true, items: all}, 200, 20);
+        if (req.method !== 'POST') return json({error: 'Use GET or POST'}, 405, 0);
+        if (!env.ING_PASS) return json({error: 'No passcode is set: add a Worker secret named ING_PASS.'}, 501, 0);
+        let b; try { b = await req.json(); } catch (e){ return json({error: 'Send JSON'}, 400, 0); }
+        if (String(b.pass || '') !== String(env.ING_PASS)) return json({error: 'Wrong passcode'}, 403, 0);
+        let host = ''; try { host = new URL(String(b.url)).hostname.replace(/^www\./, ''); } catch (e){}
+        if (!ALLOWED.has(host)) return json({error: 'That store is not on the PureFinds list'}, 400, 0);
+        const key = String(b.url).slice(0, 400);
+        if (b.clear) delete all[key];
+        else if (b.ban) all[key] = {ban: String(b.ban).slice(0, 80), ing: String(b.ing || '').slice(0, 600), t: Date.now()};
+        else if (b.ing && String(b.ing).length >= 3) all[key] = {ing: String(b.ing).slice(0, 4000), t: Date.now()};
+        else return json({error: 'Nothing to save'}, 400, 0);
+        await env.ING.put('all', JSON.stringify(all));
+        return json({ok: true, count: Object.keys(all).length}, 200, 0);
+      }
       if (u.pathname === '/' || u.pathname === '/stores') return json({version: VERSION, stores: STORES}, 200, 300);
       if (u.pathname === '/store'){
         const d = (u.searchParams.get('d') || '').toLowerCase(), type = u.searchParams.get('type');
