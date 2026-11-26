@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.66">
+<meta name="pf-version" content="1.18.68">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.66';
+const VERSION = '1.18.68';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1528,6 +1528,16 @@ async function homeBeautyPics(){
   const picks = pick(rows, 2, seed + 23);
   slots.forEach((el, i) => { const r = picks[i]; if (r && el.isConnected){ const a = el.querySelector('.art'); if (a) a.outerHTML = `<img src="${esc(sized(r.img))}" alt="Beauty Closet" loading="lazy">`; } });
 }
+// Discover's Beauty Closet and Little Shop tiles show photos too, like the section pages
+const HOME_SUB = {beauty: 'Skin, face, nail and hair care with a clean-ingredient check', shop: 'School things, art, dolls and random finds from Etsy'};
+function homeSwapTile(go, title, pics, icon){ const el = document.querySelector(`.hub .htile[data-go="${go}"]`); if (el && pics.length) el.outerHTML = hubTile({go, title, sub: HOME_SUB[go], items: pics, item: pics[0], icon}, go === 'shop' ? 0 : 3); }
+const shopHomeTile = () => homeSwapTile('shop', 'The Little Shop', SHOP.filter(x => x.img).sort(() => .5 - Math.random()).slice(0, 6), '');
+async function homeTilePics(){
+  shopHomeTile(); shopPreview();
+  let rows = BEAUTY.ok.filter(x => x.img); for (const [d] of BEAUTY_STORES){ const hit = store.get('beauty1|' + d, null); if (hit && hit.items) rows = rows.concat(hit.items.filter(r => r.img)); }
+  if (rows.length < 3 && scanBase()) try { rows = rows.concat(((await getJSON(`${scanBase()}/store?d=${BEAUTY_STORES[0][0]}&type=beauty&v=1`, 15000)).items || []).filter(r => r.img)); } catch (e){}
+  homeSwapTile('beauty', 'Beauty Closet', pick(rows, 6, seed + 31), '');
+}
 function home(){
   // the top picture row shows all three shops: clothes, food and beauty, in turn
   const heroC = pick(cottonV(), 2, seed + 21), heroF = pick(foodsV().filter(f => f.img), 2, seed + 22);
@@ -1555,7 +1565,7 @@ function home(){
   <section class="blk">${sh('100% Cotton Only', `${cottonV().length} pieces, each fabric line quoted from the brand. Checked ${CHECKED}.`, '<a class="link" href="#cotton">Open the Natural Closet →</a>')}<div class="rail">${pick(cottonV(), 10, seed + 7).map(card).join('')}</div></section>
   <section class="blk">${sh('Outfit Ideas', 'Whole outfits built from verified cotton pieces on Etsy.', '<a class="link" href="#cotton-outfits">All outfits →</a>')}<div class="outfits">${outfitList().slice(0, 3).map(outfit).join('')}</div></section>
   <section class="blk">${sh('Shop by aesthetic')}<div class="tiles">${STYLES.slice(0, 10).map(tile).join('')}</div></section>`;
-  homeBeautyPics();
+  homeBeautyPics(); homeTilePics();
   loadHomeFood();
 }
 let bestPool = foodsV();
@@ -2281,7 +2291,7 @@ let beautyShown = {key: '', urls: new Set()};
 function beautyPaint(force){
   if (force) beautyShown = {key: '', urls: new Set()};
   const hub = document.getElementById('bhub');
-  if (hub){ const sig = BEAUTY_GROUPS.map(g => BEAUTY.ok.filter(x => g[3].includes(x.kindB) && x.img).slice(0, 6).map(x => x.url).join('|')).join('~'); if (sig !== beautyTileSig){ beautyTileSig = sig; hub.innerHTML = beautyTiles(); } }
+  if (hub){ const sig = BEAUTY_GROUPS.map(g => BEAUTY.ok.filter(x => g[3].includes(x.kindB) && x.img).slice(0, 6).map(x => x.url).join('|') + '#' + BEAUTY.raw.filter(x => !x.done && x.img && g[3].includes(beautyKind(x))).length).join('~'); if (sig !== beautyTileSig){ beautyTileSig = sig; hub.innerHTML = beautyTiles(); } }
   const list = document.getElementById('blist'); if (!list) return;
   const items = BEAUTY.ok.filter(x => beautyIn(x.kindB) && (BEAUTY.cert === 'any' || (BEAUTY.cert === 'organic' && x.isOrg) || (BEAUTY.cert === 'nongmo' && x.isNG) || (BEAUTY.cert === 'both' && x.isOrg && x.isNG)));
   const left = BEAUTY.raw.filter(x => !x.done && (beautyIn(beautyKind(x)))).length;
@@ -2312,8 +2322,8 @@ const BEAUTY_ICONS = {
   orgonite: '<path d="M24 6l10 12-10 24L14 18z"/><path d="M14 18h20M19 12l5 30M29 12l-5 30"/>',
   bags: '<path d="M10 18h28l3 22H7z"/><path d="M17 18v-4a7 7 0 0 1 14 0v4"/>',
   nail: '<rect x="18" y="22" width="12" height="18" rx="3"/><path d="M21 22v-8h6v8M22 14l2-7 2 7"/>'};
-const beautyTiles = () => BEAUTY_GROUPS.map(([k, name, sub, kinds], i) => { const pics = BEAUTY.ok.filter(x => kinds.includes(x.kindB) && x.img).slice(0, 6);
-  return hubTile({go: 'beauty-' + k, title: name, sub, items: pics, icon: BEAUTY_ICONS[k]}, i); }).join('');
+const beautyTiles = () => BEAUTY_GROUPS.map(([k, name, sub, kinds], i) => { let pics = BEAUTY.ok.filter(x => kinds.includes(x.kindB) && x.img).slice(0, 6); if (!pics.length) pics = BEAUTY.raw.filter(x => !x.done && x.img && kinds.includes(beautyKind(x))).slice(0, 6); // photos from products still being checked, until checked ones arrive
+  return hubTile({go: 'beauty-' + k, title: name, sub, items: pics, item: pics[0], icon: BEAUTY_ICONS[k]}, i); }).join('');
 let beautyTileSig = '';
 function beautyHub(){
   BEAUTY.kinds = null; BEAUTY.sub = 'all'; beautyTileSig = '';
@@ -2484,7 +2494,25 @@ function listReport(items){
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-copylist]')) copyText(listReport(listShown)); });
 function shopHub(){
   main.innerHTML = `<div class="pagehead"><h1>The Little Shop</h1><p>School things, art supplies, plushies, dolls and random finds from Etsy and official brand websites. The rules here are looser than in the closets, except plushies, which follow the same 100% natural fabric rules as the clothes. Pick a section to start.</p></div>
-  <div class="hub">${SHOP_GROUPS.map(([k, name, sub, , icon], i) => hubTile({go: 'shop-' + k, title: name, sub, items: SHOP.filter(x => x.group === k && x.img), icon}, i)).join('')}</div>`;
+  <div class="hub" id="shub">${shopTiles()}</div>`;
+  shopPreview();
+}
+const shopTiles = () => SHOP_GROUPS.map(([k, name, sub, , icon], i) => { const pics = SHOP.filter(x => x.group === k && x.img); return hubTile({go: 'shop-' + k, title: name, sub, items: pics, item: pics[0], icon}, i); }).join('');
+// The hub shows a photo on every section tile: one search per section runs in the background (two at a time) and each tile fills in as its photos arrive
+let shopPreviewed = false;
+async function shopPreview(){
+  if (!scanBase()) return;
+  const jobs = SHOP_GROUPS.filter(g => !SHOP.some(x => x.group === g[0] && x.img)).map(g => [g[0], g[5] ? g[5][0][2][0] : g[3][0], g[5] ? g[5][0][0] : '']);
+  if (!jobs.length || shopPreviewed) return; shopPreviewed = true;
+  let i = 0;
+  const w = async () => { while (i < jobs.length){
+    const [k, q, sub] = jobs[i++], key = 'etsy6|shop|' + q, hit = store.get(key, null); let rows;
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else try { rows = (await shopGet(`${scanBase()}/etsy?v=4&type=shop&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); } catch (e){ continue; }
+    rows.forEach(r => shopAccept(r, k, sub));
+    const hub = document.getElementById('shub'); if (hub) hub.innerHTML = shopTiles(); shopHomeTile();
+  } };
+  await Promise.all([w(), w()]); shopPreviewed = false;
 }
 function shopSection(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g) return shopHub();
