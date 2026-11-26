@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.14';
+const VERSION = '1.9.15';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -48,7 +48,7 @@ const STORES = {
 // Beauty Closet: skin, face, nail and hair care. Each is a Shopify store (checked); ingredient lists are read from the product pages.
 STORES.beauty = [['carolsdaughter.com', "Carol's Daughter"], ['anua.com', 'ANUA'], ['herbivorebotanicals.com', 'Herbivore'], ['www.100percentpure.com', '100% Pure']];
 // The Little Shop: official brand stores for school things, art, sewing and knitting, and toys. Each is read as a Shopify store; any that can't be read show up in the front-end status note.
-STORES.shop = [['baronfig.com', 'Baron Fig'], ['fieldnotesbrand.com', 'Field Notes'], ['blackwing602.com', 'Blackwing'], ['leuchtturm1917.us', 'Leuchtturm1917'], ['cwpencils.com', 'CW Pencil Enterprise'],
+STORES.shop = [['baronfig.com', 'Baron Fig'], ['blackwing602.com', 'Blackwing'], ['leuchtturm1917.us', 'Leuchtturm1917'],
   ['greenkidcrafts.com', 'Green Kid Crafts'], ['madelinetosh.com', 'Madelinetosh'], ['purlsoho.com', 'Purl Soho'],
   ['bellalunatoys.com', 'Bella Luna Toys'], ['camdenrose.com', 'Camden Rose'], ['plantoysusa.com', 'PlanToys'], ['grimms.eu', 'Grimm’s'], ['haba-usa.com', 'HABA USA'], ['kinderfeets.com', 'Kinderfeets']];
 const ALLOWED = new Map();

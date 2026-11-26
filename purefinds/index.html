@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.51">
+<meta name="pf-version" content="1.18.54">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.51';
+const VERSION = '1.18.54';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2314,7 +2314,7 @@ const SHOP_GROUPS = [
   ['random', 'Random finds', 'Handmade gifts, stationery, decor and unusual things', ['handmade gift', 'unique handmade find', 'handmade home decor', 'stationery set', 'tote bag', 'keychain handmade', 'wooden gift', 'handmade ornament'], '<path d="M8 20h32v22H8z"/><path d="M4 12h40v8H4zM24 12v30"/><path d="M24 12c-6-8-14-4-10 0M24 12c6-8 14-4 10 0"/>']
 ];
 // Official brand stores for each Little Shop section (read through the scanner, like the clothing and food stores)
-const SHOP_STORES = {school: ['baronfig.com', 'fieldnotesbrand.com', 'blackwing602.com', 'leuchtturm1917.us', 'cwpencils.com'], kidsart: ['greenkidcrafts.com'], art: ['madelinetosh.com', 'purlsoho.com'],
+const SHOP_STORES = {school: ['baronfig.com', 'blackwing602.com', 'leuchtturm1917.us'], kidsart: ['greenkidcrafts.com'], art: ['madelinetosh.com', 'purlsoho.com'],
   plush: ['bellalunatoys.com', 'camdenrose.com'], dolls: ['bellalunatoys.com', 'camdenrose.com', 'plantoysusa.com', 'grimms.eu', 'haba-usa.com', 'kinderfeets.com'], random: []};
 // Which chip a brand store's product belongs under, from the words in its name and type
 const SHOP_SUB_WORDS = [['bags', /bag|backpack|satchel|lunch/i], ['pencils', /pencil|eraser|sharpener/i], ['pens', /\bpens?\b|marker|highlighter/i], ['rulers', /ruler|protractor|compass|geometry|abacus|calculator/i], ['notebooks', /notebook|journal|planner|pad\b|sketchbook|index card/i],
@@ -2322,9 +2322,13 @@ const SHOP_SUB_WORDS = [['bags', /bag|backpack|satchel|lunch/i], ['pencils', /pe
 const SHOP_SUBS = {}; // filled from SHOP_GROUPS below
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
 const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic: 'Plastic', other: 'Other'}, TOY_RANK = {wood: 0, metal: 0, soft: 0, other: 1, plastic: 2};
+const CRAFT_NOT_SUPPLY = /\b(dress|dresses|shirts?|tees?|t-shirts?|blouses?|skirts?|pants|trousers|jackets?|coats?|sweaters?|cardigans?|hoodies?|socks?|scarf|scarves|shawls?|hats?|beanies?|gloves|mittens|bikinis?|swimsuits?|pajamas?|nightgowns?|robes?|jeans|shorts|rompers?|jumpsuits?|bras?|underwear|costumes?|jewelry|earrings?|necklaces?|bracelets?|rings?|toys?|dolls?|ornaments?|pillows?|blankets?|wall art|prints?|paintings?|tapestry|decor)\b/i;
+const CRAFT_SUPPLY = /\b(fabric|fabrics|yarn|yarns|skeins?|roving|felt sheets?|thread|fat quarters?|by the (yard|metre|meter)|batting|bolts?|remnants?|notions?|kits?|needles?|hooks?|supplies|supply|machines?|bobbins?|paint set|paints|brush(es)?|clay|dough|crayons?|beads?|loom|stitch markers?|serger|scissors|cardstock|craft paper|sketchbook|blank)\b/i;
 function shopSubFor(k, r){ const g = SHOP_GROUPS.find(x => x[0] === k), keys = g && g[5] ? g[5].map(x => x[0]) : []; const t = `${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`; const m = SHOP_SUB_WORDS.find(([sk, re]) => keys.includes(sk) && re.test(t)); return m ? m[0] : ''; }
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
+  // craft sections show supplies, not finished clothes, toys or jewelry: a listing that reads as a garment needs a supply word (fabric, yarn, kit, notions...) to stay
+  if ((k === 'art' || k === 'kidsart') && CRAFT_NOT_SUPPLY.test(`${r.name} ${r.ptype || ''}`) && !CRAFT_SUPPLY.test(`${r.name} ${r.ptype || ''}`)) return;
   if (k === 'kidsart' && /\b(vintage|antique|singer|retro|1[89]\d\d|19[0-9]0s)\b/i.test(`${r.name} ${r.ptype || ''}`)) return; // kids' crafts: no old adult machines
   SHOP.push(reg({id: 'shop-' + (r.domain || 'etsy') + '-' + (r.handle || r.url), kind: 'shop', group: k, sub: shopSubFor(k, r) || (sub && (SHOP_SUB_WORDS.find(x => x[0] === sub) || [, /./])[1].test(`${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`) ? sub : ''), name: r.name, brand: r.vendor || 'Etsy seller', store: r.store || 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
 }
@@ -2371,6 +2375,7 @@ function shopPaint(k){
   } else if (items.length){
     shopShown = {k, urls: new Set(items.map(x => x.url))}; list.innerHTML = `<div class="grid">${shuf(items, hubSeed + 7).sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0) || (TOY_RANK[a.toyMat] ?? 0) - (TOY_RANK[b.toyMat] ?? 0)).map(shopCard).join('')}</div>`;
   } else list.innerHTML = `<div class="empty"><h3>${running ? 'Searching Etsy…' : 'Nothing found yet'}</h3><p>${running ? 'Finds appear here as they come in.' : 'Etsy didn’t return anything for this section yet. Try again in a minute.'}</p></div>`;
+  if (note && !note.querySelector('[data-copynote]')) note.insertAdjacentHTML('beforeend', ' <button class="btn sm" type="button" data-copynote>Copy this message</button>');
   if (shopSub) shopFilter();
 }
 let shopSub = '';
@@ -2446,9 +2451,9 @@ document.addEventListener('click', e => {
   }, 1400);
 })();
 
-document.addEventListener('click', e => { const cn = e.target.closest && e.target.closest('[data-copynote]'); if (cn){ const box = cn.closest('#scanNote, #bnote'); let body = '', errs = [];
+document.addEventListener('click', e => { const cn = e.target.closest && e.target.closest('[data-copynote]'); if (cn){ const box = cn.closest('#scanNote, #bnote, #snote'); let body = '', errs = [];
     if (box){ const c = box.cloneNode(true); c.querySelectorAll('details,button').forEach(x => x.remove()); c.querySelectorAll('br').forEach(x => x.replaceWith('\n')); body = c.textContent.replace(/[ \t]+/g, ' ').replace(/\n\s+/g, '\n').trim();
-      errs = box.id === 'bnote' ? BEAUTY.errors : ((scanState[box.dataset.type] || {}).errors || []); }
+      errs = box.id === 'bnote' ? BEAUTY.errors : box.id === 'snote' ? SHOP_STATE.errors : ((scanState[box.dataset.type] || {}).errors || []); }
     copyText(`PureFinds ${VERSION} · ${new Date().toISOString()}\n${body}\nKroger: ${krogerNote || '-'}\nEtsy: ${etsyNote || '-'}${errs.length ? `\n\n${errs.length} error${errs.length === 1 ? '' : 's'} (all of them, whether the list is open or not):\n` + errs.map((x, n) => `${n + 1}. ${x}`).join('\n') : ''}`); } });
 document.addEventListener('click', e => { if (e.target.closest && e.target.closest('[data-copyresults]')) copyText(resultsReport(shownNow)); });
 
