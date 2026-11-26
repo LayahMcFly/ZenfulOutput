@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.44">
+<meta name="pf-version" content="1.18.45">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.44';
+const VERSION = '1.18.45';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2284,31 +2284,38 @@ document.addEventListener('click', e => {
 /* ---------- The Little Shop: school things, art, dolls and random finds. Looser rules: real Etsy listings, no material check ---------- */
 const SHOP_GROUPS = [
   ['school', 'School supplies', 'Pencils, notebooks, planners, pencil cases, book bags and stickers', ['wooden pencils', 'handmade notebook', 'school planner', 'pencil case', 'kids book bag', 'school stickers', 'erasers', 'kids backpack'], '<path d="M8 36l4-4 20-20 4 4-20 20z"/><path d="M12 32l-2 6 6-2M30 14l4 4"/>'],
-  ['art', 'Art & craft', 'Paints, brushes, sketchbooks, clay and craft kits', ['watercolor paint set', 'sketchbook', 'paint brushes', 'colored pencils', 'craft kit', 'air dry clay', 'embroidery kit', 'canvas painting'], '<circle cx="24" cy="24" r="16"/><circle cx="17" cy="20" r="2.5"/><circle cx="25" cy="15" r="2.5"/><circle cx="32" cy="22" r="2.5"/><path d="M24 40c-3 0-4-3-2-5s0-5 4-5h8"/>'],
+  ['art', 'Art & craft', 'Paints and drawing, sewing, knitting and crochet, fabric and yarn, sewing machines, paper and glue', [], '<circle cx="24" cy="24" r="16"/><circle cx="17" cy="20" r="2.5"/><circle cx="25" cy="15" r="2.5"/><circle cx="32" cy="22" r="2.5"/><path d="M24 40c-3 0-4-3-2-5s0-5 4-5h8"/>', [
+    ['paint', 'Paints & drawing', ['watercolor paint set', 'sketchbook', 'paint brushes', 'colored pencils', 'canvas painting', 'crayons natural beeswax']],
+    ['sewing', 'Sewing', ['sewing kit', 'sewing notions', 'embroidery kit', 'sewing patterns kids', 'needle and thread set', 'felt craft kit', 'sewing scissors', 'pin cushion handmade']],
+    ['knit', 'Knitting & crochet', ['knitting needles', 'crochet hooks', 'knitting kit beginner', 'crochet kit beginner', 'amigurumi kit', 'knitting pattern kids', 'stitch markers', 'knitting needle set wood']],
+    ['fabric', 'Fabric & yarn', ['cotton yarn', 'wool yarn', 'organic cotton fabric', 'linen fabric', 'merino wool yarn', 'hemp yarn', 'cotton fabric by the yard', 'felt sheets wool']],
+    ['machines', 'Sewing machines', ['sewing machine', 'mini sewing machine kids', 'vintage sewing machine', 'sewing machine accessories', 'serger', 'embroidery machine', 'sewing machine bobbins']],
+    ['paper', 'Paper & glue', ['construction paper kids', 'craft paper pack', 'origami paper', 'non toxic glue kids', 'glue sticks', 'washi tape', 'cardstock', 'kids craft supplies']]
+  ]],
   ['plush', 'Plushies', '100% natural fabric only, the same rules as the clothes: cotton, wool, linen, silk or hemp, never mixed, no polyester', ['organic cotton plush', '100% cotton stuffed animal', 'wool plush toy', 'linen stuffed animal', 'organic cotton teddy bear', 'wool felt plush animal', 'organic cotton lovey', 'hemp stuffed toy', 'organic cotton plushie', 'natural fiber stuffed animal'], '<circle cx="24" cy="26" r="12"/><circle cx="13" cy="13" r="5"/><circle cx="35" cy="13" r="5"/><path d="M20 24h.01M28 24h.01M22 31c1.5 1.5 4.5 1.5 6 0"/>'],
   ['dolls', 'Dolls & toys', 'Dolls, doll clothes, plush, wooden toys and dollhouses', ['waldorf doll', 'wooden toys', 'rag doll', 'handmade plush', 'doll clothes', 'dollhouse furniture', 'wooden blocks', 'stuffed animal handmade'], '<circle cx="24" cy="14" r="8"/><path d="M14 42c0-10 4-16 10-16s10 6 10 16z"/>'],
   ['random', 'Random finds', 'Handmade gifts, stationery, decor and unusual things', ['handmade gift', 'unique handmade find', 'handmade home decor', 'stationery set', 'tote bag', 'keychain handmade', 'wooden gift', 'handmade ornament'], '<path d="M8 20h32v22H8z"/><path d="M4 12h40v8H4zM24 12v30"/><path d="M24 12c-6-8-14-4-10 0M24 12c6-8 14-4 10 0"/>']
 ];
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
-function shopAccept(r, k){
+function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
-  SHOP.push(reg({id: 'shop-' + (r.handle || r.url), kind: 'shop', group: k, name: r.name, brand: r.vendor || 'Etsy seller', store: 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, claims: [], created: Date.parse(r.created) || 0}));
+  SHOP.push(reg({id: 'shop-' + (r.handle || r.url), kind: 'shop', group: k, sub: sub || '', name: r.name, brand: r.vendor || 'Etsy seller', store: 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, claims: [], created: Date.parse(r.created) || 0}));
 }
 async function shopScan(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g || SHOP_STATE.started[k]) return; SHOP_STATE.started[k] = true;
   if (!scanBase()){ SHOP_STATE.errors.push('The scanner address is not set.'); return shopPaint(k); }
-  for (const q of g[3]){
+  for (const [q, sub] of (g[5] ? g[5].flatMap(([sk, , qs]) => qs.map(x => [x, sk])) : g[3].map(x => [x, '']))){
     const key = 'etsy6|shop|' + q, hit = store.get(key, null); let rows;
     if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
     else try { rows = (await getJSON(`${scanBase()}/etsy?v=4&type=shop&q=${encodeURIComponent(q)}`, 25000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
     catch (e){ const m = errText(e); SHOP_STATE.errors.push(`Etsy: ${m}`); if (/not set up|501/.test(m)) break; continue; }
-    rows.forEach(r => shopAccept(r, k)); shopPaint(k);
+    rows.forEach(r => shopAccept(r, k, sub)); shopPaint(k);
   }
   SHOP_STATE.started[k] = 'done'; shopPaint(k);
 }
 function shopCard(it){
   const fav = !!favs[it.id];
-  return `<article class="card shop"><button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
+  return `<article class="card shop" data-sub="${esc(it.sub || '')}"><button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
     <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
     <div class="cb"><p class="meta">${esc(it.brand)} · Etsy</p><h3>${esc(it.name)}</h3>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}${it.plush ? `<p class="comp full"><b>Fabric:</b> 100% ${esc((it.material || '').toLowerCase())}</p>` : ''}
     <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
@@ -2325,15 +2332,21 @@ function shopPaint(k){
   } else if (items.length){
     shopShown = {k, urls: new Set(items.map(x => x.url))}; list.innerHTML = `<div class="grid">${shuf(items, hubSeed + 7).sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0)).map(shopCard).join('')}</div>`;
   } else list.innerHTML = `<div class="empty"><h3>${running ? 'Searching Etsy…' : 'Nothing found yet'}</h3><p>${running ? 'Finds appear here as they come in.' : 'Etsy didn’t return anything for this section yet. Try again in a minute.'}</p></div>`;
+  if (shopSub) shopFilter();
 }
+let shopSub = '';
+function shopFilter(){ document.querySelectorAll('#slist .card.shop').forEach(c => { c.hidden = !!shopSub && c.dataset.sub !== shopSub; }); const n = document.querySelectorAll('#slist .card.shop:not([hidden])').length, note = document.getElementById('snote'); if (shopSub && note && !n) note.insertAdjacentHTML('beforeend', ' · nothing in this group yet'); }
+document.addEventListener('click', e => { const c = e.target.closest && e.target.closest('[data-ssub]'); if (!c) return; shopSub = c.dataset.ssub; document.querySelectorAll('[data-ssub]').forEach(b => b.setAttribute('aria-pressed', b.dataset.ssub === shopSub)); shopPaint(location.hash.slice(6)); shopFilter(); });
 function shopHub(){
   main.innerHTML = `<div class="pagehead"><h1>The Little Shop</h1><p>School things, art supplies, plushies, dolls and random finds from Etsy. The rules here are looser than in the closets, except plushies, which follow the same 100% natural fabric rules as the clothes. Pick a section to start.</p></div>
   <div class="hub">${SHOP_GROUPS.map(([k, name, sub, , icon], i) => hubTile({go: 'shop-' + k, title: name, sub, items: SHOP.filter(x => x.group === k && x.img), icon}, i)).join('')}</div>`;
 }
 function shopSection(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g) return shopHub();
+  shopSub = '';
   shopShown = {k: '', urls: new Set()};
   main.innerHTML = `<div class="pagehead">${crumb('shop', 'The Little Shop', g[1])}<h1>${esc(g[1])}</h1><p>${esc(g[2])}. ${k === 'plush' ? 'Same rules as the clothes: each plushie names one natural fabric and nothing else.' : 'Looser rules: the listings come straight from Etsy sellers, so check the material on the seller’s page.'}</p></div>
+  ${g[5] ? `<div class="chips" role="group" aria-label="${esc(g[1])} groups"><button class="chip" data-ssub="" aria-pressed="true">All ${esc(g[1].toLowerCase())}</button>${g[5].map(([sk, sn]) => `<button class="chip" data-ssub="${sk}" aria-pressed="false">${esc(sn)}</button>`).join('')}</div>` : ''}
   <p class="note" id="snote">Searching Etsy…</p><div id="slist" data-k="${k}"></div>`;
   shopPaint(k); shopScan(k);
 }
