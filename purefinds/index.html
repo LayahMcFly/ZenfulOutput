@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.46">
+<meta name="pf-version" content="1.18.47">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.46';
+const VERSION = '1.18.47';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2283,7 +2283,15 @@ document.addEventListener('click', e => {
 });
 /* ---------- The Little Shop: school things, art, dolls and random finds. Looser rules: real Etsy listings, no material check ---------- */
 const SHOP_GROUPS = [
-  ['school', 'School supplies', 'Pencils, notebooks, planners, pencil cases, book bags and stickers', ['wooden pencils', 'handmade notebook', 'school planner', 'pencil case', 'kids book bag', 'school stickers', 'erasers', 'kids backpack'], '<path d="M8 36l4-4 20-20 4 4-20 20z"/><path d="M12 32l-2 6 6-2M30 14l4 4"/>'],
+  ['school', 'School supplies', 'Book bags, pencils, pens, rulers, notebooks, ink and printer supplies for worksheets, and other school things', [], '<path d="M8 36l4-4 20-20 4 4-20 20z"/><path d="M12 32l-2 6 6-2M30 14l4 4"/>', [
+    ['bags', 'Book bags', ['kids book bag', 'school backpack', 'canvas book bag', 'kids backpack', 'school bag leather', 'lunch bag school']],
+    ['pencils', 'Pencils', ['wooden pencils', 'colored pencils school', 'pencil sharpener', 'erasers', 'mechanical pencil', 'pencil grips']],
+    ['pens', 'Pens & markers', ['fountain pen', 'gel pens', 'markers kids', 'highlighters', 'ballpoint pen handmade', 'dry erase markers']],
+    ['rulers', 'Rulers & math', ['wooden ruler', 'ruler set school', 'protractor compass set', 'geometry set', 'calculator', 'abacus']],
+    ['notebooks', 'Notebooks & paper', ['school notebook', 'composition notebook', 'planner student', 'lined paper pad', 'handwriting practice book', 'index cards']],
+    ['ink', 'Ink & printing', ['printer ink cartridges', 'refillable ink tank', 'printer paper', 'ink refill kit', 'printer cartridge refill', 'laminating sheets']],
+    ['more', 'Pencil cases & more', ['pencil case', 'school supplies set', 'desk organizer', 'name labels school', 'stickers school', 'clipboard', 'binder']]
+  ]],
   ['kidsart', 'Kids’ art & craft', 'Safe, easy crafts for children: crayons, kid paint, play dough, paper and glue, beginner sewing and knitting', [], '<circle cx="24" cy="24" r="16"/><circle cx="17" cy="20" r="2.5"/><circle cx="25" cy="15" r="2.5"/><circle cx="32" cy="22" r="2.5"/><path d="M24 40c-3 0-4-3-2-5s0-5 4-5h8"/>', [
     ['paint', 'Crayons & paint', ['kids watercolor paint set', 'natural beeswax crayons', 'finger paint kids', 'kids coloring set', 'kids paint brushes', 'kids sketchbook']],
     ['paper', 'Paper & glue', ['construction paper kids', 'kids craft paper pack', 'origami paper kids', 'non toxic glue kids', 'glue sticks kids', 'kids craft supplies', 'kids stickers craft']],
