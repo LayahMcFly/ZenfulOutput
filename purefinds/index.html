@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.60">
+<meta name="pf-version" content="1.18.61">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.60';
+const VERSION = '1.18.61';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2342,6 +2342,10 @@ function fiberPure(txt){
   if (found.size > 1) return false;                                // two different fibers named
   return found.size === 1;                                         // exactly one natural fiber, or nothing to verify (dropped)
 }
+// Plushies are stuffed toys only: a verified natural-fabric listing (the scanner marks it) that names a toy, with no clothes, towels, bedding, books or other languages
+const PLUSH_YES = /\b(plush|plushie|plushies|stuffed|stuffie|stuffy|teddy|soft toy|cuddly|amigurumi|rag doll|ragdoll|lovey|snuggle|softie|bear|bunny|rabbit|lamb|sheep|kitten|puppy|fox|elephant|whale|frog|pig|piggy|giraffe|mouse|monkey|dragon|dinosaur|unicorn|hedgehog|deer|owl|animal|dog|cat)\b/i;
+const PLUSH_NOT = /\b(towels?|overalls?|jumpsuits?|jackets?|coats?|rompers?|socks?|shoes?|slippers?|booties|scarf|scarves|hats?|beanies?|blankets?|beds?|cushions?|pillows?|hot water|covers?|cases?|bags?|baskets?|books?|postcards?|bookmarks?|games?|lamps?|tables?|furniture|decor|ornaments?|costumes?|clothes|clothing|outfits?|dress|dresses|onesies?|bibs?|diapers?|wipes?|mittens?|gloves?|cardigans?|sweaters?|hoodies?|kits?|patterns?|rugs?|nightlights?|night lights?|swaddles?|sleep ?sacks?|pajamas?|hangers?|storage|puzzles?)\b/i;
+const PLUSH_FOREIGN = /\b(peluche|pl[uü]sch\w*|kuschel\w*|stofftier|bio|baumwoll\w*|couverture|b[eé]b[eé]|enfant|lana|morbid\w*|laine|pour|avec|coton|algod[oó]n|mu[nñ]eco|juguete|doudou|tricot\w*|hecho|regalo|cadeau|geschenk|babygeschenk|handgemacht\w*|fatto|mano)\b/i;
 const SCHOOL_BAG_NOT = /\b(tote|totes|purse|handbag|clutch|makeup|cosmetic|wallet|pouch|shopping|grocery|market bag|beach|diaper|duffel|duffle|crossbody|shoulder bag|fanny|belt bag|drawstring|bucket bag|hobo|laptop sleeve)\b/i, SCHOOL_BAG_OK = /\b(backpacks?|rucksack|book ?bags?|school ?bags?|satchel|messenger|lunch ?(bag|box)|bookbag)\b/i;
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
@@ -2350,6 +2354,7 @@ function shopAccept(r, k, sub){
   if ((k === 'art' || k === 'kidsart') && /canvas|canvases/i.test(r.name || '') && CANVAS_FINISHED.test(`${r.name} ${r.ptype || ''}`)) return; // canvases are blank surfaces, not finished art
   // craft sections show supplies, not finished clothes, toys or jewelry: a listing that reads as a garment needs a supply word (fabric, yarn, kit, notions...) to stay
   if ((k === 'art' || k === 'kidsart') && CRAFT_NOT_SUPPLY.test(`${r.name} ${r.ptype || ''}`) && !CRAFT_SUPPLY.test(`${r.name} ${r.ptype || ''}`)) return;
+  if (k === 'plush' && (!r.plush || !PLUSH_YES.test(r.name || '') || PLUSH_NOT.test(r.name || '') || TOY_FOREIGN.test(r.name || '') || PLUSH_FOREIGN.test(r.name || ''))) return;
   if (k === 'dolls' && (TOY_NOT.test(`${r.name} ${r.ptype || ''}`) || TOY_FOREIGN.test(r.name || ''))) return;
   if (k === 'kidsart' && /\b(vintage|antique|singer|retro|1[89]\d\d|19[0-9]0s)\b/i.test(`${r.name} ${r.ptype || ''}`)) return; // kids' crafts: no old adult machines
   SHOP.push(reg({id: 'shop-' + (r.domain || 'etsy') + '-' + (r.handle || r.url), kind: 'shop', group: k, sub: shopSubFor(k, r) || (sub && (SHOP_SUB_WORDS.find(x => x[0] === sub) || [, /./])[1].test(`${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`) ? sub : ''), name: r.name, brand: r.vendor || 'Etsy seller', store: r.store || 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
