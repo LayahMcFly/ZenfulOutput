@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.40">
+<meta name="pf-version" content="1.18.41">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -411,7 +411,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.40';
+const VERSION = '1.18.41';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1474,7 +1474,7 @@ function home(){
     heroC[i] && `<figure data-open="${heroC[i].id}" style="animation-delay:${(i * 3) * .08}s">${img(heroC[i])}<figcaption>Natural Closet</figcaption></figure>`,
     heroF[i] && `<figure data-open="${heroF[i].id}" style="animation-delay:${(i * 3 + 1) * .08}s">${img(heroF[i])}<figcaption>Food</figcaption></figure>`,
     `<figure data-go="beauty" data-hbeauty="${i}" style="animation-delay:${(i * 3 + 2) * .08}s"><div class="art a${i + 1}"></div><figcaption>Beauty Closet</figcaption></figure>`]).filter(Boolean).join('');
-  const cute = cottonV().filter(c => c.styles.some(s => ['casual-cute', 'soft-girl', 'coquette'].includes(s)));
+  const cute = [...new Set(['casual-cute', 'soft-girl', 'coquette'].flatMap(styleItems))];
   const newest = [...cottonV(), ...foodsV()].sort((a, b) => b.created - a.created).slice(0, 12);
   main.innerHTML = `
   <section class="hero">
@@ -1521,7 +1521,7 @@ function dcard(it){
    <div class="acts"><button class="btn" data-open="${it.id}">Details</button>${f && it.src !== 'brand' ? '' : `<a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">${it.price != null ? 'Buy Now' : 'View'} ↗</a>`}<button class="heart" style="position:static" data-fav="${it.id}" aria-pressed="${!!favs[it.id]}" aria-label="Save to favorites">${heartSvg}</button></div></div></article>`;
 }
 function tile([k, n]){
-  const items = cottonV().filter(c => c.styles.includes(k)); const c = items[0];
+  const items = styleItems(k); const c = items[0];
   return `<button class="tile" data-style="${k}">${c ? img(c, n) : ''}<span>${n}<small>${items.length} ${items.length === 1 ? 'piece' : 'pieces'}</small></span></button>`;
 }
 const OUTFIT_WORDS = {'soft-girl': /soft|pastel|pink|ruffle|puff|bow|blush|lilac/i, coquette: /bow|lace|ruffle|ribbon|coquette|pink|eyelet|pointelle/i, 'old-money': /polo|cable|oxford|stripe|navy|classic|button|preppy|cardigan|trouser/i,
@@ -1529,6 +1529,8 @@ const OUTFIT_WORDS = {'soft-girl': /soft|pastel|pink|ruffle|puff|bow|blush|lilac
   korean: /oversized|cardigan|wide[- ]leg|pleated|school|boxy|cropped/i, 'japanese-street': /boxy|oversized|cargo|harajuku|japanese|kimono|haori|sashiko|indigo/i, minimalist: /minimal|plain|simple|solid|basic|essential/i,
   'casual-cute': /cute|casual|ruffle|tee|shorts|romper|sundress/i, vintage: /vintage|retro|70s|80s|90s|1950|1940|1930|victorian|edwardian|handmade/i, brown: /brown|chocolate|coffee|mocha|tan\b|camel|khaki|rust|caramel/i,
   neutral: /beige|cream|oat|natural|ivory|neutral|sand|off[- ]?white|ecru|undyed|stone/i, y2k: /y2k|baby tee|low[- ]rise|cropped|butterfly|90s|2000|halter|tube/i, cozy: /cozy|sweater|hoodie|sweatshirt|fleece|knit|cardigan|lounge|robe/i};
+// Every aesthetic shows Etsy pieces only, matched by the words in each listing's name and colors
+const styleItems = k => COTTON.filter(c => c.store === 'Etsy' && c.kind === 'cotton' && c.src === 'scan' && c.img && inSrc(c) && OUTFIT_WORDS[k].test(`${c.name} ${(c.colors || []).join(' ')}`));
 // Outfits are put together from the Etsy pieces that were found; each style takes the best-matching top and bottom (or a dress), and the first listing with a photo wins
 function etsyOutfits(){
   const pool = COTTON.filter(c => c.store === 'Etsy' && c.kind === 'cotton' && c.src === 'scan' && c.img), used = new Set(), out = [];
@@ -1708,7 +1710,7 @@ function cottonHub(){ bagScan();
   ${srcLine()}
   <p class="note" id="scanNote" data-type="cotton" hidden></p>
   <div class="hub">
-    ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: cottonV().find(c => c.styles.includes('coquette')), items: cottonV().filter(c => c.styles.length)}, 0)}
+    ${hubTile({go: 'cotton-aesthetics', title: 'Shop by aesthetic', sub: 'Soft girl, coquette, old money and 12 more', item: styleItems('coquette')[0], items: STYLES.flatMap(([k]) => styleItems(k)).slice(0, 12)}, 0)}
     ${hubTile({go: 'cotton-outfits', title: 'Outfit ideas', sub: 'Whole outfits, all cotton', item: byHandle('the-katrina-dress-picnic-patchwork')}, 1)}
     ${hubTile({go: 'cotton-shop', cot: '', title: 'All 100% cotton', sub: 'Every piece, hand-checked and found by the scanner', item: byHandle('womens-cozy-turtleneck-in-marshmallow-v2'), items: pick(cottonV(), 6, seed + 7), n: cottonV().length}, 2)}
     ${types.map(([t, a], i) => hubTile({go: 'cotton-shop', cot: t, title: t, item: a[Math.min(1, a.length - 1)], items: a, n: a.length}, i + 3)).join('')}
@@ -1727,7 +1729,7 @@ function cottonShop(){ setTimeout(scanNote); bagScan();
   mountList($('#list'), items); scanNote();
 }
 function styles(){
-  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton. The aesthetic tags are PureFinds style picks, not the brands' own labels.</p></div>
+  main.innerHTML = `<div class="pagehead">${crumb('cotton', 'Natural Closet', 'Aesthetics')}<h1>Shop by aesthetic</h1><p>Every piece here is 100% cotton and sold on Etsy. The aesthetic tags are PureFinds style picks matched from each listing's words, not the sellers' own labels.</p></div>
   <div class="tiles" style="margin:18px 0">${STYLES.map(tile).join('')}</div>
   <div id="sty"></div>`;
   showStyle(state.style, false);
@@ -1735,9 +1737,9 @@ function styles(){
 function showStyle(k, scroll = true){
   state.style = k; F = blankF();
   const el = $('#sty'); if (!el) return;
-  const items = cottonV().filter(c => c.styles.includes(k));
-  el.innerHTML = `<div class="sh" id="sty-h"><div><h2>${esc(STYLE_NAME[k])}</h2><p>${items.length} cotton ${items.length === 1 ? 'piece' : 'pieces'}</p></div></div><div id="list"></div>`;
-  items.length ? mountList($('#list'), items) : ($('#list').innerHTML = '<div class="empty"><h3>No pieces yet</h3><p>Nothing verified in this aesthetic so far.</p></div>');
+  const items = styleItems(k);
+  el.innerHTML = `<div class="sh" id="sty-h"><div><h2>${esc(STYLE_NAME[k])}</h2><p>${items.length} cotton ${items.length === 1 ? 'piece' : 'pieces'} on Etsy</p></div></div><div id="list"></div>`;
+  items.length ? mountList($('#list'), items) : ($('#list').innerHTML = '<div class="empty"><h3>No pieces yet</h3><p>No Etsy piece matched this aesthetic yet. The Etsy scan is still running, or nothing found so far fits.</p></div>');
   if (scroll) $('#sty-h').scrollIntoView({behavior: matchMedia('(prefers-reduced-motion:reduce)').matches ? 'auto' : 'smooth'});
 }
 const outfitList = () => { const e = etsyOutfits(); return e.length ? e : OUTFITS; };
