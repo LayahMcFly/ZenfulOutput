@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.57">
+<meta name="pf-version" content="1.18.58">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.57';
+const VERSION = '1.18.58';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -2296,6 +2296,7 @@ const SHOP_GROUPS = [
   ]],
   ['kidsart', 'Kids’ art & craft', 'Safe, easy crafts for children: crayons, kid paint, play dough, paper and glue, beginner sewing and knitting', [], '<circle cx="24" cy="24" r="16"/><circle cx="17" cy="20" r="2.5"/><circle cx="25" cy="15" r="2.5"/><circle cx="32" cy="22" r="2.5"/><path d="M24 40c-3 0-4-3-2-5s0-5 4-5h8"/>', [
     ['paint', 'Crayons & paint', ['kids watercolor paint set', 'natural beeswax crayons', 'finger paint kids', 'kids coloring set', 'kids paint brushes', 'kids sketchbook']],
+    ['canvas', 'Canvases', ['kids blank canvas', 'mini canvas set kids', 'canvas panels kids painting', 'kids easel', 'kids paint by number canvas blank']],
     ['paper', 'Paper & glue', ['construction paper kids', 'kids craft paper pack', 'origami paper kids', 'non toxic glue kids', 'glue sticks kids', 'kids craft supplies', 'kids stickers craft']],
     ['dough', 'Clay & play dough', ['natural play dough kids', 'kids air dry clay', 'beeswax modeling clay', 'kids clay kit']],
     ['sewing', 'Kids sewing & felt', ['kids sewing kit', 'beginner sewing kit children', 'kids felt craft kit', 'kids embroidery kit', 'kids sewing cards', 'learn to sew kids']],
@@ -2307,7 +2308,8 @@ const SHOP_GROUPS = [
     ['knit', 'Knitting & crochet', ['knitting needles', 'crochet hooks', 'knitting kit', 'crochet kit', 'knitting pattern', 'stitch markers', 'knitting needle set wood', 'circular knitting needles']],
     ['fabric', 'Fabric & yarn', ['cotton yarn', 'wool yarn', 'organic cotton fabric', 'linen fabric', 'merino wool yarn', 'hemp yarn', 'cotton fabric by the yard', 'felt sheets wool']],
     ['machines', 'Sewing machines', ['sewing machine', 'vintage sewing machine', 'sewing machine accessories', 'serger', 'embroidery machine', 'sewing machine bobbins']],
-    ['paint', 'Paints & drawing', ['watercolor paint set', 'artist sketchbook', 'artist paint brushes', 'colored pencils', 'canvas painting', 'calligraphy set']],
+    ['paint', 'Paints & drawing', ['watercolor paint set', 'artist sketchbook', 'artist paint brushes', 'colored pencils', 'calligraphy set']],
+    ['canvas', 'Canvases', ['blank canvas', 'stretched canvas', 'canvas panels', 'canvas board painting', 'cotton canvas painting surface', 'mini canvas set', 'canvas pad', 'round canvas blank', 'canvas roll', 'easel']],
     ['paper', 'Paper & glue', ['craft paper pack', 'origami paper', 'washi tape', 'cardstock', 'bookbinding supplies', 'scrapbook paper']]
   ]],
   ['plush', 'Plushies', '100% natural fabric only, the same rules as the clothes: cotton, wool, linen, silk or hemp, never mixed, no polyester', ['organic cotton plush', '100% cotton stuffed animal', 'wool plush toy', 'linen stuffed animal', 'organic cotton teddy bear', 'wool felt plush animal', 'organic cotton lovey', 'hemp stuffed toy', 'organic cotton plushie', 'natural fiber stuffed animal'], '<circle cx="24" cy="26" r="12"/><circle cx="13" cy="13" r="5"/><circle cx="35" cy="13" r="5"/><path d="M20 24h.01M28 24h.01M22 31c1.5 1.5 4.5 1.5 6 0"/>'],
@@ -2319,7 +2321,7 @@ const SHOP_STORES = {school: ['baronfig.com', 'blackwing602.com', 'leuchtturm191
   plush: ['bellalunatoys.com', 'camdenrose.com'], dolls: ['bellalunatoys.com', 'camdenrose.com', 'grimms.eu', 'kinderfeets.com'], random: []};
 // Which chip a brand store's product belongs under, from the words in its name and type
 const SHOP_SUB_WORDS = [['bags', /bag|backpack|satchel|lunch/i], ['pencils', /pencil|eraser|sharpener/i], ['pens', /\bpens?\b|marker|highlighter/i], ['rulers', /ruler|protractor|compass|geometry|abacus|calculator/i], ['notebooks', /notebook|journal|planner|pad\b|sketchbook|index card/i],
-  ['ink', /\bink\b|cartridge|toner|printer/i], ['machines', /sewing machine|serger/i], ['knit', /knit|crochet|loom|hook\b/i], ['sewing', /\bsew|needle|thread|embroider|felt|quilt/i], ['fabric', /fabric|yarn|\bwool\b|linen/i], ['dough', /clay|dough/i], ['paint', /paint|crayon|watercolor|brush|canvas|gouache/i], ['paper', /paper|glue|tape|cardstock|origami|sticker/i]];
+  ['ink', /\bink\b|cartridge|toner|printer/i], ['machines', /sewing machine|serger/i], ['knit', /knit|crochet|loom|hook\b/i], ['sewing', /\bsew|needle|thread|embroider|felt|quilt/i], ['fabric', /fabric|yarn|\bwool\b|linen/i], ['dough', /clay|dough/i], ['canvas', /canvas|canvases|easel/i], ['paint', /paint|crayon|watercolor|brush|gouache/i], ['paper', /paper|glue|tape|cardstock|origami|sticker/i]];
 const SHOP_SUBS = {}; // filled from SHOP_GROUPS below
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
 const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic: 'Plastic', other: 'Other'}, TOY_RANK = {wood: 0, metal: 0, soft: 0, other: 1, plastic: 2};
@@ -2327,10 +2329,12 @@ const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic:
 const TOY_NOT = /\b(decor|decoration|shelf sitters?|keepsakes?|memorial|signs?|plaques?|desk|figurines?|statues?|christmas|xmas|halloween|nutcrackers?|gnomes?|ornaments?|photo|portrait|couple|anniversary|wedding|retirement|veteran|lovers?|gifts? for (him|her|dad|mom|grandpa|grandma|husband|wife|men|women|adults?)|for adults|adults?|escape room|brain teasers?|puzzle box(es)?|jewel(l)?ery|stamps?|printing|print set|apron|phone case|case for|svg|dxf|cnc|laser[- ]?cut|files|plans|digital|3d (wooden )?puzzle|model kit|book nook|miniature (house|kit)|diorama|tiered tray|wall (art|decor)|jigsaw|mechanical|shelf|bookcase|bookshelf|furniture)\b/i;
 const TOY_FOREIGN = /[äöüßñáéíóúàèìòùâêîôûçœæ]|\b(aus|für|mit|und|der|die|das|holz|bois|madera|bloques|bausatz|geschenk|personalisiert\w*|puppenhaus|spielzeug|holzpuzzle|puzzle en|pareja|para)\b/i;
 const CRAFT_NOT_SUPPLY = /\b(dress|dresses|shirts?|tees?|t-shirts?|blouses?|skirts?|pants|trousers|jackets?|coats?|sweaters?|cardigans?|hoodies?|socks?|scarf|scarves|shawls?|hats?|beanies?|gloves|mittens|bikinis?|swimsuits?|pajamas?|nightgowns?|robes?|jeans|shorts|rompers?|jumpsuits?|bras?|underwear|costumes?|jewelry|earrings?|necklaces?|bracelets?|rings?|toys?|dolls?|ornaments?|pillows?|blankets?|wall art|prints?|paintings?|tapestry|decor)\b/i;
-const CRAFT_SUPPLY = /\b(fabric|fabrics|yarn|yarns|skeins?|roving|felt sheets?|thread|fat quarters?|by the (yard|metre|meter)|batting|bolts?|remnants?|notions?|kits?|needles?|hooks?|supplies|supply|machines?|bobbins?|paint set|paints|brush(es)?|clay|dough|crayons?|beads?|loom|stitch markers?|serger|scissors|cardstock|craft paper|sketchbook|blank)\b/i;
+const CRAFT_SUPPLY = /\b(fabric|fabrics|yarn|yarns|skeins?|roving|felt sheets?|thread|fat quarters?|by the (yard|metre|meter)|batting|bolts?|remnants?|notions?|kits?|needles?|hooks?|supplies|supply|machines?|bobbins?|paint set|paints|brush(es)?|clay|dough|canvas|canvases|easels?|crayons?|beads?|loom|stitch markers?|serger|scissors|cardstock|craft paper|sketchbook|blank)\b/i;
 function shopSubFor(k, r){ const g = SHOP_GROUPS.find(x => x[0] === k), keys = g && g[5] ? g[5].map(x => x[0]) : []; const t = `${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`; const m = SHOP_SUB_WORDS.find(([sk, re]) => keys.includes(sk) && re.test(t)); return m ? m[0] : ''; }
+const CANVAS_FINISHED = /\b(wall art|print|prints|poster|framed|original painting|oil painting|acrylic painting|abstract|landscape|portrait|decor|tote|bag|pouch|sticker|phone|case|digital|svg|pdf|template|pattern|wrap|gallery wrap art|signed|for sale|hand[- ]painted|custom painting|painting on canvas)\b/i;
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
+  if ((k === 'art' || k === 'kidsart') && /canvas|canvases/i.test(r.name || '') && CANVAS_FINISHED.test(`${r.name} ${r.ptype || ''}`)) return; // canvases are blank surfaces, not finished art
   // craft sections show supplies, not finished clothes, toys or jewelry: a listing that reads as a garment needs a supply word (fabric, yarn, kit, notions...) to stay
   if ((k === 'art' || k === 'kidsart') && CRAFT_NOT_SUPPLY.test(`${r.name} ${r.ptype || ''}`) && !CRAFT_SUPPLY.test(`${r.name} ${r.ptype || ''}`)) return;
   if (k === 'dolls' && (TOY_NOT.test(`${r.name} ${r.ptype || ''}`) || TOY_FOREIGN.test(r.name || ''))) return;
