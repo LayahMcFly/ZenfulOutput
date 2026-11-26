@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.63">
+<meta name="pf-version" content="1.18.64">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.63';
+const VERSION = '1.18.64';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1075,6 +1075,7 @@ const NOT_A_SNACK = /gift (set|box|pack|card)|holiday gift|\btote\b|merch|subscr
 const NOT_FOOD_THING = /\b(baking\s+scale|kitchen\s+scale|scales?|pans?|sheet\s+pan|baking\s+(sheet|stone|mat|dish|tray)|trays?|molds?|moulds?|(cake|muffin|baking|loaf|pie)\s+tins?|ramekins?|whisks?|spatulas?|rolling\s+pins?|spoons?|ladles?|tongs|knives|knife|cutting\s+boards?|boards?|bowls?|mugs?|cups?\s+set|measuring\s+(cups?|spoons?)|thermometers?|timers?|bannetons?|proofing\s+baskets?|baskets?|lames?|scrapers?|sifters?|strainers?|colanders?|graters?|peelers?|grinders?|grain\s+mills?|blenders?|mixers?|machines?|appliances?|kettles?|teapots?|infusers?|tumblers?|water\s+bottles?|jars?\s+(set|only)|storage\s+(canisters?|containers?)|towels?|cloths?|aprons?|oven\s+mitts?|pot\s+holders?|cookbooks?|books?|recipe\s+cards?|posters?|prints?|stickers?|magnets?|candles?|ornaments?|gift\s+cards?|e-?gift|totes?|bags?\s+(reusable|canvas|cotton)|t-?shirts?|hoodies?|hats?|socks|merch|subscriptions?|memberships?|classes?|workshops?|vouchers?)\b/i;
 const rs = {total: 0, done: 0, noIng: 0, banned: 0, kept: 0, unreached: 0};
 async function resolveOne(f){
+  if (f.opened){ rs.kept++; return false; }
   try {
     const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(f.url)}`, 20000);
     if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (f.titleVouched){ rs.kept++; return false; } if (!ingFull(f)){ markNoIng(f); rs.noIng++; logRemoved(f.name, f.store, f.url, f.cats, 'no readable ingredients'); return true; } rs.kept++; return false; }
@@ -1208,11 +1209,12 @@ function rerender(){
 async function fetchDetails(it){
   const partial = !it.ing || /partial|^Begins|^Includes/.test(`${it.ingSrc || ''} ${it.ing}`);
   if (it.kind !== 'food' || it.src !== 'brand' || !partial || !scanBase() || /etsy\.com|kroger\.com/.test(it.url)) return;
+  it.opened = true; // you looked at this one, so the background ingredient check leaves it alone
   const box = document.querySelector('#modal .ing'), src = document.getElementById('ingsrc');
   if (box && !it.ing) box.textContent = 'Looking up the ingredients on the product page…';
   try {
     const r = await getJSON(`${scanBase()}/details?v=6&url=${encodeURIComponent(it.url)}`, 20000);
-    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = it.titleVouched ? 'The seller doesn’t list ingredients. The title says it is made from einkorn, spelt or kamut and nothing in it breaks your rules, so ask the seller what else is in it before you buy.' : `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; if (!it.titleVouched && (!it.ing || !ingFull(it))){ markNoIng(it); setTimeout(() => { if (!$('#scrim').classList.contains('on')) return; closeModal(); toast(`Removed “${String(it.name).slice(0, 50)}”: its ingredients could not be read.`, 6000); rerender(); }, 2500); } return; }
+    if (!r.ingredients || !okIng(r.ingredients, r.ingredientsSource)){ if (box && !it.ing) box.textContent = it.titleVouched ? 'The seller doesn’t list ingredients. The title says it is made from einkorn, spelt or kamut and nothing in it breaks your rules, so ask the seller what else is in it before you buy.' : `${it.brand} doesn’t publish this ingredient list online, and it isn’t in Open Food Facts either.`; return; } // opening a listing never removes it: it stays until you report it yourself
     it.ing = r.ingredients; it.ingSrc = r.ingredientsSource; it.pop = 1;
     ingCache[it.url] = {ing: it.ing, src: it.ingSrc}; store.set('ingCache2', ingCache);
     if (box) box.textContent = it.ing;
