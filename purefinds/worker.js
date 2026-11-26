@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.11';
+const VERSION = '1.9.12';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -238,6 +238,7 @@ function realOrgonite(text){
 /* ---------- Etsy (clothing that is 100% cotton, silk, wool or linen) ---------- */
 // Etsy Open API v3: search active listings, then read them in one batch with photos and shop names.
 // The x-api-key header is "keystring:sharedsecret" (required by Etsy since Feb 2026).
+const TOY_WORDS = /\b(toys?|dolls?|doll ?house|dollhouses?|blocks?|puzzles?|playsets?|play set|figurines?|action figures?|teethers?|rattles?|rocking|stacking|nesting|montessori|waldorf|pull toy|train set|marbles|kaleidoscope|spinning tops?|yo-?yo|board games?)\b/i;
 const PLUSH_WORDS = /\b(plush(ie|ies)?|stuffed|stuffie|stuffy|teddy|soft toy|cuddly|amigurumi|rag doll|ragdoll|lovey|snuggle)\b/i;
 async function etsySearch(q, key, type){
   const H = {...UA, 'x-api-key': key}, cf = {cacheTtl: 21600, cacheEverything: true};
@@ -276,6 +277,16 @@ async function etsySearch(q, key, type){
         const f = pureFabric(`${desc}. ${mats}`) || pureFabric(title);
         if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) continue;
         out.push({...row, fabric: f.line, material: f.material, plush: true, desc: desc.slice(0, 400)});
+        continue;
+      }
+      // toys: wood, metal and soft toys are welcome; plastic only when the listing says BPA free; PVC, vinyl and BPA plastic are left out
+      if (TOY_WORDS.test(`${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`)){
+        const all = `${title}. ${desc}. ${mats}`, bpaFree = /\b(bpa|phthalate|pvc|lead)[- ]?free\b|\bnon[- ]?toxic plastic\b/i.test(all);
+        const cleaned = all.replace(/\b(plastic|bpa|pvc|phthalate|vinyl)[- ]?free\b|\bno plastic\b|\bwithout plastic\b|\bplastic[- ]free packaging\b|\b(eco|plastic) packaging\b|\bpackag\w* (is |are )?plastic[- ]free\b/gi, ' ');
+        const plastic = /\b(plastic|abs|polypropylene|polyethylene|acrylic|resin|silicone|rubber|polystyrene|polymer)\b/i.test(cleaned), bad = /\b(pvc|vinyl|polycarbonate|phthalates?)\b/i.test(cleaned) || /\bbpa\b(?![- ]?free)/i.test(cleaned);
+        if (bad || (plastic && !bpaFree)) continue;
+        const kind = /\b(wood|wooden|beech|maple|birch|bamboo|cherry|walnut wood)\b/i.test(all) ? 'wood' : /\b(metal|tin|steel|brass|iron|aluminum|aluminium|copper|pewter)\b/i.test(all) ? 'metal' : /\b(cotton|wool|felt|linen|plush|fabric|knit|crochet|hemp|silk|stuffed)\b/i.test(all) ? 'soft' : plastic ? 'plastic' : 'other';
+        out.push({...row, material: mats, toyMat: kind, bpaFree: plastic && bpaFree, desc: desc.slice(0, 400)});
         continue;
       }
       out.push({...row, material: mats, desc: desc.slice(0, 400)});

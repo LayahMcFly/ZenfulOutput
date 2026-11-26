@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.47">
+<meta name="pf-version" content="1.18.48">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.47';
+const VERSION = '1.18.48';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1866,8 +1866,9 @@ function openItem(id){
      <div class="mb"><h2 id="mt">${esc(it.name)}</h2><p class="meta" style="font-size:15px">${esc(it.brand)} · ${esc(sg)} · sold at Etsy</p>
        ${it.price != null ? `<p class="price" style="font-size:24px;margin:0">${money(it.price)}</p>` : ''}
        ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
-       ${it.plush ? `<h3 style="font-size:22px">Fabric</h3><div class="ing">100% ${esc((it.material || '').toLowerCase())}: “${esc(it.fabric)}”</div><p class="meta" style="margin:0">Quoted from the seller’s listing. PureFinds keeps a plushie only when it names one natural fabric and no polyester, acrylic or other fiber.</p>` : it.material ? `<h3 style="font-size:22px">Materials the seller lists</h3><div class="ing">${esc(it.material)}</div>` : ''}
-       <p class="meta">${it.plush ? 'Plushies follow the clothing rules.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s Etsy page.</p>
+       ${it.toyMat ? `<h3 style="font-size:22px">Toy material</h3><div class="ing">${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ': the seller says BPA free' : ''}${it.material ? '. Materials listed: ' + esc(it.material) : ''}</div>` : ''}
+      ${it.plush ? `<h3 style="font-size:22px">Fabric</h3><div class="ing">100% ${esc((it.material || '').toLowerCase())}: “${esc(it.fabric)}”</div><p class="meta" style="margin:0">Quoted from the seller’s listing. PureFinds keeps a plushie only when it names one natural fabric and no polyester, acrylic or other fiber.</p>` : it.material ? `<h3 style="font-size:22px">Materials the seller lists</h3><div class="ing">${esc(it.material)}</div>` : ''}
+       <p class="meta">${it.toyMat ? 'Toys: wood, metal and soft toys come first. Plastic is shown only when the seller says BPA free.' : it.plush ? 'Plushies follow the clothing rules.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s Etsy page.</p>
        <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at Etsy ↗</a></div>
        <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fv}">${fv ? '♥ Saved' : '♡ Save to favorites'}</button></div></div>`;
     lastFocus = document.activeElement; $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; $('#modal').querySelector('.x').focus(); return;
@@ -2309,13 +2310,14 @@ const SHOP_GROUPS = [
     ['paper', 'Paper & glue', ['craft paper pack', 'origami paper', 'washi tape', 'cardstock', 'bookbinding supplies', 'scrapbook paper']]
   ]],
   ['plush', 'Plushies', '100% natural fabric only, the same rules as the clothes: cotton, wool, linen, silk or hemp, never mixed, no polyester', ['organic cotton plush', '100% cotton stuffed animal', 'wool plush toy', 'linen stuffed animal', 'organic cotton teddy bear', 'wool felt plush animal', 'organic cotton lovey', 'hemp stuffed toy', 'organic cotton plushie', 'natural fiber stuffed animal'], '<circle cx="24" cy="26" r="12"/><circle cx="13" cy="13" r="5"/><circle cx="35" cy="13" r="5"/><path d="M20 24h.01M28 24h.01M22 31c1.5 1.5 4.5 1.5 6 0"/>'],
-  ['dolls', 'Dolls & toys', 'Dolls, doll clothes, plush, wooden toys and dollhouses', ['waldorf doll', 'wooden toys', 'rag doll', 'handmade plush', 'doll clothes', 'dollhouse furniture', 'wooden blocks', 'stuffed animal handmade'], '<circle cx="24" cy="14" r="8"/><path d="M14 42c0-10 4-16 10-16s10 6 10 16z"/>'],
+  ['dolls', 'Dolls & toys', 'Wood, metal and soft toys first. Plastic only when the seller says BPA free, and never PVC or vinyl', ['wooden toys', 'waldorf doll', 'wooden dollhouse', 'wooden blocks', 'wooden puzzle', 'tin toy metal', 'cast iron toy', 'wooden toy car', 'wooden train set', 'stacking toy wood', 'rag doll cotton', 'doll clothes cotton', 'wooden doll', 'montessori wooden toy', 'bpa free toy', 'metal toy vintage'], '<circle cx="24" cy="14" r="8"/><path d="M14 42c0-10 4-16 10-16s10 6 10 16z"/>'],
   ['random', 'Random finds', 'Handmade gifts, stationery, decor and unusual things', ['handmade gift', 'unique handmade find', 'handmade home decor', 'stationery set', 'tote bag', 'keychain handmade', 'wooden gift', 'handmade ornament'], '<path d="M8 20h32v22H8z"/><path d="M4 12h40v8H4zM24 12v30"/><path d="M24 12c-6-8-14-4-10 0M24 12c6-8 14-4 10 0"/>']
 ];
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
+const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic: 'Plastic', other: 'Other'}, TOY_RANK = {wood: 0, metal: 0, soft: 0, other: 1, plastic: 2};
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
-  SHOP.push(reg({id: 'shop-' + (r.handle || r.url), kind: 'shop', group: k, sub: sub || '', name: r.name, brand: r.vendor || 'Etsy seller', store: 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, claims: [], created: Date.parse(r.created) || 0}));
+  SHOP.push(reg({id: 'shop-' + (r.handle || r.url), kind: 'shop', group: k, sub: sub || '', name: r.name, brand: r.vendor || 'Etsy seller', store: 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
 }
 async function shopScan(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g || SHOP_STATE.started[k]) return; SHOP_STATE.started[k] = true;
@@ -2333,7 +2335,7 @@ function shopCard(it){
   const fav = !!favs[it.id];
   return `<article class="card shop" data-sub="${esc(it.sub || '')}"><button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
     <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
-    <div class="cb"><p class="meta">${esc(it.brand)} · Etsy</p><h3>${esc(it.name)}</h3>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}${it.plush ? `<p class="comp full"><b>Fabric:</b> 100% ${esc((it.material || '').toLowerCase())}</p>` : ''}
+    <div class="cb"><p class="meta">${esc(it.brand)} · Etsy</p><h3>${esc(it.name)}</h3>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}${it.plush ? `<p class="comp full"><b>Fabric:</b> 100% ${esc((it.material || '').toLowerCase())}</p>` : ''}${it.toyMat ? `<p class="comp full"><b>Toy material:</b> ${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ' (seller says BPA free)' : ''}</p>` : ''}
     <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
 }
 let shopShown = {k: '', urls: new Set()};
@@ -2346,7 +2348,7 @@ function shopPaint(k){
     const fresh = items.filter(x => !shopShown.urls.has(x.url));
     if (fresh.length){ grid.insertAdjacentHTML('beforeend', shuf(fresh, hubSeed + 7).map(shopCard).join('')); fresh.forEach(x => shopShown.urls.add(x.url)); }
   } else if (items.length){
-    shopShown = {k, urls: new Set(items.map(x => x.url))}; list.innerHTML = `<div class="grid">${shuf(items, hubSeed + 7).sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0)).map(shopCard).join('')}</div>`;
+    shopShown = {k, urls: new Set(items.map(x => x.url))}; list.innerHTML = `<div class="grid">${shuf(items, hubSeed + 7).sort((a, b) => (b.img ? 1 : 0) - (a.img ? 1 : 0) || (TOY_RANK[a.toyMat] ?? 0) - (TOY_RANK[b.toyMat] ?? 0)).map(shopCard).join('')}</div>`;
   } else list.innerHTML = `<div class="empty"><h3>${running ? 'Searching Etsy…' : 'Nothing found yet'}</h3><p>${running ? 'Finds appear here as they come in.' : 'Etsy didn’t return anything for this section yet. Try again in a minute.'}</p></div>`;
   if (shopSub) shopFilter();
 }
