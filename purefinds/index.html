@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.62">
+<meta name="pf-version" content="1.18.63">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.62';
+const VERSION = '1.18.63';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -587,10 +587,12 @@ const FCATS = {
  sprouted:['Sprouted flours','sprouted flour',null,null,/sprout/i], spelt:['Spelt','spelt',null,null,/spelt/i], einkorn:['Einkorn','einkorn',null,null,/einkorn/i],
  kamut:['Kamut (khorasan)','kamut',null,null,/kamut|khorasan/i], quinoa:['Quinoa','quinoa',null,null,/quinoa/i], teff:['Teff','teff',null,null,/teff/i],
  amaranth:['Amaranth','amaranth',null,null,/amaranth/i], rye:['Rye','rye flour',null,null,/\brye\b/i], fonio:['Fonio','fonio',null,null,/fonio/i],
- chickpea:['Chickpea flour','chickpea flour',null,null,/chickpea|garbanzo/i]
+ chickpea:['Chickpea flour','chickpea flour',null,null,/chickpea|garbanzo/i],
+ pasta:['Noodles & pasta','spelt pasta',null,null,/\b(pasta|noodles?|spaghetti|macaroni|penne|fusilli|linguine|fettuccine|lasagn\w*|rotini|vermicelli|soba|orzo|rigatoni|farfalle|tagliatelle|elbows?|shells|ziti|ramen)\b/i]
 };
 // Extra live searches by allowed flour, so baked goods made with einkorn, spelt or rye are found outside the flour section
 const FLOUR_QUERIES = {
+ pasta: ['spelt pasta', 'einkorn pasta', 'kamut pasta', 'quinoa pasta', 'chickpea pasta', 'buckwheat soba noodles', 'spelt spaghetti', 'einkorn spaghetti', 'sprouted spelt pasta', 'spelt noodles', 'lentil pasta', 'teff pasta'],
  'all-frozen': ['ice cream', 'popsicle', 'sorbet', 'frozen strawberries', 'frozen blueberries', 'frozen mango', 'frozen peaches', 'frozen mixed berries', 'frozen broccoli', 'frozen green beans', 'frozen peas', 'frozen zucchini', 'frozen kale', 'freeze dried fruit', 'einkorn tortillas', 'spelt tortillas', 'coconut wraps', 'freeze dried strawberries', 'freeze dried mango', 'freeze dried apple'],
  'frozen-foods': ['frozen strawberries', 'frozen blueberries', 'frozen mango', 'frozen peaches', 'frozen broccoli', 'frozen green beans', 'frozen peas', 'frozen zucchini'],
  frozen: ['organic ice cream', 'coconut milk ice cream', 'sorbet'], popsicles: ['fruit popsicles', 'frozen fruit bars'],
@@ -606,7 +608,7 @@ const FLOUR_QUERIES = {
 const FOOD_SECTIONS = [
  ['snacks','Snacks','Cocoa, cacao and chocolate, chips, plantain chips, gummies, cookies, cereal and granola, dried fruit and more',['all-snacks','fruit-snacks','gummies','cocoa','cookies','chips','plantain','crackers','granola-bars','cereal','dried-fruit','natural']],
  ['groceries','Groceries','Fruit, vegetables, walnuts and almonds, eggs, dairy and pantry staples to pick up',['fruit','vegetables','nuts','eggs','milk','yogurt','meat','pantry','frozen-foods']],
- ['flours','Flours & grains','Sprouted flours first, then spelt, einkorn, kamut, quinoa, teff, amaranth, rye, fonio and chickpea',['sprouted','spelt','einkorn','kamut','quinoa','teff','amaranth','rye','fonio','chickpea']],
+ ['flours','Flours & grains','Sprouted flours first, then spelt, einkorn, kamut, quinoa, teff, amaranth, rye, fonio and chickpea, plus noodles, pasta and spaghetti',['sprouted','spelt','einkorn','kamut','quinoa','teff','amaranth','rye','fonio','chickpea','pasta']],
  ['bread','Bread & bakery','Spelt, einkorn and rye breads, tortillas, bagels and baking, all wheat-free and corn-free',['bread','tortillas','bagels','baking']],
  ['breakfast','Breakfast','Oat-free cereal, grain-free granola, puffed and flaked grains, almond butter, pancake mix, jams and fruit spreads, butter and ghee',['cereal','nut-butter','pancake','jams','butters']],
  ['drinks','Drinks','Juice, almond milk, ginger and chaga, raspberry, rosemary and other herbal teas',['drinks','plant-milk','ginger-tea','raspberry-tea','rosemary-tea','herbal-tea','tea']],
@@ -655,6 +657,7 @@ const PICKUP = {
  kamut:['Sprouted kamut flour','Kamut flour','Kamut berries'], quinoa:['Quinoa','Quinoa flour','Sprouted quinoa'],
  teff:['Teff flour','Teff grain'], amaranth:['Amaranth','Amaranth flour'], rye:['Sprouted rye flour','Rye flour','Rye berries'],
  fonio:['Fonio','Fonio flour'], chickpea:['Chickpea flour','Sprouted chickpea flour'],
+ pasta:['Spelt spaghetti','Einkorn pasta','Kamut pasta','Quinoa pasta','Chickpea pasta','Buckwheat soba noodles','Spelt penne','Spelt noodles'],
  'ginger-tea':['Ginger chaga tea','Organic ginger tea','Chaga tea','Ginger turmeric tea'], 'raspberry-tea':['Raspberry leaf tea','Raspberry herbal tea'], 'rosemary-tea':['Rosemary tea','Rosemary tea with lemon balm'],
  'herbal-tea':['Chamomile tea','Hibiscus tea','Lemon balm tea','Tulsi tea','Nettle tea','Lemongrass tea','Rooibos tea'], tea:['Organic black tea','Organic coffee']
 };
@@ -974,7 +977,7 @@ const FOOD_MAP = [
   [/(almond|walnut) butter|nut butter/, 'nut-butter'], [/\b(jams?|jell(y|ies)|preserves|marmalade|conserves?|fruit spreads?)\b/, 'jams'], [/\b(butter|ghee)\b/, 'butters'], [/pancake|waffle/, 'pancake'], [/\bbread\b|\bloaf\b/, 'bread'], [/tortilla|\bwraps?\b/, 'tortillas'],
   [/bagel|muffin/, 'bagels'], [/baking|cake mix|brownie mix/, 'baking'], [/sprouted/, 'sprouted'], [/spelt/, 'spelt'], [/einkorn/, 'einkorn'],
   [/kamut|khorasan/, 'kamut'], [/quinoa/, 'quinoa'], [/\bteff\b/, 'teff'], [/amaranth/, 'amaranth'], [/\brye\b/, 'rye'], [/fonio/, 'fonio'],
-  [/chickpea|garbanzo/, 'chickpea'], [/\b(almonds?|walnuts?)\b(?! (butter|milk|flour))/, 'nuts'],
+  [/\b(pasta|noodles?|spaghetti|macaroni|penne|fusilli|linguine|fettuccine|lasagn\w*|rotini|vermicelli|soba|orzo|rigatoni|farfalle|tagliatelle|ziti|ramen)\b/, 'pasta'], [/chickpea|garbanzo/, 'chickpea'], [/\b(almonds?|walnuts?)\b(?! (butter|milk|flour))/, 'nuts'],
   [/(ginger|chaga)[a-z ,&-]*\b(tea|infusion|brew)\b|\b(tea|infusion)\b[a-z ,&-]*(ginger|chaga)/, 'ginger-tea'], [/raspberr[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*raspberr/, 'raspberry-tea'], [/rosemary[a-z ]*\b(tea|infusion)\b|\b(tea|infusion)\b[a-z ]*rosemary/, 'rosemary-tea'],
   [/herbal|(chamomile|spearmint|hibiscus|lavender|nettle|rooibos|lemon balm|tulsi|holy basil|dandelion|fennel|lemongrass|elderflower|linden)[a-z ]*\b(tea|infusion)\b/, 'herbal-tea'],
   [/juice|smoothie|electrolyte|lemonade|\bdrinks?\b/, 'drinks'], [/(oat|almond|plant) milk/, 'plant-milk'], [/\btea\b|coffee/, 'tea'],
