@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.48">
+<meta name="pf-version" content="1.18.49">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.48';
+const VERSION = '1.18.49';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1863,13 +1863,13 @@ function openItem(id){
     const fv = !!favs[id], sg = (SHOP_GROUPS.find(g => g[0] === it.group) || [])[1] || 'The Little Shop';
     $('#modal').innerHTML = `<button class="x" data-close aria-label="Close">×</button>
      <div class="mi">${img(it)}</div>
-     <div class="mb"><h2 id="mt">${esc(it.name)}</h2><p class="meta" style="font-size:15px">${esc(it.brand)} · ${esc(sg)} · sold at Etsy</p>
+     <div class="mb"><h2 id="mt">${esc(it.name)}</h2><p class="meta" style="font-size:15px">${esc(it.brand)} · ${esc(sg)} · sold at ${esc(it.store || 'Etsy')}</p>
        ${it.price != null ? `<p class="price" style="font-size:24px;margin:0">${money(it.price)}</p>` : ''}
        ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
        ${it.toyMat ? `<h3 style="font-size:22px">Toy material</h3><div class="ing">${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ': the seller says BPA free' : ''}${it.material ? '. Materials listed: ' + esc(it.material) : ''}</div>` : ''}
       ${it.plush ? `<h3 style="font-size:22px">Fabric</h3><div class="ing">100% ${esc((it.material || '').toLowerCase())}: “${esc(it.fabric)}”</div><p class="meta" style="margin:0">Quoted from the seller’s listing. PureFinds keeps a plushie only when it names one natural fabric and no polyester, acrylic or other fiber.</p>` : it.material ? `<h3 style="font-size:22px">Materials the seller lists</h3><div class="ing">${esc(it.material)}</div>` : ''}
-       <p class="meta">${it.toyMat ? 'Toys: wood, metal and soft toys come first. Plastic is shown only when the seller says BPA free.' : it.plush ? 'Plushies follow the clothing rules.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s Etsy page.</p>
-       <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at Etsy ↗</a></div>
+       <p class="meta">${it.toyMat ? 'Toys: wood, metal and soft toys come first. Plastic is shown only when the seller says BPA free.' : it.plush ? 'Plushies follow the clothing rules.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s page.</p>
+       <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at ${esc(it.store || 'Etsy')} ↗</a></div>
        <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fv}">${fv ? '♥ Saved' : '♡ Save to favorites'}</button></div></div>`;
     lastFocus = document.activeElement; $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; $('#modal').querySelector('.x').focus(); return;
   }
@@ -2313,11 +2313,19 @@ const SHOP_GROUPS = [
   ['dolls', 'Dolls & toys', 'Wood, metal and soft toys first. Plastic only when the seller says BPA free, and never PVC or vinyl', ['wooden toys', 'waldorf doll', 'wooden dollhouse', 'wooden blocks', 'wooden puzzle', 'tin toy metal', 'cast iron toy', 'wooden toy car', 'wooden train set', 'stacking toy wood', 'rag doll cotton', 'doll clothes cotton', 'wooden doll', 'montessori wooden toy', 'bpa free toy', 'metal toy vintage'], '<circle cx="24" cy="14" r="8"/><path d="M14 42c0-10 4-16 10-16s10 6 10 16z"/>'],
   ['random', 'Random finds', 'Handmade gifts, stationery, decor and unusual things', ['handmade gift', 'unique handmade find', 'handmade home decor', 'stationery set', 'tote bag', 'keychain handmade', 'wooden gift', 'handmade ornament'], '<path d="M8 20h32v22H8z"/><path d="M4 12h40v8H4zM24 12v30"/><path d="M24 12c-6-8-14-4-10 0M24 12c6-8 14-4 10 0"/>']
 ];
+// Official brand stores for each Little Shop section (read through the scanner, like the clothing and food stores)
+const SHOP_STORES = {school: ['baronfig.com', 'fieldnotesbrand.com', 'blackwing602.com', 'leuchtturm1917.us', 'cwpencils.com'], kidsart: ['greenkidcrafts.com'], art: ['woolandthegang.com', 'madelinetosh.com', 'purlsoho.com', 'jacquardproducts.com'],
+  plush: ['bellalunatoys.com', 'camdenrose.com'], dolls: ['bellalunatoys.com', 'camdenrose.com', 'plantoysusa.com', 'grimms.eu', 'haba-usa.com', 'kinderfeets.com'], random: []};
+// Which chip a brand store's product belongs under, from the words in its name and type
+const SHOP_SUB_WORDS = [['bags', /bag|backpack|satchel|lunch/i], ['pencils', /pencil|eraser|sharpener/i], ['pens', /\bpens?\b|marker|highlighter/i], ['rulers', /ruler|protractor|compass|geometry|abacus|calculator/i], ['notebooks', /notebook|journal|planner|pad\b|sketchbook|index card/i],
+  ['ink', /\bink\b|cartridge|toner|printer/i], ['machines', /sewing machine|serger/i], ['knit', /knit|crochet|loom|hook\b/i], ['sewing', /\bsew|needle|thread|embroider|felt|quilt/i], ['fabric', /fabric|yarn|\bwool\b|linen/i], ['dough', /clay|dough/i], ['paint', /paint|crayon|watercolor|brush|canvas|gouache/i], ['paper', /paper|glue|tape|cardstock|origami|sticker/i]];
+const SHOP_SUBS = {}; // filled from SHOP_GROUPS below
 const SHOP = [], SHOP_STATE = {started: {}, errors: []};
 const TOY_LABEL = {wood: 'Wood', metal: 'Metal', soft: 'Soft (fabric)', plastic: 'Plastic', other: 'Other'}, TOY_RANK = {wood: 0, metal: 0, soft: 0, other: 1, plastic: 2};
+function shopSubFor(k, r){ const g = SHOP_GROUPS.find(x => x[0] === k), keys = g && g[5] ? g[5].map(x => x[0]) : []; const t = `${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`; const m = SHOP_SUB_WORDS.find(([sk, re]) => keys.includes(sk) && re.test(t)); return m ? m[0] : ''; }
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
-  SHOP.push(reg({id: 'shop-' + (r.handle || r.url), kind: 'shop', group: k, sub: sub || '', name: r.name, brand: r.vendor || 'Etsy seller', store: 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
+  SHOP.push(reg({id: 'shop-' + (r.domain || 'etsy') + '-' + (r.handle || r.url), kind: 'shop', group: k, sub: sub || shopSubFor(k, r), name: r.name, brand: r.vendor || 'Etsy seller', store: r.store || 'Etsy', url: r.url, price: r.price, img: sized(r.img || ''), desc: r.desc || '', material: r.material || '', fabric: r.fabric || '', plush: !!r.plush, toyMat: r.toyMat || '', bpaFree: !!r.bpaFree, claims: [], created: Date.parse(r.created) || 0}));
 }
 async function shopScan(k){
   const g = SHOP_GROUPS.find(x => x[0] === k); if (!g || SHOP_STATE.started[k]) return; SHOP_STATE.started[k] = true;
@@ -2329,13 +2337,20 @@ async function shopScan(k){
     catch (e){ const m = errText(e); SHOP_STATE.errors.push(`Etsy: ${m}`); if (/not set up|501/.test(m)) break; continue; }
     rows.forEach(r => shopAccept(r, k, sub)); shopPaint(k);
   }
+  for (const d of SHOP_STORES[k] || []){
+    const key = 'scan2|shop|' + d, hit = store.get(key, null); let rows;
+    if (hit && Date.now() - hit.t < 6 * 3600e3) rows = hit.items;
+    else try { rows = (await getJSON(`${scanBase()}/store?d=${encodeURIComponent(d)}&type=shop`, 30000)).items || []; store.set(key, {t: Date.now(), items: rows}); }
+    catch (e){ SHOP_STATE.errors.push(`${d}: ${errText(e)}`); shopPaint(k); continue; }
+    rows.forEach(r => shopAccept(r, k)); shopPaint(k);
+  }
   SHOP_STATE.started[k] = 'done'; shopPaint(k);
 }
 function shopCard(it){
   const fav = !!favs[it.id];
   return `<article class="card shop" data-sub="${esc(it.sub || '')}"><button class="ph" data-open="${esc(it.id)}" aria-label="View details for ${esc(it.name)}">${img(it)}</button>
     <button class="heart" data-fav="${esc(it.id)}" aria-pressed="${fav}" aria-label="${fav ? 'Remove from' : 'Save to'} favorites">${heartSvg}</button>
-    <div class="cb"><p class="meta">${esc(it.brand)} · Etsy</p><h3>${esc(it.name)}</h3>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}${it.plush ? `<p class="comp full"><b>Fabric:</b> 100% ${esc((it.material || '').toLowerCase())}</p>` : ''}${it.toyMat ? `<p class="comp full"><b>Toy material:</b> ${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ' (seller says BPA free)' : ''}</p>` : ''}
+    <div class="cb"><p class="meta">${esc(it.brand === it.store ? it.store : it.brand + ' · ' + it.store)}</p><h3>${esc(it.name)}</h3>${it.price != null ? `<span class="price">${money(it.price)}</span>` : ''}${it.plush ? `<p class="comp full"><b>Fabric:</b> 100% ${esc((it.material || '').toLowerCase())}</p>` : ''}${it.toyMat ? `<p class="comp full"><b>Toy material:</b> ${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ' (seller says BPA free)' : ''}</p>` : ''}
     <div class="acts"><button class="btn" data-open="${esc(it.id)}">Details</button><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now ↗</a></div></div></article>`;
 }
 let shopShown = {k: '', urls: new Set()};
@@ -2343,7 +2358,7 @@ function shopPaint(k){
   const list = document.getElementById('slist'); if (!list || list.dataset.k !== k) return;
   const items = SHOP.filter(x => x.group === k), grid = list.querySelector('.grid');
   const note = document.getElementById('snote'), running = SHOP_STATE.started[k] === true;
-  if (note) note.innerHTML = SHOP_STATE.errors.length && !SHOP.length ? `The scanner didn’t answer: <span style="user-select:all">${esc(SHOP_STATE.errors[0])}</span>` : `${items.length} finds from Etsy so far${running ? ' · still searching' : ''}${SHOP_STATE.errors.length ? ` · ${SHOP_STATE.errors.length} lookup problem${SHOP_STATE.errors.length > 1 ? 's' : ''}: <span style="user-select:all">${esc(SHOP_STATE.errors.join(' | '))}</span>` : ''}`;
+  if (note) note.innerHTML = SHOP_STATE.errors.length && !SHOP.length ? `The scanner didn’t answer: <span style="user-select:all">${esc(SHOP_STATE.errors[0])}</span>` : `${items.length} finds from Etsy and brand stores so far${running ? ' · still searching' : ''}${SHOP_STATE.errors.length ? ` · ${SHOP_STATE.errors.length} lookup problem${SHOP_STATE.errors.length > 1 ? 's' : ''}: <span style="user-select:all">${esc(SHOP_STATE.errors.join(' | '))}</span>` : ''}`;
   if (items.length && grid && shopShown.k === k){
     const fresh = items.filter(x => !shopShown.urls.has(x.url));
     if (fresh.length){ grid.insertAdjacentHTML('beforeend', shuf(fresh, hubSeed + 7).map(shopCard).join('')); fresh.forEach(x => shopShown.urls.add(x.url)); }
@@ -2356,7 +2371,7 @@ let shopSub = '';
 function shopFilter(){ document.querySelectorAll('#slist .card.shop').forEach(c => { c.hidden = !!shopSub && c.dataset.sub !== shopSub; }); const n = document.querySelectorAll('#slist .card.shop:not([hidden])').length, note = document.getElementById('snote'); if (shopSub && note && !n) note.insertAdjacentHTML('beforeend', ' · nothing in this group yet'); }
 document.addEventListener('click', e => { const c = e.target.closest && e.target.closest('[data-ssub]'); if (!c) return; shopSub = c.dataset.ssub; document.querySelectorAll('[data-ssub]').forEach(b => b.setAttribute('aria-pressed', b.dataset.ssub === shopSub)); shopPaint(location.hash.slice(6)); shopFilter(); });
 function shopHub(){
-  main.innerHTML = `<div class="pagehead"><h1>The Little Shop</h1><p>School things, art supplies, plushies, dolls and random finds from Etsy. The rules here are looser than in the closets, except plushies, which follow the same 100% natural fabric rules as the clothes. Pick a section to start.</p></div>
+  main.innerHTML = `<div class="pagehead"><h1>The Little Shop</h1><p>School things, art supplies, plushies, dolls and random finds from Etsy and official brand websites. The rules here are looser than in the closets, except plushies, which follow the same 100% natural fabric rules as the clothes. Pick a section to start.</p></div>
   <div class="hub">${SHOP_GROUPS.map(([k, name, sub, , icon], i) => hubTile({go: 'shop-' + k, title: name, sub, items: SHOP.filter(x => x.group === k && x.img), icon}, i)).join('')}</div>`;
 }
 function shopSection(k){

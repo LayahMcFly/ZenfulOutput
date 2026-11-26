@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.12';
+const VERSION = '1.9.13';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -47,8 +47,12 @@ const STORES = {
 };
 // Beauty Closet: skin, face, nail and hair care. Each is a Shopify store (checked); ingredient lists are read from the product pages.
 STORES.beauty = [['carolsdaughter.com', "Carol's Daughter"], ['anua.com', 'ANUA'], ['herbivorebotanicals.com', 'Herbivore'], ['www.100percentpure.com', '100% Pure']];
+// The Little Shop: official brand stores for school things, art, sewing and knitting, and toys. Each is read as a Shopify store; any that can't be read show up in the front-end status note.
+STORES.shop = [['baronfig.com', 'Baron Fig'], ['fieldnotesbrand.com', 'Field Notes'], ['blackwing602.com', 'Blackwing'], ['leuchtturm1917.us', 'Leuchtturm1917'], ['cwpencils.com', 'CW Pencil Enterprise'],
+  ['greenkidcrafts.com', 'Green Kid Crafts'], ['woolandthegang.com', 'Wool and the Gang'], ['madelinetosh.com', 'Madelinetosh'], ['purlsoho.com', 'Purl Soho'], ['jacquardproducts.com', 'Jacquard'],
+  ['bellalunatoys.com', 'Bella Luna Toys'], ['camdenrose.com', 'Camden Rose'], ['plantoysusa.com', 'PlanToys'], ['grimms.eu', 'Grimm’s'], ['haba-usa.com', 'HABA USA'], ['kinderfeets.com', 'Kinderfeets']];
 const ALLOWED = new Map();
-for (const [domain, name] of [...STORES.cotton, ...STORES.food, ...STORES.beauty]) ALLOWED.set(domain, name);
+for (const [domain, name] of [...STORES.cotton, ...STORES.food, ...STORES.beauty, ...STORES.shop]) ALLOWED.set(domain, name);
 
 const CORS = {'Access-Control-Allow-Origin': '*', 'Access-Control-Allow-Methods': 'GET, OPTIONS', 'Access-Control-Allow-Headers': 'Content-Type'};
 const json = (o, status = 200, maxAge = 1800) => new Response(JSON.stringify(o), {
@@ -67,7 +71,7 @@ export default {
       if (u.pathname === '/store'){
         const d = (u.searchParams.get('d') || '').toLowerCase(), type = u.searchParams.get('type');
         if (!ALLOWED.has(d)) return json({error: 'This store is not on the PureFinds list: ' + d}, 400);
-        if (type !== 'cotton' && type !== 'food' && type !== 'beauty') return json({error: 'type must be cotton, food or beauty'}, 400);
+        if (type !== 'cotton' && type !== 'food' && type !== 'beauty' && type !== 'shop') return json({error: 'type must be cotton, food, beauty or shop'}, 400);
         const items = await scan(d, type);
         return json({store: ALLOWED.get(d), domain: d, type, count: items.length, checked: new Date().toISOString(), items}, 200, 21600);
       }
@@ -136,7 +140,7 @@ async function getJSON(url){
 
 // Shopify stores first, then WooCommerce (WordPress) stores, which publish a public product list too
 async function scan(d, type){
-  const keep = ps => ps.map(p => type === 'cotton' ? cottonItem(d, p) : type === 'beauty' ? beautyItem(d, p) : foodItem(d, p)).filter(Boolean);
+  const keep = ps => ps.map(p => type === 'cotton' ? cottonItem(d, p) : type === 'beauty' ? beautyItem(d, p) : type === 'shop' ? shopItem(d, p) : foodItem(d, p)).filter(Boolean);
   let shopifyErr;
   try {
     const out = [];
@@ -240,6 +244,30 @@ function realOrgonite(text){
 // The x-api-key header is "keystring:sharedsecret" (required by Etsy since Feb 2026).
 const TOY_WORDS = /\b(toys?|dolls?|doll ?house|dollhouses?|blocks?|puzzles?|playsets?|play set|figurines?|action figures?|teethers?|rattles?|rocking|stacking|nesting|montessori|waldorf|pull toy|train set|marbles|kaleidoscope|spinning tops?|yo-?yo|board games?)\b/i;
 const PLUSH_WORDS = /\b(plush(ie|ies)?|stuffed|stuffie|stuffy|teddy|soft toy|cuddly|amigurumi|rag doll|ragdoll|lovey|snuggle)\b/i;
+// The Little Shop rules, shared by Etsy and the brand stores: no downloads; plushies follow the clothing rules (one natural fabric, 100%, no other fiber);
+// toys welcome wood, metal and soft, with plastic only when the seller says BPA free and never PVC or vinyl
+function shopFilter(row, title, desc, mats, kind){
+  if (/\b(digital|printable|svg|png|pdf|download|template|instant download|pattern|tutorial|clipart|mockup|gift ?cards?)\b/i.test(`${title} ${row.ptype || ''}`)) return null;
+  if (PLUSH_WORDS.test(kind)){
+    const f = pureFabric(`${desc}. ${mats}`) || pureFabric(title);
+    if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) return null;
+    return {...row, fabric: f.line, material: f.material, plush: true, desc: desc.slice(0, 400)};
+  }
+  if (TOY_WORDS.test(kind)){
+    const all = `${title}. ${desc}. ${mats}`, bpaFree = /\b(bpa|phthalate|pvc|lead)[- ]?free\b|\bnon[- ]?toxic plastic\b/i.test(all);
+    const cleaned = all.replace(/\b(plastic|bpa|pvc|phthalate|vinyl)[- ]?free\b|\bno plastic\b|\bwithout plastic\b|\bplastic[- ]free packaging\b|\b(eco|plastic) packaging\b|\bpackag\w* (is |are )?plastic[- ]free\b/gi, ' ');
+    const plastic = /\b(plastic|abs|polypropylene|polyethylene|acrylic|resin|silicone|rubber|polystyrene|polymer)\b/i.test(cleaned), bad = /\b(pvc|vinyl|polycarbonate|phthalates?)\b/i.test(cleaned) || /\bbpa\b(?![- ]?free)/i.test(cleaned);
+    if (bad || (plastic && !bpaFree)) return null;
+    const k = /\b(wood|wooden|beech|maple|birch|bamboo|cherry|walnut wood)\b/i.test(all) ? 'wood' : /\b(metal|tin|steel|brass|iron|aluminum|aluminium|copper|pewter)\b/i.test(all) ? 'metal' : /\b(cotton|wool|felt|linen|plush|fabric|knit|crochet|hemp|silk|stuffed)\b/i.test(all) ? 'soft' : plastic ? 'plastic' : 'other';
+    return {...row, material: mats, toyMat: k, bpaFree: plastic && bpaFree, desc: desc.slice(0, 400)};
+  }
+  return {...row, material: mats, desc: desc.slice(0, 400)};
+}
+function shopItem(d, p){
+  const row = base(d, p), title = plain(p.title), desc = plain(p.body_html || ''), kind = `${p.title} ${p.product_type || ''} ${(Array.isArray(p.tags) ? p.tags : String(p.tags || '').split(',')).join(' ')}`;
+  if (!row.img || (p.variants && p.variants.length && p.variants.every(v => v.available === false))) return null;
+  return shopFilter(row, title, desc, '', kind);
+}
 async function etsySearch(q, key, type){
   const H = {...UA, 'x-api-key': key}, cf = {cacheTtl: 21600, cacheEverything: true};
   const ask = async url => { const r = await fetch(url, {headers: H, cf}); if (!r.ok){ let why = ''; try { const j = await r.json(); why = ': ' + (j.error || j.message || ''); } catch (e){} throw new Error(`Etsy answered HTTP ${r.status}${why}`); } return r.json(); };
@@ -270,26 +298,9 @@ async function etsySearch(q, key, type){
       continue;
     }
     if (type === 'shop'){
-      if (/\b(digital|printable|svg|png|pdf|download|template|instant download|pattern|tutorial|clipart|mockup)\b/i.test(`${title} ${row.ptype}`)) continue;
       const mats = (l.materials || []).map(String).filter(Boolean).slice(0, 8).join(', ');
-      // plushies follow the clothing rules: one natural fabric, 100%, and no other fiber (polyester fill included) named anywhere in the listing
-      if (PLUSH_WORDS.test(`${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`)){
-        const f = pureFabric(`${desc}. ${mats}`) || pureFabric(title);
-        if (!f || OTHER_FIBERS && new RegExp('\\b(' + OTHER_FIBERS + ')\\b', 'i').test(`${title} ${desc} ${mats}`) || /\b(polyester|poly[- ]?fill|acrylic|nylon|minky|velboa|faux fur|synthetic|fiberfill|fibrefill|microfiber|plastic beads?)\b/i.test(`${title} ${desc} ${mats}`)) continue;
-        out.push({...row, fabric: f.line, material: f.material, plush: true, desc: desc.slice(0, 400)});
-        continue;
-      }
-      // toys: wood, metal and soft toys are welcome; plastic only when the listing says BPA free; PVC, vinyl and BPA plastic are left out
-      if (TOY_WORDS.test(`${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`)){
-        const all = `${title}. ${desc}. ${mats}`, bpaFree = /\b(bpa|phthalate|pvc|lead)[- ]?free\b|\bnon[- ]?toxic plastic\b/i.test(all);
-        const cleaned = all.replace(/\b(plastic|bpa|pvc|phthalate|vinyl)[- ]?free\b|\bno plastic\b|\bwithout plastic\b|\bplastic[- ]free packaging\b|\b(eco|plastic) packaging\b|\bpackag\w* (is |are )?plastic[- ]free\b/gi, ' ');
-        const plastic = /\b(plastic|abs|polypropylene|polyethylene|acrylic|resin|silicone|rubber|polystyrene|polymer)\b/i.test(cleaned), bad = /\b(pvc|vinyl|polycarbonate|phthalates?)\b/i.test(cleaned) || /\bbpa\b(?![- ]?free)/i.test(cleaned);
-        if (bad || (plastic && !bpaFree)) continue;
-        const kind = /\b(wood|wooden|beech|maple|birch|bamboo|cherry|walnut wood)\b/i.test(all) ? 'wood' : /\b(metal|tin|steel|brass|iron|aluminum|aluminium|copper|pewter)\b/i.test(all) ? 'metal' : /\b(cotton|wool|felt|linen|plush|fabric|knit|crochet|hemp|silk|stuffed)\b/i.test(all) ? 'soft' : plastic ? 'plastic' : 'other';
-        out.push({...row, material: mats, toyMat: kind, bpaFree: plastic && bpaFree, desc: desc.slice(0, 400)});
-        continue;
-      }
-      out.push({...row, material: mats, desc: desc.slice(0, 400)});
+      const r = shopFilter(row, title, desc, mats, `${l.title} ${(l.tags || []).join(' ')} ${(l.taxonomy_path || []).join(' ')}`);
+      if (r) out.push(r);
       continue;
     }
     if (type === 'orgonite'){
