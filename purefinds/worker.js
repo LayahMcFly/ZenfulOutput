@@ -14,7 +14,7 @@
 // Optional: add a secret named FDC_KEY (free key from fdc.nal.usda.gov/api-key-signup)
 // and the scanner also checks USDA FoodData Central for missing ingredient lists.
 
-const VERSION = '1.9.9';
+const VERSION = '1.9.10';
 
 // Add or remove stores here. Each must be a Shopify store (most brand websites are).
 const STORES = {
@@ -95,7 +95,7 @@ export default {
       if (u.pathname === '/etsy'){
         const q = (u.searchParams.get('q') || '').slice(0, 80).trim();
         if (!q) return json({error: 'Add a search, for example /etsy?q=100% cotton dress'}, 400);
-        const etype = u.searchParams.get('type') === 'food' ? 'food' : u.searchParams.get('type') === 'beauty' ? 'beauty' : u.searchParams.get('type') === 'bags' ? 'bags' : u.searchParams.get('type') === 'orgonite' ? 'orgonite' : 'cotton';
+        const etype = u.searchParams.get('type') === 'food' ? 'food' : u.searchParams.get('type') === 'beauty' ? 'beauty' : u.searchParams.get('type') === 'bags' ? 'bags' : u.searchParams.get('type') === 'orgonite' ? 'orgonite' : u.searchParams.get('type') === 'shop' ? 'shop' : 'cotton';
         if (!env.ETSY_KEY) return json({error: 'Etsy is not set up yet: add Worker secrets ETSY_KEY (your keystring) and ETSY_SECRET (your shared secret).'}, 501, 0);
         const ekey = env.ETSY_KEY.includes(':') ? env.ETSY_KEY : `${env.ETSY_KEY}:${env.ETSY_SECRET || ''}`;
         return json({items: await etsySearch(q, ekey, etype)}, 200, 21600);
@@ -265,6 +265,11 @@ async function etsySearch(q, key, type){
       const all = `${title} ${desc} ${(l.tags || []).join(' ')}`;
       out.push({...row, organic: /usda[- ]organic/i.test(all) ? 'USDA Organic' : /certified organic/i.test(all) ? 'Certified organic' : /\borganic\b/i.test(all) ? 'Organic (seller wording)' : '',
         nonGmo: /non[- ]?gmo/i.test(all) ? 'Non-GMO (seller claim)' : '', ing, ingSrc: ing ? (findIngredients(plainList(l.description)) ? 'Etsy listing' : 'Etsy listing (materials)') : '', desc: desc.slice(0, 400), barcode: ''});
+      continue;
+    }
+    if (type === 'shop'){
+      if (/\b(digital|printable|svg|png|pdf|download|template|instant download|pattern|tutorial|clipart|mockup)\b/i.test(`${title} ${row.ptype}`)) continue;
+      out.push({...row, material: (l.materials || []).map(String).filter(Boolean).slice(0, 8).join(', '), desc: desc.slice(0, 400)});
       continue;
     }
     if (type === 'orgonite'){
