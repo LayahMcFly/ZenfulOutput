@@ -21,7 +21,7 @@ document.body.appendChild(b);},3000);})();
 <meta property="og:url" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://layahmcfly.github.io/ZenfulOutput/purefinds/preview.png">
-<meta name="pf-version" content="1.18.58">
+<meta name="pf-version" content="1.18.60">
 <title>PureFinds · Organic food & natural-fabric finds</title>
 <meta name="description" content="Discover real organic foods, clothing that is 100% cotton, silk, wool or linen, and clean beauty, from real stores.">
 <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='16' fill='%23f8f3ea'/><circle cx='32' cy='32' r='23' fill='none' stroke='%23e9bdb8' stroke-width='1.5'/><path d='M20 44C20 29 30 19 45 18c1 15-8 26-23 27' fill='%238ea888'/><path d='M21 44c6-8 12-15 21-22' fill='none' stroke='%23f8f3ea' stroke-width='1.8' stroke-linecap='round'/><circle cx='46' cy='45' r='3' fill='%23c98682'/></svg>">
@@ -412,7 +412,7 @@ input,textarea,.field{caret-color:#56704f;animation:caretHue 5.3s steps(1,end) i
 
 <script>
 {
-const VERSION = '1.18.58';
+const VERSION = '1.18.60';
 const CHECKED = 'Nov 22, 2026';
 
 /* ---------- Direct sales (sold by PureFinds) ----------
@@ -1868,7 +1868,7 @@ function openItem(id){
        ${it.desc ? `<p style="margin:0">${esc(it.desc)}</p>` : ''}
        ${it.toyMat ? `<h3 style="font-size:22px">Toy material</h3><div class="ing">${esc(TOY_LABEL[it.toyMat] || 'Other')}${it.toyMat === 'plastic' ? ': the seller says BPA free' : ''}${it.material ? '. Materials listed: ' + esc(it.material) : ''}</div>` : ''}
       ${it.plush ? `<h3 style="font-size:22px">Fabric</h3><div class="ing">100% ${esc((it.material || '').toLowerCase())}: “${esc(it.fabric)}”</div><p class="meta" style="margin:0">Quoted from the seller’s listing. PureFinds keeps a plushie only when it names one natural fabric and no polyester, acrylic or other fiber.</p>` : it.material ? `<h3 style="font-size:22px">Materials the seller lists</h3><div class="ing">${esc(it.material)}</div>` : ''}
-       <p class="meta">${it.toyMat ? 'Toys: wood, metal and soft toys come first. Plastic is shown only when the seller says BPA free.' : it.plush ? 'Plushies follow the clothing rules.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s page.</p>
+       <p class="meta">${it.toyMat ? 'Toys: wood, metal and soft toys come first. Plastic is shown only when the seller says BPA free.' : it.plush ? 'Plushies follow the clothing rules.' : ((it.group === 'art' || it.group === 'kidsart') && FIBER_ITEM.test(it.name) && !FIBER_SKIP.test(it.name)) ? 'Fabric and yarn follow the clothing rules: one natural fiber only, never a blend.' : 'The Little Shop has looser rules: PureFinds doesn’t check materials here, except for plushies.'} Shipping and stock are on the seller’s page.</p>
        <div class="acts"><a class="btn go" href="${esc(it.url)}" target="_blank" rel="noopener">Buy Now at ${esc(it.store || 'Etsy')} ↗</a></div>
        <div class="acts"><button class="btn pk" data-fav="${esc(id)}" aria-pressed="${fv}">${fv ? '♥ Saved' : '♡ Save to favorites'}</button></div></div>`;
     lastFocus = document.activeElement; $('#scrim').classList.add('on'); $('#scrim').setAttribute('aria-hidden', 'false'); document.body.style.overflow = 'hidden'; $('#modal').querySelector('.x').focus(); return;
@@ -2286,7 +2286,7 @@ document.addEventListener('click', e => {
 /* ---------- The Little Shop: school things, art, dolls and random finds. Looser rules: real Etsy listings, no material check ---------- */
 const SHOP_GROUPS = [
   ['school', 'School supplies', 'Book bags, pencils, pens, rulers, notebooks, ink and printer supplies for worksheets, and other school things', [], '<path d="M8 36l4-4 20-20 4 4-20 20z"/><path d="M12 32l-2 6 6-2M30 14l4 4"/>', [
-    ['bags', 'Book bags', ['kids book bag', 'school backpack', 'canvas book bag', 'kids backpack', 'school bag leather', 'lunch bag school']],
+    ['bags', 'Book bags', ['kids book bag', 'school backpack', 'canvas backpack school', 'kids backpack', 'leather school satchel', 'lunch bag school', 'messenger book bag']],
     ['pencils', 'Pencils', ['wooden pencils', 'colored pencils school', 'pencil sharpener', 'erasers', 'mechanical pencil', 'pencil grips']],
     ['pens', 'Pens & markers', ['fountain pen', 'gel pens', 'markers kids', 'highlighters', 'ballpoint pen handmade', 'dry erase markers']],
     ['rulers', 'Rulers & math', ['wooden ruler', 'ruler set school', 'protractor compass set', 'geometry set', 'calculator', 'abacus']],
@@ -2332,8 +2332,21 @@ const CRAFT_NOT_SUPPLY = /\b(dress|dresses|shirts?|tees?|t-shirts?|blouses?|skir
 const CRAFT_SUPPLY = /\b(fabric|fabrics|yarn|yarns|skeins?|roving|felt sheets?|thread|fat quarters?|by the (yard|metre|meter)|batting|bolts?|remnants?|notions?|kits?|needles?|hooks?|supplies|supply|machines?|bobbins?|paint set|paints|brush(es)?|clay|dough|canvas|canvases|easels?|crayons?|beads?|loom|stitch markers?|serger|scissors|cardstock|craft paper|sketchbook|blank)\b/i;
 function shopSubFor(k, r){ const g = SHOP_GROUPS.find(x => x[0] === k), keys = g && g[5] ? g[5].map(x => x[0]) : []; const t = `${r.name} ${r.ptype || ''} ${(r.tags || []).join(' ')}`; const m = SHOP_SUB_WORDS.find(([sk, re]) => keys.includes(sk) && re.test(t)); return m ? m[0] : ''; }
 const CANVAS_FINISHED = /\b(wall art|print|prints|poster|framed|original painting|oil painting|acrylic painting|abstract|landscape|portrait|decor|tote|bag|pouch|sticker|phone|case|digital|svg|pdf|template|pattern|wrap|gallery wrap art|signed|for sale|hand[- ]painted|custom painting|painting on canvas)\b/i;
+// Fabric and yarn follow the clothing rules: one natural fiber only (cotton, wool, linen, silk, hemp...), so no blends and no synthetics
+const FIBER_NATURAL = /\b(cotton|wool|merino|linen|flax|silk|hemp|cashmere|alpaca|mohair|angora|pashmina)\b/gi, FIBER_OTHER = /\b(polyester|poly|nylon|acrylic|rayon|viscose|spandex|elastane|lycra|microfiber|polyamide|modal|tencel|lyocell|bamboo|metallic|lurex|synthetic|blend|blended|mixed fibers?)\b/i, FIBER_ITEM = /\b(yarns?|skeins?|fabrics?|roving|fat quarters?|by the (yard|metre|meter)|felt sheets?|batting)\b/i, FIBER_SKIP = /\b(kits?|patterns?|needles?|hooks?|machines?|bobbins?|scissors|notions)\b/i;
+function fiberPure(txt){
+  if (FIBER_OTHER.test(txt)) return false;
+  const pct = [...txt.matchAll(/(\d{1,3})\s*%/g)].map(m => +m[1]);
+  if (pct.some(n => n < 100)) return false;                       // any percentage under 100 means a blend
+  const found = new Set((txt.match(FIBER_NATURAL) || []).map(w => w.toLowerCase().replace(/^merino$|^pashmina$/, 'wool').replace(/^flax$/, 'linen')));
+  if (found.size > 1) return false;                                // two different fibers named
+  return found.size === 1;                                         // exactly one natural fiber, or nothing to verify (dropped)
+}
+const SCHOOL_BAG_NOT = /\b(tote|totes|purse|handbag|clutch|makeup|cosmetic|wallet|pouch|shopping|grocery|market bag|beach|diaper|duffel|duffle|crossbody|shoulder bag|fanny|belt bag|drawstring|bucket bag|hobo|laptop sleeve)\b/i, SCHOOL_BAG_OK = /\b(backpacks?|rucksack|book ?bags?|school ?bags?|satchel|messenger|lunch ?(bag|box)|bookbag)\b/i;
 function shopAccept(r, k, sub){
   if (!r.url || SHOP.some(x => x.url === r.url)) return;
+  if ((k === 'art' || k === 'kidsart') && (sub === 'fabric' || shopSubFor(k, r) === 'fabric' || FIBER_ITEM.test(r.name || '')) && !FIBER_SKIP.test(r.name || '') && !fiberPure(`${r.name} ${r.material || ''} ${r.fabric || ''} ${r.desc || ''} ${(r.tags || []).join(' ')}`)) return; // fabric and yarn: 100% one natural fiber only
+  if (k === 'school' && (sub === 'bags' || shopSubFor(k, r) === 'bags') && SCHOOL_BAG_NOT.test(r.name || '') && !SCHOOL_BAG_OK.test(r.name || '')) return; // book bags: no totes, purses or handbags
   if ((k === 'art' || k === 'kidsart') && /canvas|canvases/i.test(r.name || '') && CANVAS_FINISHED.test(`${r.name} ${r.ptype || ''}`)) return; // canvases are blank surfaces, not finished art
   // craft sections show supplies, not finished clothes, toys or jewelry: a listing that reads as a garment needs a supply word (fabric, yarn, kit, notions...) to stay
   if ((k === 'art' || k === 'kidsart') && CRAFT_NOT_SUPPLY.test(`${r.name} ${r.ptype || ''}`) && !CRAFT_SUPPLY.test(`${r.name} ${r.ptype || ''}`)) return;
